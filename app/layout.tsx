@@ -1,8 +1,3 @@
-export const metadata = {
-  title: "Hoodacity",
-  description: "Audacity in Every Algorythm",
-};
-
 export default function RootLayout({
   children,
 }: {

@@ -1,15 +1,15 @@
-import { openai } from "@ai-sdk/openai";
 import { streamText } from "ai";
+import { openai } from "@ai-sdk/openai";
 
 export async function POST(req: Request) {
   const { messages } = await req.json();
 
-  const result = streamText({
+  const result = await streamText({
     model: openai("gpt-4o"),
     system:
-      "do not respond on markdown or lists, keep your responses brief, you can ask the user to upload images or documents if it could help you understand the problem better",
+      "Respond concisely. No markdown. No lists. Keep it direct and human.",
     messages,
   });
 
-  return result.toDataStreamResponse();
+  return result.toTextStreamResponse();
 }

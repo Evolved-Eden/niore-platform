@@ -2,51 +2,58 @@
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const supabase = createClient();
+  const router = useRouter();
+
   const [email, setEmail] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [password, setPassword] = useState("");
 
   const handleLogin = async () => {
-    setLoading(true);
-
-    const { error } = await supabase.auth.signInWithOtp({
+    const { error } = await supabase.auth.signInWithPassword({
       email,
-      options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
-      },
+      password,
     });
-
-    setLoading(false);
 
     if (error) {
       alert(error.message);
-    } else {
-      alert("Check your email for the magic link ✨");
+      return;
     }
+
+    router.push("/dashboard");
+    router.refresh();
   };
 
   return (
-    <div className="flex h-screen items-center justify-center">
-      <div className="p-10 border rounded-lg w-[400px]">
-        <h1 className="text-2xl mb-6">Login</h1>
+    <div className="min-h-screen flex items-center justify-center bg-[#080810] text-white">
+      <div className="w-full max-w-sm space-y-4">
+        <h1 className="text-xl font-bold">Login</h1>
 
         <input
-          type="email"
+          className="w-full p-2 bg-black border border-white/10"
           placeholder="Email"
-          className="w-full p-2 border mb-4 text-black"
           onChange={(e) => setEmail(e.target.value)}
+        />
+
+        <input
+          type="password"
+          className="w-full p-2 bg-black border border-white/10"
+          placeholder="Password"
+          onChange={(e) => setPassword(e.target.value)}
         />
 
         <button
           onClick={handleLogin}
-          disabled={loading}
-          className="w-full p-2 bg-black text-white"
+          className="w-full p-2 bg-white text-black font-medium"
         >
-          {loading ? "Sending..." : "Send Magic Link"}
+          Login
         </button>
       </div>
     </div>
   );
+
+console.log("URL:", process.env.NEXT_PUBLIC_SUPABASE_URL);
+console.log("KEY:", process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 }

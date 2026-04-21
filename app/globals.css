@@ -1,26 +1,69 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --acid:     #c8ff00;
+  --cyan:     #00d4ff;
+  --violet:   #a78bfa;
+  --coral:    #ff6b6b;
+  --amber:    #fb923c;
+
+  --surface-0: #080810;
+  --surface-1: #0d0d1a;
+  --surface-2: #12121f;
+  --surface-3: #1a1a2e;
+
+  --border:   rgba(255,255,255,0.08);
+  --border-hover: rgba(255,255,255,0.15);
+
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-space);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+* { box-sizing: border-box; }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+html { scroll-behavior: smooth; }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  background: var(--surface-0);
+  color: #fff;
 }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+
+/* Utility classes */
+.font-display { font-family: var(--font-display); }
+.text-acid    { color: var(--acid); }
+.text-cyan    { color: var(--cyan); }
+.text-violet  { color: var(--violet); }
+.text-coral   { color: var(--coral); }
+
+.border-surface { border-color: var(--border); }
+
+.glass {
+  background: rgba(255,255,255,0.03);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+}
+
+.glow-acid  { box-shadow: 0 0 24px rgba(200,255,0,0.15); }
+.glow-cyan  { box-shadow: 0 0 24px rgba(0,212,255,0.15); }
+
+/* Animations */
+@keyframes pulse-slow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+.animate-pulse-slow { animation: pulse-slow 3s ease-in-out infinite; }
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in { animation: fade-in 0.4s ease forwards; }

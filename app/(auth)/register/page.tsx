@@ -2,49 +2,61 @@
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
   const supabase = createClient();
+  const router = useRouter();
+
   const [email, setEmail] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [password, setPassword] = useState("");
 
-  const handleRegister = async () => {
-    setLoading(true);
-
-    const { error } = await supabase.auth.signInWithOtp({
+  const handleSignup = async () => {
+    const { error, data } = await supabase.auth.signUp({
       email,
-      options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
-      },
+      password,
     });
-
-    setLoading(false);
 
     if (error) {
       alert(error.message);
-    } else {
-      alert("Check your email to complete signup ✨");
+      return;
     }
+
+    // create profile immediately
+    await fetch("/api/auth/onSignup", {
+      method: "POST",
+      body: JSON.stringify({
+        user_id: data.user?.id,
+        email,
+      }),
+    });
+
+    router.push("/onboarding");
   };
 
   return (
-    <div className="flex h-screen items-center justify-center">
-      <div className="p-10 border rounded-lg w-[400px]">
-        <h1 className="text-2xl mb-6">Create Account</h1>
+    <div className="min-h-screen flex items-center justify-center bg-[#080810] text-white">
+      <div className="w-full max-w-sm space-y-4">
+        <h1 className="text-xl font-bold">Create Account</h1>
 
         <input
-          type="email"
+          className="w-full p-2 bg-black border border-white/10"
           placeholder="Email"
-          className="w-full p-2 border mb-4 text-black"
           onChange={(e) => setEmail(e.target.value)}
         />
 
+        <input
+          type="password"
+          className="w-full p-2 bg-black border border-white/10"
+          placeholder="Password"
+          onChange={(e) => setPassword(e.target.value)}
+        />
+
         <button
-          onClick={handleRegister}
-          disabled={loading}
-          className="w-full p-2 bg-black text-white"
+          onClick={handleSignup}
+          className="w-full p-2 bg-white text-black font-medium"
         >
-          {loading ? "Creating..." : "Create Account"}
+          Register
         </button>
       </div>
     </div>

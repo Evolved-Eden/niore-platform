@@ -1,0 +1,612 @@
+[
+  {
+    "id": "21ef69ea-2639-4338-aff5-e0152da15907",
+    "key": "standard_intake_workflow",
+    "name": "Standard Tier Intake Workflow",
+    "description": "Complete intake workflow for standard tier clients",
+    "vertical_key": null,
+    "tier": "standard",
+    "workflow_type": "INTAKE",
+    "stages_json": [
+      {
+        "key": "identify_business",
+        "order": 1,
+        "title": "Business Identification",
+        "required": true
+      },
+      {
+        "key": "assess_maturity",
+        "order": 2,
+        "title": "Business Maturity",
+        "required": true
+      },
+      {
+        "key": "set_goals",
+        "order": 3,
+        "title": "Goals & Objectives",
+        "required": false
+      }
+    ],
+    "agent_assignments": {
+      "assigned_agents": [
+        "AGT-001"
+      ],
+      "escalation_agent": "AGT-003"
+    },
+    "swarms_json": [
+      "sales_realestate_swarm"
+    ],
+    "is_active": true,
+    "created_at": "2026-06-03T20:20:09.108Z",
+    "updated_at": "2026-06-03T20:20:09.108Z"
+  },
+  {
+    "id": "c05ffb5e-2a87-4ab5-8789-3d93ce50cb6f",
+    "key": "premium_intake_workflow",
+    "name": "Premium Tier Intake Workflow",
+    "description": "Complete intake workflow for premium tier clients",
+    "vertical_key": null,
+    "tier": "premium",
+    "workflow_type": "INTAKE",
+    "stages_json": [
+      {
+        "key": "identify_business",
+        "order": 1,
+        "title": "Business Identification",
+        "required": true
+      },
+      {
+        "key": "assess_maturity",
+        "order": 2,
+        "title": "Business Maturity",
+        "required": true
+      },
+      {
+        "key": "assess_tech",
+        "order": 3,
+        "title": "Technology Stack",
+        "required": true
+      },
+      {
+        "key": "set_goals",
+        "order": 4,
+        "title": "Goals & Objectives",
+        "required": true
+      }
+    ],
+    "agent_assignments": {
+      "assigned_agents": [
+        "AGT-001",
+        "AGT-002"
+      ],
+      "escalation_agent": "AGT-004"
+    },
+    "swarms_json": [
+      "sales_realestate_swarm",
+      "service_concierge_swarm"
+    ],
+    "is_active": true,
+    "created_at": "2026-06-03T20:20:09.108Z",
+    "updated_at": "2026-06-03T20:20:09.108Z"
+  },
+  {
+    "id": "8d4c9c0c-4e87-4dd4-ad27-c029ce7b24d4",
+    "key": "concierge_intake_workflow",
+    "name": "Concierge Tier Intake Workflow",
+    "description": "Complete intake workflow for concierge tier clients",
+    "vertical_key": null,
+    "tier": "concierge",
+    "workflow_type": "INTAKE",
+    "stages_json": [
+      {
+        "key": "identify_business",
+        "order": 1,
+        "title": "Business Identification",
+        "required": true
+      },
+      {
+        "key": "assess_maturity",
+        "order": 2,
+        "title": "Business Maturity",
+        "required": true
+      },
+      {
+        "key": "assess_experience",
+        "order": 3,
+        "title": "Client Experience",
+        "required": true
+      },
+      {
+        "key": "assess_tech",
+        "order": 4,
+        "title": "Technology Stack",
+        "required": true
+      },
+      {
+        "key": "assess_team",
+        "order": 5,
+        "title": "Team Structure",
+        "required": true
+      },
+      {
+        "key": "set_goals",
+        "order": 6,
+        "title": "Goals & Objectives",
+        "required": true
+      }
+    ],
+    "agent_assignments": {
+      "assigned_agents": [
+        "AGT-001",
+        "AGT-002",
+        "AGT-003"
+      ],
+      "escalation_agent": "AGT-005"
+    },
+    "swarms_json": [
+      "service_concierge_swarm",
+      "executive_ops_swarm"
+    ],
+    "is_active": true,
+    "created_at": "2026-06-03T20:20:09.108Z",
+    "updated_at": "2026-06-03T20:20:09.108Z"
+  },
+  {
+    "id": "054d546d-a6f9-4037-a89a-06ea90971964",
+    "key": "luxe_intake_workflow",
+    "name": "Luxe Tier Intake Workflow",
+    "description": "Complete intake workflow for luxe tier clients",
+    "vertical_key": null,
+    "tier": "luxe",
+    "workflow_type": "INTAKE",
+    "stages_json": [
+      {
+        "key": "identify_business",
+        "order": 1,
+        "title": "Business Identification",
+        "required": true
+      },
+      {
+        "key": "assess_maturity",
+        "order": 2,
+        "title": "Business Maturity",
+        "required": true
+      },
+      {
+        "key": "assess_revenue",
+        "order": 3,
+        "title": "Revenue Quality",
+        "required": true
+      },
+      {
+        "key": "assess_experience",
+        "order": 4,
+        "title": "Client Experience",
+        "required": true
+      },
+      {
+        "key": "assess_tech",
+        "order": 5,
+        "title": "Technology Stack",
+        "required": true
+      },
+      {
+        "key": "assess_team",
+        "order": 6,
+        "title": "Team Structure",
+        "required": true
+      },
+      {
+        "key": "assess_growth",
+        "order": 7,
+        "title": "Growth Strategy",
+        "required": true
+      },
+      {
+        "key": "assess_ai",
+        "order": 8,
+        "title": "AI Readiness",
+        "required": true
+      }
+    ],
+    "agent_assignments": {
+      "assigned_agents": [
+        "AGT-001",
+        "AGT-002",
+        "AGT-004",
+        "AGT-005"
+      ],
+      "escalation_agent": "AGT-400"
+    },
+    "swarms_json": [
+      "executive_ops_swarm",
+      "research_intelligence_swarm",
+      "financial_cfo_swarm"
+    ],
+    "is_active": true,
+    "created_at": "2026-06-03T20:20:09.108Z",
+    "updated_at": "2026-06-03T20:20:09.108Z"
+  },
+  {
+    "id": "4c9d4057-08f3-41cb-a51a-4ac36521e61e",
+    "key": "real_estate_assessment_workflow",
+    "name": "Real Estate Assessment Workflow",
+    "description": "Complete assessment workflow for real estate vertical",
+    "vertical_key": "real_estate",
+    "tier": null,
+    "workflow_type": "ASSESSMENT",
+    "stages_json": [
+      {
+        "key": "agent_profile",
+        "order": 1,
+        "title": "Agent Profile",
+        "required": true
+      },
+      {
+        "key": "portfolio",
+        "order": 2,
+        "title": "Portfolio & Listings",
+        "required": true
+      },
+      {
+        "key": "lead_generation",
+        "order": 3,
+        "title": "Lead Generation",
+        "required": true
+      },
+      {
+        "key": "client_management",
+        "order": 4,
+        "title": "Client Management",
+        "required": true
+      },
+      {
+        "key": "marketing_brand",
+        "order": 5,
+        "title": "Marketing & Brand",
+        "required": true
+      },
+      {
+        "key": "transactions",
+        "order": 6,
+        "title": "Transactions",
+        "required": false
+      },
+      {
+        "key": "technology",
+        "order": 7,
+        "title": "Technology",
+        "required": true
+      },
+      {
+        "key": "team_growth",
+        "order": 8,
+        "title": "Team & Growth",
+        "required": false
+      },
+      {
+        "key": "ai_readiness",
+        "order": 9,
+        "title": "AI Readiness",
+        "required": true
+      }
+    ],
+    "agent_assignments": {
+      "assigned_agents": [
+        "AGT-001",
+        "AGT-101"
+      ],
+      "escalation_agent": "AGT-004"
+    },
+    "swarms_json": [
+      "sales_realestate_swarm",
+      "creator_growth_swarm"
+    ],
+    "is_active": true,
+    "created_at": "2026-06-03T20:20:09.108Z",
+    "updated_at": "2026-06-03T20:20:09.108Z"
+  },
+  {
+    "id": "8fc49423-bf4f-48ae-8c74-902e9515377a",
+    "key": "hospitality_assessment_workflow",
+    "name": "Hospitality Assessment Workflow",
+    "description": "Complete assessment workflow for hospitality vertical",
+    "vertical_key": "hospitality",
+    "tier": null,
+    "workflow_type": "ASSESSMENT",
+    "stages_json": [
+      {
+        "key": "property_profile",
+        "order": 1,
+        "title": "Property Profile",
+        "required": true
+      },
+      {
+        "key": "guest_experience",
+        "order": 2,
+        "title": "Guest Experience",
+        "required": true
+      },
+      {
+        "key": "operations",
+        "order": 3,
+        "title": "Operations",
+        "required": true
+      },
+      {
+        "key": "revenue_management",
+        "order": 4,
+        "title": "Revenue Management",
+        "required": true
+      },
+      {
+        "key": "marketing_distribution",
+        "order": 5,
+        "title": "Marketing & Distribution",
+        "required": true
+      },
+      {
+        "key": "technology",
+        "order": 6,
+        "title": "Technology",
+        "required": true
+      },
+      {
+        "key": "growth_strategy",
+        "order": 7,
+        "title": "Growth Strategy",
+        "required": false
+      }
+    ],
+    "agent_assignments": {
+      "assigned_agents": [
+        "AGT-002",
+        "AGT-201"
+      ],
+      "escalation_agent": "AGT-004"
+    },
+    "swarms_json": [
+      "service_concierge_swarm",
+      "executive_ops_swarm"
+    ],
+    "is_active": true,
+    "created_at": "2026-06-03T20:20:09.108Z",
+    "updated_at": "2026-06-03T20:20:09.108Z"
+  },
+  {
+    "id": "6574035c-08c2-4257-adb2-fb2206945fae",
+    "key": "medspa_assessment_workflow",
+    "name": "Med Spa Assessment Workflow",
+    "description": "Complete assessment workflow for med spa vertical",
+    "vertical_key": "medspa",
+    "tier": null,
+    "workflow_type": "ASSESSMENT",
+    "stages_json": [
+      {
+        "key": "business_profile",
+        "order": 1,
+        "title": "Business Profile",
+        "required": true
+      },
+      {
+        "key": "services_offerings",
+        "order": 2,
+        "title": "Services & Offerings",
+        "required": true
+      },
+      {
+        "key": "client_experience",
+        "order": 3,
+        "title": "Client Experience",
+        "required": true
+      },
+      {
+        "key": "operations_workflow",
+        "order": 4,
+        "title": "Operations & Workflow",
+        "required": true
+      },
+      {
+        "key": "marketing_sales",
+        "order": 5,
+        "title": "Marketing & Sales",
+        "required": true
+      },
+      {
+        "key": "technology_stack",
+        "order": 6,
+        "title": "Technology Stack",
+        "required": true
+      },
+      {
+        "key": "team_staffing",
+        "order": 7,
+        "title": "Team & Staffing",
+        "required": true
+      },
+      {
+        "key": "compliance_safety",
+        "order": 8,
+        "title": "Compliance & Safety",
+        "required": true
+      },
+      {
+        "key": "growth_scaling",
+        "order": 9,
+        "title": "Growth & Scaling",
+        "required": false
+      }
+    ],
+    "agent_assignments": {
+      "assigned_agents": [
+        "AGT-003",
+        "AGT-301"
+      ],
+      "escalation_agent": "AGT-006"
+    },
+    "swarms_json": [
+      "service_concierge_swarm",
+      "health_wellness_swarm"
+    ],
+    "is_active": true,
+    "created_at": "2026-06-03T20:20:09.108Z",
+    "updated_at": "2026-06-03T20:20:09.108Z"
+  },
+  {
+    "id": "6b28c227-7f24-459b-af2c-d1af064889f6",
+    "key": "essence_generation_workflow",
+    "name": "Essence Generation Workflow",
+    "description": "Generate essence profile from assessment answers",
+    "vertical_key": null,
+    "tier": null,
+    "workflow_type": "ESSENCE_GENERATION",
+    "stages_json": [
+      {
+        "key": "collect_answers",
+        "order": 1,
+        "title": "Collect Assessment Answers",
+        "required": true
+      },
+      {
+        "key": "calculate_scores",
+        "order": 2,
+        "title": "Calculate Domain Scores",
+        "required": true
+      },
+      {
+        "key": "generate_insights",
+        "order": 3,
+        "title": "Generate Top Insights",
+        "required": true
+      },
+      {
+        "key": "recommend_agents",
+        "order": 4,
+        "title": "Recommend Agents & Swarms",
+        "required": true
+      },
+      {
+        "key": "build_essence",
+        "order": 5,
+        "title": "Build Essence JSON",
+        "required": true
+      }
+    ],
+    "agent_assignments": {
+      "assigned_agents": [
+        "AGT-004",
+        "AGT-005"
+      ],
+      "escalation_agent": "AGT-400"
+    },
+    "swarms_json": [
+      "research_intelligence_swarm"
+    ],
+    "is_active": true,
+    "created_at": "2026-06-03T20:20:09.108Z",
+    "updated_at": "2026-06-03T20:20:09.108Z"
+  },
+  {
+    "id": "9c16a6e1-19ae-43e0-9788-0c2f30f8e170",
+    "key": "ris_analysis_workflow",
+    "name": "RIS Analysis Workflow",
+    "description": "Analyze resonance intelligence signals",
+    "vertical_key": null,
+    "tier": null,
+    "workflow_type": "RIS_ANALYSIS",
+    "stages_json": [
+      {
+        "key": "collect_signals",
+        "order": 1,
+        "title": "Collect Signal Data",
+        "required": true
+      },
+      {
+        "key": "calculate_weights",
+        "order": 2,
+        "title": "Calculate Signal Weights",
+        "required": true
+      },
+      {
+        "key": "identify_risks",
+        "order": 3,
+        "title": "Identify Risk Patterns",
+        "required": true
+      },
+      {
+        "key": "generate_alerts",
+        "order": 4,
+        "title": "Generate Alerts",
+        "required": true
+      },
+      {
+        "key": "recommend_actions",
+        "order": 5,
+        "title": "Recommend Actions",
+        "required": true
+      }
+    ],
+    "agent_assignments": {
+      "assigned_agents": [
+        "AGT-004",
+        "AGT-005"
+      ],
+      "escalation_agent": "AGT-006"
+    },
+    "swarms_json": [
+      "research_intelligence_swarm",
+      "executive_ops_swarm"
+    ],
+    "is_active": true,
+    "created_at": "2026-06-03T20:20:09.108Z",
+    "updated_at": "2026-06-03T20:20:09.108Z"
+  },
+  {
+    "id": "5835c8a4-7f65-457b-beb4-bff1914b262d",
+    "key": "daily_briefing_workflow",
+    "name": "Daily Briefing Workflow",
+    "description": "Generate and deliver daily intelligence briefing",
+    "vertical_key": null,
+    "tier": null,
+    "workflow_type": "DAILY_BRIEFING",
+    "stages_json": [
+      {
+        "key": "aggregate_data",
+        "order": 1,
+        "title": "Aggregate Daily Data",
+        "required": true
+      },
+      {
+        "key": "generate_insights",
+        "order": 2,
+        "title": "Generate AI Insights",
+        "required": true
+      },
+      {
+        "key": "compile_sections",
+        "order": 3,
+        "title": "Compile Briefing Sections",
+        "required": true
+      },
+      {
+        "key": "schedule_delivery",
+        "order": 4,
+        "title": "Schedule Delivery",
+        "required": true
+      }
+    ],
+    "agent_assignments": {
+      "assigned_agents": [
+        "AGT-004",
+        "AGT-005"
+      ],
+      "escalation_agent": "AGT-004"
+    },
+    "swarms_json": [
+      "research_intelligence_swarm"
+    ],
+    "is_active": true,
+    "created_at": "2026-06-03T20:20:09.108Z",
+    "updated_at": "2026-06-03T20:20:09.108Z"
+  }
+]

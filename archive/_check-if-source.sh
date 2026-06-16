@@ -1,0 +1,1 @@
+sshpass -p "Shemeca2027#" ssh -o StrictHostKeyChecking=no root@148.230.86.150 docker exec --user root n8n sh -c "ls -la /usr/local/lib/node_modules/n8n/node_modules/n8n-nodes-base/dist/nodes/If/ 2>/dev/null; echo '---'; ls /usr/local/lib/node_modules/n8n/node_modules/n8n-nodes-base/dist/nodes/ 2>/dev/null | head -20"

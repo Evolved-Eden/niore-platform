@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { loadStripe } from '@stripe/stripe-js'
@@ -227,17 +227,18 @@ function UploadStep({ onNext, userId }: { onNext: () => void; userId: string }) 
     for (const file of files) {
       const path = `onboarding/${userId}/${Date.now()}_${file.name}`
       const { error } = await supabase.storage
-        .from('ris-uploads')
+        .from('onboarding')
         .upload(path, file)
 
       if (!error) {
         setUploaded(u => [...u, file.name])
-        // Log to ris_uploads table
-        await supabase.from('ris_uploads').insert({
-          user_id: userId,
-          file_name: file.name,
-          storage_path: path,
-          upload_type: 'onboarding',
+        // Log to knowledge_base
+        await supabase.from('knowledge_base').insert({
+          org_id: userId,
+          title: file.name,
+          content: `Onboarding upload: ${file.name}`,
+          source_type: 'onboarding_upload',
+          metadata: { storage_path: path, upload_type: 'onboarding' },
         })
       }
     }
@@ -334,14 +335,20 @@ function ScheduleStep({ onNext, userId, userName }: {
     }
     setSaving(true)
 
-    const { error } = await supabase.from('calendar_events').insert({
-      user_id: userId,
-      title: `Onboarding Consultation — ${userName}`,
-      event_type: 'onboarding_consult',
-      scheduled_date: selectedDate,
-      scheduled_time: selectedTime,
-      status: 'confirmed',
-      notes: 'Initial consultation booked during onboarding',
+    // Store as a notification log entry (calendar_events doesn't exist)
+    const { error } = await supabase.from('notification_logs').insert({
+      client_id: userId,
+      notification_type: 'consultation',
+      channel: 'email',
+      recipient: userId,
+      subject: `Onboarding Consultation — ${userName}`,
+      message: `Scheduled: ${selectedDate} at ${selectedTime}. Type: onboarding_consult`,
+      delivery_status: 'scheduled',
+      metadata: {
+        event_type: 'onboarding_consult',
+        scheduled_date: selectedDate,
+        scheduled_time: selectedTime,
+      },
     })
 
     if (error) {
@@ -465,17 +472,17 @@ function DoneStep({ userName, router }: { userName: string; router: ReturnType<t
       </div>
 
       <button
-        onClick={() => router.push('/dashboard')}
+        onClick={() => router.push('/blueprint/assess')}
         className="w-full py-4 bg-[#c8ff00] text-black font-bold rounded-sm hover:bg-white transition-colors"
       >
-        Enter Your Dashboard →
+        Run Your Blueprint Assessment →
       </button>
     </div>
   )
 }
 
 // ── MAIN ONBOARDING PAGE ──────────────────────────────────────
-export default function OnboardingPage() {
+function OnboardingContent() {
   const supabase = createClient()
   const router = useRouter()
   const params = useSearchParams()
@@ -484,39 +491,76 @@ export default function OnboardingPage() {
   const [clientSecret, setClientSecret] = useState<string | null>(null)
   const [paymentAmount, setPaymentAmount] = useState(0)
   const [paymentLabel, setPaymentLabel] = useState('')
+  const [paymentError, setPaymentError] = useState<string | null>(null)
+  const [initializing, setInitializing] = useState(true)
   const [user, setUser] = useState<{ id: string; email: string; name: string } | null>(null)
-  const [tier, setTier] = useState<string>('founder')
+  const [tier, setTier] = useState<string>('')
   const [suite, setSuite] = useState<string>('')
 
   useEffect(() => {
+    let cancelled = false
+
     async function init() {
+      setInitializing(true)
+      setPaymentError(null)
+
       const { data: { user: u } } = await supabase.auth.getUser()
       if (!u) { router.push('/login'); return }
+      if (cancelled) return
 
-      const { data: citizen } = await supabase
-        .from('ris_citizens')
-        .select('display_name, tier, suite')
-        .eq('supabase_user_id', u.id)
-        .maybeSingle()
+      // Poll for client record (race condition: onSignup may not have completed)
+      let client: { full_name: string | null; plan_tier_key: string | null; metadata?: Record<string, unknown> | null } | null = null
+      for (let attempt = 0; attempt < 5; attempt++) {
+        const { data } = await supabase
+          .from('clients')
+          .select('full_name, plan_tier_key, metadata')
+          .eq('id', u.id)
+          .maybeSingle()
+        if (data) {
+          client = data as { full_name: string | null; plan_tier_key: string | null; metadata?: Record<string, unknown> | null }
+          break
+        }
+        if (attempt < 4) await new Promise(r => setTimeout(r, 800 * (attempt + 1)))
+        if (cancelled) return
+      }
 
-      const t = citizen?.tier ?? params.get('tier') ?? 'founder'
-      const s = citizen?.suite ?? params.get('suite') ?? ''
+      if (cancelled) return
+
+      const requestedPlan = typeof client?.metadata?.requested_plan_tier_key === 'string'
+        ? client.metadata.requested_plan_tier_key
+        : null
+      const t = client?.plan_tier_key ?? requestedPlan ?? params.get('tier') ?? 'client_founder'
+      const s = params.get('suite') ?? ''
       setTier(t)
       setSuite(s)
-      setUser({ id: u.id, email: u.email!, name: citizen?.display_name ?? u.email!.split('@')[0] })
+      setUser({ id: u.id, email: u.email!, name: client?.full_name ?? u.email!.split('@')[0] })
 
       // Create payment intent
-      const res = await fetch('/api/stripe/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tier: t, suite: s, email: u.email, name: citizen?.display_name }),
-      })
-      const data = await res.json()
-      setClientSecret(data.clientSecret)
-      setPaymentAmount(data.amount)
-      setPaymentLabel(data.label)
+      try {
+        const res = await fetch('/api/stripe/checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ tier: t, suite: s, email: u.email, name: client?.full_name }),
+        })
+        if (cancelled) return
+
+        const data = await res.json()
+        if (!res.ok) {
+          setPaymentError(data.error ?? data.message ?? 'Failed to create payment')
+          setInitializing(false)
+          return
+        }
+        setClientSecret(data.clientSecret)
+        setPaymentAmount(data.amount)
+        setPaymentLabel(data.label)
+      } catch (err) {
+        if (!cancelled) setPaymentError('Network error creating payment. Check your connection.')
+      }
+      setInitializing(false)
     }
     init()
+
+    return () => { cancelled = true }
   }, [])
 
   const STEPS: { id: Step; label: string }[] = [
@@ -593,8 +637,29 @@ export default function OnboardingPage() {
           </Elements>
         )}
 
-        {step === 'payment' && !clientSecret && (
-          <div className="text-center text-white/30 text-sm py-20">Preparing your enrollment...</div>
+        {step === 'payment' && initializing && !paymentError && (
+          <div className="text-center py-20">
+            <div className="w-8 h-8 border-2 border-[#c8ff00] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <div className="text-white/30 text-sm">Preparing your enrollment...</div>
+          </div>
+        )}
+
+        {step === 'payment' && paymentError && (
+          <div className="max-w-md mx-auto text-center">
+            <div className="glass rounded-sm p-6 mb-6 border border-red-500/20">
+              <div className="text-red-400 text-sm mb-2">Payment setup failed</div>
+              <p className="text-white/40 text-xs mb-4">{paymentError}</p>
+              <button
+                onClick={() => window.location.reload()}
+                className="px-6 py-3 bg-[#c8ff00] text-black text-sm font-bold rounded-sm hover:bg-white transition-colors"
+              >
+                Try Again
+              </button>
+            </div>
+            <p className="text-xs text-white/20">
+              If the problem persists, contact support.
+            </p>
+          </div>
         )}
 
         {step === 'zuri' && user && (
@@ -618,5 +683,17 @@ export default function OnboardingPage() {
         )}
       </div>
     </div>
+  )
+}
+
+export default function OnboardingPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#080810] flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-[#c8ff00] border-t-transparent rounded-full animate-spin" />
+      </div>
+    }>
+      <OnboardingContent />
+    </Suspense>
   )
 }

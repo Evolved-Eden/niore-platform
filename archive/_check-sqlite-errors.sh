@@ -1,0 +1,1 @@
+sshpass -p "Shemeca2027#" ssh -o StrictHostKeyChecking=no root@148.230.86.150 docker exec --user root n8n sh -c "sqlite3 /home/node/.n8n/database.sqlite \"SELECT id, workflowId, status, finished, mode, json_extract(data, '$.resultData.error.message') as errmsg FROM execution_entity WHERE workflowId='38BbSqtBcMP6JggU' ORDER BY id DESC LIMIT 5;\""

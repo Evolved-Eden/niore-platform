@@ -1,5 +1,5 @@
 export const metadata = {
-  title: "Auth | Hoodacity",
+  title: "Auth | Evolved Eden",
 };
 
 export default function AuthLayout({

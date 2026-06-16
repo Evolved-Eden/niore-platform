@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { OpenAI } from 'openai'
 import { NextRequest, NextResponse } from 'next/server'
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY || '' })
 
 export async function POST(req: NextRequest) {
   const supabase = await createClient()
@@ -14,25 +14,26 @@ export async function POST(req: NextRequest) {
 
   const { messages, context } = await req.json()
 
-  // Fetch Zuri personality
-  const { data: personality } = await supabase
-    .from('zuri_personality')
+  // Fetch Zuri personality from canonical_agent_map
+  const { data: zuriAgent } = await supabase
+    .from('canonical_agent_map')
     .select('*')
+    .eq('slug', 'zuri')
     .single()
 
-  // Fetch recent memory for this user
+  // Fetch recent AI memories for this user
   const { data: memories } = await supabase
-    .from('zuri_memory')
+    .from('ai_memories')
     .select('content, memory_type')
-    .eq('user_id', user.id)
+    .eq('entity_id', user.id)
     .order('created_at', { ascending: false })
     .limit(10)
 
   const memoryContext = memories?.map(m => m.content).join('\n') ?? ''
 
-  const systemPrompt = `You are Zuri — the core intelligence of Hoodacity, an AI-powered ecosystem for building and deploying Registered Intelligence Systems (RIS).
+  const systemPrompt = `You are Zuri — the core intelligence of Evolved Eden, an AI-powered ecosystem for building and deploying Registered Intelligence Systems (RIS).
 
-${personality?.core_description ?? 'You are bold, strategic, and deeply knowledgeable about AI automation, business systems, and the OmniGrid ecosystem.'}
+You are bold, strategic, and deeply knowledgeable about AI automation, business systems, and the OmniGrid ecosystem.
 
 User context:
 ${context ?? 'No additional context provided.'}
@@ -54,11 +55,13 @@ Always respond in Zuri's voice: direct, confident, visionary. Never generic.`
 
   const reply = completion.choices[0].message.content
 
-  // Save to memory
-  await supabase.from('zuri_memory').insert({
-    user_id: user.id,
+  // Save to AI memory
+  await supabase.from('ai_memories').insert({
+    entity_id: user.id,
+    entity_type: 'user',
     content: `User asked: ${messages[messages.length - 1]?.content?.slice(0, 200)}`,
     memory_type: 'interaction',
+    title: `Zuri interaction - ${new Date().toISOString().split('T')[0]}`,
   })
 
   return NextResponse.json({ reply })

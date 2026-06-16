@@ -1,0 +1,89 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "default_agent": "general",
+  "instructions": ["AGENTS.md"],
+  "permission": {
+    "edit": "ask",
+    "bash": {
+      "*": "ask",
+      "git *": "allow",
+      "npm *": "allow",
+      "npx *": "allow",
+      "pnpm *": "allow"
+    }
+  },
+  "agent": {
+    "plan": {
+      "permission": {
+        "edit": "deny"
+      }
+    }
+  },
+  "plugin": [
+    "opencode-mem",
+    "opencode-agent-memory",
+    "opencode-agent-context",
+    "opencode-agent-skills",
+    "opencode-background",
+    "oh-my-opencode-slim",
+    "envsitter-guard"
+  ],
+  "mcp": {
+    // ── Discord & Social Media (enable when you have tokens) ──
+    "discord": {
+      "type": "local",
+      "command": ["bash", "-c", "DISCORD_TOKEN='${DISCORD_BOT_TOKEN}' exec npx -y @rayenking/discord-mcp"],
+      "enabled": true,
+      "description": "94 Discord tools — messaging, channels, roles, moderation, forums, webhooks"
+    },
+    "posteverywhere": {
+      "type": "local",
+      "command": ["npx", "-y", "@posteverywhere/mcp"],
+      "env": {
+        "POST_EVERYWHERE_API_KEY": "${POST_EVERYWHERE_API_KEY}"
+      },
+      "enabled": false,
+      "description": "Schedule & publish to Instagram, TikTok, YouTube, LinkedIn, Facebook, X, Threads, Pinterest"
+    },
+    "composio": {
+      "type": "remote",
+      "url": "https://connect.composio.dev/mcp",
+      "enabled": false,
+      "description": "Single MCP endpoint for 1000+ apps (Discord, Slack, GitHub, Jira, social media, etc.)"
+    },
+    "n8n": {
+      "type": "remote",
+      "url": "https://automation.evolvededen.com/mcp-server/http",
+      "headers": {
+        "Authorization": "Bearer ${N8N_MCP_TOKEN}"
+      },
+      "enabled": true,
+      "description": "n8n workflow automation — bridge dashboard events to Discord, social media, etc. (production)"
+    },
+    "github": {
+      "type": "local",
+      "command": ["npx", "-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_TOKEN": "${GITHUB_TOKEN}"
+      },
+      "enabled": true
+    },
+    "supabase": {
+      "type": "local",
+      "command": ["npx", "-y", "@supabase/mcp-server-supabase"],
+      "env": {
+        "SUPABASE_URL": "${SUPABASE_URL}",
+        "SUPABASE_SERVICE_ROLE_KEY": "${SUPABASE_SERVICE_ROLE_KEY}"
+      },
+      "enabled": true
+    },
+    "stripe": {
+      "type": "local",
+      "command": ["npx", "-y", "stripe-mcp"],
+      "env": {
+        "STRIPE_SECRET_KEY": "${STRIPE_SECRET_KEY}"
+      },
+      "enabled": true
+    }
+  }
+}

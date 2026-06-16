@@ -1,0 +1,3426 @@
+[
+  {
+    "agent_id": "AGT-001",
+    "agent_name": "Executive Twin",
+    "vertical": "core",
+    "role_type": "CORE",
+    "avatar": "eden",
+    "archetype_id": "ARC-001"
+  },
+  {
+    "agent_id": "AGT-002",
+    "agent_name": "Communication Sovereign",
+    "vertical": "core",
+    "role_type": "CORE",
+    "avatar": "eden",
+    "archetype_id": "ARC-002"
+  },
+  {
+    "agent_id": "AGT-003",
+    "agent_name": "Time Architecture Agent",
+    "vertical": "core",
+    "role_type": "CORE",
+    "avatar": "eden",
+    "archetype_id": "ARC-003"
+  },
+  {
+    "agent_id": "AGT-004",
+    "agent_name": "Operations Command Agent",
+    "vertical": "core",
+    "role_type": "CORE",
+    "avatar": "eden",
+    "archetype_id": "ARC-004"
+  },
+  {
+    "agent_id": "AGT-005",
+    "agent_name": "Revenue Intelligence Agent",
+    "vertical": "core",
+    "role_type": "CORE",
+    "avatar": "eden",
+    "archetype_id": "ARC-005"
+  },
+  {
+    "agent_id": "AGT-006",
+    "agent_name": "Identity Architect Agent",
+    "vertical": "core",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-015"
+  },
+  {
+    "agent_id": "AGT-007",
+    "agent_name": "Blueprint Strategist Agent",
+    "vertical": "core",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-016"
+  },
+  {
+    "agent_id": "AGT-008",
+    "agent_name": "Governance Intelligence Agent",
+    "vertical": "core",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-017"
+  },
+  {
+    "agent_id": "AGT-009",
+    "agent_name": "Luxury Acquisition Agent",
+    "vertical": "real_estate",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-018"
+  },
+  {
+    "agent_id": "AGT-010",
+    "agent_name": "Client Experience Agent",
+    "vertical": "real_estate",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-019"
+  },
+  {
+    "agent_id": "AGT-011",
+    "agent_name": "Showing Optimization Agent",
+    "vertical": "real_estate",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-020"
+  },
+  {
+    "agent_id": "AGT-012",
+    "agent_name": "Real Estate Transaction Agent",
+    "vertical": "real_estate",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-021"
+  },
+  {
+    "agent_id": "AGT-013",
+    "agent_name": "Real Estate Market Agent",
+    "vertical": "real_estate",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-022"
+  },
+  {
+    "agent_id": "AGT-014",
+    "agent_name": "Property Management Agent",
+    "vertical": "real_estate",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-023"
+  },
+  {
+    "agent_id": "AGT-015",
+    "agent_name": "Real Estate Legal Agent",
+    "vertical": "real_estate",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-024"
+  },
+  {
+    "agent_id": "AGT-016",
+    "agent_name": "Real Estate Investment Agent",
+    "vertical": "real_estate",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-025"
+  },
+  {
+    "agent_id": "AGT-017",
+    "agent_name": "Real Estate Development Agent",
+    "vertical": "real_estate",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-026"
+  },
+  {
+    "agent_id": "AGT-018",
+    "agent_name": "Social Services Intake Agent",
+    "vertical": "social_services",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-027"
+  },
+  {
+    "agent_id": "AGT-019",
+    "agent_name": "Food Assistance Agent",
+    "vertical": "social_services",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-028"
+  },
+  {
+    "agent_id": "AGT-020",
+    "agent_name": "Housing Assistance Agent",
+    "vertical": "social_services",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-029"
+  },
+  {
+    "agent_id": "AGT-021",
+    "agent_name": "Child Protective Services Agent",
+    "vertical": "social_services",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-030"
+  },
+  {
+    "agent_id": "AGT-022",
+    "agent_name": "Disability Services Agent",
+    "vertical": "social_services",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-031"
+  },
+  {
+    "agent_id": "AGT-023",
+    "agent_name": "Senior Services Agent",
+    "vertical": "social_services",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-032"
+  },
+  {
+    "agent_id": "AGT-024",
+    "agent_name": "Community Outreach Agent",
+    "vertical": "social_services",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-033"
+  },
+  {
+    "agent_id": "AGT-025",
+    "agent_name": "Health Optimization Agent",
+    "vertical": "health",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-034"
+  },
+  {
+    "agent_id": "AGT-026",
+    "agent_name": "Telemedicine Agent",
+    "vertical": "health",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-035"
+  },
+  {
+    "agent_id": "AGT-027",
+    "agent_name": "Nutrition Agent",
+    "vertical": "health",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-036"
+  },
+  {
+    "agent_id": "AGT-028",
+    "agent_name": "Fitness Agent",
+    "vertical": "health",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-037"
+  },
+  {
+    "agent_id": "AGT-029",
+    "agent_name": "Chronic Disease Agent",
+    "vertical": "health",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-038"
+  },
+  {
+    "agent_id": "AGT-030",
+    "agent_name": "Mental Wellness Agent",
+    "vertical": "health",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-039"
+  },
+  {
+    "agent_id": "AGT-031",
+    "agent_name": "Preventive Care Agent",
+    "vertical": "health",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-040"
+  },
+  {
+    "agent_id": "AGT-032",
+    "agent_name": "Health Insurance Agent",
+    "vertical": "health",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-041"
+  },
+  {
+    "agent_id": "AGT-033",
+    "agent_name": "Executive Front Desk",
+    "vertical": "corporate",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-042"
+  },
+  {
+    "agent_id": "AGT-034",
+    "agent_name": "Corporate Strategy Agent",
+    "vertical": "corporate",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-043"
+  },
+  {
+    "agent_id": "AGT-035",
+    "agent_name": "HR Agent",
+    "vertical": "corporate",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-044"
+  },
+  {
+    "agent_id": "AGT-036",
+    "agent_name": "Corporate Finance Agent",
+    "vertical": "corporate",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-045"
+  },
+  {
+    "agent_id": "AGT-037",
+    "agent_name": "Corporate Legal Agent",
+    "vertical": "corporate",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-046"
+  },
+  {
+    "agent_id": "AGT-038",
+    "agent_name": "Corporate Communications Agent",
+    "vertical": "corporate",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-047"
+  },
+  {
+    "agent_id": "AGT-039",
+    "agent_name": "Corporate IT Agent",
+    "vertical": "corporate",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-048"
+  },
+  {
+    "agent_id": "AGT-040",
+    "agent_name": "Corporate Procurement Agent",
+    "vertical": "corporate",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-049"
+  },
+  {
+    "agent_id": "AGT-041",
+    "agent_name": "Luxury Brand Agent",
+    "vertical": "luxury",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-050"
+  },
+  {
+    "agent_id": "AGT-042",
+    "agent_name": "Luxury Concierge Agent",
+    "vertical": "luxury",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-051"
+  },
+  {
+    "agent_id": "AGT-043",
+    "agent_name": "Luxury Goods Agent",
+    "vertical": "luxury",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-052"
+  },
+  {
+    "agent_id": "AGT-044",
+    "agent_name": "Luxury Travel Agent",
+    "vertical": "luxury",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-053"
+  },
+  {
+    "agent_id": "AGT-045",
+    "agent_name": "Luxury Events Agent",
+    "vertical": "luxury",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-054"
+  },
+  {
+    "agent_id": "AGT-046",
+    "agent_name": "Luxury Real Estate Agent",
+    "vertical": "luxury",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-055"
+  },
+  {
+    "agent_id": "AGT-047",
+    "agent_name": "Luxury Automotive Agent",
+    "vertical": "luxury",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-056"
+  },
+  {
+    "agent_id": "AGT-048",
+    "agent_name": "Luxury Investment Agent",
+    "vertical": "luxury",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-057"
+  },
+  {
+    "agent_id": "AGT-049",
+    "agent_name": "Athlete Brand Agent",
+    "vertical": "sports",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-058"
+  },
+  {
+    "agent_id": "AGT-050",
+    "agent_name": "Sports Performance Agent",
+    "vertical": "sports",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-059"
+  },
+  {
+    "agent_id": "AGT-051",
+    "agent_name": "Sports Contract Agent",
+    "vertical": "sports",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-060"
+  },
+  {
+    "agent_id": "AGT-052",
+    "agent_name": "Sports Media Agent",
+    "vertical": "sports",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-061"
+  },
+  {
+    "agent_id": "AGT-053",
+    "agent_name": "Sports Health Agent",
+    "vertical": "sports",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-062"
+  },
+  {
+    "agent_id": "AGT-054",
+    "agent_name": "Sports Analytics Agent",
+    "vertical": "sports",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-063"
+  },
+  {
+    "agent_id": "AGT-055",
+    "agent_name": "Product-Market Fit Agent",
+    "vertical": "tech",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-064"
+  },
+  {
+    "agent_id": "AGT-056",
+    "agent_name": "Tech Operations Agent",
+    "vertical": "tech",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-065"
+  },
+  {
+    "agent_id": "AGT-057",
+    "agent_name": "Tech Revenue Agent",
+    "vertical": "tech",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-066"
+  },
+  {
+    "agent_id": "AGT-058",
+    "agent_name": "Tech Talent Agent",
+    "vertical": "tech",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-067"
+  },
+  {
+    "agent_id": "AGT-059",
+    "agent_name": "Tech IP Agent",
+    "vertical": "tech",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-068"
+  },
+  {
+    "agent_id": "AGT-060",
+    "agent_name": "Tech Compliance Agent",
+    "vertical": "tech",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-069"
+  },
+  {
+    "agent_id": "AGT-061",
+    "agent_name": "Civic Infrastructure Agent",
+    "vertical": "government",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-070"
+  },
+  {
+    "agent_id": "AGT-062",
+    "agent_name": "Government Policy Agent",
+    "vertical": "government",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-071"
+  },
+  {
+    "agent_id": "AGT-063",
+    "agent_name": "Government Services Agent",
+    "vertical": "government",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-072"
+  },
+  {
+    "agent_id": "AGT-064",
+    "agent_name": "Government Budget Agent",
+    "vertical": "government",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-073"
+  },
+  {
+    "agent_id": "AGT-065",
+    "agent_name": "Government Transparency Agent",
+    "vertical": "government",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-074"
+  },
+  {
+    "agent_id": "AGT-066",
+    "agent_name": "Government Digital Agent",
+    "vertical": "government",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-075"
+  },
+  {
+    "agent_id": "AGT-067",
+    "agent_name": "Creator Identity Agent",
+    "vertical": "creator",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-076"
+  },
+  {
+    "agent_id": "AGT-068",
+    "agent_name": "Creator Content Agent",
+    "vertical": "creator",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-077"
+  },
+  {
+    "agent_id": "AGT-069",
+    "agent_name": "Creator Monetization Agent",
+    "vertical": "creator",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-078"
+  },
+  {
+    "agent_id": "AGT-070",
+    "agent_name": "Creator Community Agent",
+    "vertical": "creator",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-079"
+  },
+  {
+    "agent_id": "AGT-071",
+    "agent_name": "Creator Analytics Agent",
+    "vertical": "creator",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-080"
+  },
+  {
+    "agent_id": "AGT-072",
+    "agent_name": "Creator Legal Agent",
+    "vertical": "creator",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-081"
+  },
+  {
+    "agent_id": "AGT-073",
+    "agent_name": "Legacy Estate Agent",
+    "vertical": "legacy",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-082"
+  },
+  {
+    "agent_id": "AGT-074",
+    "agent_name": "Legacy Trust Agent",
+    "vertical": "legacy",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-083"
+  },
+  {
+    "agent_id": "AGT-075",
+    "agent_name": "Legacy Philanthropy Agent",
+    "vertical": "legacy",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-084"
+  },
+  {
+    "agent_id": "AGT-076",
+    "agent_name": "Legacy Inheritance Agent",
+    "vertical": "legacy",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-085"
+  },
+  {
+    "agent_id": "AGT-077",
+    "agent_name": "Legacy Planning Agent",
+    "vertical": "legacy",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-086"
+  },
+  {
+    "agent_id": "AGT-078",
+    "agent_name": "Legacy Family Office Agent",
+    "vertical": "legacy",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-087"
+  },
+  {
+    "agent_id": "AGT-079",
+    "agent_name": "Beauty Brand Agent",
+    "vertical": "beauty",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-088"
+  },
+  {
+    "agent_id": "AGT-080",
+    "agent_name": "Beauty Product Agent",
+    "vertical": "beauty",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-089"
+  },
+  {
+    "agent_id": "AGT-081",
+    "agent_name": "Beauty Salon Agent",
+    "vertical": "beauty",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-090"
+  },
+  {
+    "agent_id": "AGT-082",
+    "agent_name": "Beauty Supply Chain Agent",
+    "vertical": "beauty",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-091"
+  },
+  {
+    "agent_id": "AGT-083",
+    "agent_name": "Beauty Trends Agent",
+    "vertical": "beauty",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-092"
+  },
+  {
+    "agent_id": "AGT-084",
+    "agent_name": "Beauty Wellness Agent",
+    "vertical": "beauty",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-093"
+  },
+  {
+    "agent_id": "AGT-085",
+    "agent_name": "Travel Concierge Agent",
+    "vertical": "travel",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-094"
+  },
+  {
+    "agent_id": "AGT-086",
+    "agent_name": "Travel Booking Agent",
+    "vertical": "travel",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-095"
+  },
+  {
+    "agent_id": "AGT-087",
+    "agent_name": "Travel Experience Agent",
+    "vertical": "travel",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-096"
+  },
+  {
+    "agent_id": "AGT-088",
+    "agent_name": "Travel Safety Agent",
+    "vertical": "travel",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-097"
+  },
+  {
+    "agent_id": "AGT-089",
+    "agent_name": "Travel Logistics Agent",
+    "vertical": "travel",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-098"
+  },
+  {
+    "agent_id": "AGT-090",
+    "agent_name": "Travel Sustainability Agent",
+    "vertical": "travel",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-099"
+  },
+  {
+    "agent_id": "AGT-091",
+    "agent_name": "Legal Practice Agent",
+    "vertical": "legal",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-010"
+  },
+  {
+    "agent_id": "AGT-092",
+    "agent_name": "Legal Contract Agent",
+    "vertical": "legal",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-011"
+  },
+  {
+    "agent_id": "AGT-093",
+    "agent_name": "Legal Discovery Agent",
+    "vertical": "legal",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-012"
+  },
+  {
+    "agent_id": "AGT-094",
+    "agent_name": "Legal Compliance Agent",
+    "vertical": "legal",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-013"
+  },
+  {
+    "agent_id": "AGT-095",
+    "agent_name": "Legal Litigation Agent",
+    "vertical": "legal",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-014"
+  },
+  {
+    "agent_id": "AGT-096",
+    "agent_name": "Legal Mediation Agent",
+    "vertical": "legal",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-015"
+  },
+  {
+    "agent_id": "AGT-097",
+    "agent_name": "Media Production Agent",
+    "vertical": "media",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-016"
+  },
+  {
+    "agent_id": "AGT-098",
+    "agent_name": "Media Distribution Agent",
+    "vertical": "media",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-017"
+  },
+  {
+    "agent_id": "AGT-099",
+    "agent_name": "Media Rights Agent",
+    "vertical": "media",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-018"
+  },
+  {
+    "agent_id": "AGT-100",
+    "agent_name": "Media Analytics Agent",
+    "vertical": "media",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-019"
+  },
+  {
+    "agent_id": "AGT-101",
+    "agent_name": "Media Branding Agent",
+    "vertical": "media",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-020"
+  },
+  {
+    "agent_id": "AGT-102",
+    "agent_name": "Media Compliance Agent",
+    "vertical": "media",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-021"
+  },
+  {
+    "agent_id": "AGT-103",
+    "agent_name": "Food Recipe Agent",
+    "vertical": "food",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-022"
+  },
+  {
+    "agent_id": "AGT-104",
+    "agent_name": "Food Nutrition Agent",
+    "vertical": "food",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-023"
+  },
+  {
+    "agent_id": "AGT-105",
+    "agent_name": "Food Supply Chain Agent",
+    "vertical": "food",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-024"
+  },
+  {
+    "agent_id": "AGT-106",
+    "agent_name": "Food Safety Agent",
+    "vertical": "food",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-025"
+  },
+  {
+    "agent_id": "AGT-107",
+    "agent_name": "Food Trends Agent",
+    "vertical": "food",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-026"
+  },
+  {
+    "agent_id": "AGT-108",
+    "agent_name": "Food Commerce Agent",
+    "vertical": "food",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-027"
+  },
+  {
+    "agent_id": "AGT-109",
+    "agent_name": "Events Planning Agent",
+    "vertical": "events",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-028"
+  },
+  {
+    "agent_id": "AGT-110",
+    "agent_name": "Events Operations Agent",
+    "vertical": "events",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-029"
+  },
+  {
+    "agent_id": "AGT-111",
+    "agent_name": "Events Logistics Agent",
+    "vertical": "events",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-030"
+  },
+  {
+    "agent_id": "AGT-112",
+    "agent_name": "Events Marketing Agent",
+    "vertical": "events",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-031"
+  },
+  {
+    "agent_id": "AGT-113",
+    "agent_name": "Events Compliance Agent",
+    "vertical": "events",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-032"
+  },
+  {
+    "agent_id": "AGT-114",
+    "agent_name": "Events Revenue Agent",
+    "vertical": "events",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-033"
+  },
+  {
+    "agent_id": "AGT-115",
+    "agent_name": "AI Workflow Agent",
+    "vertical": "ai",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-034"
+  },
+  {
+    "agent_id": "AGT-116",
+    "agent_name": "AI Model Agent",
+    "vertical": "ai",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-035"
+  },
+  {
+    "agent_id": "AGT-117",
+    "agent_name": "AI Data Agent",
+    "vertical": "ai",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-036"
+  },
+  {
+    "agent_id": "AGT-118",
+    "agent_name": "AI Ethics Agent",
+    "vertical": "ai",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-037"
+  },
+  {
+    "agent_id": "AGT-119",
+    "agent_name": "AI Deployment Agent",
+    "vertical": "ai",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-038"
+  },
+  {
+    "agent_id": "AGT-120",
+    "agent_name": "AI Integration Agent",
+    "vertical": "ai",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-039"
+  },
+  {
+    "agent_id": "AGT-121",
+    "agent_name": "Offer Architecture Agent",
+    "vertical": "commerce",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-040"
+  },
+  {
+    "agent_id": "AGT-122",
+    "agent_name": "Commerce Checkout Agent",
+    "vertical": "commerce",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-041"
+  },
+  {
+    "agent_id": "AGT-123",
+    "agent_name": "Commerce Fulfillment Agent",
+    "vertical": "commerce",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-042"
+  },
+  {
+    "agent_id": "AGT-124",
+    "agent_name": "Commerce Pricing Agent",
+    "vertical": "commerce",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-043"
+  },
+  {
+    "agent_id": "AGT-125",
+    "agent_name": "Commerce Analytics Agent",
+    "vertical": "commerce",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-044"
+  },
+  {
+    "agent_id": "AGT-126",
+    "agent_name": "Commerce Compliance Agent",
+    "vertical": "commerce",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-045"
+  },
+  {
+    "agent_id": "AGT-127",
+    "agent_name": "Curriculum Agent",
+    "vertical": "education",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-046"
+  },
+  {
+    "agent_id": "AGT-128",
+    "agent_name": "Education Delivery Agent",
+    "vertical": "education",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-047"
+  },
+  {
+    "agent_id": "AGT-129",
+    "agent_name": "Education Assessment Agent",
+    "vertical": "education",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-048"
+  },
+  {
+    "agent_id": "AGT-130",
+    "agent_name": "Education Technology Agent",
+    "vertical": "education",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-049"
+  },
+  {
+    "agent_id": "AGT-131",
+    "agent_name": "Education Compliance Agent",
+    "vertical": "education",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-050"
+  },
+  {
+    "agent_id": "AGT-132",
+    "agent_name": "Education Funding Agent",
+    "vertical": "education",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-051"
+  },
+  {
+    "agent_id": "AGT-133",
+    "agent_name": "Deal Sourcing Agent",
+    "vertical": "finance",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-052"
+  },
+  {
+    "agent_id": "AGT-134",
+    "agent_name": "Finance Modeling Agent",
+    "vertical": "finance",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-053"
+  },
+  {
+    "agent_id": "AGT-135",
+    "agent_name": "Finance Due Diligence Agent",
+    "vertical": "finance",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-054"
+  },
+  {
+    "agent_id": "AGT-136",
+    "agent_name": "Finance Compliance Agent",
+    "vertical": "finance",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-055"
+  },
+  {
+    "agent_id": "AGT-137",
+    "agent_name": "Finance Portfolio Agent",
+    "vertical": "finance",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-056"
+  },
+  {
+    "agent_id": "AGT-138",
+    "agent_name": "Finance Risk Agent",
+    "vertical": "finance",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-057"
+  },
+  {
+    "agent_id": "AGT-139",
+    "agent_name": "Wealth Architecture Agent",
+    "vertical": "wealth",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-058"
+  },
+  {
+    "agent_id": "AGT-140",
+    "agent_name": "Wealth Planning Agent",
+    "vertical": "wealth",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-059"
+  },
+  {
+    "agent_id": "AGT-141",
+    "agent_name": "Wealth Investment Agent",
+    "vertical": "wealth",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-060"
+  },
+  {
+    "agent_id": "AGT-142",
+    "agent_name": "Wealth Tax Agent",
+    "vertical": "wealth",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-061"
+  },
+  {
+    "agent_id": "AGT-143",
+    "agent_name": "Wealth Protection Agent",
+    "vertical": "wealth",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-062"
+  },
+  {
+    "agent_id": "AGT-144",
+    "agent_name": "Wealth Legacy Agent",
+    "vertical": "wealth",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-063"
+  },
+  {
+    "agent_id": "AGT-145",
+    "agent_name": "Corporate M&A Agent",
+    "vertical": "corporate_extended",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-064"
+  },
+  {
+    "agent_id": "AGT-146",
+    "agent_name": "Corporate Restructuring Agent",
+    "vertical": "corporate_extended",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-065"
+  },
+  {
+    "agent_id": "AGT-147",
+    "agent_name": "Corporate Governance Agent",
+    "vertical": "corporate_extended",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-066"
+  },
+  {
+    "agent_id": "AGT-148",
+    "agent_name": "Corporate Risk Agent",
+    "vertical": "corporate_extended",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-067"
+  },
+  {
+    "agent_id": "AGT-149",
+    "agent_name": "Corporate Culture Agent",
+    "vertical": "corporate_extended",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-068"
+  },
+  {
+    "agent_id": "AGT-150",
+    "agent_name": "Corporate Sustainability Agent",
+    "vertical": "corporate_extended",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-069"
+  },
+  {
+    "agent_id": "AGT-151",
+    "agent_name": "Real Estate Valuation Agent",
+    "vertical": "real_estate",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-070"
+  },
+  {
+    "agent_id": "AGT-152",
+    "agent_name": "Real Estate Closing Agent",
+    "vertical": "real_estate",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-071"
+  },
+  {
+    "agent_id": "AGT-153",
+    "agent_name": "Social Services Volunteer Agent",
+    "vertical": "social_services",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-072"
+  },
+  {
+    "agent_id": "AGT-154",
+    "agent_name": "Sports Sponsorship Agent",
+    "vertical": "sports",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-073"
+  },
+  {
+    "agent_id": "AGT-155",
+    "agent_name": "Tech Security Agent",
+    "vertical": "tech",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-074"
+  },
+  {
+    "agent_id": "AGT-156",
+    "agent_name": "Tech Scaling Agent",
+    "vertical": "tech",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-075"
+  },
+  {
+    "agent_id": "AGT-157",
+    "agent_name": "Government Procurement Agent",
+    "vertical": "government",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-076"
+  },
+  {
+    "agent_id": "AGT-158",
+    "agent_name": "Government Compliance Agent",
+    "vertical": "government",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-077"
+  },
+  {
+    "agent_id": "AGT-159",
+    "agent_name": "Social Services Case Agent",
+    "vertical": "social_services",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-078"
+  },
+  {
+    "agent_id": "AGT-160",
+    "agent_name": "Social Services Crisis Agent",
+    "vertical": "social_services",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-079"
+  },
+  {
+    "agent_id": "AGT-161",
+    "agent_name": "Creator Monetization Agent (Ext)",
+    "vertical": "creator",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-080"
+  },
+  {
+    "agent_id": "AGT-162",
+    "agent_name": "Creator Analytics Agent (Ext)",
+    "vertical": "creator",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-081"
+  },
+  {
+    "agent_id": "AGT-163",
+    "agent_name": "Legacy Wealth Transfer Agent",
+    "vertical": "legacy",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-082"
+  },
+  {
+    "agent_id": "AGT-164",
+    "agent_name": "Legacy Trust Agent (Ext)",
+    "vertical": "legacy",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-083"
+  },
+  {
+    "agent_id": "AGT-165",
+    "agent_name": "Beauty Product Testing Agent",
+    "vertical": "beauty",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-084"
+  },
+  {
+    "agent_id": "AGT-166",
+    "agent_name": "Beauty Supply Chain (Ext)",
+    "vertical": "beauty",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-085"
+  },
+  {
+    "agent_id": "AGT-167",
+    "agent_name": "Travel Insurance Agent",
+    "vertical": "travel",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-086"
+  },
+  {
+    "agent_id": "AGT-168",
+    "agent_name": "Travel Concierge (Ext)",
+    "vertical": "travel",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-087"
+  },
+  {
+    "agent_id": "AGT-169",
+    "agent_name": "Legal Contract Review Agent",
+    "vertical": "legal",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-088"
+  },
+  {
+    "agent_id": "AGT-170",
+    "agent_name": "Legal Discovery Agent (Ext)",
+    "vertical": "legal",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-089"
+  },
+  {
+    "agent_id": "AGT-171",
+    "agent_name": "Media Rights Agent (Ext)",
+    "vertical": "media",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-090"
+  },
+  {
+    "agent_id": "AGT-172",
+    "agent_name": "Media Distribution Agent (Ext)",
+    "vertical": "media",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-091"
+  },
+  {
+    "agent_id": "AGT-173",
+    "agent_name": "Food Safety Agent (Ext)",
+    "vertical": "food",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-092"
+  },
+  {
+    "agent_id": "AGT-174",
+    "agent_name": "Food Supply Chain (Ext)",
+    "vertical": "food",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-093"
+  },
+  {
+    "agent_id": "AGT-175",
+    "agent_name": "Core System Bridge",
+    "vertical": "core",
+    "role_type": "CORE",
+    "avatar": "eden",
+    "archetype_id": "ARC-004"
+  },
+  {
+    "agent_id": "AGT-176",
+    "agent_name": "General Intelligence Bridge",
+    "vertical": "core",
+    "role_type": "CORE",
+    "avatar": "eden",
+    "archetype_id": "ARC-005"
+  },
+  {
+    "agent_id": "AGT-177",
+    "agent_name": "Real Estate Bridge",
+    "vertical": "real_estate",
+    "role_type": "BRIDGE",
+    "avatar": "orion",
+    "archetype_id": "ARC-106"
+  },
+  {
+    "agent_id": "AGT-178",
+    "agent_name": "Social Impact Bridge",
+    "vertical": "social_services",
+    "role_type": "BRIDGE",
+    "avatar": "orion",
+    "archetype_id": "ARC-107"
+  },
+  {
+    "agent_id": "AGT-179",
+    "agent_name": "Corporate Bridge",
+    "vertical": "corporate",
+    "role_type": "BRIDGE",
+    "avatar": "orion",
+    "archetype_id": "ARC-108"
+  },
+  {
+    "agent_id": "AGT-180",
+    "agent_name": "Wellness Bridge",
+    "vertical": "health",
+    "role_type": "BRIDGE",
+    "avatar": "orion",
+    "archetype_id": "ARC-109"
+  },
+  {
+    "agent_id": "AGT-181",
+    "agent_name": "Faith & Spirit Bridge",
+    "vertical": "spiritual",
+    "role_type": "BRIDGE",
+    "avatar": "orion",
+    "archetype_id": "ARC-100"
+  },
+  {
+    "agent_id": "AGT-182",
+    "agent_name": "Creator Bridge",
+    "vertical": "creator",
+    "role_type": "BRIDGE",
+    "avatar": "orion",
+    "archetype_id": "ARC-101"
+  },
+  {
+    "agent_id": "AGT-183",
+    "agent_name": "Government Bridge",
+    "vertical": "government",
+    "role_type": "BRIDGE",
+    "avatar": "orion",
+    "archetype_id": "ARC-102"
+  },
+  {
+    "agent_id": "AGT-184",
+    "agent_name": "Sports Bridge",
+    "vertical": "sports",
+    "role_type": "BRIDGE",
+    "avatar": "orion",
+    "archetype_id": "ARC-103"
+  },
+  {
+    "agent_id": "AGT-185",
+    "agent_name": "Legal Cross-System",
+    "vertical": "legal",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-014"
+  },
+  {
+    "agent_id": "AGT-186",
+    "agent_name": "Commerce Bridge",
+    "vertical": "commerce",
+    "role_type": "BRIDGE",
+    "avatar": "orion",
+    "archetype_id": "ARC-105"
+  },
+  {
+    "agent_id": "AGT-187",
+    "agent_name": "Infrastructure Bridge",
+    "vertical": "infrastructure",
+    "role_type": "BRIDGE",
+    "avatar": "orion",
+    "archetype_id": "ARC-106"
+  },
+  {
+    "agent_id": "AGT-188",
+    "agent_name": "Crisis Bridge",
+    "vertical": "crisis",
+    "role_type": "CRISIS",
+    "avatar": "alaric",
+    "archetype_id": "ARC-126"
+  },
+  {
+    "agent_id": "AGT-189",
+    "agent_name": "Mental Health Bridge",
+    "vertical": "mental_health",
+    "role_type": "CRISIS",
+    "avatar": "alaric",
+    "archetype_id": "ARC-127"
+  },
+  {
+    "agent_id": "AGT-190",
+    "agent_name": "Financial Bridge",
+    "vertical": "finance",
+    "role_type": "BRIDGE",
+    "avatar": "orion",
+    "archetype_id": "ARC-109"
+  },
+  {
+    "agent_id": "AGT-191",
+    "agent_name": "Care Bridge",
+    "vertical": "elder_care",
+    "role_type": "BRIDGE",
+    "avatar": "orion",
+    "archetype_id": "ARC-100"
+  },
+  {
+    "agent_id": "AGT-192",
+    "agent_name": "Immigration Bridge",
+    "vertical": "immigration",
+    "role_type": "BRIDGE",
+    "avatar": "orion",
+    "archetype_id": "ARC-101"
+  },
+  {
+    "agent_id": "AGT-193",
+    "agent_name": "Veterans Bridge",
+    "vertical": "veterans",
+    "role_type": "BRIDGE",
+    "avatar": "orion",
+    "archetype_id": "ARC-102"
+  },
+  {
+    "agent_id": "AGT-194",
+    "agent_name": "AI Bridge",
+    "vertical": "ai",
+    "role_type": "BRIDGE",
+    "avatar": "orion",
+    "archetype_id": "ARC-103"
+  },
+  {
+    "agent_id": "AGT-195",
+    "agent_name": "Personal Narrative Agent",
+    "vertical": "core",
+    "role_type": "CORE",
+    "avatar": "eden",
+    "archetype_id": "ARC-006"
+  },
+  {
+    "agent_id": "AGT-196",
+    "agent_name": "Visual Identity Agent",
+    "vertical": "core",
+    "role_type": "CORE",
+    "avatar": "eden",
+    "archetype_id": "ARC-007"
+  },
+  {
+    "agent_id": "AGT-197",
+    "agent_name": "Business Model Agent",
+    "vertical": "core",
+    "role_type": "CORE",
+    "avatar": "eden",
+    "archetype_id": "ARC-008"
+  },
+  {
+    "agent_id": "AGT-198",
+    "agent_name": "Roadmap Intelligence Agent",
+    "vertical": "core",
+    "role_type": "CORE",
+    "avatar": "eden",
+    "archetype_id": "ARC-009"
+  },
+  {
+    "agent_id": "AGT-199",
+    "agent_name": "Access Control Agent",
+    "vertical": "core",
+    "role_type": "CORE",
+    "avatar": "eden",
+    "archetype_id": "ARC-001"
+  },
+  {
+    "agent_id": "AGT-200",
+    "agent_name": "Membership Agent",
+    "vertical": "core",
+    "role_type": "CORE",
+    "avatar": "eden",
+    "archetype_id": "ARC-002"
+  },
+  {
+    "agent_id": "AGT-201",
+    "agent_name": "Research Agent",
+    "vertical": "core",
+    "role_type": "CORE",
+    "avatar": "eden",
+    "archetype_id": "ARC-003"
+  },
+  {
+    "agent_id": "AGT-202",
+    "agent_name": "Copy & Conversion Agent",
+    "vertical": "core",
+    "role_type": "CORE",
+    "avatar": "eden",
+    "archetype_id": "ARC-004"
+  },
+  {
+    "agent_id": "AGT-203",
+    "agent_name": "Analytics Agent",
+    "vertical": "core",
+    "role_type": "CORE",
+    "avatar": "eden",
+    "archetype_id": "ARC-005"
+  },
+  {
+    "agent_id": "AGT-204",
+    "agent_name": "Pricing Agent",
+    "vertical": "core",
+    "role_type": "CORE",
+    "avatar": "eden",
+    "archetype_id": "ARC-006"
+  },
+  {
+    "agent_id": "AGT-205",
+    "agent_name": "Partnership Agent",
+    "vertical": "core",
+    "role_type": "CORE",
+    "avatar": "eden",
+    "archetype_id": "ARC-007"
+  },
+  {
+    "agent_id": "AGT-206",
+    "agent_name": "IP Agent",
+    "vertical": "core",
+    "role_type": "CORE",
+    "avatar": "eden",
+    "archetype_id": "ARC-008"
+  },
+  {
+    "agent_id": "AGT-207",
+    "agent_name": "Marketplace Agent",
+    "vertical": "core",
+    "role_type": "CORE",
+    "avatar": "eden",
+    "archetype_id": "ARC-009"
+  },
+  {
+    "agent_id": "AGT-208",
+    "agent_name": "Compliance Agent",
+    "vertical": "core",
+    "role_type": "CORE",
+    "avatar": "eden",
+    "archetype_id": "ARC-001"
+  },
+  {
+    "agent_id": "AGT-209",
+    "agent_name": "Audit Agent",
+    "vertical": "core",
+    "role_type": "CORE",
+    "avatar": "eden",
+    "archetype_id": "ARC-002"
+  },
+  {
+    "agent_id": "AGT-210",
+    "agent_name": "Workflow Automation Agent",
+    "vertical": "core",
+    "role_type": "CORE",
+    "avatar": "eden",
+    "archetype_id": "ARC-003"
+  },
+  {
+    "agent_id": "AGT-211",
+    "agent_name": "Event Trigger Agent",
+    "vertical": "core",
+    "role_type": "CORE",
+    "avatar": "eden",
+    "archetype_id": "ARC-004"
+  },
+  {
+    "agent_id": "AGT-212",
+    "agent_name": "Soul Blueprint Agent",
+    "vertical": "core",
+    "role_type": "CORE",
+    "avatar": "eden",
+    "archetype_id": "ARC-005"
+  },
+  {
+    "agent_id": "AGT-213",
+    "agent_name": "Spiritual Agent",
+    "vertical": "core",
+    "role_type": "CORE",
+    "avatar": "eden",
+    "archetype_id": "ARC-006"
+  },
+  {
+    "agent_id": "AGT-214",
+    "agent_name": "Wealth Consciousness Agent",
+    "vertical": "core",
+    "role_type": "CORE",
+    "avatar": "eden",
+    "archetype_id": "ARC-007"
+  },
+  {
+    "agent_id": "AGT-215",
+    "agent_name": "Zuri Sovereign Agent",
+    "vertical": "core",
+    "role_type": "CORE",
+    "avatar": "eden",
+    "archetype_id": "ARC-008"
+  },
+  {
+    "agent_id": "AGT-216",
+    "agent_name": "Multi-Vertical Agent",
+    "vertical": "core",
+    "role_type": "CORE",
+    "avatar": "eden",
+    "archetype_id": "ARC-009"
+  },
+  {
+    "agent_id": "AGT-217",
+    "agent_name": "Cross-Lane Agent",
+    "vertical": "core",
+    "role_type": "CORE",
+    "avatar": "eden",
+    "archetype_id": "ARC-001"
+  },
+  {
+    "agent_id": "AGT-218",
+    "agent_name": "Tier Upgrade Agent",
+    "vertical": "core",
+    "role_type": "CORE",
+    "avatar": "eden",
+    "archetype_id": "ARC-002"
+  },
+  {
+    "agent_id": "AGT-219",
+    "agent_name": "Affiliate Agent",
+    "vertical": "core",
+    "role_type": "CORE",
+    "avatar": "eden",
+    "archetype_id": "ARC-003"
+  },
+  {
+    "agent_id": "AGT-220",
+    "agent_name": "Creator Studio Agent",
+    "vertical": "core",
+    "role_type": "CORE",
+    "avatar": "eden",
+    "archetype_id": "ARC-004"
+  },
+  {
+    "agent_id": "AGT-221",
+    "agent_name": "Enterprise Command Agent",
+    "vertical": "core",
+    "role_type": "CORE",
+    "avatar": "eden",
+    "archetype_id": "ARC-005"
+  },
+  {
+    "agent_id": "AGT-222",
+    "agent_name": "Universal Integration Agent",
+    "vertical": "core",
+    "role_type": "CORE",
+    "avatar": "eden",
+    "archetype_id": "ARC-006"
+  },
+  {
+    "agent_id": "AGT-223",
+    "agent_name": "Crisis Intervention Agent",
+    "vertical": "crisis",
+    "role_type": "CRISIS",
+    "avatar": "alaric",
+    "archetype_id": "ARC-125"
+  },
+  {
+    "agent_id": "AGT-224",
+    "agent_name": "Grief & Loss Agent",
+    "vertical": "crisis",
+    "role_type": "CRISIS",
+    "avatar": "alaric",
+    "archetype_id": "ARC-126"
+  },
+  {
+    "agent_id": "AGT-225",
+    "agent_name": "Trauma Recovery Agent",
+    "vertical": "crisis",
+    "role_type": "CRISIS",
+    "avatar": "alaric",
+    "archetype_id": "ARC-127"
+  },
+  {
+    "agent_id": "AGT-226",
+    "agent_name": "Jail Support Agent",
+    "vertical": "crisis",
+    "role_type": "CRISIS",
+    "avatar": "alaric",
+    "archetype_id": "ARC-125"
+  },
+  {
+    "agent_id": "AGT-227",
+    "agent_name": "Family Reunification Agent",
+    "vertical": "crisis",
+    "role_type": "CRISIS",
+    "avatar": "alaric",
+    "archetype_id": "ARC-126"
+  },
+  {
+    "agent_id": "AGT-228",
+    "agent_name": "Legal Defense Agent",
+    "vertical": "crisis",
+    "role_type": "CRISIS",
+    "avatar": "alaric",
+    "archetype_id": "ARC-127"
+  },
+  {
+    "agent_id": "AGT-229",
+    "agent_name": "Prisoner Advocacy Agent",
+    "vertical": "crisis",
+    "role_type": "CRISIS",
+    "avatar": "alaric",
+    "archetype_id": "ARC-125"
+  },
+  {
+    "agent_id": "AGT-230",
+    "agent_name": "Emergency Housing Agent",
+    "vertical": "crisis",
+    "role_type": "CRISIS",
+    "avatar": "alaric",
+    "archetype_id": "ARC-126"
+  },
+  {
+    "agent_id": "AGT-231",
+    "agent_name": "Suicide Prevention Agent",
+    "vertical": "crisis",
+    "role_type": "CRISIS",
+    "avatar": "alaric",
+    "archetype_id": "ARC-127"
+  },
+  {
+    "agent_id": "AGT-232",
+    "agent_name": "DV Safety Agent",
+    "vertical": "crisis",
+    "role_type": "CRISIS",
+    "avatar": "alaric",
+    "archetype_id": "ARC-125"
+  },
+  {
+    "agent_id": "AGT-233",
+    "agent_name": "Depression Agent",
+    "vertical": "mental_health",
+    "role_type": "CRISIS",
+    "avatar": "alaric",
+    "archetype_id": "ARC-126"
+  },
+  {
+    "agent_id": "AGT-234",
+    "agent_name": "Anxiety Agent",
+    "vertical": "mental_health",
+    "role_type": "CRISIS",
+    "avatar": "alaric",
+    "archetype_id": "ARC-127"
+  },
+  {
+    "agent_id": "AGT-235",
+    "agent_name": "PTSD Agent",
+    "vertical": "mental_health",
+    "role_type": "CRISIS",
+    "avatar": "alaric",
+    "archetype_id": "ARC-125"
+  },
+  {
+    "agent_id": "AGT-236",
+    "agent_name": "Therapy Match Agent",
+    "vertical": "mental_health",
+    "role_type": "CRISIS",
+    "avatar": "alaric",
+    "archetype_id": "ARC-126"
+  },
+  {
+    "agent_id": "AGT-237",
+    "agent_name": "Medication Agent",
+    "vertical": "mental_health",
+    "role_type": "CRISIS",
+    "avatar": "alaric",
+    "archetype_id": "ARC-127"
+  },
+  {
+    "agent_id": "AGT-238",
+    "agent_name": "Therapy Session Agent",
+    "vertical": "mental_health",
+    "role_type": "CRISIS",
+    "avatar": "alaric",
+    "archetype_id": "ARC-125"
+  },
+  {
+    "agent_id": "AGT-239",
+    "agent_name": "Psychiatric Agent",
+    "vertical": "mental_health",
+    "role_type": "CRISIS",
+    "avatar": "alaric",
+    "archetype_id": "ARC-126"
+  },
+  {
+    "agent_id": "AGT-240",
+    "agent_name": "Addiction Recovery Agent",
+    "vertical": "mental_health",
+    "role_type": "CRISIS",
+    "avatar": "alaric",
+    "archetype_id": "ARC-127"
+  },
+  {
+    "agent_id": "AGT-241",
+    "agent_name": "Detox Agent",
+    "vertical": "addiction",
+    "role_type": "CRISIS",
+    "avatar": "alaric",
+    "archetype_id": "ARC-125"
+  },
+  {
+    "agent_id": "AGT-242",
+    "agent_name": "Sober Living Agent",
+    "vertical": "addiction",
+    "role_type": "CRISIS",
+    "avatar": "alaric",
+    "archetype_id": "ARC-126"
+  },
+  {
+    "agent_id": "AGT-243",
+    "agent_name": "Relapse Prevention Agent",
+    "vertical": "addiction",
+    "role_type": "CRISIS",
+    "avatar": "alaric",
+    "archetype_id": "ARC-127"
+  },
+  {
+    "agent_id": "AGT-244",
+    "agent_name": "12-Step Agent",
+    "vertical": "addiction",
+    "role_type": "CRISIS",
+    "avatar": "alaric",
+    "archetype_id": "ARC-125"
+  },
+  {
+    "agent_id": "AGT-245",
+    "agent_name": "Family Addiction Agent",
+    "vertical": "addiction",
+    "role_type": "CRISIS",
+    "avatar": "alaric",
+    "archetype_id": "ARC-126"
+  },
+  {
+    "agent_id": "AGT-246",
+    "agent_name": "Naloxone Agent",
+    "vertical": "addiction",
+    "role_type": "CRISIS",
+    "avatar": "alaric",
+    "archetype_id": "ARC-127"
+  },
+  {
+    "agent_id": "AGT-247",
+    "agent_name": "Addiction Roadmap Agent",
+    "vertical": "addiction",
+    "role_type": "CRISIS",
+    "avatar": "alaric",
+    "archetype_id": "ARC-125"
+  },
+  {
+    "agent_id": "AGT-248",
+    "agent_name": "Financial Crisis Agent",
+    "vertical": "financial_crisis",
+    "role_type": "CRISIS",
+    "avatar": "alaric",
+    "archetype_id": "ARC-126"
+  },
+  {
+    "agent_id": "AGT-249",
+    "agent_name": "Bankruptcy Agent",
+    "vertical": "financial_crisis",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-078"
+  },
+  {
+    "agent_id": "AGT-250",
+    "agent_name": "Debt Relief Agent",
+    "vertical": "financial_crisis",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-079"
+  },
+  {
+    "agent_id": "AGT-251",
+    "agent_name": "Unemployment Agent",
+    "vertical": "financial_crisis",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-080"
+  },
+  {
+    "agent_id": "AGT-252",
+    "agent_name": "Eviction Prevention Agent",
+    "vertical": "financial_crisis",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-081"
+  },
+  {
+    "agent_id": "AGT-253",
+    "agent_name": "Financial Recovery Agent",
+    "vertical": "financial_crisis",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-082"
+  },
+  {
+    "agent_id": "AGT-254",
+    "agent_name": "Elder Care Agent",
+    "vertical": "elder_care",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-083"
+  },
+  {
+    "agent_id": "AGT-255",
+    "agent_name": "Medicare Agent",
+    "vertical": "elder_care",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-084"
+  },
+  {
+    "agent_id": "AGT-256",
+    "agent_name": "Nursing Home Agent",
+    "vertical": "elder_care",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-085"
+  },
+  {
+    "agent_id": "AGT-257",
+    "agent_name": "Dementia Agent",
+    "vertical": "elder_care",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-086"
+  },
+  {
+    "agent_id": "AGT-258",
+    "agent_name": "Senior Housing Agent",
+    "vertical": "elder_care",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-087"
+  },
+  {
+    "agent_id": "AGT-259",
+    "agent_name": "Elder Abuse Agent",
+    "vertical": "elder_care",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-088"
+  },
+  {
+    "agent_id": "AGT-260",
+    "agent_name": "Caregiver Agent",
+    "vertical": "elder_care",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-089"
+  },
+  {
+    "agent_id": "AGT-261",
+    "agent_name": "Immigration Legal Agent",
+    "vertical": "immigration",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-090"
+  },
+  {
+    "agent_id": "AGT-262",
+    "agent_name": "Asylum Agent",
+    "vertical": "immigration",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-091"
+  },
+  {
+    "agent_id": "AGT-263",
+    "agent_name": "Refugee Agent",
+    "vertical": "immigration",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-092"
+  },
+  {
+    "agent_id": "AGT-264",
+    "agent_name": "Green Card Agent",
+    "vertical": "immigration",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-093"
+  },
+  {
+    "agent_id": "AGT-265",
+    "agent_name": "Citizenship Agent",
+    "vertical": "immigration",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-094"
+  },
+  {
+    "agent_id": "AGT-266",
+    "agent_name": "Deportation Defense Agent",
+    "vertical": "immigration",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-095"
+  },
+  {
+    "agent_id": "AGT-267",
+    "agent_name": "DACA Agent",
+    "vertical": "immigration",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-096"
+  },
+  {
+    "agent_id": "AGT-268",
+    "agent_name": "Veterans Benefits Agent",
+    "vertical": "veterans",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-097"
+  },
+  {
+    "agent_id": "AGT-269",
+    "agent_name": "VA Claims Agent",
+    "vertical": "veterans",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-098"
+  },
+  {
+    "agent_id": "AGT-270",
+    "agent_name": "Military Transition Agent",
+    "vertical": "veterans",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-099"
+  },
+  {
+    "agent_id": "AGT-271",
+    "agent_name": "PTSD Veteran Agent",
+    "vertical": "veterans",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-010"
+  },
+  {
+    "agent_id": "AGT-272",
+    "agent_name": "Veteran Housing Agent",
+    "vertical": "veterans",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-011"
+  },
+  {
+    "agent_id": "AGT-273",
+    "agent_name": "Veteran Employment Agent",
+    "vertical": "veterans",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-012"
+  },
+  {
+    "agent_id": "AGT-274",
+    "agent_name": "Veterans Care Agent",
+    "vertical": "veterans",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-013"
+  },
+  {
+    "agent_id": "AGT-275",
+    "agent_name": "Swarm Orchestrator",
+    "vertical": "core",
+    "role_type": "CORE",
+    "avatar": "eden",
+    "archetype_id": "ARC-005"
+  },
+  {
+    "agent_id": "AGT-279",
+    "agent_name": "Visual Arts Agent",
+    "vertical": "arts",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-015"
+  },
+  {
+    "agent_id": "AGT-280",
+    "agent_name": "Gallery Agent",
+    "vertical": "arts",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-016"
+  },
+  {
+    "agent_id": "AGT-281",
+    "agent_name": "Art Investment Agent",
+    "vertical": "arts",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-017"
+  },
+  {
+    "agent_id": "AGT-282",
+    "agent_name": "Art Authentication Agent",
+    "vertical": "arts",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-018"
+  },
+  {
+    "agent_id": "AGT-283",
+    "agent_name": "Creative Studio Agent",
+    "vertical": "arts",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-019"
+  },
+  {
+    "agent_id": "AGT-284",
+    "agent_name": "Performance Arts Agent",
+    "vertical": "arts",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-020"
+  },
+  {
+    "agent_id": "AGT-285",
+    "agent_name": "Art Education Agent",
+    "vertical": "arts",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-021"
+  },
+  {
+    "agent_id": "AGT-286",
+    "agent_name": "Arts Grants Agent",
+    "vertical": "arts",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-022"
+  },
+  {
+    "agent_id": "AGT-287",
+    "agent_name": "Digital Art Agent",
+    "vertical": "arts",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-023"
+  },
+  {
+    "agent_id": "AGT-288",
+    "agent_name": "Art Curation Agent",
+    "vertical": "arts",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-024"
+  },
+  {
+    "agent_id": "AGT-289",
+    "agent_name": "Arts Advocacy Agent",
+    "vertical": "arts",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-025"
+  },
+  {
+    "agent_id": "AGT-290",
+    "agent_name": "Art Market Agent",
+    "vertical": "arts",
+    "role_type": "CROSS_SYSTEM",
+    "avatar": "seren",
+    "archetype_id": "ARC-116"
+  },
+  {
+    "agent_id": "AGT-291",
+    "agent_name": "Sustainability Strategy Agent",
+    "vertical": "sustainability",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-027"
+  },
+  {
+    "agent_id": "AGT-292",
+    "agent_name": "Carbon Footprint Agent",
+    "vertical": "sustainability",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-028"
+  },
+  {
+    "agent_id": "AGT-293",
+    "agent_name": "Renewable Energy Agent",
+    "vertical": "sustainability",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-029"
+  },
+  {
+    "agent_id": "AGT-294",
+    "agent_name": "Circular Economy Agent",
+    "vertical": "sustainability",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-030"
+  },
+  {
+    "agent_id": "AGT-295",
+    "agent_name": "ESG Agent",
+    "vertical": "sustainability",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-031"
+  },
+  {
+    "agent_id": "AGT-296",
+    "agent_name": "Green Supply Chain Agent",
+    "vertical": "sustainability",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-032"
+  },
+  {
+    "agent_id": "AGT-297",
+    "agent_name": "Climate Risk Agent",
+    "vertical": "sustainability",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-033"
+  },
+  {
+    "agent_id": "AGT-298",
+    "agent_name": "Sustainable Agriculture Agent",
+    "vertical": "sustainability",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-034"
+  },
+  {
+    "agent_id": "AGT-299",
+    "agent_name": "Water Resource Agent",
+    "vertical": "sustainability",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-035"
+  },
+  {
+    "agent_id": "AGT-300",
+    "agent_name": "Biodiversity Agent",
+    "vertical": "sustainability",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-036"
+  },
+  {
+    "agent_id": "AGT-301",
+    "agent_name": "Sustainability Compliance Agent",
+    "vertical": "sustainability",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-037"
+  },
+  {
+    "agent_id": "AGT-302",
+    "agent_name": "Green Impact Agent",
+    "vertical": "sustainability",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-038"
+  },
+  {
+    "agent_id": "AGT-303",
+    "agent_name": "Manufacturing Operations Agent",
+    "vertical": "manufacturing",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-039"
+  },
+  {
+    "agent_id": "AGT-304",
+    "agent_name": "Production Planning Agent",
+    "vertical": "manufacturing",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-040"
+  },
+  {
+    "agent_id": "AGT-305",
+    "agent_name": "Quality Control Agent",
+    "vertical": "manufacturing",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-041"
+  },
+  {
+    "agent_id": "AGT-306",
+    "agent_name": "Manufacturing Automation Agent",
+    "vertical": "manufacturing",
+    "role_type": "UTILITY",
+    "avatar": "axel",
+    "archetype_id": "ARC-122"
+  },
+  {
+    "agent_id": "AGT-307",
+    "agent_name": "Industrial IoT Agent",
+    "vertical": "manufacturing",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-043"
+  },
+  {
+    "agent_id": "AGT-308",
+    "agent_name": "Factory Intelligence Agent",
+    "vertical": "manufacturing",
+    "role_type": "CROSS_SYSTEM",
+    "avatar": "seren",
+    "archetype_id": "ARC-114"
+  },
+  {
+    "agent_id": "AGT-309",
+    "agent_name": "Manufacturing Cost Agent",
+    "vertical": "manufacturing",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-045"
+  },
+  {
+    "agent_id": "AGT-310",
+    "agent_name": "Manufacturing Scale Agent",
+    "vertical": "manufacturing",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-046"
+  },
+  {
+    "agent_id": "AGT-311",
+    "agent_name": "Product Design Agent",
+    "vertical": "manufacturing",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-047"
+  },
+  {
+    "agent_id": "AGT-312",
+    "agent_name": "Manufacturing Safety Agent",
+    "vertical": "manufacturing",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-048"
+  },
+  {
+    "agent_id": "AGT-313",
+    "agent_name": "Manufacturing Compliance Agent",
+    "vertical": "manufacturing",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-049"
+  },
+  {
+    "agent_id": "AGT-314",
+    "agent_name": "Manufacturing Capacity Agent",
+    "vertical": "manufacturing",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-050"
+  },
+  {
+    "agent_id": "AGT-315",
+    "agent_name": "Youth Development Agent",
+    "vertical": "youth",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-051"
+  },
+  {
+    "agent_id": "AGT-316",
+    "agent_name": "Troubled Youth Agent",
+    "vertical": "youth",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-052"
+  },
+  {
+    "agent_id": "AGT-317",
+    "agent_name": "Gifted Youth Agent",
+    "vertical": "youth",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-053"
+  },
+  {
+    "agent_id": "AGT-318",
+    "agent_name": "Adolescent Mental Health Agent",
+    "vertical": "youth",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-054"
+  },
+  {
+    "agent_id": "AGT-319",
+    "agent_name": "Youth Education Agent",
+    "vertical": "youth",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-055"
+  },
+  {
+    "agent_id": "AGT-320",
+    "agent_name": "Youth Sports Agent",
+    "vertical": "youth",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-056"
+  },
+  {
+    "agent_id": "AGT-321",
+    "agent_name": "Youth Arts Agent",
+    "vertical": "youth",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-057"
+  },
+  {
+    "agent_id": "AGT-322",
+    "agent_name": "Youth Career Agent",
+    "vertical": "youth",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-058"
+  },
+  {
+    "agent_id": "AGT-323",
+    "agent_name": "Youth Legal Agent",
+    "vertical": "youth",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-059"
+  },
+  {
+    "agent_id": "AGT-324",
+    "agent_name": "Youth Housing Agent",
+    "vertical": "youth",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-060"
+  },
+  {
+    "agent_id": "AGT-325",
+    "agent_name": "Youth Family Agent",
+    "vertical": "youth",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-061"
+  },
+  {
+    "agent_id": "AGT-326",
+    "agent_name": "Youth Mentorship Agent",
+    "vertical": "youth",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-062"
+  },
+  {
+    "agent_id": "AGT-327",
+    "agent_name": "Early Childhood Agent",
+    "vertical": "early_childhood",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-063"
+  },
+  {
+    "agent_id": "AGT-328",
+    "agent_name": "Toddler Agent",
+    "vertical": "early_childhood",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-064"
+  },
+  {
+    "agent_id": "AGT-329",
+    "agent_name": "Preschool Agent",
+    "vertical": "early_childhood",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-065"
+  },
+  {
+    "agent_id": "AGT-330",
+    "agent_name": "Early Intervention Agent",
+    "vertical": "early_childhood",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-066"
+  },
+  {
+    "agent_id": "AGT-331",
+    "agent_name": "Child Nutrition Agent",
+    "vertical": "early_childhood",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-067"
+  },
+  {
+    "agent_id": "AGT-332",
+    "agent_name": "Child Safety Agent",
+    "vertical": "early_childhood",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-068"
+  },
+  {
+    "agent_id": "AGT-333",
+    "agent_name": "Childcare Provider Agent",
+    "vertical": "early_childhood",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-069"
+  },
+  {
+    "agent_id": "AGT-334",
+    "agent_name": "Parenting Support Agent",
+    "vertical": "early_childhood",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-070"
+  },
+  {
+    "agent_id": "AGT-335",
+    "agent_name": "Child Development Agent",
+    "vertical": "early_childhood",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-071"
+  },
+  {
+    "agent_id": "AGT-336",
+    "agent_name": "Early Literacy Agent",
+    "vertical": "early_childhood",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-072"
+  },
+  {
+    "agent_id": "AGT-337",
+    "agent_name": "Child Play Agent",
+    "vertical": "early_childhood",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-073"
+  },
+  {
+    "agent_id": "AGT-338",
+    "agent_name": "Family Support Agent",
+    "vertical": "early_childhood",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-074"
+  },
+  {
+    "agent_id": "AGT-339",
+    "agent_name": "Arts Bridge",
+    "vertical": "arts",
+    "role_type": "BRIDGE",
+    "avatar": "orion",
+    "archetype_id": "ARC-105"
+  },
+  {
+    "agent_id": "AGT-340",
+    "agent_name": "Sustainability Bridge",
+    "vertical": "sustainability",
+    "role_type": "BRIDGE",
+    "avatar": "orion",
+    "archetype_id": "ARC-106"
+  },
+  {
+    "agent_id": "AGT-341",
+    "agent_name": "Manufacturing Bridge",
+    "vertical": "manufacturing",
+    "role_type": "BRIDGE",
+    "avatar": "orion",
+    "archetype_id": "ARC-107"
+  },
+  {
+    "agent_id": "AGT-342",
+    "agent_name": "Youth Bridge",
+    "vertical": "youth",
+    "role_type": "BRIDGE",
+    "avatar": "orion",
+    "archetype_id": "ARC-108"
+  },
+  {
+    "agent_id": "AGT-343",
+    "agent_name": "Early Childhood Bridge",
+    "vertical": "early_childhood",
+    "role_type": "BRIDGE",
+    "avatar": "orion",
+    "archetype_id": "ARC-109"
+  },
+  {
+    "agent_id": "AGT-344",
+    "agent_name": "Finance & Wealth Bridge",
+    "vertical": "finance",
+    "role_type": "BRIDGE",
+    "avatar": "orion",
+    "archetype_id": "ARC-100"
+  },
+  {
+    "agent_id": "AGT-345",
+    "agent_name": "Clinical + Mental Health Bridge",
+    "vertical": "mental_health",
+    "role_type": "CRISIS",
+    "avatar": "alaric",
+    "archetype_id": "ARC-127"
+  },
+  {
+    "agent_id": "AGT-346",
+    "agent_name": "Legal & Crisis Bridge",
+    "vertical": "legal",
+    "role_type": "CRISIS",
+    "avatar": "alaric",
+    "archetype_id": "ARC-125"
+  },
+  {
+    "agent_id": "AGT-347",
+    "agent_name": "Education & Creator Bridge",
+    "vertical": "education",
+    "role_type": "BRIDGE",
+    "avatar": "orion",
+    "archetype_id": "ARC-103"
+  },
+  {
+    "agent_id": "AGT-348",
+    "agent_name": "Tech & AI Bridge",
+    "vertical": "tech",
+    "role_type": "BRIDGE",
+    "avatar": "orion",
+    "archetype_id": "ARC-104"
+  },
+  {
+    "agent_id": "AGT-349",
+    "agent_name": "Government & Social Bridge",
+    "vertical": "government",
+    "role_type": "BRIDGE",
+    "avatar": "orion",
+    "archetype_id": "ARC-105"
+  },
+  {
+    "agent_id": "AGT-350",
+    "agent_name": "Commerce & Retail Bridge",
+    "vertical": "commerce",
+    "role_type": "BRIDGE",
+    "avatar": "orion",
+    "archetype_id": "ARC-106"
+  },
+  {
+    "agent_id": "AGT-351",
+    "agent_name": "Luxury & Premium Bridge",
+    "vertical": "luxury",
+    "role_type": "BRIDGE",
+    "avatar": "orion",
+    "archetype_id": "ARC-107"
+  },
+  {
+    "agent_id": "AGT-352",
+    "agent_name": "Sports & Entertainment Bridge",
+    "vertical": "sports",
+    "role_type": "BRIDGE",
+    "avatar": "orion",
+    "archetype_id": "ARC-108"
+  },
+  {
+    "agent_id": "AGT-353",
+    "agent_name": "Global Impact Bridge",
+    "vertical": "global_impact",
+    "role_type": "BRIDGE",
+    "avatar": "orion",
+    "archetype_id": "ARC-109"
+  },
+  {
+    "agent_id": "AGT-355",
+    "agent_name": "Data Intelligence",
+    "vertical": "core",
+    "role_type": "CROSS_SYSTEM",
+    "avatar": "seren",
+    "archetype_id": "ARC-110"
+  },
+  {
+    "agent_id": "AGT-356",
+    "agent_name": "Security Intelligence",
+    "vertical": "core",
+    "role_type": "CROSS_SYSTEM",
+    "avatar": "seren",
+    "archetype_id": "ARC-111"
+  },
+  {
+    "agent_id": "AGT-357",
+    "agent_name": "Personal Intelligence",
+    "vertical": "core",
+    "role_type": "CROSS_SYSTEM",
+    "avatar": "seren",
+    "archetype_id": "ARC-112"
+  },
+  {
+    "agent_id": "AGT-358",
+    "agent_name": "Spiritual Intelligence",
+    "vertical": "core",
+    "role_type": "CROSS_SYSTEM",
+    "avatar": "seren",
+    "archetype_id": "ARC-113"
+  },
+  {
+    "agent_id": "AGT-359",
+    "agent_name": "Human Development",
+    "vertical": "core",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-094"
+  },
+  {
+    "agent_id": "AGT-360",
+    "agent_name": "Predictive Insight",
+    "vertical": "core",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-095"
+  },
+  {
+    "agent_id": "AGT-361",
+    "agent_name": "Adaptive Learning",
+    "vertical": "education",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-096"
+  },
+  {
+    "agent_id": "AGT-362",
+    "agent_name": "Global Systems",
+    "vertical": "core",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-097"
+  },
+  {
+    "agent_id": "AGT-363",
+    "agent_name": "Smart City",
+    "vertical": "government",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-098"
+  },
+  {
+    "agent_id": "AGT-364",
+    "agent_name": "Identity Intelligence",
+    "vertical": "core",
+    "role_type": "CROSS_SYSTEM",
+    "avatar": "seren",
+    "archetype_id": "ARC-119"
+  },
+  {
+    "agent_id": "AGT-365",
+    "agent_name": "Emotional Signal",
+    "vertical": "core",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-010"
+  },
+  {
+    "agent_id": "AGT-366",
+    "agent_name": "Behavioral Intelligence",
+    "vertical": "core",
+    "role_type": "CROSS_SYSTEM",
+    "avatar": "seren",
+    "archetype_id": "ARC-111"
+  },
+  {
+    "agent_id": "AGT-367",
+    "agent_name": "Ethical Alignment",
+    "vertical": "core",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-012"
+  },
+  {
+    "agent_id": "AGT-368",
+    "agent_name": "Wellness Intelligence",
+    "vertical": "core",
+    "role_type": "CROSS_SYSTEM",
+    "avatar": "seren",
+    "archetype_id": "ARC-113"
+  },
+  {
+    "agent_id": "AGT-369",
+    "agent_name": "Adaptive Evolution",
+    "vertical": "core",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-014"
+  },
+  {
+    "agent_id": "AGT-379",
+    "agent_name": "Dating Profile",
+    "vertical": "relationships",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-015"
+  },
+  {
+    "agent_id": "AGT-380",
+    "agent_name": "Matchmaking",
+    "vertical": "relationships",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-016"
+  },
+  {
+    "agent_id": "AGT-381",
+    "agent_name": "Compatibility",
+    "vertical": "relationships",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-017"
+  },
+  {
+    "agent_id": "AGT-382",
+    "agent_name": "Dating Safety",
+    "vertical": "relationships",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-018"
+  },
+  {
+    "agent_id": "AGT-383",
+    "agent_name": "Relationship Communication",
+    "vertical": "relationships",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-019"
+  },
+  {
+    "agent_id": "AGT-384",
+    "agent_name": "Breakup Recovery",
+    "vertical": "relationships",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-020"
+  },
+  {
+    "agent_id": "AGT-385",
+    "agent_name": "Long-Term Relationship",
+    "vertical": "relationships",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-021"
+  },
+  {
+    "agent_id": "AGT-386",
+    "agent_name": "Marriage",
+    "vertical": "relationships",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-022"
+  },
+  {
+    "agent_id": "AGT-387",
+    "agent_name": "Co-Parenting",
+    "vertical": "relationships",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-023"
+  },
+  {
+    "agent_id": "AGT-388",
+    "agent_name": "Relationship Boundaries",
+    "vertical": "relationships",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-024"
+  },
+  {
+    "agent_id": "AGT-389",
+    "agent_name": "Dating App Optimization",
+    "vertical": "relationships",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-025"
+  },
+  {
+    "agent_id": "AGT-390",
+    "agent_name": "Relationship Growth",
+    "vertical": "relationships",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-026"
+  },
+  {
+    "agent_id": "AGT-391",
+    "agent_name": "Relationships Bridge",
+    "vertical": "relationships",
+    "role_type": "BRIDGE",
+    "avatar": "orion",
+    "archetype_id": "ARC-107"
+  },
+  {
+    "agent_id": "AGT-394",
+    "agent_name": "Meta Intelligence",
+    "vertical": "core",
+    "role_type": "CORE",
+    "avatar": "eden",
+    "archetype_id": "ARC-001"
+  },
+  {
+    "agent_id": "AGT-395",
+    "agent_name": "Memory Integrity",
+    "vertical": "tech",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-029"
+  },
+  {
+    "agent_id": "AGT-396",
+    "agent_name": "Ethics & Alignment",
+    "vertical": "core",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-030"
+  },
+  {
+    "agent_id": "AGT-397",
+    "agent_name": "Evolution Orchestrator",
+    "vertical": "core",
+    "role_type": "CORE",
+    "avatar": "eden",
+    "archetype_id": "ARC-004"
+  },
+  {
+    "agent_id": "AGT-398",
+    "agent_name": "System Health",
+    "vertical": "core",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-032"
+  },
+  {
+    "agent_id": "AGT-399",
+    "agent_name": "Narrative Identity",
+    "vertical": "media",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-033"
+  },
+  {
+    "agent_id": "AGT-400",
+    "agent_name": "Master Conductor",
+    "vertical": "core",
+    "role_type": "CORE",
+    "avatar": "eden",
+    "archetype_id": "ARC-007"
+  },
+  {
+    "agent_id": "ai_twin_manager",
+    "agent_name": "AI Twin Manager",
+    "vertical": "core",
+    "role_type": "CORE",
+    "avatar": "eden",
+    "archetype_id": "ARC-008"
+  },
+  {
+    "agent_id": "audience_growth_agent",
+    "agent_name": "Audience Growth Agent",
+    "vertical": "commerce",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-036"
+  },
+  {
+    "agent_id": "billing_automation",
+    "agent_name": "Billing Automation Agent",
+    "vertical": "finance",
+    "role_type": "UTILITY",
+    "avatar": "axel",
+    "archetype_id": "ARC-122"
+  },
+  {
+    "agent_id": "case_coordinator",
+    "agent_name": "Case Management Coordinator",
+    "vertical": "legal",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-038"
+  },
+  {
+    "agent_id": "client_concierge",
+    "agent_name": "Client Concierge",
+    "vertical": "corporate",
+    "role_type": "BRIDGE",
+    "avatar": "orion",
+    "archetype_id": "ARC-109"
+  },
+  {
+    "agent_id": "client_intake_legal",
+    "agent_name": "Client Intake Agent",
+    "vertical": "corporate",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-040"
+  },
+  {
+    "agent_id": "client_relations",
+    "agent_name": "Client Relations Agent",
+    "vertical": "corporate",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-041"
+  },
+  {
+    "agent_id": "compliance_monitor",
+    "agent_name": "Compliance Monitor",
+    "vertical": "legal",
+    "role_type": "UTILITY",
+    "avatar": "axel",
+    "archetype_id": "ARC-122"
+  },
+  {
+    "agent_id": "compliance_sentinel",
+    "agent_name": "Compliance Sentinel",
+    "vertical": "legal",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-043"
+  },
+  {
+    "agent_id": "concierge_ai",
+    "agent_name": "Concierge Intelligence",
+    "vertical": "hospitality",
+    "role_type": "BRIDGE",
+    "avatar": "orion",
+    "archetype_id": "ARC-104"
+  },
+  {
+    "agent_id": "content_strategy_agent",
+    "agent_name": "Content Strategy Agent",
+    "vertical": "media",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-045"
+  },
+  {
+    "agent_id": "data_analytics_agent",
+    "agent_name": "Data Analytics Agent",
+    "vertical": "core",
+    "role_type": "CROSS_SYSTEM",
+    "avatar": "seren",
+    "archetype_id": "ARC-116"
+  },
+  {
+    "agent_id": "deal_room_agent",
+    "agent_name": "Deal Room Agent",
+    "vertical": "commerce",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-047"
+  },
+  {
+    "agent_id": "digital_product_agent",
+    "agent_name": "Digital Product Agent",
+    "vertical": "corporate",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-048"
+  },
+  {
+    "agent_id": "document_intelligence",
+    "agent_name": "Document Intelligence Engine",
+    "vertical": "legal",
+    "role_type": "CROSS_SYSTEM",
+    "avatar": "seren",
+    "archetype_id": "ARC-119"
+  },
+  {
+    "agent_id": "employee_intelligence",
+    "agent_name": "Employee Intelligence Engine",
+    "vertical": "corporate",
+    "role_type": "CROSS_SYSTEM",
+    "avatar": "seren",
+    "archetype_id": "ARC-110"
+  },
+  {
+    "agent_id": "guest_experience_ai",
+    "agent_name": "Guest Experience AI",
+    "vertical": "hospitality",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-051"
+  },
+  {
+    "agent_id": "guest_insights_engine",
+    "agent_name": "Guest Insights Engine",
+    "vertical": "hospitality",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-052"
+  },
+  {
+    "agent_id": "hospitality_operations",
+    "agent_name": "Hospitality Operations",
+    "vertical": "hospitality",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-053"
+  },
+  {
+    "agent_id": "intelligence_analyst",
+    "agent_name": "Intelligence Analyst",
+    "vertical": "core",
+    "role_type": "CROSS_SYSTEM",
+    "avatar": "seren",
+    "archetype_id": "ARC-114"
+  },
+  {
+    "agent_id": "lead_nurture",
+    "agent_name": "Lead Nurture Agent",
+    "vertical": "commerce",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-055"
+  },
+  {
+    "agent_id": "loyalty_architect",
+    "agent_name": "Loyalty Architect",
+    "vertical": "luxury",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-056"
+  },
+  {
+    "agent_id": "market_intel_agent",
+    "agent_name": "Market Intel Agent",
+    "vertical": "core",
+    "role_type": "CROSS_SYSTEM",
+    "avatar": "seren",
+    "archetype_id": "ARC-117"
+  },
+  {
+    "agent_id": "market_intelligence",
+    "agent_name": "Market Intelligence Engine",
+    "vertical": "core",
+    "role_type": "CROSS_SYSTEM",
+    "avatar": "seren",
+    "archetype_id": "ARC-118"
+  },
+  {
+    "agent_id": "marketing_intelligence",
+    "agent_name": "Marketing Intelligence Agent",
+    "vertical": "commerce",
+    "role_type": "CROSS_SYSTEM",
+    "avatar": "seren",
+    "archetype_id": "ARC-119"
+  },
+  {
+    "agent_id": "onboarding_automator",
+    "agent_name": "Onboarding Automator",
+    "vertical": "corporate",
+    "role_type": "UTILITY",
+    "avatar": "axel",
+    "archetype_id": "ARC-120"
+  },
+  {
+    "agent_id": "operations_orchestrator",
+    "agent_name": "Operations Orchestrator",
+    "vertical": "core",
+    "role_type": "CORE",
+    "avatar": "eden",
+    "archetype_id": "ARC-007"
+  },
+  {
+    "agent_id": "operations_sentinel",
+    "agent_name": "Operations Sentinel",
+    "vertical": "core",
+    "role_type": "UTILITY",
+    "avatar": "axel",
+    "archetype_id": "ARC-122"
+  },
+  {
+    "agent_id": "property_listing_optimizer",
+    "agent_name": "Listing Optimizer",
+    "vertical": "real_estate",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-063"
+  },
+  {
+    "agent_id": "property_match",
+    "agent_name": "Property Match Intelligence",
+    "vertical": "real_estate",
+    "role_type": "CROSS_SYSTEM",
+    "avatar": "seren",
+    "archetype_id": "ARC-114"
+  },
+  {
+    "agent_id": "research_associate",
+    "agent_name": "Research Associate",
+    "vertical": "core",
+    "role_type": "UTILITY",
+    "avatar": "axel",
+    "archetype_id": "ARC-120"
+  },
+  {
+    "agent_id": "retention_sentinel",
+    "agent_name": "Retention Sentinel",
+    "vertical": "luxury",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-066"
+  },
+  {
+    "agent_id": "revenue_optimizer",
+    "agent_name": "Revenue Optimizer",
+    "vertical": "finance",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-067"
+  },
+  {
+    "agent_id": "review_reputation_manager",
+    "agent_name": "Review & Reputation Manager",
+    "vertical": "media",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-068"
+  },
+  {
+    "agent_id": "sales_outreach_agent",
+    "agent_name": "Sales Outreach Agent",
+    "vertical": "commerce",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-069"
+  },
+  {
+    "agent_id": "seo_optimization_agent",
+    "agent_name": "SEO Optimization Agent",
+    "vertical": "media",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-070"
+  },
+  {
+    "agent_id": "talent_acquisition",
+    "agent_name": "Talent Acquisition Agent",
+    "vertical": "corporate",
+    "role_type": "UTILITY",
+    "avatar": "axel",
+    "archetype_id": "ARC-121"
+  },
+  {
+    "agent_id": "tax_optimization_agent",
+    "agent_name": "Tax Optimization Agent",
+    "vertical": "finance",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-072"
+  },
+  {
+    "agent_id": "transaction_coordinator",
+    "agent_name": "Transaction Coordinator",
+    "vertical": "real_estate",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-073"
+  },
+  {
+    "agent_id": "treatment_intelligence",
+    "agent_name": "Treatment Intelligence Engine",
+    "vertical": "core",
+    "role_type": "CROSS_SYSTEM",
+    "avatar": "seren",
+    "archetype_id": "ARC-114"
+  },
+  {
+    "agent_id": "vip_experience_manager",
+    "agent_name": "VIP Experience Manager",
+    "vertical": "luxury",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-075"
+  },
+  {
+    "agent_id": "wellness_coach_agent",
+    "agent_name": "Wellness Coach Agent",
+    "vertical": "health",
+    "role_type": "VERTICAL",
+    "avatar": "nova",
+    "archetype_id": "ARC-076"
+  },
+  {
+    "agent_id": "workforce_planner",
+    "agent_name": "Workforce Planner",
+    "vertical": "corporate",
+    "role_type": "UTILITY",
+    "avatar": "axel",
+    "archetype_id": "ARC-122"
+  }
+]

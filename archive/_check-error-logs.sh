@@ -1,0 +1,1 @@
+sshpass -p "Shemeca2027#" ssh -o StrictHostKeyChecking=no root@148.230.86.150 docker logs n8n --tail 50 2>&1 | grep -iE "error|fail|exception|cannot" | head -20

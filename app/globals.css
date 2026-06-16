@@ -55,7 +55,29 @@ body {
 .glow-acid  { box-shadow: 0 0 24px rgba(200,255,0,0.15); }
 .glow-cyan  { box-shadow: 0 0 24px rgba(0,212,255,0.15); }
 
-/* Animations */
+/* ── Native select dropdown fix ──
+   Prevents browser-native <option> rendering as white-on-white in dark theme.
+   The <select> itself uses Tailwind (bg-white/5 text-white/70) but the native
+   dropdown popup needs its own background. Explicit colors ensure visibility
+   across all browsers (Chrome, Firefox, Edge, Safari).
+*/
+select {
+  color-scheme: dark;
+}
+
+select option {
+  background-color: #1a1a2e;
+  color: #e0e0e0;
+}
+
+/* Some browsers use the select's background for the dropdown panel, so
+   reinforce with a forced dark selection highlight. */
+select option:checked {
+  background: #2a2a4e;
+  color: #c8ff00;
+}
+
+/* ============================================ */
 @keyframes pulse-slow {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.4; }
@@ -67,3 +89,16 @@ body {
   to   { opacity: 1; transform: translateY(0); }
 }
 .animate-fade-in { animation: fade-in 0.4s ease forwards; }
+
+@keyframes gradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.animate-gradient { animation: gradient 3s ease infinite; }
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+.animate-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }

@@ -1,0 +1,266 @@
+{
+  "name": "WF3 — Dead Letter Handler",
+  "nodes": [
+    {
+      "id": "e6f7a8b9-c0d1-2345-efab-456789012345",
+      "name": "Every 5m",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        250,
+        300
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "seconds",
+              "secondsInterval": 5
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "a7b8c9d0-e1f2-3456-abcd-567890123456",
+      "name": "Fetch Dead Letters",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        450,
+        300
+      ],
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT *\nFROM public.workflow_dead_letters\nWHERE processed = false\nORDER BY created_at\nLIMIT 100;"
+      },
+      "credentials": {
+        "postgres": {
+          "id": "V3Efv1mtgcNnSJUZ",
+          "name": "Supabase Postgres"
+        }
+      }
+    },
+    {
+      "id": "b8c9d0e1-f2a3-4567-bcde-678901234567",
+      "name": "Split Batches",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        650,
+        300
+      ],
+      "parameters": {
+        "batchSize": 25,
+        "options": {}
+      }
+    },
+    {
+      "id": "c9d0e1f2-a3b4-5678-cdef-789012345678",
+      "name": "Retryable?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        850,
+        300
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "condition-1",
+              "leftValue": "={{ $json.retryable }}",
+              "rightValue": "=true",
+              "operator": {
+                "type": "boolean",
+                "operation": "equal"
+              }
+            },
+            {
+              "id": "condition-2",
+              "leftValue": "={{ $json.retry_count }}",
+              "rightValue": "={{ $json.max_retries }}",
+              "operator": {
+                "type": "number",
+                "operation": "smaller"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "d0e1f2a3-b4c5-6789-defa-890123456789",
+      "name": "Replay Workflow",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1050,
+        150
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://jebixydqpvsegvrtfmgm.supabase.co/functions/v1/workflow-trigger",
+        "authentication": "genericCredentialType",
+        "nodeCredentialType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $env.SUPABASE_SERVICE_ROLE_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"workflow_id\": \"{{ $json.workflow_id }}\",\n  \"organization_id\": \"{{ $json.organization_id }}\",\n  \"client_id\": \"{{ $json.client_id }}\",\n  \"business_id\": \"{{ $json.business_id }}\",\n  \"input\": \"{{ $json.payload }}\",\n  \"idempotency_key\": \"retry-{{ $json.id }}\"\n}",
+        "options": {
+          "timeout": 30000,
+          "allowUnauthorizedCerts": false
+        }
+      }
+    },
+    {
+      "id": "e1f2a3b4-c5d6-7890-efab-901234567890",
+      "name": "Alert Dead Letter",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1050,
+        500
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://discord.com/api/webhooks/1511012175437631629/MDAs8jV2wLFdeXacP2vwUs1CXHmpUtfoSE8V5UuFjWXk0BIPRXDSOZ1peoSDkZDlt8au",
+        "authentication": "none",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\"content\":\"💀 **Dead Letter Alert**\\n**ID:** {{ $json.id }}\\n**Workflow:** {{ $json.workflow_id }}\\n**Error:** {{ $json.error_message || \\\"Unknown\\\" }}\\n**Retries:** {{ $json.retry_count }}/{{ $json.max_retries }}\"}",
+        "options": {
+          "timeout": 10000,
+          "allowUnauthorizedCerts": false
+        },
+        "sendHeaders": false
+      }
+    },
+    {
+      "id": "f2a3b4c5-d6e7-8901-fabc-012345678901",
+      "name": "Mark Processed",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        1250,
+        300
+      ],
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE public.workflow_dead_letters\nSET\n  processed = true,\n  processed_at = NOW()\nWHERE id = '{{ $json.id }}'::uuid;"
+      },
+      "credentials": {
+        "postgres": {
+          "id": "V3Efv1mtgcNnSJUZ",
+          "name": "Supabase Postgres"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Every 5m": {
+      "main": [
+        [
+          {
+            "node": "Fetch Dead Letters",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Dead Letters": {
+      "main": [
+        [
+          {
+            "node": "Split Batches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Batches": {
+      "main": [
+        [
+          {
+            "node": "Retryable?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retryable?": {
+      "main": [
+        [
+          {
+            "node": "Replay Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Alert Dead Letter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Replay Workflow": {
+      "main": [
+        [
+          {
+            "node": "Mark Processed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Alert Dead Letter": {
+      "main": [
+        [
+          {
+            "node": "Mark Processed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "errorWorkflow": "",
+    "callerPolicy": "workflowsFromSameOwner",
+    "timezone": "UTC"
+  },
+  "staticData": {
+    "node:Every 5m": {
+      "recurrenceRules": []
+    }
+  },
+  "pinData": {},
+  "tags": []
+}

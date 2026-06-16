@@ -1,0 +1,10 @@
+node_modules
+.git
+.gitignore
+.vscode
+.next
+.env*
+*.md
+.DS_Store
+*.tsbuildinfo
+next-env.d.ts

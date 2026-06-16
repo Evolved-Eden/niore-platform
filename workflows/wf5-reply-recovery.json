@@ -1,0 +1,180 @@
+{
+  "name": "WF5 — Reply Recovery",
+  "nodes": [
+    {
+      "id": "56789abc-def0-1234-5678-9abcdef01234",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.2,
+      "position": [250, 300],
+      "parameters": {
+        "path": "replay-workflow",
+        "httpMethod": "POST",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "webhookId": "replay-workflow"
+    },
+    {
+      "id": "6789abcd-ef01-2345-6789-abcdef012345",
+      "name": "Load Checkpoint",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [450, 300],
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT *\nFROM public.workflow_run_checkpoints\nWHERE workflow_run_id = '{{ $json.workflow_run_id }}'::uuid\nORDER BY created_at DESC\nLIMIT 1;"
+      },
+      "credentials": {
+        "postgres": "Supabase Postgres"
+      }
+    },
+    {
+      "id": "789abcde-f012-3456-789a-bcdef0123456",
+      "name": "Has Checkpoint?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [650, 300],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "condition-1",
+              "leftValue": "={{ $json.length }}",
+              "rightValue": "=0",
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "89abcdef-0123-4567-89ab-cdef01234567",
+      "name": "Replay Workflow",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [850, 150],
+      "parameters": {
+        "method": "POST",
+        "url": "https://jebixydqpvsegvrtfmgm.supabase.co/functions/v1/workflow-trigger",
+        "authentication": "genericCredentialType",
+        "nodeCredentialType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $env.SUPABASE_SERVICE_ROLE_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"workflow_id\": \"{{ $json.workflow_id }}\",\n  \"organization_id\": \"{{ $json.organization_id }}\",\n  \"client_id\": \"{{ $json.client_id }}\",\n  \"business_id\": \"{{ $json.business_id }}\",\n  \"input\": \"{{ $json.checkpoint_data }}\",\n  \"idempotency_key\": \"replay-{{ $json.workflow_run_id }}\"\n}",
+        "options": {
+          "timeout": 30000,
+          "allowUnauthorizedCerts": false
+        }
+      }
+    },
+    {
+      "id": "9abcdef0-1234-5678-9abc-def012345678",
+      "name": "Respond Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1050, 150],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ {\n  \"success\": true,\n  \"message\": \"Workflow replayed successfully\",\n  \"workflow_run_id\": $json.workflow_run_id,\n  \"workflow_id\": $json.workflow_id\n} }}"
+      }
+    },
+    {
+      "id": "abcdef01-2345-6789-abcd-ef0123456789",
+      "name": "Respond NotFound",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [850, 500],
+      "parameters": {
+        "respondWith": "json",
+        "responseStatusCode": 404,
+        "responseBody": "={{ {\n  \"success\": false,\n  \"message\": \"No checkpoint found for workflow_run_id\",\n  \"workflow_run_id\": $json.workflow_run_id\n} }}"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Load Checkpoint",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load Checkpoint": {
+      "main": [
+        [
+          {
+            "node": "Has Checkpoint?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Checkpoint?": {
+      "main": [
+        [
+          {
+            "node": "Replay Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond NotFound",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Replay Workflow": {
+      "main": [
+        [
+          {
+            "node": "Respond Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "versionId": "00000000-0000-0000-0000-000000000005",
+  "settings": {
+    "executionOrder": "v1",
+    "errorWorkflow": "",
+    "callerPolicy": "workflowsFromSameOwner",
+    "timezone": "UTC"
+  },
+  "staticData": null,
+  "tags": ["infrastructure", "recovery"]
+}

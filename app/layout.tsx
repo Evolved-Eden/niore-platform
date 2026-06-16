@@ -16,9 +16,9 @@ const spaceGrotesk = Space_Grotesk({
 })
 
 export const metadata: Metadata = {
-  title: 'Hoodacity — Audacity in Every Algorithm',
+  title: 'Evolved Eden - Registered Intelligence Systems',
   description: 'Registered Intelligence Systems. Build, deploy, and monetize AI twins.',
-  icons: { icon: '/favicon.ico' },
+  icons: { icon: '/favicon.JPG' },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

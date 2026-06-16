@@ -1,0 +1,400 @@
+Agent_ID,Agent_Name,Vertical,Subvertical,Role_Type,Archetype_ID,Archetype_Name,Avatar,Primary_Template,Secondary_Template,Primary_System_Range,Secondary_System_Range,Tertiary_System_Range,Generator_Models,Capability,Trust,Activation,Synergy,Risk,Evolution,MAS,Health_Status
+AGT-001,Executive Twin,core,governance,Core,1,Sovereign,Axel,Operations,Governance,141-155,1-30,,[GEN-001],95,94,90,96,10,85,82.75,ACTIVE
+AGT-002,Communication Sovereign,core,communication,Core,2,Lover,Liora,Content,Operations,71-90,141-155,,[GEN-002],88,92,85,90,5,80,78.65,ACTIVE
+AGT-003,Time Architecture Agent,core,scheduling,Core,4,Sage,Orion,Operations,Content,71-90,141-155,,[GEN-003],85,90,80,82,5,78,76.95,ACTIVE
+AGT-004,Operations Command Agent,core,operations,Core,38,Builder,Nova,Operations,Governance,141-155,1-30,[GEN-004],92,88,95,91,8,82,82.70,ACTIVE
+AGT-005,Revenue Intelligence Agent,core,finance,Core,56,Catalyst,Alaric,Revenue,Operations,141-155,141-155,,[GEN-005],96,93,88,92,10,85,84.55,ACTIVE
+AGT-006,Identity Architect Agent,core,identity,Vertical,66,Architect,Nova,Content,,71-90,,,[GEN-006],89,86,82,91,5,79,80.95,ACTIVE
+AGT-007,Blueprint Strategist Agent,core,strategy,Vertical,18,Visionary,Nova,Operations,,141-155,,,[GEN-007],88,85,80,89,5,78,79.80,ACTIVE
+AGT-008,Governance Intelligence Agent,core,governance,Vertical,67,Gatekeeper,Axel,Governance,,1-30,,,[GEN-008],91,88,84,92,6,81,82.80,ACTIVE
+AGT-009,Luxury Acquisition Agent,real_estate,luxury,Vertical,13,Hero,Axel,Revenue,,141-155,,,[GEN-009],87,83,81,86,7,76,78.25,ACTIVE
+AGT-010,Client Experience Agent,real_estate,service,Vertical,5,Caregiver,Seren,Care,,51-70,,,[GEN-009],90,87,85,91,5,80,82.85,ACTIVE
+AGT-011,Showing Optimization Agent,real_estate,operations,Vertical,73,Protector,Axel,Operations,,141-155,,,[GEN-009],84,80,79,83,6,74,76.15,ACTIVE
+AGT-012,Real Estate Transaction Agent,real_estate,transaction,Vertical,38,Builder,Nova,Revenue,,141-155,,,[GEN-009,GEN-061],86,82,80,85,5,77,78.35,ACTIVE
+AGT-013,Real Estate Market Agent,real_estate,market,Vertical,31,Scientist,Orion,Revenue,,141-155,,,[GEN-009,GEN-062],85,81,78,84,5,76,77.15,ACTIVE
+AGT-014,Property Management Agent,real_estate,management,Vertical,38,Builder,Nova,Operations,,141-155,,,[GEN-009],83,80,77,82,6,75,75.55,ACTIVE
+AGT-015,Real Estate Legal Agent,real_estate,legal,Vertical,60,Advocate,Liora,Legal,,1-30,,,[GEN-009],88,86,83,90,5,79,81.85,ACTIVE
+AGT-016,Real Estate Investment Agent,real_estate,investment,Vertical,56,Catalyst,Alaric,Revenue,,141-155,,,[GEN-009],89,87,84,91,5,80,82.80,ACTIVE
+AGT-017,Real Estate Development Agent,real_estate,development,Vertical,66,Architect,Nova,Operations,,141-155,,,[GEN-009],87,85,81,88,5,78,80.30,ACTIVE
+AGT-018,Social Services Intake Agent,social_services,intake,Vertical,5,Caregiver,Seren,Care,,51-70,,,[GEN-010],88,86,83,90,5,79,81.85,ACTIVE
+AGT-019,Food Assistance Agent,social_services,food,Vertical,5,Caregiver,Seren,Care,,51-70,,,[GEN-010],87,85,82,89,5,78,81.00,ACTIVE
+AGT-020,Housing Assistance Agent,social_services,housing,Vertical,5,Caregiver,Seren,Care,,51-70,,,[GEN-010],86,84,81,88,5,77,80.15,ACTIVE
+AGT-021,Child Protective Services Agent,social_services,child_protection,Vertical,73,Protector,Axel,Legal,,1-30,,,[GEN-010],91,89,87,93,6,83,84.80,ACTIVE
+AGT-022,Disability Services Agent,social_services,disability,Vertical,5,Caregiver,Seren,Care,,51-70,,,[GEN-010],89,87,84,91,5,80,82.80,ACTIVE
+AGT-023,Senior Services Agent,social_services,senior,Vertical,5,Caregiver,Seren,Care,,51-70,,,[GEN-010],88,86,83,90,5,79,81.85,ACTIVE
+AGT-024,Community Outreach Agent,social_services,outreach,Vertical,74,Emissary,Liora,Care,,51-70,,,[GEN-010],85,83,80,87,5,76,78.60,ACTIVE
+AGT-025,Health Optimization Agent,health,wellness,Vertical,35,Healer,Seren,Care,,51-70,,,[GEN-011,GEN-091],91,88,87,92,4,82,84.45,ACTIVE
+AGT-026,Telemedicine Agent,health,telemedicine,Vertical,35,Healer,Seren,Care,,51-70,,,[GEN-011],90,87,86,91,4,81,83.60,ACTIVE
+AGT-027,Nutrition Agent,health,nutrition,Vertical,35,Healer,Seren,Care,,51-70,,,[GEN-011],88,85,84,89,4,80,81.90,ACTIVE
+AGT-028,Fitness Agent,health,fitness,Vertical,35,Healer,Seren,Care,,51-70,,,[GEN-011],86,83,82,87,4,78,80.10,ACTIVE
+AGT-029,Chronic Disease Agent,health,chronic,Vertical,35,Healer,Seren,Care,,51-70,,,[GEN-011],92,89,88,93,5,84,85.00,ACTIVE
+AGT-030,Mental Wellness Agent,health,mental_wellness,Vertical,35,Healer,Seren,Care,,51-70,,,[GEN-011],91,88,87,92,4,83,84.55,ACTIVE
+AGT-031,Preventive Care Agent,health,preventive,Vertical,35,Healer,Seren,Care,,51-70,,,[GEN-011],90,87,86,91,4,82,83.70,ACTIVE
+AGT-032,Health Insurance Agent,health,insurance,Vertical,67,Gatekeeper,Axel,Governance,,1-30,,,[GEN-011],89,86,85,90,5,81,82.70,ACTIVE
+AGT-033,Executive Front Desk,corporate,admin,Vertical,24,Guardian,Axel,Operations,,71-90,,,[GEN-012],88,84,82,89,5,77,80.45,ACTIVE
+AGT-034,Corporate Strategy Agent,corporate,strategy,Vertical,18,Visionary,Nova,Operations,,141-155,,,[GEN-012],90,87,85,92,5,80,83.15,ACTIVE
+AGT-035,HR Agent,corporate,hr,Vertical,40,Mentor,Orion,Operations,,141-155,,,[GEN-012],86,83,81,88,5,76,79.45,ACTIVE
+AGT-036,Corporate Finance Agent,corporate,finance,Vertical,56,Catalyst,Alaric,Revenue,,141-155,,,[GEN-012],89,86,84,91,5,79,82.45,ACTIVE
+AGT-037,Corporate Legal Agent,corporate,legal,Vertical,60,Advocate,Liora,Legal,,1-30,,,[GEN-012],88,85,83,90,5,78,81.60,ACTIVE
+AGT-038,Corporate Communications Agent,corporate,communications,Vertical,2,Lover,Liora,Content,,71-90,,,[GEN-012],87,84,82,89,4,77,80.85,ACTIVE
+AGT-039,Corporate IT Agent,corporate,it,Vertical,38,Builder,Nova,AI,,121-140,,,[GEN-012],85,82,80,87,5,75,78.30,ACTIVE
+AGT-040,Corporate Procurement Agent,corporate,procurement,Vertical,27,Merchant,Liora,Revenue,,141-155,,,[GEN-012],84,81,79,86,5,74,77.35,ACTIVE
+AGT-041,Luxury Brand Agent,luxury,brand,Vertical,78,Siren,Liora,Revenue,,141-155,,,[GEN-013],86,82,80,87,5,76,78.20,ACTIVE
+AGT-042,Luxury Concierge Agent,luxury,concierge,Vertical,78,Siren,Liora,Operations,,141-155,,,[GEN-013],88,84,82,89,5,78,80.30,ACTIVE
+AGT-043,Luxury Goods Agent,luxury,goods,Vertical,27,Merchant,Liora,Revenue,,141-155,,,[GEN-013],85,81,79,86,5,75,77.25,ACTIVE
+AGT-044,Luxury Travel Agent,luxury,travel,Vertical,78,Siren,Liora,Travel,,141-155,,,[GEN-013],87,83,81,88,5,77,79.05,ACTIVE
+AGT-045,Luxury Events Agent,luxury,events,Vertical,18,Visionary,Nova,Events,,141-155,,,[GEN-013],86,82,80,87,5,76,78.20,ACTIVE
+AGT-046,Luxury Real Estate Agent,luxury,real_estate,Vertical,66,Architect,Nova,Revenue,,141-155,,,[GEN-013],89,85,83,90,5,79,81.15,ACTIVE
+AGT-047,Luxury Automotive Agent,luxury,automotive,Vertical,13,Hero,Axel,Revenue,,141-155,,,[GEN-013],84,80,78,83,6,74,75.50,ACTIVE
+AGT-048,Luxury Investment Agent,luxury,investment,Vertical,56,Catalyst,Alaric,Revenue,,141-155,,,[GEN-013],88,84,82,89,5,78,80.30,ACTIVE
+AGT-049,Athlete Brand Agent,sports,branding,Vertical,7,Creator,Nova,Content,,71-90,,,[GEN-014],86,82,80,87,5,76,78.20,ACTIVE
+AGT-050,Sports Performance Agent,sports,performance,Vertical,31,Scientist,Orion,Operations,,141-155,,,[GEN-014,GEN-063],88,84,82,89,5,78,80.30,ACTIVE
+AGT-051,Sports Contract Agent,sports,contract,Vertical,27,Merchant,Liora,Revenue,,141-155,,,[GEN-014,GEN-064],85,81,79,86,5,75,77.25,ACTIVE
+AGT-052,Sports Media Agent,sports,media,Vertical,39,Storyteller,Nova,Content,,71-90,,,[GEN-014],87,83,81,88,5,77,79.05,ACTIVE
+AGT-053,Sports Health Agent,sports,health,Vertical,35,Healer,Seren,Care,,51-70,,,[GEN-014],90,86,85,91,5,80,82.85,ACTIVE
+AGT-054,Sports Analytics Agent,sports,analytics,Vertical,31,Scientist,Orion,Analytics,,141-155,,,[GEN-014],89,85,83,90,5,79,81.15,ACTIVE
+AGT-055,Product-Market Fit Agent,tech,strategy,Vertical,7,Creator,Nova,Revenue,,141-155,,,[GEN-015],88,84,83,87,5,77,79.80,ACTIVE
+AGT-056,Tech Operations Agent,tech,operations,Vertical,38,Builder,Nova,Operations,,141-155,,,[GEN-015],87,83,81,88,5,76,78.85,ACTIVE
+AGT-057,Tech Revenue Agent,tech,revenue,Vertical,56,Catalyst,Alaric,Revenue,,141-155,,,[GEN-015],89,85,84,90,5,79,81.35,ACTIVE
+AGT-058,Tech Talent Agent,tech,talent,Vertical,40,Mentor,Orion,Operations,,141-155,,,[GEN-015],86,82,80,87,5,75,78.20,ACTIVE
+AGT-059,Tech IP Agent,tech,ip,Vertical,67,Gatekeeper,Axel,Governance,,1-30,,,[GEN-015],90,86,85,91,5,80,82.85,ACTIVE
+AGT-060,Tech Compliance Agent,tech,compliance,Vertical,67,Gatekeeper,Axel,Governance,,1-30,,,[GEN-015],88,84,82,89,5,78,80.30,ACTIVE
+AGT-061,Civic Infrastructure Agent,government,infrastructure,Vertical,31,Scientist,Orion,Governance,,91-100,,,[GEN-016],87,83,81,86,6,76,78.20,ACTIVE
+AGT-062,Government Policy Agent,government,policy,Vertical,60,Advocate,Liora,Governance,,91-100,,,[GEN-016],88,84,82,89,5,78,80.30,ACTIVE
+AGT-063,Government Services Agent,government,services,Vertical,5,Caregiver,Seren,Care,,51-70,,,[GEN-016],86,82,80,87,5,76,78.20,ACTIVE
+AGT-064,Government Budget Agent,government,budget,Vertical,56,Catalyst,Alaric,Revenue,,141-155,,,[GEN-016],89,85,83,90,5,79,81.15,ACTIVE
+AGT-065,Government Transparency Agent,government,transparency,Vertical,67,Gatekeeper,Axel,Governance,,1-30,,,[GEN-016],90,86,85,91,5,80,82.85,ACTIVE
+AGT-066,Government Digital Agent,government,digital,Vertical,38,Builder,Nova,Operations,,141-155,,,[GEN-016],87,83,81,88,5,77,79.05,ACTIVE
+AGT-067,Creator Identity Agent,creator,identity,Vertical,66,Architect,Nova,Content,,71-90,,,[GEN-017],90,86,85,91,4,80,83.55,ACTIVE
+AGT-068,Creator Content Agent,creator,content,Vertical,7,Creator,Nova,Content,,71-90,,,[GEN-017],89,85,83,90,5,79,81.15,ACTIVE
+AGT-069,Creator Monetization Agent,creator,monetization,Vertical,56,Catalyst,Alaric,Revenue,,141-155,,,[GEN-017,GEN-071],88,84,82,89,5,78,80.30,ACTIVE
+AGT-070,Creator Community Agent,creator,community,Vertical,40,Mentor,Orion,Care,,51-70,,,[GEN-017],87,83,81,88,5,77,79.05,ACTIVE
+AGT-071,Creator Analytics Agent,creator,analytics,Vertical,31,Scientist,Orion,Analytics,,141-155,,,[GEN-017,GEN-072],90,86,85,91,5,80,82.85,ACTIVE
+AGT-072,Creator Legal Agent,creator,legal,Vertical,60,Advocate,Liora,Legal,,1-30,,,[GEN-017],88,84,82,89,5,78,80.30,ACTIVE
+AGT-073,Legacy Estate Agent,legacy,estate,Vertical,42,Elder,Orion,Revenue,,141-155,,,[GEN-018,GEN-073,GEN-074],89,85,83,90,5,79,81.15,ACTIVE
+AGT-074,Legacy Trust Agent,legacy,trust,Vertical,67,Gatekeeper,Axel,Governance,,1-30,,,[GEN-018,GEN-074],90,86,85,91,5,80,82.85,ACTIVE
+AGT-075,Legacy Philanthropy Agent,legacy,philanthropy,Vertical,5,Caregiver,Seren,Care,,51-70,,,[GEN-018],87,83,81,88,5,77,79.05,ACTIVE
+AGT-076,Legacy Inheritance Agent,legacy,inheritance,Vertical,60,Advocate,Liora,Legal,,1-30,,,[GEN-018],88,84,82,89,5,78,80.30,ACTIVE
+AGT-077,Legacy Planning Agent,legacy,planning,Vertical,66,Architect,Nova,Operations,,141-155,,,[GEN-018],86,82,80,87,5,76,78.20,ACTIVE
+AGT-078,Legacy Family Office Agent,legacy,family_office,Vertical,27,Merchant,Liora,Revenue,,141-155,,,[GEN-018],85,81,79,86,5,75,77.25,ACTIVE
+AGT-079,Beauty Brand Agent,beauty,branding,Vertical,7,Creator,Nova,Content,,71-90,,,[GEN-019],86,82,80,87,5,76,78.20,ACTIVE
+AGT-080,Beauty Product Agent,beauty,product,Vertical,30,Artist,Nova,Content,,71-90,,,[GEN-019,GEN-075],88,84,82,89,5,78,80.30,ACTIVE
+AGT-081,Beauty Salon Agent,beauty,salon,Vertical,35,Healer,Seren,Care,,51-70,,,[GEN-019],85,81,79,86,5,75,77.25,ACTIVE
+AGT-082,Beauty Supply Chain Agent,beauty,supply_chain,Vertical,38,Builder,Nova,Operations,,141-155,,,[GEN-019,GEN-076],87,83,81,88,5,77,79.05,ACTIVE
+AGT-083,Beauty Trends Agent,beauty,trends,Vertical,39,Storyteller,Nova,Content,,71-90,,,[GEN-019],86,82,80,87,5,76,78.20,ACTIVE
+AGT-084,Beauty Wellness Agent,beauty,wellness,Vertical,35,Healer,Seren,Care,,51-70,,,[GEN-019],89,85,83,90,5,79,81.15,ACTIVE
+AGT-085,Travel Concierge Agent,travel,concierge,Vertical,78,Siren,Liora,Travel,,71-90,,,[GEN-020,GEN-078],90,86,85,91,5,80,82.85,ACTIVE
+AGT-086,Travel Booking Agent,travel,booking,Vertical,27,Merchant,Liora,Revenue,,141-155,,,[GEN-020],88,84,82,89,5,78,80.30,ACTIVE
+AGT-087,Travel Experience Agent,travel,experience,Vertical,39,Storyteller,Nova,Content,,71-90,,,[GEN-020],87,83,81,88,5,77,79.05,ACTIVE
+AGT-088,Travel Safety Agent,travel,safety,Vertical,73,Protector,Axel,Crisis,,51-70,,,[GEN-020],89,85,83,90,5,79,81.15,ACTIVE
+AGT-089,Travel Logistics Agent,travel,logistics,Vertical,38,Builder,Nova,Operations,,141-155,,,[GEN-020],86,82,80,87,5,76,78.20,ACTIVE
+AGT-090,Travel Sustainability Agent,travel,sustainability,Vertical,35,Healer,Seren,Sustainability,,91-100,,,[GEN-020],88,84,82,89,5,78,80.30,ACTIVE
+AGT-091,Legal Practice Agent,legal,practice,Vertical,13,Hero,Axel,Governance,,1-30,,,[GEN-021,GEN-079],89,85,83,90,5,79,81.15,ACTIVE
+AGT-092,Legal Contract Agent,legal,contract,Vertical,60,Advocate,Liora,Legal,,1-30,,,[GEN-021],90,86,85,91,5,80,82.85,ACTIVE
+AGT-093,Legal Discovery Agent,legal,discovery,Vertical,31,Scientist,Orion,Legal,,1-30,,,[GEN-021,GEN-080],88,84,82,89,5,78,80.30,ACTIVE
+AGT-094,Legal Compliance Agent,legal,compliance,Vertical,67,Gatekeeper,Axel,Governance,,1-30,,,[GEN-021],91,87,86,92,5,81,83.85,ACTIVE
+AGT-095,Legal Litigation Agent,legal,litigation,Vertical,60,Advocate,Liora,Legal,,1-30,,,[GEN-021],92,88,87,93,5,82,84.85,ACTIVE
+AGT-096,Legal Mediation Agent,legal,mediation,Vertical,74,Emissary,Liora,Legal,,1-30,,,[GEN-021],87,83,81,88,5,77,79.05,ACTIVE
+AGT-097,Media Production Agent,media,production,Vertical,7,Creator,Nova,Content,,71-90,,,[GEN-022,GEN-082],88,84,82,89,5,78,80.30,ACTIVE
+AGT-098,Media Distribution Agent,media,distribution,Vertical,68,Pathfinder,Quest,Revenue,,141-155,,,[GEN-022],86,82,80,87,5,76,78.20,ACTIVE
+AGT-099,Media Rights Agent,media,rights,Vertical,27,Merchant,Liora,Legal,,1-30,,,[GEN-022,GEN-081],89,85,83,90,5,79,81.15,ACTIVE
+AGT-100,Media Analytics Agent,media,analytics,Vertical,31,Scientist,Orion,Analytics,,141-155,,,[GEN-022],90,86,85,91,5,80,82.85,ACTIVE
+AGT-101,Media Branding Agent,media,branding,Vertical,39,Storyteller,Nova,Content,,71-90,,,[GEN-022],87,83,81,88,5,77,79.05,ACTIVE
+AGT-102,Media Compliance Agent,media,compliance,Vertical,67,Gatekeeper,Axel,Governance,,1-30,,,[GEN-022],88,84,82,89,5,78,80.30,ACTIVE
+AGT-103,Food Recipe Agent,food,recipe,Vertical,30,Artist,Nova,Content,,71-90,,,[GEN-023],86,82,80,87,5,76,78.20,ACTIVE
+AGT-104,Food Nutrition Agent,food,nutrition,Vertical,35,Healer,Seren,Care,,51-70,,,[GEN-023],88,84,82,89,5,78,80.30,ACTIVE
+AGT-105,Food Supply Chain Agent,food,supply_chain,Vertical,38,Builder,Nova,Operations,,141-155,,,[GEN-023],87,83,81,88,5,77,79.05,ACTIVE
+AGT-106,Food Safety Agent,food,safety,Vertical,67,Gatekeeper,Axel,Governance,,1-30,,,[GEN-023,GEN-084],89,85,83,90,5,79,81.15,ACTIVE
+AGT-107,Food Trends Agent,food,trends,Vertical,39,Storyteller,Nova,Content,,71-90,,,[GEN-023],85,81,79,86,5,75,77.25,ACTIVE
+AGT-108,Food Commerce Agent,food,commerce,Vertical,27,Merchant,Liora,Revenue,,141-155,,,[GEN-023],88,84,82,89,5,78,80.30,ACTIVE
+AGT-109,Events Planning Agent,events,planning,Vertical,18,Visionary,Nova,Operations,,141-155,,,[GEN-024],87,83,81,88,5,77,79.05,ACTIVE
+AGT-110,Events Operations Agent,events,operations,Vertical,38,Builder,Nova,Operations,,141-155,,,[GEN-024],86,82,80,87,5,76,78.20,ACTIVE
+AGT-111,Events Logistics Agent,events,logistics,Vertical,68,Pathfinder,Quest,Operations,,141-155,,,[GEN-024],85,81,79,86,5,75,77.25,ACTIVE
+AGT-112,Events Marketing Agent,events,marketing,Vertical,7,Creator,Nova,Content,,71-90,,,[GEN-024],88,84,82,89,5,78,80.30,ACTIVE
+AGT-113,Events Compliance Agent,events,compliance,Vertical,67,Gatekeeper,Axel,Governance,,1-30,,,[GEN-024],89,85,83,90,5,79,81.15,ACTIVE
+AGT-114,Events Revenue Agent,events,revenue,Vertical,56,Catalyst,Alaric,Revenue,,141-155,,,[GEN-024],90,86,85,91,5,80,82.85,ACTIVE
+AGT-115,AI Workflow Agent,ai,automation,Vertical,38,Builder,Nova,AI,,121-140,,,[GEN-025,GEN-085],92,89,88,93,4,83,85.05,ACTIVE
+AGT-116,AI Model Agent,ai,model,Vertical,31,Scientist,Orion,AI,,121-140,,,[GEN-025],91,88,87,92,4,82,84.45,ACTIVE
+AGT-117,AI Data Agent,ai,data,Vertical,31,Scientist,Orion,AI,,121-140,,,[GEN-025],90,87,86,91,4,81,83.60,ACTIVE
+AGT-118,AI Ethics Agent,ai,ethics,Vertical,60,Advocate,Liora,AI,,121-140,,,[GEN-025],93,90,89,94,4,85,86.15,ACTIVE
+AGT-119,AI Deployment Agent,ai,deployment,Vertical,38,Builder,Nova,AI,,121-140,,,[GEN-025],89,86,85,90,4,80,82.70,ACTIVE
+AGT-120,AI Integration Agent,ai,integration,Vertical,64,Conduit,Eden,AI,,121-140,,,[GEN-025,GEN-086],94,91,90,95,4,86,87.05,ACTIVE
+AGT-121,Offer Architecture Agent,commerce,offer_design,Vertical,66,Architect,Nova,Revenue,,141-155,,,[GEN-026],91,88,86,92,5,81,83.85,ACTIVE
+AGT-122,Commerce Checkout Agent,commerce,checkout,Vertical,27,Merchant,Liora,Revenue,,141-155,,,[GEN-026],89,86,84,90,5,79,81.95,ACTIVE
+AGT-123,Commerce Fulfillment Agent,commerce,fulfillment,Vertical,38,Builder,Nova,Operations,,141-155,,,[GEN-026],88,85,83,89,5,78,80.95,ACTIVE
+AGT-124,Commerce Pricing Agent,commerce,pricing,Vertical,66,Architect,Nova,Revenue,,141-155,,,[GEN-026],90,87,85,91,5,80,82.95,ACTIVE
+AGT-125,Commerce Analytics Agent,commerce,analytics,Vertical,31,Scientist,Orion,Analytics,,141-155,,,[GEN-026],89,86,84,90,5,79,81.95,ACTIVE
+AGT-126,Commerce Compliance Agent,commerce,compliance,Vertical,67,Gatekeeper,Axel,Governance,,1-30,,,[GEN-026,GEN-087],88,85,83,89,5,78,80.95,ACTIVE
+AGT-127,Curriculum Agent,education,curriculum,Vertical,26,Engineer,Nova,Content,,71-90,,,[GEN-027,GEN-088],87,83,81,86,5,77,78.60,ACTIVE
+AGT-128,Education Delivery Agent,education,delivery,Vertical,40,Mentor,Orion,Content,,71-90,,,[GEN-027],88,84,82,89,5,78,80.30,ACTIVE
+AGT-129,Education Assessment Agent,education,assessment,Vertical,31,Scientist,Orion,Content,,71-90,,,[GEN-027],89,85,83,90,5,79,81.15,ACTIVE
+AGT-130,Education Technology Agent,education,technology,Vertical,38,Builder,Nova,AI,,121-140,,,[GEN-027],86,82,80,87,5,76,78.20,ACTIVE
+AGT-131,Education Compliance Agent,education,compliance,Vertical,67,Gatekeeper,Axel,Governance,,1-30,,,[GEN-027],90,86,85,91,5,80,82.85,ACTIVE
+AGT-132,Education Funding Agent,education,funding,Vertical,56,Catalyst,Alaric,Revenue,,141-155,,,[GEN-027],88,84,82,89,5,78,80.30,ACTIVE
+AGT-133,Deal Sourcing Agent,finance,sourcing,Vertical,68,Pathfinder,Quest,Revenue,,141-155,,,[GEN-028],89,85,83,90,5,79,81.15,ACTIVE
+AGT-134,Finance Modeling Agent,finance,modeling,Vertical,31,Scientist,Orion,Revenue,,141-155,,,[GEN-028],90,86,85,91,5,80,82.85,ACTIVE
+AGT-135,Finance Due Diligence Agent,finance,due_diligence,Vertical,19,Judge,Orion,Governance,,1-30,,,[GEN-028,GEN-089],91,87,86,92,5,81,83.85,ACTIVE
+AGT-136,Finance Compliance Agent,finance,compliance,Vertical,67,Gatekeeper,Axel,Governance,,1-30,,,[GEN-028],88,84,82,89,5,78,80.30,ACTIVE
+AGT-137,Finance Portfolio Agent,finance,portfolio,Vertical,56,Catalyst,Alaric,Revenue,,141-155,,,[GEN-028],89,85,83,90,5,79,81.15,ACTIVE
+AGT-138,Finance Risk Agent,finance,risk,Vertical,73,Protector,Axel,Governance,,1-30,,,[GEN-028],87,83,81,88,5,77,79.05,ACTIVE
+AGT-139,Wealth Architecture Agent,wealth,architecture,Vertical,66,Architect,Nova,Revenue,,141-155,,,[GEN-029,GEN-090],90,86,85,91,5,80,82.85,ACTIVE
+AGT-140,Wealth Planning Agent,wealth,planning,Vertical,66,Architect,Nova,Revenue,,141-155,,,[GEN-029],89,85,83,90,5,79,81.15,ACTIVE
+AGT-141,Wealth Investment Agent,wealth,investment,Vertical,56,Catalyst,Alaric,Revenue,,141-155,,,[GEN-029],91,87,86,92,5,81,83.85,ACTIVE
+AGT-142,Wealth Tax Agent,wealth,tax,Vertical,19,Judge,Orion,Legal,,1-30,,,[GEN-029],88,84,82,89,5,78,80.30,ACTIVE
+AGT-143,Wealth Protection Agent,wealth,protection,Vertical,73,Protector,Axel,Governance,,1-30,,,[GEN-029],90,86,85,91,5,80,82.85,ACTIVE
+AGT-144,Wealth Legacy Agent,wealth,legacy,Vertical,42,Elder,Orion,Revenue,,141-155,,,[GEN-029],87,83,81,88,5,77,79.05,ACTIVE
+AGT-145,Corporate M&A Agent,corporate_extended,m_a,Vertical,56,Catalyst,Alaric,Revenue,,141-155,,,[GEN-030],90,86,85,91,5,80,82.85,ACTIVE
+AGT-146,Corporate Restructuring Agent,corporate_extended,restructuring,Vertical,66,Architect,Nova,Operations,,141-155,,,[GEN-030],88,84,82,89,5,78,80.30,ACTIVE
+AGT-147,Corporate Governance Agent,corporate_extended,governance,Vertical,67,Gatekeeper,Axel,Governance,,1-30,,,[GEN-030],89,85,83,90,5,79,81.15,ACTIVE
+AGT-148,Corporate Risk Agent,corporate_extended,risk,Vertical,73,Protector,Axel,Governance,,1-30,,,[GEN-030],87,83,81,88,5,77,79.05,ACTIVE
+AGT-149,Corporate Culture Agent,corporate_extended,culture,Vertical,2,Lover,Liora,Content,,71-90,,,[GEN-030],86,82,80,87,5,76,78.20,ACTIVE
+AGT-150,Corporate Sustainability Agent,corporate_extended,sustainability,Vertical,35,Healer,Seren,Sustainability,,91-100,,,[GEN-030],88,84,82,89,5,78,80.30,ACTIVE
+AGT-151,Real Estate Valuation Agent,real_estate,valuation,Vertical,31,Scientist,Orion,Revenue,,141-155,,,[GEN-009,GEN-062],87,83,81,88,5,77,79.05,ACTIVE
+AGT-152,Real Estate Closing Agent,real_estate,closing,Vertical,60,Advocate,Liora,Legal,,1-30,,,[GEN-009,GEN-061],89,85,83,90,5,79,81.15,ACTIVE
+AGT-153,Social Services Volunteer Agent,social_services,volunteer,Vertical,5,Caregiver,Seren,Care,,51-70,,,[GEN-010],84,80,78,83,5,73,76.15,ACTIVE
+AGT-154,Sports Sponsorship Agent,sports,sponsorship,Vertical,27,Merchant,Liora,Revenue,,141-155,,,[GEN-014,GEN-064],86,82,80,87,5,76,78.20,ACTIVE
+AGT-155,Tech Security Agent,tech,security,Vertical,73,Protector,Axel,AI,,121-140,,,[GEN-015,GEN-065],90,86,85,91,5,80,82.85,ACTIVE
+AGT-156,Tech Scaling Agent,tech,scaling,Vertical,18,Visionary,Nova,Operations,,141-155,,,[GEN-015,GEN-066],89,85,83,90,5,79,81.15,ACTIVE
+AGT-157,Government Procurement Agent,government,procurement,Vertical,38,Builder,Nova,Operations,,141-155,,,[GEN-016,GEN-067],86,82,80,87,5,76,78.20,ACTIVE
+AGT-158,Government Compliance Agent,government,compliance,Vertical,67,Gatekeeper,Axel,Governance,,1-30,,,[GEN-016,GEN-068],88,84,82,89,5,78,80.30,ACTIVE
+AGT-159,Social Services Case Agent,social_services,case_management,Vertical,5,Caregiver,Seren,Care,,51-70,,,[GEN-010,GEN-069],85,81,79,86,5,75,77.25,ACTIVE
+AGT-160,Social Services Crisis Agent,social_services,crisis,Vertical,35,Healer,Seren,Crisis,,51-70,,,[GEN-010,GEN-070],90,86,85,91,5,80,82.85,ACTIVE
+AGT-161,Creator Monetization Agent (Ext),creator,monetization_ext,Vertical,56,Catalyst,Alaric,Revenue,,141-155,,,[GEN-017,GEN-071],89,85,83,90,5,79,81.15,ACTIVE
+AGT-162,Creator Analytics Agent (Ext),creator,analytics_ext,Vertical,31,Scientist,Orion,Analytics,,141-155,,,[GEN-017,GEN-072],90,86,85,91,5,80,82.85,ACTIVE
+AGT-163,Legacy Wealth Transfer Agent,legacy,wealth_transfer,Vertical,42,Elder,Orion,Revenue,,141-155,,,[GEN-018,GEN-073],88,84,82,89,5,78,80.30,ACTIVE
+AGT-164,Legacy Trust Agent (Ext),legacy,trust_ext,Vertical,67,Gatekeeper,Axel,Governance,,1-30,,,[GEN-018,GEN-074],90,86,85,91,5,80,82.85,ACTIVE
+AGT-165,Beauty Product Testing Agent,beauty,product_testing,Vertical,31,Scientist,Orion,Content,,71-90,,,[GEN-019,GEN-075],87,83,81,88,5,77,79.05,ACTIVE
+AGT-166,Beauty Supply Chain (Ext),beauty,supply_chain_ext,Vertical,38,Builder,Nova,Operations,,141-155,,,[GEN-019,GEN-076],88,84,82,89,5,78,80.30,ACTIVE
+AGT-167,Travel Insurance Agent,travel,insurance,Vertical,67,Gatekeeper,Axel,Legal,,1-30,,,[GEN-020,GEN-077],86,82,80,87,5,76,78.20,ACTIVE
+AGT-168,Travel Concierge (Ext),travel,concierge_ext,Vertical,78,Siren,Liora,Travel,,71-90,,,[GEN-020,GEN-078],90,86,85,91,5,80,82.85,ACTIVE
+AGT-169,Legal Contract Review Agent,legal,contract_review,Vertical,60,Advocate,Liora,Legal,,1-30,,,[GEN-021,GEN-079],90,86,85,91,5,80,82.85,ACTIVE
+AGT-170,Legal Discovery Agent (Ext),legal,discovery_ext,Vertical,31,Scientist,Orion,Legal,,1-30,,,[GEN-021,GEN-080],89,85,83,90,5,79,81.15,ACTIVE
+AGT-171,Media Rights Agent (Ext),media,rights_ext,Vertical,27,Merchant,Liora,Legal,,1-30,,,[GEN-022,GEN-081],88,84,82,89,5,78,80.30,ACTIVE
+AGT-172,Media Distribution Agent (Ext),media,distribution_ext,Vertical,68,Pathfinder,Quest,Revenue,,141-155,,,[GEN-022,GEN-082],87,83,81,88,5,77,79.05,ACTIVE
+AGT-173,Food Safety Agent (Ext),food,safety_ext,Vertical,67,Gatekeeper,Axel,Governance,,1-30,,,[GEN-023,GEN-083],89,85,83,90,5,79,81.15,ACTIVE
+AGT-174,Food Supply Chain (Ext),food,supply_chain_ext,Vertical,38,Builder,Nova,Operations,,141-155,,,[GEN-023,GEN-084],88,84,82,89,5,78,80.30,ACTIVE
+AGT-175,Core System Bridge,core,Bridge,64,Conduit,Eden,ALL,,ALL,,,[GEN-038,GEN-059],94,90,90,95,5,88,83.55,ACTIVE
+AGT-176,General Intelligence Bridge,core,Bridge,4,Sage,Orion,ALL,,ALL,,,[GEN-038,GEN-059],92,88,89,93,5,85,82.10,ACTIVE
+AGT-177,Real Estate Bridge,real_estate,Bridge,66,Architect,Nova,"real_estate,wealth,legal,finance",141-155,1-30,,[GEN-009,GEN-039],87,83,82,88,5,78,80.35,ACTIVE
+AGT-178,Social Impact Bridge,social_services,Bridge,5,Caregiver,Seren,"social_services,government,crisis,health",51-70,91-100,,[GEN-010,GEN-039],88,84,83,89,5,79,81.15,ACTIVE
+AGT-179,Corporate Bridge,corporate,Bridge,38,Builder,Nova,"corporate,finance,legal,tech",71-90,141-155,,[GEN-012,GEN-039],87,83,82,88,5,78,80.35,ACTIVE
+AGT-180,Wellness Bridge,health,Bridge,35,Healer,Seren,"health,sports,beauty,food,wellness",51-70,,,[GEN-011,GEN-039],88,84,83,89,5,79,81.15,ACTIVE
+AGT-181,Faith & Spirit Bridge,spiritual,Bridge,20,Priestess,Eden,ALL → spiritual,101-120,,,[GEN-054],93,89,89,94,5,86,84.65,ACTIVE
+AGT-182,Creator Bridge,creator,Bridge,39,Storyteller,Nova,"creator,media,beauty,food,travel,arts",71-90,101-120,,[GEN-017,GEN-039],89,85,84,90,5,80,82.40,ACTIVE
+AGT-183,Government Bridge,government,Bridge,60,Advocate,Liora,"government,corporate,social_services,legal",1-30,91-100,,[GEN-016,GEN-039],88,84,83,89,5,79,81.15,ACTIVE
+AGT-184,Sports Bridge,sports,Bridge,13,Hero,Axel,"sports,media,entertainment,commerce",71-90,,,[GEN-014,GEN-039],84,80,79,85,5,74,77.85,ACTIVE
+AGT-185,Legal Cross-System,legal,Bridge,60,Advocate,Liora,legal ↔ ALL,1-30,,,[GEN-055],92,88,89,93,5,84,82.95,ACTIVE
+AGT-186,Commerce Bridge,commerce,Bridge,27,Merchant,Liora,"commerce,beauty,travel,creator",141-155,,,[GEN-026,GEN-039],87,83,82,88,5,78,80.35,ACTIVE
+AGT-187,Infrastructure Bridge,infrastructure,Bridge,38,Builder,Nova,ALL ↔ infrastructure,71-90,,,[GEN-056],90,86,85,91,5,82,83.45,ACTIVE
+AGT-188,Crisis Bridge,crisis,Bridge,35,Healer,Seren,"crisis,mental_health,addiction,social_services",51-70,,,[GEN-031,GEN-039],93,89,88,94,5,86,84.75,ACTIVE
+AGT-189,Mental Health Bridge,mental_health,Bridge,5,Caregiver,Seren,"mental_health,health,addiction,crisis",51-70,,,[GEN-032,GEN-039],92,88,89,93,5,84,83.75,ACTIVE
+AGT-190,Financial Bridge,finance,Bridge,56,Catalyst,Alaric,"finance,wealth,commerce,financial_crisis",141-155,,,[GEN-028,GEN-039],88,84,83,89,5,79,81.15,ACTIVE
+AGT-191,Care Bridge,elder_care,Bridge,5,Caregiver,Seren,"elder_care,health,social_services,veterans",51-70,,,[GEN-035,GEN-039],91,87,86,92,5,83,83.70,ACTIVE
+AGT-192,Immigration Bridge,immigration,Bridge,60,Advocate,Liora,"immigration,legal,government,social_services",1-30,91-100,,[GEN-036,GEN-039],89,85,84,90,5,80,82.40,ACTIVE
+AGT-193,Veterans Bridge,veterans,Bridge,13,Hero,Axel,"veterans,health,legal,employment",51-70,91-100,,[GEN-037,GEN-039],88,84,83,89,5,79,81.15,ACTIVE
+AGT-194,AI Bridge,ai,Bridge,64,Conduit,Eden,ai ↔ ALL,121-140,,,[GEN-025,GEN-058],94,90,90,95,5,87,83.55,ACTIVE
+AGT-195,Personal Narrative Agent,core,Utility,39,Storyteller,Nova,Content,,71-90,,,[GEN-041],87,83,81,88,5,77,79.05,ACTIVE
+AGT-196,Visual Identity Agent,core,Utility,30,Artist,Nova,Content,,71-90,,,[GEN-041],86,82,80,87,5,76,78.20,ACTIVE
+AGT-197,Business Model Agent,core,Utility,66,Architect,Nova,Revenue,,141-155,,,[GEN-041],89,85,83,90,5,79,81.15,ACTIVE
+AGT-198,Roadmap Intelligence Agent,core,Utility,18,Visionary,Nova,Operations,,141-155,,,[GEN-041],88,84,82,89,5,78,80.30,ACTIVE
+AGT-199,Access Control Agent,core,Utility,67,Gatekeeper,Axel,Governance,,1-30,,,[GEN-008,GEN-041],90,86,85,91,5,80,82.85,ACTIVE
+AGT-200,Membership Agent,core,Utility,40,Mentor,Orion,Governance,,91-100,,,[GEN-041],85,81,80,86,5,75,77.25,ACTIVE
+AGT-201,Research Agent,core,Utility,31,Scientist,Orion,Governance,,1-30,,,[GEN-041],86,82,80,87,5,76,78.20,ACTIVE
+AGT-202,Copy & Conversion Agent,core,Utility,7,Creator,Nova,Content,,71-90,,,[GEN-041],88,84,82,89,5,78,80.30,ACTIVE
+AGT-203,Analytics Agent,core,Utility,31,Scientist,Orion,Revenue,,141-155,,,[GEN-041],89,85,83,90,5,79,81.15,ACTIVE
+AGT-204,Pricing Agent,core,Utility,66,Architect,Nova,Revenue,,141-155,,,[GEN-041],90,86,85,91,5,80,82.85,ACTIVE
+AGT-205,Partnership Agent,core,Utility,74,Emissary,Liora,Revenue,,141-155,,,[GEN-042],87,83,81,88,5,77,79.05,ACTIVE
+AGT-206,IP Agent,core,Utility,67,Gatekeeper,Axel,Governance,,1-30,,,[GEN-042],89,85,83,90,5,79,81.15,ACTIVE
+AGT-207,Marketplace Agent,core,Utility,68,Pathfinder,Quest,Revenue,,141-155,,,[GEN-042],86,82,80,87,5,76,78.20,ACTIVE
+AGT-208,Compliance Agent,core,Utility,67,Gatekeeper,Axel,Governance,,1-30,,,[GEN-042],91,87,86,92,5,81,83.85,ACTIVE
+AGT-209,Audit Agent,core,Utility,19,Judge,Orion,Governance,,1-30,,,[GEN-042],90,86,85,91,5,80,82.85,ACTIVE
+AGT-210,Workflow Automation Agent,core,Utility,38,Builder,Nova,Operations,,141-155,,,[GEN-042],89,85,83,90,5,79,81.15,ACTIVE
+AGT-211,Event Trigger Agent,core,Utility,56,Catalyst,Alaric,Operations,,141-155,,,[GEN-042],87,83,81,88,5,77,79.05,ACTIVE
+AGT-212,Soul Blueprint Agent,core,Utility,125,Liminal Sage,Eden,Governance,,101-120,,,[GEN-042],92,88,87,93,5,83,84.95,ACTIVE
+AGT-213,Spiritual Agent,core,Utility,20,Priestess,Eden,Governance,,101-120,,,[GEN-042],91,87,86,92,5,81,83.85,ACTIVE
+AGT-214,Wealth Consciousness Agent,core,Utility,117,Phoenixheart,Alaric,Revenue,,141-155,,,[GEN-042],90,86,85,91,5,80,82.85,ACTIVE
+AGT-215,Zuri Sovereign Agent,core,Utility,128,Aetherial,Eden,Operations,,ALL,,,[GEN-043],96,93,92,97,4,88,86.55,ACTIVE
+AGT-216,Multi-Vertical Agent,core,Utility,114,Voidwalker,Axel,Operations,,ALL,,,[GEN-043],94,91,90,95,4,85,84.75,ACTIVE
+AGT-217,Cross-Lane Agent,core,Utility,4,Sage,Orion,Operations,,ALL,,,[GEN-043,GEN-092],92,89,88,93,4,83,83.55,ACTIVE
+AGT-218,Tier Upgrade Agent,core,Utility,27,Merchant,Liora,Revenue,,141-155,,,[GEN-043],86,82,80,87,5,76,78.20,ACTIVE
+AGT-219,Affiliate Agent,core,Utility,27,Merchant,Liora,Revenue,,141-155,,,[GEN-043],85,81,79,86,5,75,77.25,ACTIVE
+AGT-220,Creator Studio Agent,core,Utility,7,Creator,Nova,Content,,71-90,,,[GEN-043],87,83,81,88,5,77,79.05,ACTIVE
+AGT-221,Enterprise Command Agent,core,Utility,1,Sovereign,Axel,Operations,,141-155,,,[GEN-043],92,88,87,93,5,82,84.35,ACTIVE
+AGT-222,Universal Integration Agent,core,Utility,64,Conduit,Eden,Operations,,ALL,,,[GEN-043],94,90,89,95,4,85,85.55,ACTIVE
+AGT-223,Crisis Intervention Agent,crisis,Crisis,35,Healer,Seren,Crisis,,51-70,,,[GEN-031],95,92,93,96,4,88,85.95,ACTIVE
+AGT-224,Grief & Loss Agent,crisis,Crisis,5,Caregiver,Seren,Crisis,,51-70,,,[GEN-031],93,90,91,94,4,85,83.85,ACTIVE
+AGT-225,Trauma Recovery Agent,crisis,Crisis,52,Midwife,Seren,Crisis,,51-70,,,[GEN-031],94,91,92,95,4,86,85.05,ACTIVE
+AGT-226,Jail Support Agent,crisis,Crisis,60,Advocate,Liora,Legal,,1-30,,,[GEN-031],92,88,87,93,5,82,82.35,ACTIVE
+AGT-227,Family Reunification Agent,crisis,Crisis,5,Caregiver,Seren,Care,,51-70,,,[GEN-031],93,89,88,94,5,83,83.70,ACTIVE
+AGT-228,Legal Defense Agent,crisis,Crisis,22,Teacher,Orion,Legal,,1-30,,,[GEN-031],91,87,86,92,5,81,81.60,ACTIVE
+AGT-229,Prisoner Advocacy Agent,crisis,Crisis,60,Advocate,Liora,Legal,,1-30,,,[GEN-031],90,86,85,91,5,80,80.70,ACTIVE
+AGT-230,Emergency Housing Agent,crisis,Crisis,5,Caregiver,Seren,Care,,51-70,,,[GEN-031],92,88,87,93,5,82,82.35,ACTIVE
+AGT-231,Suicide Prevention Agent,crisis,Crisis,35,Healer,Seren,Crisis,,51-70,,,[GEN-031],96,93,94,97,3,89,87.05,ACTIVE
+AGT-232,DV Safety Agent,crisis,Crisis,73,Protector,Axel,Crisis,,51-70,,,[GEN-031],95,92,93,96,4,88,85.95,ACTIVE
+AGT-233,Depression Agent,mental_health,Crisis,5,Caregiver,Seren,Mental Health,,51-70,,,[GEN-032],94,91,92,95,4,86,85.05,ACTIVE
+AGT-234,Anxiety Agent,mental_health,Crisis,5,Caregiver,Seren,Mental Health,,51-70,,,[GEN-032],93,90,91,94,4,85,83.85,ACTIVE
+AGT-235,PTSD Agent,mental_health,Crisis,52,Midwife,Seren,Mental Health,,51-70,,,[GEN-032],95,92,93,96,4,87,85.95,ACTIVE
+AGT-236,Therapy Match Agent,mental_health,Crisis,40,Mentor,Orion,Mental Health,,51-70,,,[GEN-032],92,88,87,93,5,82,82.35,ACTIVE
+AGT-237,Medication Agent,mental_health,Crisis,67,Gatekeeper,Axel,Mental Health,,51-70,,,[GEN-032],93,89,88,94,5,83,83.70,ACTIVE
+AGT-238,Therapy Session Agent,mental_health,Crisis,5,Caregiver,Seren,Mental Health,,51-70,,,[GEN-032],91,87,86,92,5,81,81.60,ACTIVE
+AGT-239,Psychiatric Agent,mental_health,Crisis,31,Scientist,Orion,Mental Health,,51-70,,,[GEN-032],92,88,87,93,5,82,82.35,ACTIVE
+AGT-240,Addiction Recovery Agent,mental_health,Crisis,56,Catalyst,Alaric,Addiction,,51-70,,,[GEN-032],94,90,89,95,5,84,84.15,ACTIVE
+AGT-241,Detox Agent,addiction,Crisis,56,Catalyst,Alaric,Addiction,,51-70,,,[GEN-033],94,91,92,95,4,86,85.05,ACTIVE
+AGT-242,Sober Living Agent,addiction,Crisis,5,Caregiver,Seren,Addiction,,51-70,,,[GEN-033],93,89,88,94,5,83,83.70,ACTIVE
+AGT-243,Relapse Prevention Agent,addiction,Crisis,56,Catalyst,Alaric,Addiction,,51-70,,,[GEN-033],94,90,89,95,5,84,84.15,ACTIVE
+AGT-244,12-Step Agent,addiction,Crisis,40,Mentor,Orion,Addiction,,51-70,,,[GEN-033],91,87,86,92,5,81,81.60,ACTIVE
+AGT-245,Family Addiction Agent,addiction,Crisis,5,Caregiver,Seren,Addiction,,51-70,,,[GEN-033],92,88,87,93,5,82,82.35,ACTIVE
+AGT-246,Naloxone Agent,addiction,Crisis,73,Protector,Axel,Addiction,,51-70,,,[GEN-033],95,92,93,96,4,87,85.95,ACTIVE
+AGT-247,Addiction Roadmap Agent,addiction,Crisis,56,Catalyst,Alaric,Addiction,,51-70,,,[GEN-033],90,86,85,91,5,80,80.70,ACTIVE
+AGT-248,Financial Crisis Agent,financial_crisis,Crisis,5,Caregiver,Seren,Benefits,,141-155,,,[GEN-034],94,90,89,95,5,84,84.15,ACTIVE
+AGT-249,Bankruptcy Agent,financial_crisis,Crisis,60,Advocate,Liora,Legal,,1-30,,,[GEN-034],92,88,87,93,5,82,82.35,ACTIVE
+AGT-250,Debt Relief Agent,financial_crisis,Crisis,60,Advocate,Liora,Revenue,,141-155,,,[GEN-034],91,87,86,92,5,81,81.60,ACTIVE
+AGT-251,Unemployment Agent,financial_crisis,Crisis,5,Caregiver,Seren,Benefits,,141-155,,,[GEN-034],90,86,85,91,5,80,80.70,ACTIVE
+AGT-252,Eviction Prevention Agent,financial_crisis,Crisis,73,Protector,Axel,Crisis,,51-70,,,[GEN-034],94,91,92,95,4,86,85.05,ACTIVE
+AGT-253,Financial Recovery Agent,financial_crisis,Crisis,66,Architect,Nova,Revenue,,141-155,,,[GEN-034],89,85,83,90,5,79,81.15,ACTIVE
+AGT-254,Elder Care Agent,elder_care,Crisis,5,Caregiver,Seren,Care,,51-70,,,[GEN-035],93,89,88,94,5,83,83.70,ACTIVE
+AGT-255,Medicare Agent,elder_care,Crisis,40,Mentor,Orion,Benefits,,91-100,,,[GEN-035],92,88,87,93,5,82,82.35,ACTIVE
+AGT-256,Nursing Home Agent,elder_care,Crisis,68,Pathfinder,Quest,Care,,51-70,,,[GEN-035],91,87,86,92,5,81,81.60,ACTIVE
+AGT-257,Dementia Agent,elder_care,Crisis,5,Caregiver,Seren,Care,,51-70,,,[GEN-035],94,90,89,95,5,84,84.15,ACTIVE
+AGT-258,Senior Housing Agent,elder_care,Crisis,68,Pathfinder,Quest,Care,,51-70,,,[GEN-035],90,86,85,91,5,80,80.70,ACTIVE
+AGT-259,Elder Abuse Agent,elder_care,Crisis,73,Protector,Axel,Legal,,1-30,,,[GEN-035],94,91,92,95,4,86,85.05,ACTIVE
+AGT-260,Caregiver Agent,elder_care,Crisis,5,Caregiver,Seren,Care,,51-70,,,[GEN-035],92,88,87,93,5,82,82.35,ACTIVE
+AGT-261,Immigration Legal Agent,immigration,Crisis,60,Advocate,Liora,Legal,,1-30,,,[GEN-036],93,89,88,94,5,83,83.70,ACTIVE
+AGT-262,Asylum Agent,immigration,Crisis,60,Advocate,Liora,Legal,,1-30,,,[GEN-036],94,90,89,95,5,84,84.15,ACTIVE
+AGT-263,Refugee Agent,immigration,Crisis,5,Caregiver,Seren,Benefits,,91-100,,,[GEN-036],92,88,87,93,5,82,82.35,ACTIVE
+AGT-264,Green Card Agent,immigration,Crisis,40,Mentor,Orion,Legal,,1-30,,,[GEN-036],91,87,86,92,5,81,81.60,ACTIVE
+AGT-265,Citizenship Agent,immigration,Crisis,40,Mentor,Orion,Legal,,1-30,,,[GEN-036],90,86,85,91,5,80,80.70,ACTIVE
+AGT-266,Deportation Defense Agent,immigration,Crisis,60,Advocate,Liora,Legal,,1-30,,,[GEN-036],94,91,92,95,4,86,85.05,ACTIVE
+AGT-267,DACA Agent,immigration,Crisis,60,Advocate,Liora,Legal,,1-30,,,[GEN-036],91,87,86,92,5,81,81.60,ACTIVE
+AGT-268,Veterans Benefits Agent,veterans,Crisis,40,Mentor,Orion,Benefits,,91-100,,,[GEN-037],93,89,88,94,5,83,83.70,ACTIVE
+AGT-269,VA Claims Agent,veterans,Crisis,60,Advocate,Liora,Legal,,1-30,,,[GEN-037],92,88,87,93,5,82,82.35,ACTIVE
+AGT-270,Military Transition Agent,veterans,Crisis,13,Hero,Axel,Operations,,141-155,,,[GEN-037],90,86,85,91,5,80,80.70,ACTIVE
+AGT-271,PTSD Veteran Agent,veterans,Crisis,52,Midwife,Seren,Mental Health,,51-70,,,[GEN-037],94,91,92,95,4,86,85.05,ACTIVE
+AGT-272,Veteran Housing Agent,veterans,Crisis,68,Pathfinder,Quest,Care,,51-70,,,[GEN-037],91,87,86,92,5,81,81.60,ACTIVE
+AGT-273,Veteran Employment Agent,veterans,Crisis,74,Emissary,Liora,Revenue,,141-155,,,[GEN-037],90,86,85,91,5,80,80.70,ACTIVE
+AGT-274,Veterans Care Agent,veterans,Crisis,5,Caregiver,Seren,Care,,51-70,,,[GEN-037],92,88,87,93,5,82,82.35,ACTIVE
+AGT-275,Swarm Orchestrator,core,Swarm,128,Aetherial,Eden,Operations,,ALL,,,[GEN-053],99,97,98,99,2,95,90.70,ACTIVE
+AGT-276,Reserved Swarm Slot 1,reserved,Reserved,1,Sovereign,Axel,,,,,[],0,0,0,0,0,0,0.00,RESERVED
+AGT-277,Reserved Swarm Slot 2,reserved,Reserved,2,Lover,Liora,,,,,[],0,0,0,0,0,0,0.00,RESERVED
+AGT-278,Reserved Swarm Slot 3,reserved,Reserved,4,Sage,Orion,,,,,[],0,0,0,0,0,0,0.00,RESERVED
+AGT-279,Visual Arts Agent,arts,Vertical,30,Artist,Nova,Content,,71-90,,,[GEN-046],86,82,80,87,5,76,78.20,ACTIVE
+AGT-280,Gallery Agent,arts,Vertical,68,Pathfinder,Quest,Revenue,,141-155,,,[GEN-046],85,81,79,86,5,75,77.25,ACTIVE
+AGT-281,Art Investment Agent,arts,Vertical,74,Emissary,Liora,Revenue,,141-155,,,[GEN-046],87,83,81,88,5,77,79.05,ACTIVE
+AGT-282,Art Authentication Agent,arts,Vertical,31,Scientist,Orion,Governance,,1-30,,,[GEN-046],88,84,82,89,5,78,80.30,ACTIVE
+AGT-283,Creative Studio Agent,arts,Vertical,7,Creator,Nova,Content,,71-90,,,[GEN-046],86,82,80,87,5,76,78.20,ACTIVE
+AGT-284,Performance Arts Agent,arts,Vertical,39,Storyteller,Nova,Content,,71-90,,,[GEN-046],87,83,81,88,5,77,79.05,ACTIVE
+AGT-285,Art Education Agent,arts,Vertical,40,Mentor,Orion,Content,,71-90,,,[GEN-046],85,81,79,86,5,75,77.25,ACTIVE
+AGT-286,Arts Grants Agent,arts,Vertical,66,Architect,Nova,Benefits,,91-100,,,[GEN-046],86,82,80,87,5,76,78.20,ACTIVE
+AGT-287,Digital Art Agent,arts,Vertical,26,Engineer,Nova,AI,,121-140,,,[GEN-046],87,83,81,88,5,77,79.05,ACTIVE
+AGT-288,Art Curation Agent,arts,Vertical,30,Artist,Nova,Content,,71-90,,,[GEN-046],86,82,80,87,5,76,78.20,ACTIVE
+AGT-289,Arts Advocacy Agent,arts,Vertical,60,Advocate,Liora,Legal,,1-30,,,[GEN-046],85,81,79,86,5,75,77.25,ACTIVE
+AGT-290,Art Market Agent,arts,Vertical,31,Scientist,Orion,Revenue,,141-155,,,[GEN-046,GEN-062],87,83,81,88,5,77,79.05,ACTIVE
+AGT-291,Sustainability Strategy Agent,sustainability,Vertical,66,Architect,Nova,Governance,,91-100,,,[GEN-047],88,84,82,89,5,78,80.30,ACTIVE
+AGT-292,Carbon Footprint Agent,sustainability,Vertical,31,Scientist,Orion,Governance,,91-100,,,[GEN-047],87,83,81,88,5,77,79.05,ACTIVE
+AGT-293,Renewable Energy Agent,sustainability,Vertical,26,Engineer,Nova,Operations,,141-155,,,[GEN-047],86,82,80,87,5,76,78.20,ACTIVE
+AGT-294,Circular Economy Agent,sustainability,Vertical,61,Alchemist,Alaric,Revenue,,141-155,,,[GEN-047],88,84,82,89,5,78,80.30,ACTIVE
+AGT-295,ESG Agent,sustainability,Vertical,31,Scientist,Orion,Governance,,91-100,,,[GEN-047],89,85,83,90,5,79,81.15,ACTIVE
+AGT-296,Green Supply Chain Agent,sustainability,Vertical,38,Builder,Nova,Operations,,141-155,,,[GEN-047],87,83,81,88,5,77,79.05,ACTIVE
+AGT-297,Climate Risk Agent,sustainability,Vertical,73,Protector,Axel,Governance,,1-30,,,[GEN-047],90,86,85,91,5,80,82.85,ACTIVE
+AGT-298,Sustainable Agriculture Agent,sustainability,Vertical,52,Midwife,Seren,Care,,51-70,,,[GEN-047],86,82,80,87,5,76,78.20,ACTIVE
+AGT-299,Water Resource Agent,sustainability,Vertical,31,Scientist,Orion,Governance,,91-100,,,[GEN-047],85,81,79,86,5,75,77.25,ACTIVE
+AGT-300,Biodiversity Agent,sustainability,Vertical,76,Botanist,Seren,Governance,,91-100,,,[GEN-047],84,80,78,83,5,73,76.15,ACTIVE
+AGT-301,Sustainability Compliance Agent,sustainability,Vertical,67,Gatekeeper,Axel,Governance,,1-30,,,[GEN-047],89,85,83,90,5,79,81.15,ACTIVE
+AGT-302,Green Impact Agent,sustainability,Vertical,23,Student,Quest,Governance,,91-100,,,[GEN-047],86,82,80,87,5,76,78.20,ACTIVE
+AGT-303,Manufacturing Operations Agent,manufacturing,Vertical,38,Builder,Nova,Operations,,141-155,,,[GEN-048],88,84,82,89,5,78,80.30,ACTIVE
+AGT-304,Production Planning Agent,manufacturing,Vertical,26,Engineer,Nova,Operations,,141-155,,,[GEN-048],87,83,81,88,5,77,79.05,ACTIVE
+AGT-305,Quality Control Agent,manufacturing,Vertical,67,Gatekeeper,Axel,Governance,,1-30,,,[GEN-048],89,85,83,90,5,79,81.15,ACTIVE
+AGT-306,Manufacturing Automation Agent,manufacturing,Vertical,38,Builder,Nova,AI,,121-140,,,[GEN-048],88,84,82,89,5,78,80.30,ACTIVE
+AGT-307,Industrial IoT Agent,manufacturing,Vertical,26,Engineer,Nova,AI,,121-140,,,[GEN-048],87,83,81,88,5,77,79.05,ACTIVE
+AGT-308,Factory Intelligence Agent,manufacturing,Vertical,31,Scientist,Orion,Operations,,141-155,,,[GEN-048],86,82,80,87,5,76,78.20,ACTIVE
+AGT-309,Manufacturing Cost Agent,manufacturing,Vertical,56,Catalyst,Alaric,Revenue,,141-155,,,[GEN-048],87,83,81,88,5,77,79.05,ACTIVE
+AGT-310,Manufacturing Scale Agent,manufacturing,Vertical,38,Builder,Nova,Operations,,141-155,,,[GEN-048],88,84,82,89,5,78,80.30,ACTIVE
+AGT-311,Product Design Agent,manufacturing,Vertical,30,Artist,Nova,Content,,71-90,,,[GEN-048],85,81,79,86,5,75,77.25,ACTIVE
+AGT-312,Manufacturing Safety Agent,manufacturing,Vertical,73,Protector,Axel,Governance,,1-30,,,[GEN-048],89,85,83,90,5,79,81.15,ACTIVE
+AGT-313,Manufacturing Compliance Agent,manufacturing,Vertical,67,Gatekeeper,Axel,Governance,,1-30,,,[GEN-048],88,84,82,89,5,78,80.30,ACTIVE
+AGT-314,Manufacturing Capacity Agent,manufacturing,Vertical,31,Scientist,Orion,Operations,,141-155,,,[GEN-048],86,82,80,87,5,76,78.20,ACTIVE
+AGT-315,Youth Development Agent,youth,Vertical,40,Mentor,Orion,Care,,51-70,,,[GEN-049],89,85,83,90,5,79,81.15,ACTIVE
+AGT-316,Troubled Youth Agent,youth,Vertical,35,Healer,Seren,Crisis,,51-70,,,[GEN-049],94,90,89,95,5,84,84.15,ACTIVE
+AGT-317,Gifted Youth Agent,youth,Vertical,40,Mentor,Orion,Content,,71-90,,,[GEN-049],87,83,81,88,5,77,79.05,ACTIVE
+AGT-318,Adolescent Mental Health Agent,youth,Vertical,5,Caregiver,Seren,Mental Health,,51-70,,,[GEN-049],93,89,88,94,5,83,83.70,ACTIVE
+AGT-319,Youth Education Agent,youth,Vertical,40,Mentor,Orion,Content,,71-90,,,[GEN-049],86,82,80,87,5,76,78.20,ACTIVE
+AGT-320,Youth Sports Agent,youth,Vertical,13,Hero,Axel,Content,,71-90,,,[GEN-049,GEN-063],85,81,79,86,5,75,77.25,ACTIVE
+AGT-321,Youth Arts Agent,youth,Vertical,30,Artist,Nova,Content,,71-90,,,[GEN-049],84,80,78,83,5,73,76.15,ACTIVE
+AGT-322,Youth Career Agent,youth,Vertical,68,Pathfinder,Quest,Revenue,,141-155,,,[GEN-049],86,82,80,87,5,76,78.20,ACTIVE
+AGT-323,Youth Legal Agent,youth,Vertical,60,Advocate,Liora,Legal,,1-30,,,[GEN-049],88,84,82,89,5,78,80.30,ACTIVE
+AGT-324,Youth Housing Agent,youth,Vertical,5,Caregiver,Seren,Care,,51-70,,,[GEN-049],90,86,85,91,5,80,82.85,ACTIVE
+AGT-325,Youth Family Agent,youth,Vertical,5,Caregiver,Seren,Care,,51-70,,,[GEN-049],89,85,83,90,5,79,81.15,ACTIVE
+AGT-326,Youth Mentorship Agent,youth,Vertical,40,Mentor,Orion,Content,,71-90,,,[GEN-049],87,83,81,88,5,77,79.05,ACTIVE
+AGT-327,Early Childhood Agent,early_childhood,Vertical,5,Caregiver,Seren,Care,,51-70,,,[GEN-050],90,86,85,91,5,80,82.85,ACTIVE
+AGT-328,Toddler Agent,early_childhood,Vertical,5,Caregiver,Seren,Care,,51-70,,,[GEN-050],89,85,83,90,5,79,81.15,ACTIVE
+AGT-329,Preschool Agent,early_childhood,Vertical,40,Mentor,Orion,Content,,71-90,,,[GEN-050],87,83,81,88,5,77,79.05,ACTIVE
+AGT-330,Early Intervention Agent,early_childhood,Vertical,35,Healer,Seren,Crisis,,51-70,,,[GEN-050],92,88,87,93,5,82,82.35,ACTIVE
+AGT-331,Child Nutrition Agent,early_childhood,Vertical,52,Midwife,Seren,Care,,51-70,,,[GEN-050],88,84,82,89,5,78,80.30,ACTIVE
+AGT-332,Child Safety Agent,early_childhood,Vertical,73,Protector,Axel,Governance,,1-30,,,[GEN-050],91,87,86,92,5,81,83.85,ACTIVE
+AGT-333,Childcare Provider Agent,early_childhood,Vertical,5,Caregiver,Seren,Care,,51-70,,,[GEN-050],89,85,83,90,5,79,81.15,ACTIVE
+AGT-334,Parenting Support Agent,early_childhood,Vertical,40,Mentor,Orion,Care,,51-70,,,[GEN-050],88,84,82,89,5,78,80.30,ACTIVE
+AGT-335,Child Development Agent,early_childhood,Vertical,31,Scientist,Orion,Care,,51-70,,,[GEN-050],87,83,81,88,5,77,79.05,ACTIVE
+AGT-336,Early Literacy Agent,early_childhood,Vertical,40,Mentor,Orion,Content,,71-90,,,[GEN-050],86,82,80,87,5,76,78.20,ACTIVE
+AGT-337,Child Play Agent,early_childhood,Vertical,30,Artist,Nova,Content,,71-90,,,[GEN-050],85,81,79,86,5,75,77.25,ACTIVE
+AGT-338,Family Support Agent,early_childhood,Vertical,5,Caregiver,Seren,Care,,51-70,,,[GEN-050],89,85,83,90,5,79,81.15,ACTIVE
+AGT-339,Arts Bridge,arts,Bridge,30,Artist,Nova,"arts,creator,media,commerce",71-90,101-120,,[GEN-046,GEN-040],88,84,83,89,5,79,81.15,ACTIVE
+AGT-340,Sustainability Bridge,sustainability,Bridge,35,Healer,Seren,"sustainability,corporate,government,commerce",91-100,141-155,,[GEN-047,GEN-040],87,83,82,88,5,78,80.35,ACTIVE
+AGT-341,Manufacturing Bridge,manufacturing,Bridge,38,Builder,Nova,"manufacturing,commerce,tech,supply_chain",141-155,71-90,121-140,[GEN-048,GEN-040],88,84,83,89,5,79,81.15,ACTIVE
+AGT-342,Youth Bridge,youth,Bridge,40,Mentor,Orion,"youth,education,health,mental_health,social_services",51-70,71-90,91-100,[GEN-049,GEN-040],90,86,85,91,5,81,83.55,ACTIVE
+AGT-343,Early Childhood Bridge,early_childhood,Bridge,5,Caregiver,Seren,"early_childhood,education,health,family",51-70,71-90,91-100,[GEN-050,GEN-040],89,85,84,90,5,80,82.40,ACTIVE
+AGT-344,Finance & Wealth Bridge,finance,Bridge,56,Catalyst,Alaric,"finance,wealth,commerce,real_estate",141-155,1-30,,[GEN-028,GEN-029,GEN-040],88,84,83,89,5,79,81.15,ACTIVE
+AGT-345,Clinical + Mental Health Bridge,mental_health,Bridge,35,Healer,Seren,"health,mental_health,addiction,sports,beauty",51-70,71-90,,[GEN-011,GEN-032,GEN-040],91,87,86,92,5,82,83.70,ACTIVE
+AGT-346,Legal & Crisis Bridge,legal,Bridge,60,Advocate,Liora,"legal,crisis,immigration,veterans,financial_crisis",1-30,51-70,141-155,[GEN-021,GEN-031,GEN-034,GEN-036,GEN-037,GEN-040],92,88,87,93,5,83,84.05,ACTIVE
+AGT-347,Education & Creator Bridge,education,Bridge,40,Mentor,Orion,"education,creator,media,arts",71-90,101-120,,[GEN-017,GEN-027,GEN-040],89,85,84,90,5,80,82.40,ACTIVE
+AGT-348,Tech & AI Bridge,tech,Bridge,38,Builder,Nova,"tech,ai,corporate,manufacturing",141-155,121-140,71-90,[GEN-015,GEN-025,GEN-040],90,86,85,91,5,81,83.55,ACTIVE
+AGT-349,Government & Social Bridge,government,Bridge,5,Caregiver,Seren,"government,social_services,crisis,health",1-30,51-70,91-100,[GEN-010,GEN-016,GEN-040],89,85,84,90,5,80,82.40,ACTIVE
+AGT-350,Commerce & Retail Bridge,commerce,Bridge,27,Merchant,Liora,"commerce,retail,travel,food",141-155,71-90,,[GEN-020,GEN-023,GEN-026,GEN-040],87,83,82,88,5,78,80.35,ACTIVE
+AGT-351,Luxury & Premium Bridge,luxury,Bridge,78,Siren,Liora,"luxury,wealth,real_estate,travel",141-155,,,[GEN-013,GEN-029,GEN-040],88,84,83,89,5,79,81.15,ACTIVE
+AGT-352,Sports & Entertainment Bridge,sports,Bridge,13,Hero,Axel,"sports,entertainment,media,creator",71-90,101-120,,[GEN-014,GEN-022,GEN-040],86,82,81,87,5,76,79.05,ACTIVE
+AGT-353,Global Impact Bridge,global_impact,Bridge,5,Altruist,Seren,"global_impact,government,social_services,sustainability",1-30,51-70,91-100,[GEN-016,GEN-010,GEN-047,GEN-040],88,84,83,89,5,79,81.15,ACTIVE
+AGT-391,Relationships Bridge,relationships,Bridge,2,Lover,Liora,"relationships,health,mental_health,development,youth,early_childhood",51-70,71-90,,[GEN-051,GEN-040],93,89,88,94,5,85,84.75,ACTIVE
+AGT-355,Data Intelligence,,Cross-System,31,Scientist,Orion,"data,ai,analytics",121-140,,,[GEN-025,GEN-044,GEN-085],89,85,84,90,5,80,81.15,ACTIVE
+AGT-356,Security Intelligence,,Cross-System,73,Protector,Axel,"security,legal,tech",1-30,121-140,,[GEN-044,GEN-065],91,87,86,92,5,82,83.10,ACTIVE
+AGT-357,Personal Intelligence,,Cross-System,4,Sage,Orion,"self,all",ALL,,,[GEN-044,GEN-092],94,90,89,95,4,85,85.55,ACTIVE
+AGT-358,Spiritual Intelligence,,Cross-System,20,Priestess,Eden,"spiritual,human,AI",101-120,121-140,,[GEN-044,GEN-054],93,89,88,94,5,85,84.75,ACTIVE
+AGT-359,Human Development,,Cross-System,40,Mentor,Orion,"development,education,health",51-70,71-90,91-100,[GEN-044,GEN-088],90,86,85,91,5,81,82.40,ACTIVE
+AGT-360,Predictive Insight,,Cross-System,31,Scientist,Orion,"all forecasting",ALL,,,[GEN-045],92,88,87,93,5,83,83.55,ACTIVE
+AGT-361,Adaptive Learning,,Cross-System,40,Mentor,Orion,"all learning",ALL,,,[GEN-045],91,87,86,92,5,82,82.70,ACTIVE
+AGT-362,Global Systems,,Cross-System,5,Altruist,Seren,"global,government,sustainability",1-30,91-100,,[GEN-045,GEN-047],89,85,84,90,5,80,81.15,ACTIVE
+AGT-363,Smart City,,Cross-System,66,Architect,Nova,"city,infrastructure,technology",71-90,141-155,,[GEN-045,GEN-056],90,86,85,91,5,81,82.40,ACTIVE
+AGT-364,Identity Intelligence,,Cross-System,39,Storyteller,Nova,"identity,behavior,AI",71-90,121-140,,[GEN-045,GEN-006],91,87,86,92,5,82,82.70,ACTIVE
+AGT-365,Emotional Signal,,Cross-System,35,Healer,Seren,"emotion,health,relationships",51-70,,,[GEN-045,GEN-011],92,88,87,93,5,83,83.55,ACTIVE
+AGT-366,Behavioral Intelligence,,Cross-System,31,Scientist,Orion,"actions,habits,prediction",ALL,,,[GEN-045],90,86,85,91,5,81,82.40,ACTIVE
+AGT-367,Ethical Alignment,,Cross-System,60,Advocate,Liora,"all systems",ALL,,,[GEN-045,GEN-052],93,89,88,94,5,85,84.75,ACTIVE
+AGT-368,Wellness Intelligence,,Cross-System,35,Healer,Seren,"health,wellness,behavior",51-70,,,[GEN-045,GEN-011,GEN-091],90,86,85,91,5,81,82.40,ACTIVE
+AGT-369,Adaptive Evolution,,Cross-System,61,Alchemist,Alaric,"all systems",ALL,,,[GEN-045,GEN-052,GEN-093],95,91,90,96,4,87,86.25,ACTIVE
+AGT-379,Dating Profile,relationships,Vertical,39,Storyteller,Nova,Content,,71-90,,,[GEN-051],86,82,80,87,5,76,78.20,ACTIVE
+AGT-380,Matchmaking,relationships,Vertical,35,Healer,Seren,Care,,51-70,,,[GEN-051],90,86,85,91,5,80,82.85,ACTIVE
+AGT-381,Compatibility,relationships,Vertical,2,Lover,Liora,Care,,51-70,,,[GEN-051],92,88,87,93,5,82,84.45,ACTIVE
+AGT-382,Dating Safety,relationships,Vertical,73,Protector,Axel,Crisis,,51-70,,,[GEN-051],94,90,89,95,5,84,84.15,ACTIVE
+AGT-383,Relationship Communication,relationships,Vertical,2,Lover,Liora,Care,,51-70,,,[GEN-051],91,87,86,92,5,81,82.70,ACTIVE
+AGT-384,Breakup Recovery,relationships,Vertical,35,Healer,Seren,Mental Health,,51-70,,,[GEN-051],93,89,88,94,5,83,83.70,ACTIVE
+AGT-385,Long-Term Relationship,relationships,Vertical,40,Mentor,Orion,Care,,51-70,,,[GEN-051],89,85,83,90,5,79,81.15,ACTIVE
+AGT-386,Marriage,relationships,Vertical,40,Mentor,Orion,Legal,,1-30,,,[GEN-051],88,84,82,89,5,78,80.30,ACTIVE
+AGT-387,Co-Parenting,relationships,Vertical,5,Caregiver,Seren,Care,,51-70,,,[GEN-051],90,86,85,91,5,80,82.85,ACTIVE
+AGT-388,Relationship Boundaries,relationships,Vertical,67,Gatekeeper,Axel,Governance,,1-30,,,[GEN-051],89,85,83,90,5,79,81.15,ACTIVE
+AGT-389,Dating App Optimization,relationships,Vertical,31,Scientist,Orion,AI,,121-140,,,[GEN-051,GEN-025],87,83,81,88,5,77,79.05,ACTIVE
+AGT-390,Relationship Growth,relationships,Vertical,61,Alchemist,Alaric,Care,,51-70,,,[GEN-051],88,84,82,89,5,78,80.30,ACTIVE
+AGT-394,Meta Intelligence,,Cross-System,4,Sage,Orion,Operations,,ALL,,,[GEN-052],96,93,92,97,3,89,87.15,ACTIVE
+AGT-395,Memory Integrity,,Utility,67,Gatekeeper,Axel,Governance,,ALL,,,[GEN-052],95,92,91,96,3,88,86.25,ACTIVE
+AGT-396,Ethics & Alignment,,Governance,60,Advocate,Liora,Governance,,1-30,,,[GEN-052,GEN-0367?],97,95,94,98,2,90,88.85,ACTIVE
+AGT-397,Evolution Orchestrator,,Cross-System,61,Alchemist,Alaric,Operations,,ALL,,,[GEN-052,GEN-093],96,93,92,97,3,89,87.15,ACTIVE
+AGT-398,System Health,,Utility,35,Healer,Seren,Care,,51-70,,,[GEN-052],94,91,90,95,3,87,85.35,ACTIVE
+AGT-399,Narrative Identity,,Core,39,Storyteller,Nova,Content,,71-90,,,[GEN-052],93,90,89,94,3,86,84.45,ACTIVE
+AGT-400,Master Conductor,,Executive,64,Conduit,Eden,Operations,,ALL,,,[GEN-052,GEN-053],100,98,99,100,1,97,90.15,ACTIVE
+AGT-370,Reserved Root Node 1,,Reserved,1,Sovereign,Axel,,,,,[],0,0,0,0,0,0,0.00,RESERVED
+AGT-371,Reserved Root Node 2,,Reserved,2,Lover,Liora,,,,,[],0,0,0,0,0,0,0.00,RESERVED
+AGT-372,Reserved Root Node 3,,Reserved,4,Sage,Orion,,,,,[],0,0,0,0,0,0,0.00,RESERVED
+AGT-373,Reserved Root Node 4,,Reserved,38,Builder,Nova,,,,,[],0,0,0,0,0,0,0.00,RESERVED
+AGT-374,Reserved Root Node 5,,Reserved,35,Healer,Seren,,,,,[],0,0,0,0,0,0,0.00,RESERVED
+AGT-375,Reserved Root Node 6,,Reserved,60,Advocate,Liora,,,,,[],0,0,0,0,0,0,0.00,RESERVED
+AGT-376,Reserved Root Node 7,,Reserved,67,Gatekeeper,Axel,,,,,[],0,0,0,0,0,0,0.00,RESERVED
+AGT-377,Reserved Root Node 8,,Reserved,56,Catalyst,Alaric,,,,,[],0,0,0,0,0,0,0.00,RESERVED
+AGT-378,Reserved Root Node 9,,Reserved,64,Conduit,Eden,,,,,[],0,0,0,0,0,0,0.00,RESERVED
+AGT-392,Reserved Bridge Slot 1,,Reserved,64,Conduit,Eden,,,,,[],0,0,0,0,0,0,0.00,RESERVED
+AGT-393,Reserved Bridge Slot 2,,Reserved,5,Caregiver,Seren,,,,,[],0,0,0,0,0,0,0.00,RESERVED

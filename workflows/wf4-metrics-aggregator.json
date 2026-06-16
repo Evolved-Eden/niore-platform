@@ -1,0 +1,143 @@
+{
+  "name": "WF4 — Metrics Aggregator",
+  "nodes": [
+    {
+      "id": "01234567-89ab-cdef-0123-456789abcdef",
+      "name": "Every 5m",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        250,
+        300
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "seconds",
+              "secondsInterval": 5
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "12345678-9abc-def0-1234-56789abcdef0",
+      "name": "Aggregate Runs",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        450,
+        300
+      ],
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT\n  organization_id,\n  workflow_id,\n  COUNT(*)::int AS total_runs,\n  COUNT(CASE WHEN status = 'completed' THEN 1 END)::int AS completed_runs,\n  COUNT(CASE WHEN status = 'failed' THEN 1 END)::int AS failed_runs,\n  AVG(EXTRACT(EPOCH FROM (ended_at - started_at))) AS avg_duration\nFROM public.workflow_runs\nGROUP BY organization_id, workflow_id;"
+      },
+      "credentials": {
+        "postgres": "Supabase Postgres"
+      }
+    },
+    {
+      "id": "23456789-abcd-ef01-2345-6789abcdef01",
+      "name": "Split Batches",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        650,
+        300
+      ],
+      "parameters": {
+        "batchSize": 50,
+        "options": {}
+      }
+    },
+    {
+      "id": "3456789a-bcde-f012-3456-789abcdef012",
+      "name": "Upsert Metrics",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        850,
+        300
+      ],
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO public.workflow_metrics (\n  organization_id,\n  workflow_id,\n  total_runs,\n  completed_runs,\n  failed_runs,\n  avg_duration,\n  updated_at\n)\nVALUES (\n  '{{ $json.organization_id }}'::uuid,\n  '{{ $json.workflow_id }}',\n  {{ $json.total_runs }},\n  {{ $json.completed_runs }},\n  {{ $json.failed_runs }},\n  {{ $json.avg_duration }},\n  NOW()\n)\nON CONFLICT (organization_id, workflow_id)\nDO UPDATE SET\n  total_runs = EXCLUDED.total_runs,\n  completed_runs = EXCLUDED.completed_runs,\n  failed_runs = EXCLUDED.failed_runs,\n  avg_duration = EXCLUDED.avg_duration,\n  updated_at = NOW();"
+      },
+      "credentials": {
+        "postgres": "Supabase Postgres"
+      }
+    },
+    {
+      "id": "456789ab-cdef-0123-4567-89abcdef0123",
+      "name": "Send Summary",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1050,
+        300
+      ],
+      "parameters": {}
+    }
+  ],
+  "connections": {
+    "Every 5m": {
+      "main": [
+        [
+          {
+            "node": "Aggregate Runs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate Runs": {
+      "main": [
+        [
+          {
+            "node": "Split Batches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Batches": {
+      "main": [
+        [
+          {
+            "node": "Upsert Metrics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upsert Metrics": {
+      "main": [
+        [
+          {
+            "node": "Send Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "versionId": "00000000-0000-0000-0000-000000000004",
+  "settings": {
+    "executionOrder": "v1",
+    "errorWorkflow": "",
+    "callerPolicy": "workflowsFromSameOwner",
+    "timezone": "UTC"
+  },
+  "staticData": null,
+  "tags": [
+    "infrastructure",
+    "metrics"
+  ]
+}

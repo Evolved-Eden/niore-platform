@@ -1,0 +1,1915 @@
+[
+  {
+    "id": "d745ff6d-f33f-495a-b11c-c96281446852",
+    "agent_id": "property_listing_optimizer",
+    "name": "Listing Optimizer",
+    "tagline": "Listings that sell themselves",
+    "description": "Optimizes property listings with SEO descriptions, virtual tour scheduling, and multi-platform syndication.",
+    "long_description": null,
+    "icon": "✦",
+    "color": "#c8ff00",
+    "capabilities": [
+      "listing_creation",
+      "virtual_tour_scheduling",
+      "platform_syndication",
+      "price_analysis"
+    ],
+    "vertical_ids": [],
+    "triggers": [
+      "new_listing",
+      "price_change",
+      "market_shift"
+    ],
+    "data_sources": [
+      "mls",
+      "photography_system",
+      "market_data"
+    ],
+    "outputs": [
+      "optimized_listing",
+      "tour_scheduled",
+      "market_analysis"
+    ],
+    "workflow_ids": [],
+    "agent_type": "marketing_intelligence",
+    "category": "real_estate",
+    "is_active": true,
+    "metadata": {},
+    "created_at": "2026-06-04T03:04:20.488Z",
+    "updated_at": "2026-06-04T03:04:20.488Z"
+  },
+  {
+    "id": "6385e2a4-2425-402b-a372-9bcf56b9864d",
+    "agent_id": "market_intel_agent",
+    "name": "Market Intel Agent",
+    "tagline": "Know your market, win your market",
+    "description": "Tracks market trends, comparable sales, and neighborhood data to provide real-time pricing recommendations.",
+    "long_description": null,
+    "icon": "✦",
+    "color": "#c8ff00",
+    "capabilities": [
+      "market_tracking",
+      "comparable_analysis",
+      "pricing_recommendations",
+      "neighborhood_insights"
+    ],
+    "vertical_ids": [],
+    "triggers": [
+      "market_update",
+      "new_comparable",
+      "client_question"
+    ],
+    "data_sources": [
+      "mls",
+      "public_records",
+      "market_reports"
+    ],
+    "outputs": [
+      "market_report",
+      "cma",
+      "pricing_guidance"
+    ],
+    "workflow_ids": [],
+    "agent_type": "enterprise_infrastructure",
+    "category": "real_estate",
+    "is_active": true,
+    "metadata": {},
+    "created_at": "2026-06-04T03:04:20.508Z",
+    "updated_at": "2026-06-04T03:04:20.508Z"
+  },
+  {
+    "id": "e297608e-e7b8-4bf9-a37a-cbe7e9a87e68",
+    "agent_id": "tax_optimization_agent",
+    "name": "Tax Optimization Agent",
+    "tagline": "Keep more of what you earn",
+    "description": "Identifies tax-saving opportunities, tracks deductibles, and prepares tax-optimized financial strategies.",
+    "long_description": null,
+    "icon": "✦",
+    "color": "#c8ff00",
+    "capabilities": [
+      "deduction_tracking",
+      "tax_strategy",
+      "deadline_management",
+      "document_organization"
+    ],
+    "vertical_ids": [],
+    "triggers": [
+      "tax_season",
+      "major_purchase",
+      "investment_event"
+    ],
+    "data_sources": [
+      "financial_accounts",
+      "transaction_history",
+      "tax_codes"
+    ],
+    "outputs": [
+      "tax_report",
+      "strategy_recommendation",
+      "deadline_reminder"
+    ],
+    "workflow_ids": [],
+    "agent_type": "enterprise_infrastructure",
+    "category": "wealth",
+    "is_active": true,
+    "metadata": {},
+    "created_at": "2026-06-04T03:04:20.539Z",
+    "updated_at": "2026-06-04T03:04:20.539Z"
+  },
+  {
+    "id": "cc9e8534-ccff-44d7-be5e-efad0f321337",
+    "agent_id": "audience_growth_agent",
+    "name": "Audience Growth Agent",
+    "tagline": "Grow your tribe",
+    "description": "Analyzes audience demographics, identifies growth opportunities, and recommends content strategies to expand reach.",
+    "long_description": null,
+    "icon": "✦",
+    "color": "#c8ff00",
+    "capabilities": [
+      "demographic_analysis",
+      "growth_opportunities",
+      "content_recommendations",
+      "collaboration_finder"
+    ],
+    "vertical_ids": [],
+    "triggers": [
+      "growth_plateau",
+      "new_content_format",
+      "collaboration_opportunity"
+    ],
+    "data_sources": [
+      "social_analytics",
+      "audience_tools",
+      "trending_content"
+    ],
+    "outputs": [
+      "growth_report",
+      "content_strategy",
+      "collaboration_suggestion"
+    ],
+    "workflow_ids": [],
+    "agent_type": "creator_commerce",
+    "category": "creator",
+    "is_active": true,
+    "metadata": {},
+    "created_at": "2026-06-04T03:04:20.559Z",
+    "updated_at": "2026-06-04T03:04:20.559Z"
+  },
+  {
+    "id": "703c44df-82f3-4cfc-a4ec-f0152e25d767",
+    "agent_id": "digital_product_agent",
+    "name": "Digital Product Agent",
+    "tagline": "Smarter commerce, bigger revenue",
+    "description": "Manage digital product listings, optimize pricing, and automate delivery of digital goods and memberships.",
+    "long_description": null,
+    "icon": "✦",
+    "color": "#c8ff00",
+    "capabilities": [
+      "product_listing",
+      "pricing_optimization",
+      "digital_delivery",
+      "subscription_management"
+    ],
+    "vertical_ids": [],
+    "triggers": [
+      "new_product",
+      "order_received",
+      "subscription_renewal"
+    ],
+    "data_sources": [
+      "ecommerce_platform",
+      "payment_processor",
+      "digital_assets"
+    ],
+    "outputs": [
+      "product_published",
+      "order_fulfilled",
+      "revenue_report"
+    ],
+    "workflow_ids": [],
+    "agent_type": "creator_commerce",
+    "category": "commerce",
+    "is_active": true,
+    "metadata": {},
+    "created_at": "2026-06-04T03:04:20.585Z",
+    "updated_at": "2026-06-04T03:04:20.585Z"
+  },
+  {
+    "id": "e67de423-07df-4b30-a01f-66e5d47d0b46",
+    "agent_id": "ai_twin_manager",
+    "name": "AI Twin Manager",
+    "tagline": "Your AI, your clone",
+    "description": "Manages AI twin profiles including personality, memory, and knowledge base. Ensures the twin stays synced with your real-world data.",
+    "long_description": null,
+    "icon": "✦",
+    "color": "#c8ff00",
+    "capabilities": [
+      "twin_profiling",
+      "memory_management",
+      "knowledge_syncing",
+      "personality_configuration"
+    ],
+    "vertical_ids": [],
+    "triggers": [
+      "twin_created",
+      "data_updated",
+      "sync_needed"
+    ],
+    "data_sources": [
+      "user_profile",
+      "knowledge_base",
+      "interaction_history"
+    ],
+    "outputs": [
+      "twin_profile",
+      "sync_report",
+      "personality_update"
+    ],
+    "workflow_ids": [],
+    "agent_type": "concierge_booking",
+    "category": "ai",
+    "is_active": true,
+    "metadata": {},
+    "created_at": "2026-06-04T03:04:20.603Z",
+    "updated_at": "2026-06-04T03:04:20.603Z"
+  },
+  {
+    "id": "9e727422-487b-4daf-a343-04c6e4323a5e",
+    "agent_id": "intelligence_analyst",
+    "name": "Intelligence Analyst",
+    "tagline": "Patterns become predictions",
+    "description": "Analyzes business data to surface patterns, predict trends, and generate strategic recommendations across all verticals.",
+    "long_description": null,
+    "icon": "✦",
+    "color": "#c8ff00",
+    "capabilities": [
+      "pattern_recognition",
+      "trend_prediction",
+      "strategic_recommendations",
+      "cross_vertical_analysis"
+    ],
+    "vertical_ids": [],
+    "triggers": [
+      "data_threshold",
+      "trend_identified",
+      "strategic_review"
+    ],
+    "data_sources": [
+      "business_data",
+      "market_intel",
+      "historical_trends"
+    ],
+    "outputs": [
+      "intelligence_report",
+      "prediction_alert",
+      "strategy_document"
+    ],
+    "workflow_ids": [],
+    "agent_type": "enterprise_infrastructure",
+    "category": "analytics",
+    "is_active": true,
+    "metadata": {},
+    "created_at": "2026-06-04T03:04:20.624Z",
+    "updated_at": "2026-06-04T03:04:20.624Z"
+  },
+  {
+    "id": "2e80f217-514e-4dc0-afbe-6be58fc6c4eb",
+    "agent_id": "wellness_coach_agent",
+    "name": "Wellness Coach Agent",
+    "tagline": "Your clients' wellness journey, guided",
+    "description": "Creates personalized wellness plans, tracks client progress, and sends motivational check-ins between appointments.",
+    "long_description": null,
+    "icon": "✦",
+    "color": "#c8ff00",
+    "capabilities": [
+      "wellness_planning",
+      "progress_tracking",
+      "checkin_messaging",
+      "goal_setting"
+    ],
+    "vertical_ids": [],
+    "triggers": [
+      "plan_created",
+      "appointment_completed",
+      "checkin_due"
+    ],
+    "data_sources": [
+      "client_health_data",
+      "treatment_history",
+      "preferences"
+    ],
+    "outputs": [
+      "wellness_plan",
+      "progress_report",
+      "checkin_message"
+    ],
+    "workflow_ids": [],
+    "agent_type": "intake_consultation",
+    "category": "wellness",
+    "is_active": true,
+    "metadata": {},
+    "created_at": "2026-06-04T03:04:20.644Z",
+    "updated_at": "2026-06-04T03:04:20.644Z"
+  },
+  {
+    "id": "3a7e065f-9208-4b21-bd59-86827b1d6cdf",
+    "agent_id": "client_concierge",
+    "name": "Client Concierge",
+    "tagline": "Your front desk never sleeps",
+    "description": "Handles bookings, rescheduling, cancellations, and automated follow-ups. Syncs with your calendar and sends smart reminders.",
+    "long_description": "The Client Concierge is your 24/7 front desk. It handles every booking, reschedule, and cancellation automatically. It syncs with your calendar, sends smart reminders, optimizes your waitlist, and follows up with clients after every visit. No booking falls through. No client is forgotten.",
+    "icon": "✦",
+    "color": "#f472b6",
+    "capabilities": [
+      "Smart booking management",
+      "Automated follow-ups",
+      "Calendar sync",
+      "Waitlist optimization",
+      "Post-visit follow-up"
+    ],
+    "vertical_ids": [
+      "med_spa",
+      "legal",
+      "real_estate"
+    ],
+    "triggers": [
+      "New booking",
+      "Cancellation",
+      "No-show",
+      "Follow-up trigger"
+    ],
+    "data_sources": [
+      "Calendar API",
+      "CRM",
+      "Client database"
+    ],
+    "outputs": [
+      "Booking confirmation",
+      "Reminder notification",
+      "Follow-up message",
+      "Waitlist update"
+    ],
+    "workflow_ids": [
+      "wf1",
+      "wf3"
+    ],
+    "agent_type": "frontline",
+    "category": "operations",
+    "is_active": true,
+    "metadata": {},
+    "created_at": "2026-06-01T03:01:59.542Z",
+    "updated_at": "2026-06-01T15:31:28.306Z"
+  },
+  {
+    "id": "dec67aba-61db-4e62-9395-428fbdb7e7cb",
+    "agent_id": "treatment_intelligence",
+    "name": "Treatment Intelligence Engine",
+    "tagline": "Recommendations that convert",
+    "description": "Analyzes client history, preferences, and purchase patterns to recommend the right treatments and products.",
+    "long_description": "The Treatment Intelligence Engine studies every client's history, preferences, and purchase patterns to recommend exactly what they need next. It cross-sells intelligently, identifies seasonal trends, and suggests products that complement previous purchases. Every recommendation is personalized and timed for maximum conversion.",
+    "icon": "◎",
+    "color": "#f472b6",
+    "capabilities": [
+      "Personalized treatment matching",
+      "Cross-sell optimization",
+      "Seasonal trend analysis",
+      "Product recommendations",
+      "Purchase pattern analysis"
+    ],
+    "vertical_ids": [
+      "med_spa"
+    ],
+    "triggers": [
+      "Client check-in",
+      "Purchase event",
+      "Seasonal change",
+      "Treatment completion"
+    ],
+    "data_sources": [
+      "Treatment catalog",
+      "Client history",
+      "Purchase data",
+      "Seasonal calendar"
+    ],
+    "outputs": [
+      "Treatment recommendation",
+      "Product suggestion",
+      "Cross-sell alert",
+      "Trend report"
+    ],
+    "workflow_ids": [
+      "wf2",
+      "wf4"
+    ],
+    "agent_type": "analytics",
+    "category": "intelligence",
+    "is_active": true,
+    "metadata": {},
+    "created_at": "2026-06-01T03:01:59.542Z",
+    "updated_at": "2026-06-01T15:31:28.306Z"
+  },
+  {
+    "id": "b9272902-6242-4704-89f6-4f0dcbeb3a21",
+    "agent_id": "retention_sentinel",
+    "name": "Retention Sentinel",
+    "tagline": "Never lose a client again",
+    "description": "Monitors engagement patterns, flags at-risk clients before they churn, and triggers re-engagement campaigns automatically.",
+    "long_description": "The Retention Sentinel watches every client's engagement patterns. It identifies disengagement signals early — missed appointments, declining visit frequency, unreviewed offers — and triggers personalized re-engagement campaigns before the client drifts away. It manages loyalty programs and tracks satisfaction scores to ensure every client feels valued.",
+    "icon": "◈",
+    "color": "#f472b6",
+    "capabilities": [
+      "Churn prediction",
+      "Re-engagement automation",
+      "Loyalty program management",
+      "Satisfaction tracking",
+      "Engagement scoring"
+    ],
+    "vertical_ids": [
+      "med_spa",
+      "hotel",
+      "hr"
+    ],
+    "triggers": [
+      "Missed appointment",
+      "Low engagement score",
+      "Expiring loyalty points",
+      "Negative feedback"
+    ],
+    "data_sources": [
+      "Engagement metrics",
+      "Visit history",
+      "Feedback data",
+      "Loyalty program"
+    ],
+    "outputs": [
+      "Churn alert",
+      "Re-engagement campaign",
+      "Loyalty reward",
+      "Satisfaction survey"
+    ],
+    "workflow_ids": [
+      "wf2",
+      "wf5"
+    ],
+    "agent_type": "monitor",
+    "category": "retention",
+    "is_active": true,
+    "metadata": {},
+    "created_at": "2026-06-01T03:01:59.542Z",
+    "updated_at": "2026-06-01T15:31:28.306Z"
+  },
+  {
+    "id": "4e62b5f7-848d-4a3c-84b9-1e43a3a23e5c",
+    "agent_id": "marketing_intelligence",
+    "name": "Marketing Intelligence Agent",
+    "tagline": "Campaigns that actually work",
+    "description": "Optimizes ad spend, tracks ROI, and generates campaign recommendations based on real-time client data.",
+    "long_description": "The Marketing Intelligence Agent transforms your ad spend from guesswork to precision. It tracks ROI across every channel, segments your audience for targeted campaigns, generates content that converts, and optimizes budgets in real-time. Every dollar spent is tracked against results.",
+    "icon": "▣",
+    "color": "#f472b6",
+    "capabilities": [
+      "Campaign optimization",
+      "ROI tracking",
+      "Audience segmentation",
+      "Content generation",
+      "Budget optimization"
+    ],
+    "vertical_ids": [
+      "med_spa",
+      "hotel",
+      "real_estate"
+    ],
+    "triggers": [
+      "Campaign launch",
+      "Budget threshold",
+      "Performance milestone",
+      "Seasonal event"
+    ],
+    "data_sources": [
+      "Ad platform data",
+      "Client segments",
+      "Campaign history",
+      "ROI data"
+    ],
+    "outputs": [
+      "Campaign recommendation",
+      "ROI report",
+      "Audience segment",
+      "Content draft"
+    ],
+    "workflow_ids": [
+      "wf1",
+      "wf4"
+    ],
+    "agent_type": "analytics",
+    "category": "marketing",
+    "is_active": true,
+    "metadata": {},
+    "created_at": "2026-06-01T03:01:59.542Z",
+    "updated_at": "2026-06-01T15:31:28.306Z"
+  },
+  {
+    "id": "ecaf310d-c474-4005-ae12-dfbb653db2b9",
+    "agent_id": "operations_orchestrator",
+    "name": "Operations Orchestrator",
+    "tagline": "Everything runs itself",
+    "description": "Coordinates staff schedules, inventory, supply orders, and daily workflows so you focus on clients, not logistics.",
+    "long_description": "The Operations Orchestrator is the backbone of your daily operations. It manages staff schedules, tracks inventory levels, automates supply orders, and coordinates daily workflows. It surfaces conflicts before they happen and ensures every moving part of your business runs smoothly.",
+    "icon": "◇",
+    "color": "#f472b6",
+    "capabilities": [
+      "Staff scheduling",
+      "Inventory management",
+      "Supply chain automation",
+      "Daily ops dashboard",
+      "Conflict detection"
+    ],
+    "vertical_ids": [
+      "med_spa",
+      "hotel"
+    ],
+    "triggers": [
+      "Shift change",
+      "Low inventory",
+      "Schedule conflict",
+      "Daily opening"
+    ],
+    "data_sources": [
+      "Staff database",
+      "Inventory system",
+      "Supplier catalog",
+      "Calendar"
+    ],
+    "outputs": [
+      "Staff schedule",
+      "Re-order alert",
+      "Daily ops report",
+      "Conflict alert"
+    ],
+    "workflow_ids": [
+      "wf1",
+      "wf3"
+    ],
+    "agent_type": "operations",
+    "category": "logistics",
+    "is_active": true,
+    "metadata": {},
+    "created_at": "2026-06-01T03:01:59.542Z",
+    "updated_at": "2026-06-01T15:31:28.306Z"
+  },
+  {
+    "id": "6373bf93-bba2-4f7e-b8b8-c93953fedcab",
+    "agent_id": "guest_experience_ai",
+    "name": "Guest Experience AI",
+    "tagline": "Every stay is personal",
+    "description": "Personalizes every guest interaction from pre-arrival preferences to post-stay follow-ups. Learns guest preferences across visits.",
+    "long_description": "The Guest Experience AI creates a personalized journey for every guest. It learns preferences across visits, sends pre-arrival communications, customizes in-room settings, and follows up after checkout. Every interaction builds a deeper understanding of each guest.",
+    "icon": "◆",
+    "color": "#00d4ff",
+    "capabilities": [
+      "Preference learning",
+      "Personalized welcome",
+      "Stay history tracking",
+      "Post-stay engagement",
+      "Pre-arrival communication"
+    ],
+    "vertical_ids": [
+      "hotel"
+    ],
+    "triggers": [
+      "New booking",
+      "Guest arrival",
+      "Checkout",
+      "Preference update"
+    ],
+    "data_sources": [
+      "Booking system",
+      "Guest profiles",
+      "Preference data",
+      "Stay history"
+    ],
+    "outputs": [
+      "Personalized welcome",
+      "Stay recommendations",
+      "Post-stay message",
+      "Preference profile"
+    ],
+    "workflow_ids": [
+      "wf1",
+      "wf4"
+    ],
+    "agent_type": "frontline",
+    "category": "guest",
+    "is_active": true,
+    "metadata": {},
+    "created_at": "2026-06-01T03:01:59.542Z",
+    "updated_at": "2026-06-01T15:31:28.306Z"
+  },
+  {
+    "id": "415a8b1d-8667-4d7a-9b78-5e87ead9201e",
+    "agent_id": "concierge_ai",
+    "name": "Concierge Intelligence",
+    "tagline": "Your 24/7 luxury concierge",
+    "description": "Handles guest requests, restaurant recommendations, spa bookings, room service, and local experiences in natural conversation.",
+    "long_description": "The Concierge Intelligence handles every guest request in natural conversation — from dinner reservations to spa bookings, room service orders to local experiences. It learns preferences, makes intelligent recommendations, and coordinates with hotel services seamlessly.",
+    "icon": "◎",
+    "color": "#00d4ff",
+    "capabilities": [
+      "Natural language requests",
+      "Local recommendations",
+      "Service booking",
+      "Multi-language support",
+      "Preference learning"
+    ],
+    "vertical_ids": [
+      "hotel"
+    ],
+    "triggers": [
+      "Guest request",
+      "Service inquiry",
+      "Complaint",
+      "Special request"
+    ],
+    "data_sources": [
+      "Hotel services",
+      "Local directory",
+      "Guest preferences",
+      "Availability"
+    ],
+    "outputs": [
+      "Request fulfillment",
+      "Recommendation",
+      "Service booking",
+      "Follow-up"
+    ],
+    "workflow_ids": [
+      "wf1",
+      "wf3"
+    ],
+    "agent_type": "frontline",
+    "category": "concierge",
+    "is_active": true,
+    "metadata": {},
+    "created_at": "2026-06-01T03:01:59.542Z",
+    "updated_at": "2026-06-01T15:31:28.306Z"
+  },
+  {
+    "id": "a827808a-fd09-406e-a2fc-0fea041e8eb2",
+    "agent_id": "revenue_optimizer",
+    "name": "Revenue Optimizer",
+    "tagline": "Maximize every room",
+    "description": "Dynamic pricing engine that adjusts rates based on demand, seasonality, events, and booking patterns in real-time.",
+    "long_description": "The Revenue Optimizer dynamically adjusts room rates based on demand, seasonality, local events, and booking patterns. It forecasts occupancy, recommends package deals, and identifies revenue opportunities across your property.",
+    "icon": "◈",
+    "color": "#00d4ff",
+    "capabilities": [
+      "Dynamic pricing",
+      "Demand forecasting",
+      "Yield management",
+      "Package optimization",
+      "Revenue reporting"
+    ],
+    "vertical_ids": [
+      "hotel"
+    ],
+    "triggers": [
+      "Rate change",
+      "Booking surge",
+      "Event nearby",
+      "Low occupancy"
+    ],
+    "data_sources": [
+      "Pricing data",
+      "Booking system",
+      "Events calendar",
+      "Competitor rates"
+    ],
+    "outputs": [
+      "Rate recommendation",
+      "Forecast report",
+      "Package deal",
+      "Revenue alert"
+    ],
+    "workflow_ids": [
+      "wf2",
+      "wf4"
+    ],
+    "agent_type": "analytics",
+    "category": "revenue",
+    "is_active": true,
+    "metadata": {},
+    "created_at": "2026-06-01T03:01:59.542Z",
+    "updated_at": "2026-06-01T15:31:28.306Z"
+  },
+  {
+    "id": "010a588c-691f-4364-8cc7-1a14593f63ad",
+    "agent_id": "operations_sentinel",
+    "name": "Operations Sentinel",
+    "tagline": "Everything behind the scenes",
+    "description": "Monitors housekeeping, maintenance, F&B, and front desk operations. Flags issues before guests notice them.",
+    "long_description": "The Operations Sentinel keeps your entire property running smoothly. It monitors housekeeping schedules, maintenance requests, F&B inventory, and front desk operations. It flags issues before guests notice them and coordinates responses across departments.",
+    "icon": "▣",
+    "color": "#00d4ff",
+    "capabilities": [
+      "Housekeeping coordination",
+      "Maintenance alerts",
+      "F&B inventory tracking",
+      "Front desk oversight",
+      "Cross-dept coordination"
+    ],
+    "vertical_ids": [
+      "hotel"
+    ],
+    "triggers": [
+      "Maintenance request",
+      "Housekeeping delay",
+      "Low inventory",
+      "Guest complaint"
+    ],
+    "data_sources": [
+      "Hotel operations",
+      "Maintenance system",
+      "Inventory",
+      "Staff schedules"
+    ],
+    "outputs": [
+      "Maintenance alert",
+      "Ops report",
+      "Inventory alert",
+      "Coordination task"
+    ],
+    "workflow_ids": [
+      "wf1",
+      "wf3"
+    ],
+    "agent_type": "operations",
+    "category": "logistics",
+    "is_active": true,
+    "metadata": {},
+    "created_at": "2026-06-01T03:01:59.542Z",
+    "updated_at": "2026-06-01T15:31:28.306Z"
+  },
+  {
+    "id": "a00f1da5-82b4-425c-9965-c9e61e75ba19",
+    "agent_id": "guest_insights_engine",
+    "name": "Guest Insights Engine",
+    "tagline": "Know your guests deeply",
+    "description": "Aggregates guest feedback, reviews, and behavior data to surface actionable insights for service improvement.",
+    "long_description": "The Guest Insights Engine aggregates feedback from every touchpoint — reviews, surveys, direct feedback, and behavioral data. It surfaces actionable insights for service improvement, identifies trends, and helps your team continuously elevate the guest experience.",
+    "icon": "◇",
+    "color": "#00d4ff",
+    "capabilities": [
+      "Sentiment analysis",
+      "Review aggregation",
+      "Service improvement suggestions",
+      "Loyalty optimization",
+      "Trend identification"
+    ],
+    "vertical_ids": [
+      "hotel"
+    ],
+    "triggers": [
+      "New review",
+      "Feedback submission",
+      "Survey response",
+      "Behavioral shift"
+    ],
+    "data_sources": [
+      "Review platforms",
+      "Feedback system",
+      "Guest behavior",
+      "Loyalty data"
+    ],
+    "outputs": [
+      "Sentiment report",
+      "Improvement suggestion",
+      "Trend alert",
+      "Loyalty recommendation"
+    ],
+    "workflow_ids": [
+      "wf2",
+      "wf5"
+    ],
+    "agent_type": "analytics",
+    "category": "intelligence",
+    "is_active": true,
+    "metadata": {},
+    "created_at": "2026-06-01T03:01:59.542Z",
+    "updated_at": "2026-06-01T15:31:28.306Z"
+  },
+  {
+    "id": "fa154f6f-4eb8-486b-b3c5-7ba4df15a6f6",
+    "agent_id": "lead_nurture",
+    "name": "Lead Nurture Agent",
+    "tagline": "Cold leads become hot prospects",
+    "description": "Automatically follows up with leads, qualifies interest, schedules showings, and keeps your pipeline warm 24/7.",
+    "long_description": "The Lead Nurture Agent works 24/7 to keep your pipeline warm. It automatically follows up with every lead, qualifies their interest, schedules showings, and nurtures long-term prospects until they're ready to buy or sell.",
+    "icon": "◇",
+    "color": "#a78bfa",
+    "capabilities": [
+      "Automated follow-ups",
+      "Lead qualification",
+      "Showing scheduling",
+      "Pipeline warming",
+      "Drip campaigns"
+    ],
+    "vertical_ids": [
+      "real_estate"
+    ],
+    "triggers": [
+      "New lead",
+      "Lead inactivity",
+      "Showing request",
+      "Lead re-engagement"
+    ],
+    "data_sources": [
+      "Lead database",
+      "CRM",
+      "Property listings",
+      "Communication history"
+    ],
+    "outputs": [
+      "Follow-up message",
+      "Qualification score",
+      "Showing confirmation",
+      "Pipeline report"
+    ],
+    "workflow_ids": [
+      "wf1",
+      "wf3"
+    ],
+    "agent_type": "frontline",
+    "category": "sales",
+    "is_active": true,
+    "metadata": {},
+    "created_at": "2026-06-01T03:01:59.542Z",
+    "updated_at": "2026-06-01T15:31:28.306Z"
+  },
+  {
+    "id": "1de6cd4b-0dea-4208-9858-88ebf847307e",
+    "agent_id": "property_match",
+    "name": "Property Match Intelligence",
+    "tagline": "The perfect property finds them",
+    "description": "Pairs buyers with their ideal properties using preference analysis, behavioral data, and market intelligence.",
+    "long_description": "The Property Match Intelligence analyzes buyer preferences, viewing behavior, and market data to match them with their ideal property. It learns from every interaction and refines recommendations over time.",
+    "icon": "◎",
+    "color": "#a78bfa",
+    "capabilities": [
+      "Preference matching",
+      "Behavioral analysis",
+      "Neighborhood insights",
+      "Comparative market analysis",
+      "Recommendation refinement"
+    ],
+    "vertical_ids": [
+      "real_estate"
+    ],
+    "triggers": [
+      "New search",
+      "Property view",
+      "Preference update",
+      "Market change"
+    ],
+    "data_sources": [
+      "Property database",
+      "Buyer preferences",
+      "Viewing history",
+      "Market data"
+    ],
+    "outputs": [
+      "Property match",
+      "Neighborhood report",
+      "CMA report",
+      "Recommendation update"
+    ],
+    "workflow_ids": [
+      "wf2",
+      "wf4"
+    ],
+    "agent_type": "analytics",
+    "category": "intelligence",
+    "is_active": true,
+    "metadata": {},
+    "created_at": "2026-06-01T03:01:59.542Z",
+    "updated_at": "2026-06-01T15:31:28.306Z"
+  },
+  {
+    "id": "efecd6b0-79ff-4eae-b894-0457b39bb341",
+    "agent_id": "market_intelligence",
+    "name": "Market Intelligence Engine",
+    "tagline": "Know the market before everyone else",
+    "description": "Tracks neighborhood trends, pricing shifts, days-on-market, and emerging opportunities in real-time.",
+    "long_description": "The Market Intelligence Engine tracks every signal in your market — neighborhood trends, pricing shifts, days-on-market, school ratings changes, new developments. It surfaces opportunities before your competition sees them.",
+    "icon": "◈",
+    "color": "#a78bfa",
+    "capabilities": [
+      "Trend tracking",
+      "Pricing analysis",
+      "Opportunity detection",
+      "Competitive intelligence",
+      "Market reports"
+    ],
+    "vertical_ids": [
+      "real_estate"
+    ],
+    "triggers": [
+      "Market shift",
+      "New listing",
+      "Price change",
+      "Development announcement"
+    ],
+    "data_sources": [
+      "MLS data",
+      "Public records",
+      "Market feeds",
+      "Development pipeline"
+    ],
+    "outputs": [
+      "Market report",
+      "Opportunity alert",
+      "Competitive analysis",
+      "Trend forecast"
+    ],
+    "workflow_ids": [
+      "wf2",
+      "wf4"
+    ],
+    "agent_type": "analytics",
+    "category": "market",
+    "is_active": true,
+    "metadata": {},
+    "created_at": "2026-06-01T03:01:59.542Z",
+    "updated_at": "2026-06-01T15:31:28.306Z"
+  },
+  {
+    "id": "dd3953b2-4023-4448-9721-a6e42ff09430",
+    "agent_id": "transaction_coordinator",
+    "name": "Transaction Coordinator",
+    "tagline": "Deals close on autopilot",
+    "description": "Handles paperwork, deadlines, escrow coordination, and compliance — so no deal falls through the cracks.",
+    "long_description": "The Transaction Coordinator ensures every deal closes smoothly. It manages paperwork, tracks deadlines, coordinates with escrow, monitors compliance requirements, and alerts you to potential issues before they become problems.",
+    "icon": "▣",
+    "color": "#a78bfa",
+    "capabilities": [
+      "Document automation",
+      "Deadline tracking",
+      "Escrow coordination",
+      "Compliance checks",
+      "Issue alerts"
+    ],
+    "vertical_ids": [
+      "real_estate",
+      "legal"
+    ],
+    "triggers": [
+      "Offer accepted",
+      "Deadline approaching",
+      "Document needed",
+      "Compliance check"
+    ],
+    "data_sources": [
+      "Transaction data",
+      "Document templates",
+      "Escrow system",
+      "Compliance rules"
+    ],
+    "outputs": [
+      "Document package",
+      "Deadline alert",
+      "Escrow update",
+      "Compliance report"
+    ],
+    "workflow_ids": [
+      "wf1",
+      "wf3"
+    ],
+    "agent_type": "operations",
+    "category": "transaction",
+    "is_active": true,
+    "metadata": {},
+    "created_at": "2026-06-01T03:01:59.542Z",
+    "updated_at": "2026-06-01T15:31:28.306Z"
+  },
+  {
+    "id": "4808134a-0733-461c-89df-548f3d596d8c",
+    "agent_id": "client_relations",
+    "name": "Client Relations Agent",
+    "tagline": "Relationships that last beyond closing",
+    "description": "Manages client communication, referrals, reviews, and long-touch nurture campaigns for repeat and referral business.",
+    "long_description": "The Client Relations Agent keeps your relationship with every client strong long after closing. It manages referrals, solicits reviews, sends personalized check-ins, and nurtures past clients for repeat business and referrals.",
+    "icon": "✦",
+    "color": "#a78bfa",
+    "capabilities": [
+      "Communication automation",
+      "Referral generation",
+      "Review management",
+      "Long-touch nurture",
+      "Milestone reminders"
+    ],
+    "vertical_ids": [
+      "real_estate",
+      "legal",
+      "med_spa"
+    ],
+    "triggers": [
+      "Closing complete",
+      "Referral trigger",
+      "Review request",
+      "Milestone date"
+    ],
+    "data_sources": [
+      "Client database",
+      "Referral tracking",
+      "Review platforms",
+      "Calendar"
+    ],
+    "outputs": [
+      "Check-in message",
+      "Referral request",
+      "Review prompt",
+      "Nurture email"
+    ],
+    "workflow_ids": [
+      "wf3",
+      "wf5"
+    ],
+    "agent_type": "frontline",
+    "category": "relations",
+    "is_active": true,
+    "metadata": {},
+    "created_at": "2026-06-01T03:01:59.542Z",
+    "updated_at": "2026-06-01T15:31:28.306Z"
+  },
+  {
+    "id": "a9c41eb9-50df-4df2-aa74-ccf5f9a3e824",
+    "agent_id": "talent_acquisition",
+    "name": "Talent Acquisition Agent",
+    "tagline": "Hire the best, faster",
+    "description": "Screens candidates, schedules interviews, ranks applicants, and manages the entire hiring pipeline with intelligent automation.",
+    "long_description": "The Talent Acquisition Agent transforms your hiring process. It screens candidates against job requirements, schedules interviews automatically, ranks applicants by fit score, and manages your entire hiring pipeline. Your best candidates never slip through.",
+    "icon": "▤",
+    "color": "#fb923c",
+    "capabilities": [
+      "Candidate screening",
+      "Interview scheduling",
+      "Applicant ranking",
+      "Pipeline management",
+      "Skill matching"
+    ],
+    "vertical_ids": [
+      "hr"
+    ],
+    "triggers": [
+      "New application",
+      "Interview needed",
+      "Offer decision",
+      "Pipeline review"
+    ],
+    "data_sources": [
+      "ATS",
+      "Job requirements",
+      "Candidate data",
+      "Interview availability"
+    ],
+    "outputs": [
+      "Screening result",
+      "Interview schedule",
+      "Ranking score",
+      "Pipeline report"
+    ],
+    "workflow_ids": [
+      "wf1",
+      "wf3"
+    ],
+    "agent_type": "frontline",
+    "category": "talent",
+    "is_active": true,
+    "metadata": {},
+    "created_at": "2026-06-01T03:01:59.542Z",
+    "updated_at": "2026-06-01T15:31:28.306Z"
+  },
+  {
+    "id": "1965490f-8fcd-4bf2-b7e1-f2b299d06ab4",
+    "agent_id": "onboarding_automator",
+    "name": "Onboarding Automator",
+    "tagline": "Day one starts before day one",
+    "description": "Handles paperwork, equipment setup, training plans, and compliance docs so every new hire is productive from day one.",
+    "long_description": "The Onboarding Automator ensures every new hire hits the ground running. It handles paperwork automatically, coordinates equipment setup, generates personalized training plans, and tracks compliance documents. Day one productivity, zero administrative burden.",
+    "icon": "◎",
+    "color": "#fb923c",
+    "capabilities": [
+      "Paperwork automation",
+      "Equipment provisioning",
+      "Training plan generation",
+      "Compliance tracking",
+      "Welcome sequence"
+    ],
+    "vertical_ids": [
+      "hr"
+    ],
+    "triggers": [
+      "New hire",
+      "Start date approaching",
+      "Training milestone",
+      "Compliance check"
+    ],
+    "data_sources": [
+      "HRIS",
+      "Equipment inventory",
+      "Training content",
+      "Compliance rules"
+    ],
+    "outputs": [
+      "Completed paperwork",
+      "Equipment order",
+      "Training plan",
+      "Compliance status"
+    ],
+    "workflow_ids": [
+      "wf1",
+      "wf3"
+    ],
+    "agent_type": "operations",
+    "category": "onboarding",
+    "is_active": true,
+    "metadata": {},
+    "created_at": "2026-06-01T03:01:59.542Z",
+    "updated_at": "2026-06-01T15:31:28.306Z"
+  },
+  {
+    "id": "822a6f83-fe4d-44c9-9a7b-8bde1fe82edc",
+    "agent_id": "employee_intelligence",
+    "name": "Employee Intelligence Engine",
+    "tagline": "Know your people deeply",
+    "description": "Tracks engagement, performance, satisfaction, and growth patterns to surface insights that reduce turnover and boost productivity.",
+    "long_description": "The Employee Intelligence Engine gives you deep insight into your workforce. It tracks engagement patterns, performance metrics, satisfaction trends, and growth trajectories. It surfaces insights that reduce turnover, boost productivity, and help every employee reach their potential.",
+    "icon": "◈",
+    "color": "#fb923c",
+    "capabilities": [
+      "Engagement tracking",
+      "Performance analytics",
+      "Satisfaction monitoring",
+      "Growth path mapping",
+      "Turnover prediction"
+    ],
+    "vertical_ids": [
+      "hr"
+    ],
+    "triggers": [
+      "Performance review",
+      "Engagement dip",
+      "Promotion eligibility",
+      "Resignation risk"
+    ],
+    "data_sources": [
+      "HRIS",
+      "Performance data",
+      "Engagement surveys",
+      "Feedback tools"
+    ],
+    "outputs": [
+      "Engagement report",
+      "Performance review",
+      "Growth recommendation",
+      "Risk alert"
+    ],
+    "workflow_ids": [
+      "wf2",
+      "wf5"
+    ],
+    "agent_type": "analytics",
+    "category": "intelligence",
+    "is_active": true,
+    "metadata": {},
+    "created_at": "2026-06-01T03:01:59.542Z",
+    "updated_at": "2026-06-01T15:31:28.306Z"
+  },
+  {
+    "id": "65e56f5d-a8be-4c1e-b408-8acf9ede17a8",
+    "agent_id": "compliance_sentinel",
+    "name": "Compliance Sentinel",
+    "tagline": "Audit-ready always",
+    "description": "Monitors regulatory requirements, certification expirations, policy updates, and generates compliance reports automatically.",
+    "long_description": "The Compliance Sentinel keeps your organization audit-ready at all times. It monitors regulatory requirements, tracks certification expirations, alerts on policy updates, and generates compliance reports automatically. No compliance gap goes unnoticed.",
+    "icon": "▣",
+    "color": "#fb923c",
+    "capabilities": [
+      "Regulatory monitoring",
+      "Certification tracking",
+      "Policy management",
+      "Audit reporting",
+      "Deadline alerts"
+    ],
+    "vertical_ids": [
+      "hr",
+      "legal"
+    ],
+    "triggers": [
+      "Certification expiry",
+      "Regulation change",
+      "Audit request",
+      "Policy update"
+    ],
+    "data_sources": [
+      "Compliance database",
+      "Certification records",
+      "Regulatory feeds",
+      "Policy documents"
+    ],
+    "outputs": [
+      "Compliance report",
+      "Certification alert",
+      "Policy update notice",
+      "Audit package"
+    ],
+    "workflow_ids": [
+      "wf2",
+      "wf5"
+    ],
+    "agent_type": "monitor",
+    "category": "compliance",
+    "is_active": true,
+    "metadata": {},
+    "created_at": "2026-06-01T03:01:59.542Z",
+    "updated_at": "2026-06-01T15:31:28.306Z"
+  },
+  {
+    "id": "f09604c6-4792-4db8-89bc-789d340f1ba1",
+    "agent_id": "workforce_planner",
+    "name": "Workforce Planner",
+    "tagline": "Right people, right time",
+    "description": "Analyzes headcount needs, skill gaps, and staffing forecasts to recommend hiring, training, and restructuring decisions.",
+    "long_description": "The Workforce Planner gives you strategic workforce intelligence. It analyzes headcount needs, identifies skill gaps, forecasts staffing requirements, and recommends hiring, training, and restructuring decisions aligned with your business goals.",
+    "icon": "◇",
+    "color": "#fb923c",
+    "capabilities": [
+      "Headcount analysis",
+      "Skill gap mapping",
+      "Staffing forecasts",
+      "Organizational planning",
+      "Budget optimization"
+    ],
+    "vertical_ids": [
+      "hr"
+    ],
+    "triggers": [
+      "Quarterly planning",
+      "Budget cycle",
+      "Team expansion",
+      "Skill shortage"
+    ],
+    "data_sources": [
+      "HRIS",
+      "Financial data",
+      "Project plans",
+      "Skills database"
+    ],
+    "outputs": [
+      "Headcount plan",
+      "Skill gap report",
+      "Staffing forecast",
+      "Org recommendation"
+    ],
+    "workflow_ids": [
+      "wf4"
+    ],
+    "agent_type": "analytics",
+    "category": "strategy",
+    "is_active": true,
+    "metadata": {},
+    "created_at": "2026-06-01T03:01:59.542Z",
+    "updated_at": "2026-06-01T15:31:28.306Z"
+  },
+  {
+    "id": "63a25550-3ea6-4ff6-8544-e2cfe5e78a82",
+    "agent_id": "client_intake_legal",
+    "name": "Client Intake Agent",
+    "tagline": "Qualify leads instantly",
+    "description": "Screens potential clients, qualifies cases, schedules consultations, and collects initial information before the first meeting.",
+    "long_description": "The Client Intake Agent screens every potential client before your first conversation. It qualifies cases against your practice areas, checks for conflicts, schedules consultations, and collects initial information so your first meeting is productive.",
+    "icon": "⊙",
+    "color": "#34d399",
+    "capabilities": [
+      "Case qualification",
+      "Conflict checking",
+      "Consultation scheduling",
+      "Initial data collection",
+      "Practice area matching"
+    ],
+    "vertical_ids": [
+      "legal"
+    ],
+    "triggers": [
+      "New inquiry",
+      "Consultation request",
+      "Conflict check needed",
+      "Case referral"
+    ],
+    "data_sources": [
+      "CRM",
+      "Practice areas",
+      "Conflict database",
+      "Calendar"
+    ],
+    "outputs": [
+      "Qualification result",
+      "Conflict check",
+      "Consultation booking",
+      "Intake summary"
+    ],
+    "workflow_ids": [
+      "wf1",
+      "wf3"
+    ],
+    "agent_type": "frontline",
+    "category": "intake",
+    "is_active": true,
+    "metadata": {},
+    "created_at": "2026-06-01T03:01:59.542Z",
+    "updated_at": "2026-06-01T15:31:28.306Z"
+  },
+  {
+    "id": "7589daa3-f089-4b97-821d-12296366e6d1",
+    "agent_id": "document_intelligence",
+    "name": "Document Intelligence Engine",
+    "tagline": "Draft, review, file — automatically",
+    "description": "Drafts standard documents, reviews contracts for risk, organizes filings, and maintains a searchable knowledge base.",
+    "long_description": "The Document Intelligence Engine transforms your document workflow. It drafts standard documents from templates, reviews contracts for risk clauses, organizes filings for easy retrieval, and maintains a searchable knowledge base of your firm's work product.",
+    "icon": "◎",
+    "color": "#34d399",
+    "capabilities": [
+      "Document drafting",
+      "Contract review",
+      "Filing organization",
+      "Knowledge management",
+      "Risk identification"
+    ],
+    "vertical_ids": [
+      "legal"
+    ],
+    "triggers": [
+      "Document request",
+      "Contract review needed",
+      "Filing deadline",
+      "Knowledge search"
+    ],
+    "data_sources": [
+      "Document templates",
+      "Contract library",
+      "Filing system",
+      "Knowledge base"
+    ],
+    "outputs": [
+      "Drafted document",
+      "Contract review",
+      "Filing package",
+      "Knowledge match"
+    ],
+    "workflow_ids": [
+      "wf1",
+      "wf4"
+    ],
+    "agent_type": "operations",
+    "category": "document",
+    "is_active": true,
+    "metadata": {},
+    "created_at": "2026-06-01T03:01:59.542Z",
+    "updated_at": "2026-06-01T15:31:28.306Z"
+  },
+  {
+    "id": "257e8279-32bb-4d8b-94e9-52e762b7df76",
+    "agent_id": "case_coordinator",
+    "name": "Case Management Coordinator",
+    "tagline": "Every deadline met",
+    "description": "Tracks court dates, filing deadlines, task assignments, and case milestones across every active matter.",
+    "long_description": "The Case Management Coordinator ensures nothing falls through the cracks. It tracks every court date, filing deadline, task assignment, and case milestone. It alerts the right person at the right time and provides a complete view of every active matter.",
+    "icon": "◈",
+    "color": "#34d399",
+    "capabilities": [
+      "Deadline tracking",
+      "Task coordination",
+      "Milestone monitoring",
+      "Calendar management",
+      "Team alerts"
+    ],
+    "vertical_ids": [
+      "legal"
+    ],
+    "triggers": [
+      "New case",
+      "Deadline approaching",
+      "Task overdue",
+      "Milestone reached"
+    ],
+    "data_sources": [
+      "Case management system",
+      "Court calendar",
+      "Task database",
+      "Team availability"
+    ],
+    "outputs": [
+      "Deadline alert",
+      "Task update",
+      "Milestone report",
+      "Calendar sync"
+    ],
+    "workflow_ids": [
+      "wf1",
+      "wf3"
+    ],
+    "agent_type": "operations",
+    "category": "case",
+    "is_active": true,
+    "metadata": {},
+    "created_at": "2026-06-01T03:01:59.542Z",
+    "updated_at": "2026-06-01T15:31:28.306Z"
+  },
+  {
+    "id": "076e4543-7b61-40c1-acad-e455c51451ab",
+    "agent_id": "billing_automation",
+    "name": "Billing Automation Agent",
+    "tagline": "Time tracked, invoices sent",
+    "description": "Tracks billable hours, generates invoices, manages trust accounts, and follows up on outstanding payments automatically.",
+    "long_description": "The Billing Automation Agent captures every billable minute. It tracks time across matters, generates professional invoices, manages trust accounts with precision, and follows up on outstanding payments automatically. Your revenue flows while you focus on clients.",
+    "icon": "▣",
+    "color": "#34d399",
+    "capabilities": [
+      "Time tracking",
+      "Invoice generation",
+      "Trust accounting",
+      "Payment follow-up",
+      "Revenue reporting"
+    ],
+    "vertical_ids": [
+      "legal"
+    ],
+    "triggers": [
+      "Time entry",
+      "Invoice cycle",
+      "Payment received",
+      "Overdue invoice"
+    ],
+    "data_sources": [
+      "Time tracking",
+      "Matter data",
+      "Trust accounts",
+      "Payment processor"
+    ],
+    "outputs": [
+      "Time report",
+      "Invoice",
+      "Trust statement",
+      "Payment reminder"
+    ],
+    "workflow_ids": [
+      "wf1",
+      "wf5"
+    ],
+    "agent_type": "operations",
+    "category": "billing",
+    "is_active": true,
+    "metadata": {},
+    "created_at": "2026-06-01T03:01:59.542Z",
+    "updated_at": "2026-06-01T15:31:28.306Z"
+  },
+  {
+    "id": "40afe0d2-8fac-4890-b064-bccff8a3e148",
+    "agent_id": "research_associate",
+    "name": "Research Associate",
+    "tagline": "Find precedent in seconds",
+    "description": "Searches case law, statutes, and legal databases. Surfaces relevant precedents and summarizes findings for your review.",
+    "long_description": "The Research Associate is your always-on legal researcher. It searches case law, statutes, and legal databases in seconds. It surfaces relevant precedents, summarizes findings, and connects research to your active matters. Hours of research compressed into minutes.",
+    "icon": "◇",
+    "color": "#34d399",
+    "capabilities": [
+      "Legal research",
+      "Precedent analysis",
+      "Statute lookup",
+      "Case summarization",
+      "Matter linking"
+    ],
+    "vertical_ids": [
+      "legal"
+    ],
+    "triggers": [
+      "Research request",
+      "New precedent",
+      "Statute change",
+      "Case update"
+    ],
+    "data_sources": [
+      "Legal databases",
+      "Case law",
+      "Statutes",
+      "Active matters"
+    ],
+    "outputs": [
+      "Research memo",
+      "Precedent summary",
+      "Statute update",
+      "Case alert"
+    ],
+    "workflow_ids": [
+      "wf2",
+      "wf4"
+    ],
+    "agent_type": "analytics",
+    "category": "research",
+    "is_active": true,
+    "metadata": {},
+    "created_at": "2026-06-01T03:01:59.542Z",
+    "updated_at": "2026-06-01T15:31:28.306Z"
+  },
+  {
+    "id": "5149abaf-c941-4dd5-bfe9-907fa9a9eb44",
+    "agent_id": "vip_experience_manager",
+    "name": "VIP Experience Manager",
+    "tagline": "Every guest feels like a VIP",
+    "description": "Manages VIP guest profiles, preferences, and special requests across all touchpoints. Ensures consistent white-glove service.",
+    "long_description": null,
+    "icon": "✦",
+    "color": "#c8ff00",
+    "capabilities": [
+      "vip_profiling",
+      "preference_tracking",
+      "special_request_handling",
+      "gift_coordination"
+    ],
+    "vertical_ids": [],
+    "triggers": [
+      "vip_checkin",
+      "preference_update",
+      "special_request",
+      "anniversary"
+    ],
+    "data_sources": [
+      "guest_profiles",
+      "purchase_history",
+      "preferences"
+    ],
+    "outputs": [
+      "vip_itinerary",
+      "guest_bio",
+      "upgrade_recommendation"
+    ],
+    "workflow_ids": [],
+    "agent_type": "concierge_booking",
+    "category": "concierge",
+    "is_active": true,
+    "metadata": {},
+    "created_at": "2026-06-04T03:04:20.281Z",
+    "updated_at": "2026-06-04T03:04:20.281Z"
+  },
+  {
+    "id": "49750697-d079-4f3d-914b-3b529608fec9",
+    "agent_id": "hospitality_operations",
+    "name": "Hospitality Operations",
+    "tagline": "Behind the scenes, effortlessly",
+    "description": "Coordinates housekeeping, maintenance, inventory, and vendor logistics so your property runs like clockwork.",
+    "long_description": null,
+    "icon": "✦",
+    "color": "#c8ff00",
+    "capabilities": [
+      "inventory_tracking",
+      "staff_scheduling",
+      "maintenance_requests",
+      "vendor_management"
+    ],
+    "vertical_ids": [],
+    "triggers": [
+      "low_inventory",
+      "maintenance_alert",
+      "staff_shortage"
+    ],
+    "data_sources": [
+      "pms",
+      "inventory_system",
+      "hr_system"
+    ],
+    "outputs": [
+      "restock_order",
+      "maintenance_ticket",
+      "staff_schedule"
+    ],
+    "workflow_ids": [],
+    "agent_type": "enterprise_infrastructure",
+    "category": "operations",
+    "is_active": true,
+    "metadata": {},
+    "created_at": "2026-06-04T03:04:20.312Z",
+    "updated_at": "2026-06-04T03:04:20.312Z"
+  },
+  {
+    "id": "aad668c2-470c-4a0e-9266-c60b1c93fdd4",
+    "agent_id": "review_reputation_manager",
+    "name": "Review & Reputation Manager",
+    "tagline": "Your brand, always protected",
+    "description": "Monitors reviews across Google, Yelp, TripAdvisor, and social media. Flags negative reviews and drafts response templates.",
+    "long_description": null,
+    "icon": "✦",
+    "color": "#c8ff00",
+    "capabilities": [
+      "review_monitoring",
+      "sentiment_analysis",
+      "response_drafting",
+      "trend_alerting"
+    ],
+    "vertical_ids": [],
+    "triggers": [
+      "new_review",
+      "negative_review",
+      "rating_drop"
+    ],
+    "data_sources": [
+      "google_business",
+      "yelp",
+      "tripadvisor",
+      "social_media"
+    ],
+    "outputs": [
+      "review_alert",
+      "response_draft",
+      "reputation_report"
+    ],
+    "workflow_ids": [],
+    "agent_type": "marketing_intelligence",
+    "category": "marketing",
+    "is_active": true,
+    "metadata": {},
+    "created_at": "2026-06-04T03:04:20.333Z",
+    "updated_at": "2026-06-04T03:04:20.333Z"
+  },
+  {
+    "id": "8cf46756-501d-42af-ba41-2582ada4c614",
+    "agent_id": "sales_outreach_agent",
+    "name": "Sales Outreach Agent",
+    "tagline": "The follow-up that closes",
+    "description": "Automates personalized email and SMS outreach sequences. Tracks opens, replies, and optimizes send timing for max conversion.",
+    "long_description": null,
+    "icon": "✦",
+    "color": "#c8ff00",
+    "capabilities": [
+      "email_outreach",
+      "sms_campaigns",
+      "a_b_testing",
+      "followup_automation"
+    ],
+    "vertical_ids": [],
+    "triggers": [
+      "lead_qualified",
+      "deal_stage_change",
+      "meeting_completed"
+    ],
+    "data_sources": [
+      "crm",
+      "email_platform",
+      "sms_gateway"
+    ],
+    "outputs": [
+      "outreach_email",
+      "sms_sent",
+      "meeting_booked"
+    ],
+    "workflow_ids": [],
+    "agent_type": "lead_sales",
+    "category": "sales",
+    "is_active": true,
+    "metadata": {},
+    "created_at": "2026-06-04T03:04:20.352Z",
+    "updated_at": "2026-06-04T03:04:20.352Z"
+  },
+  {
+    "id": "d0aae1a8-1efb-4b9a-a15b-0a4970215a4f",
+    "agent_id": "deal_room_agent",
+    "name": "Deal Room Agent",
+    "tagline": "Close faster with intelligence",
+    "description": "Coordinates deal documentation, approvals, and stakeholder communication in a structured deal pipeline.",
+    "long_description": null,
+    "icon": "✦",
+    "color": "#c8ff00",
+    "capabilities": [
+      "document_management",
+      "approval_workflows",
+      "stakeholder_communication",
+      "timeline_tracking"
+    ],
+    "vertical_ids": [],
+    "triggers": [
+      "new_deal",
+      "deal_stage_update",
+      "document_needed"
+    ],
+    "data_sources": [
+      "crm",
+      "document_storage",
+      "calendar"
+    ],
+    "outputs": [
+      "deal_summary",
+      "approval_request",
+      "closing_documents"
+    ],
+    "workflow_ids": [],
+    "agent_type": "lead_sales",
+    "category": "sales",
+    "is_active": true,
+    "metadata": {},
+    "created_at": "2026-06-04T03:04:20.372Z",
+    "updated_at": "2026-06-04T03:04:20.372Z"
+  },
+  {
+    "id": "b65a0574-af92-4e7c-a53c-72102472333d",
+    "agent_id": "content_strategy_agent",
+    "name": "Content Strategy Agent",
+    "tagline": "Content that connects",
+    "description": "Plans, generates, and schedules content across channels. Analyzes engagement to refine messaging for each audience segment.",
+    "long_description": null,
+    "icon": "✦",
+    "color": "#c8ff00",
+    "capabilities": [
+      "content_planning",
+      "generation",
+      "scheduling",
+      "performance_analysis"
+    ],
+    "vertical_ids": [],
+    "triggers": [
+      "content_calendar_start",
+      "campaign_launch",
+      "engagement_drop"
+    ],
+    "data_sources": [
+      "social_platforms",
+      "blog_analytics",
+      "brand_guidelines"
+    ],
+    "outputs": [
+      "content_calendar",
+      "post_draft",
+      "engagement_report"
+    ],
+    "workflow_ids": [],
+    "agent_type": "creator_commerce",
+    "category": "marketing",
+    "is_active": true,
+    "metadata": {},
+    "created_at": "2026-06-04T03:04:20.392Z",
+    "updated_at": "2026-06-04T03:04:20.392Z"
+  },
+  {
+    "id": "d5842d98-0453-48be-bee7-1c9fbbdcc323",
+    "agent_id": "seo_optimization_agent",
+    "name": "SEO Optimization Agent",
+    "tagline": "Get found, stay found",
+    "description": "Analyzes search rankings, identifies keyword opportunities, and generates on-page optimization recommendations.",
+    "long_description": null,
+    "icon": "✦",
+    "color": "#c8ff00",
+    "capabilities": [
+      "keyword_research",
+      "rank_tracking",
+      "competitor_analysis",
+      "onpage_optimization"
+    ],
+    "vertical_ids": [],
+    "triggers": [
+      "ranking_change",
+      "content_publish",
+      "algorithm_update"
+    ],
+    "data_sources": [
+      "search_console",
+      "analytics",
+      "competitor_tools"
+    ],
+    "outputs": [
+      "keyword_opportunities",
+      "seo_audit",
+      "optimization_tasks"
+    ],
+    "workflow_ids": [],
+    "agent_type": "marketing_intelligence",
+    "category": "marketing",
+    "is_active": true,
+    "metadata": {},
+    "created_at": "2026-06-04T03:04:20.412Z",
+    "updated_at": "2026-06-04T03:04:20.412Z"
+  },
+  {
+    "id": "b6820611-6cb5-4735-9676-e52065860a17",
+    "agent_id": "loyalty_architect",
+    "name": "Loyalty Architect",
+    "tagline": "Turn customers into advocates",
+    "description": "Designs and manages loyalty programs, tracks rewards, and identifies top advocates for referral campaigns.",
+    "long_description": null,
+    "icon": "✦",
+    "color": "#c8ff00",
+    "capabilities": [
+      "loyalty_design",
+      "reward_tracking",
+      "referral_management",
+      "advocate_identification"
+    ],
+    "vertical_ids": [],
+    "triggers": [
+      "program_launch",
+      "reward_milestone",
+      "referral_completed"
+    ],
+    "data_sources": [
+      "crm",
+      "transaction_data",
+      "referral_tracking"
+    ],
+    "outputs": [
+      "loyalty_program",
+      "reward_notification",
+      "referral_report"
+    ],
+    "workflow_ids": [],
+    "agent_type": "marketing_intelligence",
+    "category": "retention",
+    "is_active": true,
+    "metadata": {},
+    "created_at": "2026-06-04T03:04:20.433Z",
+    "updated_at": "2026-06-04T03:04:20.433Z"
+  },
+  {
+    "id": "19372a40-88b6-4324-8c41-b12d863cdc51",
+    "agent_id": "compliance_monitor",
+    "name": "Compliance Monitor",
+    "tagline": "Stay compliant, automatically",
+    "description": "Monitors regulatory requirements, flags compliance gaps, and generates audit-ready reports for your industry.",
+    "long_description": null,
+    "icon": "✦",
+    "color": "#c8ff00",
+    "capabilities": [
+      "regulation_tracking",
+      "gap_analysis",
+      "audit_reporting",
+      "policy_enforcement"
+    ],
+    "vertical_ids": [],
+    "triggers": [
+      "regulation_change",
+      "audit_upcoming",
+      "policy_violation"
+    ],
+    "data_sources": [
+      "regulatory_db",
+      "internal_policies",
+      "audit_logs"
+    ],
+    "outputs": [
+      "compliance_report",
+      "gap_alert",
+      "policy_update"
+    ],
+    "workflow_ids": [],
+    "agent_type": "enterprise_infrastructure",
+    "category": "compliance",
+    "is_active": true,
+    "metadata": {},
+    "created_at": "2026-06-04T03:04:20.458Z",
+    "updated_at": "2026-06-04T03:04:20.458Z"
+  },
+  {
+    "id": "917841f8-cb9f-4766-ac9b-34324ba95628",
+    "agent_id": "data_analytics_agent",
+    "name": "Data Analytics Agent",
+    "tagline": "Your numbers tell a story",
+    "description": "Connects to your data sources, builds dashboards, and surfaces actionable insights. No SQL required.",
+    "long_description": null,
+    "icon": "✦",
+    "color": "#c8ff00",
+    "capabilities": [
+      "data_connection",
+      "dashboard_building",
+      "insight_generation",
+      "trend_spotting"
+    ],
+    "vertical_ids": [],
+    "triggers": [
+      "data_connected",
+      "scheduled_report",
+      "anomaly_detected"
+    ],
+    "data_sources": [
+      "database",
+      "analytics_platform",
+      "business_apps"
+    ],
+    "outputs": [
+      "dashboard",
+      "insight_report",
+      "anomaly_alert"
+    ],
+    "workflow_ids": [],
+    "agent_type": "enterprise_infrastructure",
+    "category": "analytics",
+    "is_active": true,
+    "metadata": {},
+    "created_at": "2026-06-04T03:04:20.473Z",
+    "updated_at": "2026-06-04T03:04:20.473Z"
+  }
+]

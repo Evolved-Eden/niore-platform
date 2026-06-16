@@ -1,8 +1,16 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
+import { STRIPE_API_VERSION } from '@/lib/constants'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2025-01-27.acacia' })
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: STRIPE_API_VERSION })
+
+// Strip role prefix (client_/creator_/personal_/affiliate_) to map to base deposit keys
+function normalizeTier(tier: string): string {
+  const base = tier.replace(/^(client|creator|personal|affiliate)_/, '')
+  const VALID = ['founder', 'team', 'enterprise']
+  return VALID.includes(base) ? base : tier
+}
 
 const DEPOSITS: Record<string, { amount: number; label: string }> = {
   founder:    { amount: 250000, label: 'Founder — First Month ($2,500)' },
@@ -13,39 +21,67 @@ const DEPOSITS: Record<string, { amount: number; label: string }> = {
 export async function POST(req: NextRequest) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  const { tier, suite, email, name, intelligence_count = 1 } = await req.json()
+  const { tier: rawTier, suite, email, name, intelligence_count = 1 } = await req.json()
+
+  if (!user) {
+    return NextResponse.json({ error: 'Sign in before checkout' }, { status: 401 })
+  }
+
+  const tier = normalizeTier(rawTier)
 
   if (!tier || !DEPOSITS[tier]) {
     return NextResponse.json({ error: 'Invalid tier' }, { status: 400 })
   }
 
+  // Extract role name for display
+const roleMap: Record<string, string> = { client: 'Client', creator: 'Creator', personal: 'Personal', affiliate: 'Affiliate' }
+const roleMatch = rawTier?.match(/^(client|creator|personal|affiliate)_/)
+  const roleName = roleMatch ? roleMap[roleMatch[1]] : ''
   const base = DEPOSITS[tier]
   const amount = tier === 'enterprise' ? base.amount * intelligence_count : base.amount
   const label  = tier === 'enterprise'
-    ? `Enterprise — ${intelligence_count} Intelligence${intelligence_count > 1 ? 's' : ''} ($${(amount/100).toLocaleString()})`
-    : base.label
+    ? `${roleName ? roleName + ' ' : ''}Enterprise — ${intelligence_count} Intelligence${intelligence_count > 1 ? 's' : ''} ($${(amount/100).toLocaleString()})`
+    : `${roleName ? roleName + ' ' : ''}${base.label}`
 
   let customerId: string | undefined
   if (user) {
-    const { data: citizen } = await supabase
-      .from('ris_citizens').select('stripe_customer_id')
-      .eq('supabase_user_id', user.id).maybeSingle()
-    customerId = citizen?.stripe_customer_id ?? undefined
+    const { data: userRec } = await supabase
+      .from('users').select('metadata')
+      .eq('id', user.id).maybeSingle()
+    customerId = (userRec?.metadata as Record<string, unknown>)?.stripe_customer_id as string ?? undefined
   }
 
   if (!customerId) {
     const customer = await stripe.customers.create({
-      email: email ?? user?.email,
+      email: email ?? user.email,
       name,
-      metadata: { tier, suite: suite ?? '', supabase_user_id: user?.id ?? '' },
+      metadata: { tier, raw_tier: rawTier ?? tier, suite: suite ?? '', supabase_user_id: user.id },
     })
     customerId = customer.id
-    if (user) {
-      await supabase.from('ris_citizens')
-        .update({ stripe_customer_id: customerId })
-        .eq('supabase_user_id', user.id)
-    }
+    const { data: userRec } = await supabase
+      .from('users')
+      .select('metadata')
+      .eq('id', user.id)
+      .maybeSingle()
+
+    await supabase.from('users')
+      .update({ metadata: { ...((userRec?.metadata as Record<string, unknown>) ?? {}), stripe_customer_id: customerId } })
+      .eq('id', user.id)
   }
+
+  await supabase
+    .from('clients')
+    .update({
+      status: 'pending_payment',
+      onboarding_status: 'payment_started',
+      metadata: {
+        requested_plan_tier_key: rawTier ?? tier,
+        requested_deposit_tier_key: tier,
+        requested_suite: suite ?? '',
+        billing_status: 'payment_intent_created',
+      },
+    })
+    .eq('id', user.id)
 
   const paymentIntent = await stripe.paymentIntents.create({
     amount,
@@ -55,9 +91,11 @@ export async function POST(req: NextRequest) {
     description: label,
     metadata: {
       tier,
+      raw_tier: rawTier ?? tier,
       suite: suite ?? '',
       intelligence_count: String(intelligence_count),
-      supabase_user_id: user?.id ?? '',
+      supabase_user_id: user.id,
+      email: user.email ?? email ?? '',
       billing_status: 'deposit_paid_awaiting_consult',
     },
   })

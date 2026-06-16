@@ -1,0 +1,93 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { supabaseAdmin } from '@/lib/supabase/admin';
+
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const type = searchParams.get('type') || 'all';
+
+    let blueprints: any[] = [];
+    let essences: any[] = [];
+    let workflows: any[] = [];
+
+    if (type === 'all' || type === 'blueprint') {
+      const { data, error } = await supabaseAdmin
+        .from('blueprint_templates')
+        .select('*')
+        .order('key', { ascending: true });
+      if (!error) blueprints = (data || []).map((b: any) => ({ ...b, _template_type: 'blueprint' }));
+    }
+
+    if (type === 'all' || type === 'essence') {
+      const { data, error } = await supabaseAdmin
+        .from('essence_templates')
+        .select('*')
+        .order('key', { ascending: true });
+      if (!error) essences = (data || []).map((e: any) => ({ ...e, _template_type: 'essence' }));
+    }
+
+    if (type === 'all' || type === 'workflow') {
+      const { data, error } = await supabaseAdmin
+        .from('workflow_templates')
+        .select('key, name, description, vertical_key, workflow_type, is_active, stages_json')
+        .order('key', { ascending: true });
+      if (!error) workflows = (data || []).map((w: any) => ({
+        ...w,
+        _template_type: 'workflow',
+        sections_json: w.stages_json || [],
+        template_json: { workflow_type: w.workflow_type, stages: w.stages_json },
+      }));
+    }
+
+    const templates = [...blueprints, ...essences, ...workflows];
+
+    return NextResponse.json({
+      templates,
+      count: templates.length,
+      blueprint_count: blueprints.length,
+      essence_count: essences.length,
+      workflow_count: workflows.length,
+    });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const templateType = body._template_type || body.type || 'blueprint';
+
+    if (templateType === 'essence') {
+      const { data, error } = await supabaseAdmin
+        .from('essence_templates')
+        .insert({
+          key: body.key, name: body.name, description: body.description || null,
+          vertical_key: body.vertical_key || null, subcategory_key: body.subcategory_key || null,
+          is_active: body.is_active ?? true, sections_json: body.sections_json || [],
+          template_json: body.template_json || {}, essence_json: body.essence_json || null,
+          blueprint_key: body.blueprint_key || null, mas_category: body.mas_category || null,
+          mas_priority: body.mas_priority || null,
+        })
+        .select()
+        .single();
+      if (error) throw error;
+      return NextResponse.json({ success: true, template: data });
+    }
+
+    const { data, error } = await supabaseAdmin
+      .from('blueprint_templates')
+      .insert({
+        key: body.key, name: body.name, description: body.description || null,
+        vertical_key: body.vertical_key || null, subcategory_key: body.subcategory_key || null,
+        is_active: body.is_active ?? true, sections_json: body.sections_json || [],
+        template_json: body.template_json || {},
+      })
+      .select()
+      .single();
+    if (error) throw error;
+    return NextResponse.json({ success: true, template: data });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}

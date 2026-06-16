@@ -1,0 +1,178 @@
+{
+  "name": "WF1 — Queue Poller",
+  "nodes": [
+    {
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "name": "Every 5s",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "seconds",
+              "secondsInterval": 5
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+      "name": "Count Pending",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        450,
+        300
+      ],
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT COUNT(*)::int AS pending_count\nFROM public.workflow_jobs\nWHERE status = 'pending';"
+      },
+      "credentials": {
+        "postgres": "Supabase Postgres"
+      }
+    },
+    {
+      "id": "c3d4e5f6-a7b8-9012-cdef-123456789012",
+      "name": "Has Work?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        650,
+        300
+      ],
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{ $json.pending_count }}",
+              "operation": "larger",
+              "value2": 0
+            }
+          ]
+        },
+        "combineOperation": "all"
+      }
+    },
+    {
+      "id": "d4e5f6a7-b8c9-0123-defa-234567890123",
+      "name": "Call Worker",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        850,
+        200
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://jebixydqpvsegvrtfmgm.supabase.co/functions/v1/workflow-worker",
+        "authentication": "genericCredentialType",
+        "nodeCredentialType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $env.SUPABASE_SERVICE_ROLE_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{}",
+        "options": {
+          "timeout": 30000,
+          "allowUnauthorizedCerts": false
+        }
+      }
+    },
+    {
+      "id": "e5f6a7b8-c9d0-1234-efab-345678901234",
+      "name": "Log Alert",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        850,
+        500
+      ],
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "CREATE TABLE IF NOT EXISTS public.workflow_alerts (id UUID PRIMARY KEY DEFAULT gen_random_uuid(), source TEXT NOT NULL DEFAULT 'n8n', workflow_name TEXT NOT NULL, node_name TEXT NOT NULL DEFAULT 'unknown', level TEXT NOT NULL DEFAULT 'error', title TEXT NOT NULL, message TEXT NOT NULL, context JSONB DEFAULT '{}'::jsonb, created_at TIMESTAMPTZ NOT NULL DEFAULT NOW());\nINSERT INTO public.workflow_alerts (source, workflow_name, node_name, level, title, message, context)\nVALUES ('n8n', 'WF1 - Queue Poller', 'Call Worker', 'error', 'HTTP Call Failed', 'HTTP call to workflow-worker function failed', '{{ JSON.stringify($json) }}'::jsonb);",
+        "options": {}
+      },
+      "credentials": {
+        "postgres": "Supabase Postgres"
+      }
+    }
+  ],
+  "connections": {
+    "Every 5s": {
+      "main": [
+        [
+          {
+            "node": "Count Pending",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Count Pending": {
+      "main": [
+        [
+          {
+            "node": "Has Work?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Work?": {
+      "main": [
+        [
+          {
+            "node": "Call Worker",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Call Worker": {
+      "error": [
+        [
+          {
+            "node": "Log Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "versionId": "00000000-0000-0000-0000-000000000001",
+  "settings": {
+    "executionOrder": "v1",
+    "errorWorkflow": "",
+    "callerPolicy": "workflowsFromSameOwner",
+    "timezone": "UTC"
+  },
+  "staticData": null,
+  "tags": [
+    "infrastructure",
+    "queue"
+  ]
+}

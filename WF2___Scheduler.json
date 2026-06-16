@@ -1,0 +1,174 @@
+{
+  "name": "WF2 — Scheduler",
+  "nodes": [
+    {
+      "id": "f1a2b3c4-d5e6-7890-abcd-ef1234567890",
+      "name": "Every 1m",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        250,
+        300
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "seconds",
+              "secondsInterval": 1
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "a2b3c4d5-e6f7-8901-abcd-f12345678901",
+      "name": "Fetch Due Schedules",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        450,
+        300
+      ],
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT *\nFROM public.workflow_schedules\nWHERE active = true\n  AND next_run_at <= NOW()\nORDER BY next_run_at\nLIMIT 500;"
+      },
+      "credentials": {
+        "postgres": {
+          "id": "V3Efv1mtgcNnSJUZ",
+          "name": "Supabase Postgres"
+        }
+      }
+    },
+    {
+      "id": "b3c4d5e6-f7a8-9012-bcde-123456789012",
+      "name": "Split Batches",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        650,
+        300
+      ],
+      "parameters": {
+        "batchSize": 50,
+        "options": {}
+      }
+    },
+    {
+      "id": "c4d5e6f7-a8b9-0123-cdef-234567890123",
+      "name": "Trigger Workflow",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        850,
+        300
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://jebixydqpvsegvrtfmgm.supabase.co/functions/v1/workflow-trigger",
+        "authentication": "genericCredentialType",
+        "nodeCredentialType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $env.SUPABASE_SERVICE_ROLE_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"workflow_id\": \"{{ $json.workflow_id }}\",\n  \"organization_id\": \"{{ $json.organization_id }}\",\n  \"client_id\": \"{{ $json.client_id }}\",\n  \"business_id\": \"{{ $json.business_id }}\",\n  \"input\": \"{{ $json.payload }}\",\n  \"idempotency_key\": \"schedule-{{ $json.id }}-{{ $now }}\"\n}",
+        "options": {
+          "timeout": 30000,
+          "allowUnauthorizedCerts": false
+        }
+      }
+    },
+    {
+      "id": "d5e6f7a8-b9c0-1234-defa-345678901234",
+      "name": "Update Schedule",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        1050,
+        300
+      ],
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE public.workflow_schedules\nSET\n  last_run_at = NOW(),\n  next_run_at = public.calculate_next_run(cron_expression)\nWHERE id = '{{ $json.id }}'::uuid;"
+      },
+      "credentials": {
+        "postgres": {
+          "id": "V3Efv1mtgcNnSJUZ",
+          "name": "Supabase Postgres"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Every 1m": {
+      "main": [
+        [
+          {
+            "node": "Fetch Due Schedules",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Due Schedules": {
+      "main": [
+        [
+          {
+            "node": "Split Batches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Batches": {
+      "main": [
+        [
+          {
+            "node": "Trigger Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trigger Workflow": {
+      "main": [
+        [
+          {
+            "node": "Update Schedule",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "errorWorkflow": "",
+    "callerPolicy": "workflowsFromSameOwner",
+    "timezone": "UTC"
+  },
+  "staticData": {
+    "node:Every 1m": {
+      "recurrenceRules": []
+    }
+  },
+  "pinData": {},
+  "tags": []
+}

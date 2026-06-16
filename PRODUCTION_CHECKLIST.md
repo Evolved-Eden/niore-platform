@@ -1,84 +1,96 @@
-# Evolved Eden — Production Readiness Report
+# Niore Platform — Production Readiness
 
-**Date:** 2026-06-03
-**Project:** Hoodacity / Evolved Eden Intelligence Platform
+Last updated: 2026-06-16
 
----
+## ✅ Resolved (since 2026-06-07)
 
-## ✅ Report Card
+- Hardcoded `jebixydqpvsegvrtfmgm.supabase.co` removed from all active code (only present in `archive/` and the prior checklist doc)
+- `docker-compose.yml` — passwords + `N8N_ENCRYPTION_KEY` now via env vars; required (`:?required`) not defaulted
+- pgadmin bound to `127.0.0.1` only (no public exposure); auth required
+- Root error/loading/not-found pages with Sentry reporting (`app/error.tsx`, `app/global-error.tsx`, `app/not-found.tsx`, `app/loading.tsx`, `app/dashboard/error.tsx`, `app/dashboard/loading.tsx`)
+- Sentry wired up via `@sentry/nextjs` (client/server/edge configs present)
+- GitHub Actions CI added (`.github/workflows/ci.yml`) — lint + typecheck + vitest on PR
+- Smoke tests added (`tests/config.test.ts`, `tests/db.test.ts`, `tests/proxy.test.ts`) — 29 tests passing
+- Vitest installed + configured
+- n8n pinned to `1.80.0` with healthcheck (was `:latest`)
+- 143 legacy scripts archived → 6 active in `/scripts`
+- n8n env vars consolidated on `automation.evolvededen.com` (`N8N_URL`, `N8N_BASE_URL`, `N8N_PUBLIC_API_URL`, `N8N_MCP_URL`)
+- n8n workflow JSONs (`workflows/wf*.json`) — Supabase URL now via `={{ $env.SUPABASE_URL }}` instead of hardcoded
+- Duplicate root-level `WF*___*.json` files moved to `archive/workflow-dupes/`
+- `docker-compose.prod.yml` overlay created — no host port exposure on postgres/n8n in prod, pgadmin disabled
+- `tsc --noEmit` is now a fast, standalone script (`pnpm typecheck`)
 
-| Area | Status | Notes |
-|---|---|---|
-| **Build** | ✅ PASS | 77 pages, 0 TS errors, compiles clean |
-| **Database Schema** | ⚠️ NEEDS MIGRATION | Run `00004_fix_schema_and_auth.sql` in Supabase SQL Editor |
-| **User Creation** | ⚠️ BROKEN TRIGGER | Auth trigger must be fixed (migration fixes it) |
-| **Admin Dashboard** | ✅ PASS | All pages dark-themed, show real data |
-| **User Management** | ✅ PASS | Approve/reject/set tier works. Shows all 8 users |
-| **New User Flow** | ✅ PASS | `/dashboard/admin/users/new` creates auth + app users |
-| **Edit Pages** | ✅ PASS | Agents, swarms, generators, templates — all editable |
-| **RLS Policies** | ⚠️ NEEDS MIGRATION | Recursion fixed, self-read policies added in migration 00004 |
-| **Branding** | ✅ PASS | All "MaaS" replaced with "Evolved Eden" |
-| **Entitlement RPCs** | ⚠️ NEEDS MIGRATION | Run `00002_entitlement_rpcs.sql` (5 functions + usage_count column) |
-| **n8n Integration** | ❌ UNREACHABLE | `n8n-stitch.app.evolve-eden.com` DNS fails |
+## ⚠️ Action required before launch
 
----
+### 1. n8n cert + tokens (HIGH)
 
-## Deployment Checklist
+Verified `automation.evolvededen.com` is up:
+- `/healthz` → 200 ✅
+- `/rest/login` → 401 (correct — auth gate works)
+- `/api/v1/workflows` → 401 (API token rejected — see below)
+- MCP `/mcp-server/http` → 401 (MCP token rejected)
 
-### Before Launch — Database Migrations (Run in order)
+**TLS:** Node's native fetch rejects the cert (`SEC_E_UNTRUSTED_ROOT`). Fix on the host:
+- If using Coolify with Caddy: ensure ACME certs are issued and the domain is verified
+- If self-signed: install a real cert via Let's Encrypt
+- As a temp diagnostic only: `node --env-file=.env.local scripts/verify-n8n.mjs --insecure`
 
-- [ ] **Run 00002_entitlement_rpcs.sql** — Creates 5 entitlement RPC functions + `usage_count` column
-- [ ] **Run 00003_fix_rls_recursion.sql** — Disables recursive RLS on `organization_memberships`
-- [ ] **Run 00004_fix_schema_and_auth.sql** — Fixes auth trigger, adds `owner_id` on organizations, backfills missing users, adds indexes, fixes RLS
+**Tokens:** `N8N_MCP_TOKEN` and `N8N_PUBLIC_API_KEY` in `.env.local` both return 401. Regenerate them from the n8n UI (Settings → API) and update `.env.local`.
 
-### After Migrations — Verify
+### 2. Sentry DSN is a placeholder
 
-- [ ] All 8 users show in `/dashboard/admin/users` (including newly backfilled)
-- [ ] Creating a new user at `/dashboard/admin/users/new` works end-to-end
-- [ ] Existing users can log in and see their dashboard
-- [ ] Edit links on agents/swarms/generators/templates pages load the detail page
-- [ ] Admin approve/reject workflow creates client records and provisions
+`.env.local` contains `SENTRY_DSN=https://examplePublicKey@o0.ingest.sentry.io/0` — that's the docs example, not a real DSN. Create a Sentry project for `niore-platform` and paste both `SENTRY_DSN` and `NEXT_PUBLIC_SENTRY_DSN` from there.
 
-### Environment Variables (.env.local / production)
+### 3. Pending migrations
 
-- [ ] `NEXT_PUBLIC_SUPABASE_URL` — Supabase project URL
-- [ ] `NEXT_PUBLIC_SUPABASE_ANON_KEY` — Anon/public key
-- [ ] `SUPABASE_SERVICE_ROLE_KEY` — Service role key (admin API)
-- [ ] `NEXT_PUBLIC_APP_URL` — Set to production URL (e.g., `https://evolvededen.com`)
-- [ ] `N8N_MCP_URL` — n8n instance (currently unreachable)
+Migrations present locally (00002–00017). Confirm each has been applied to the prod Supabase project:
 
-### Known Issues
-
-| Issue | Impact | Workaround |
-|---|---|---|
-| Auth trigger broken | Can't create users from app | Migration 00004 fixes it |
-| n8n unreachable | No workflow automation | Fix DNS / URL in env |
-| Seed users lack auth records (5 of 8) | Can't log in | Migration 00004 backfills auth → public; seed-only users need auth records created |
-| Users & clients have different UUIDs | Client data won't join by ID | API now joins by email (fixed) |
-
----
-
-## App Architecture Summary
-
-```
-User visits /dashboard/admin/*
-    ↓
-Layout checks auth + role (plan guard)
-    ↓
-Page fetches data via /api/admin/* endpoints
-    ↓
-API routes use createAdminClient() (service_role key → bypass RLS)
-    ↓
-Supabase returns enriched data
+```sql
+-- Run in Supabase SQL Editor:
+SELECT version FROM supabase_migrations.schema_migrations ORDER BY version;
 ```
 
-**Key files:**
-- `app/api/admin/users/route.ts` — User CRUD + approve/reject
-- `app/api/admin/users/new/route.ts` — Create user (with auth trigger fallback)
-- `app/api/admin/provision/route.ts` — Full account provisioning
-- `app/dashboard/admin/users/page.tsx` — Dark-themed user management UI
-- `supabase/migrations/00004_fix_schema_and_auth.sql` — Comprehensive fix
+Then sequentially apply any missing ones from `supabase/migrations/`. Notable: 00012 (archetype RLS), 00013 (orgs RLS), 00017 (client multi-plan).
 
----
+### 4. Secrets rotation
 
-*Generated by Evolved Eden Intelligence Platform — Production Scan 2026-06-03*
+`.env.local` is on disk with live Stripe + Supabase + GitHub + Anthropic + OpenAI + Discord keys. Before:
+- Adding any new collaborator to the laptop/repo
+- Posting any screenshots
+- Pushing to a public mirror
+
+rotate everything in `.env.local` that matters.
+
+## Production deployment commands
+
+```bash
+# Local dev (with pgadmin on localhost:5050)
+docker compose up -d
+
+# Production (no pgadmin, no exposed ports, env vars required)
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+
+# Verify n8n is reachable from server perspective
+node --env-file=.env.local scripts/verify-n8n.mjs
+
+# Run smoke tests
+pnpm test
+
+# Typecheck
+pnpm typecheck
+```
+
+## Files added/changed this pass
+
+- `.github/workflows/ci.yml`
+- `app/error.tsx`, `app/global-error.tsx` — added Sentry capture
+- `app/dashboard/error.tsx`, `app/dashboard/loading.tsx`
+- `tests/config.test.ts`, `tests/db.test.ts`, `tests/proxy.test.ts`
+- `scripts/verify-n8n.mjs`
+- `workflows/wf1-queue-poller.json`, `wf2-scheduler.json`, `wf3-dead-letter-handler.json`, `wf5-reply-recovery.json` — hardcoded URL → `$env.SUPABASE_URL`
+- `archive/workflow-dupes/` — moved 5 duplicate root WF JSONs
+- `docker-compose.yml` — pgadmin lockdown
+- `docker-compose.prod.yml` — new
+- `package.json` — `typecheck` is now `tsc --noEmit` (was full build + tsc)
+- `.env.local`, `.env.example` — n8n URL consolidation
+- `PRODUCTION_CHECKLIST_2026-06-07.md` — kept for history

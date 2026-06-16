@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "typecheck": "next build && tsc --noEmit",
+    "typecheck": "tsc --noEmit",
+    "typecheck:full": "next build && tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
     "seed": "node scripts/seed.mjs"

@@ -71,7 +71,7 @@
       ],
       "parameters": {
         "method": "POST",
-        "url": "https://jebixydqpvsegvrtfmgm.supabase.co/functions/v1/workflow-worker",
+        "url": "={{ $env.SUPABASE_URL }}/functions/v1/workflow-worker",
         "authentication": "genericCredentialType",
         "nodeCredentialType": "httpHeaderAuth",
         "sendHeaders": true,

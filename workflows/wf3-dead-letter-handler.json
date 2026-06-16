@@ -103,7 +103,7 @@
       ],
       "parameters": {
         "method": "POST",
-        "url": "https://jebixydqpvsegvrtfmgm.supabase.co/functions/v1/workflow-trigger",
+        "url": "={{ $env.SUPABASE_URL }}/functions/v1/workflow-trigger",
         "authentication": "genericCredentialType",
         "nodeCredentialType": "httpHeaderAuth",
         "sendHeaders": true,

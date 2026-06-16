@@ -1,0 +1,41 @@
+# Production overlay — combine with base file:
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+#
+# Differences from base (dev) compose:
+#   - postgres NOT exposed on host (only reachable via private network)
+#   - pgadmin REMOVED (use SSH tunnel + psql or port-forward when needed)
+#   - n8n NOT exposed on host (reachable only via reverse proxy / VPN)
+#   - All passwords required (not optional)
+
+services:
+  postgres:
+    ports: !reset []
+    environment:
+      POSTGRES_USER: evolved
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?required}
+      POSTGRES_DB: evolved_eden
+
+  n8n:
+    ports: !reset []
+    environment:
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_HOST=postgres
+      - DB_POSTGRESDB_PORT=5432
+      - DB_POSTGRESDB_USER=evolved
+      - DB_POSTGRESDB_PASSWORD=${POSTGRES_PASSWORD:?required}
+      - DB_POSTGRESDB_DATABASE=evolved_eden
+      - N8N_MCP_TOKEN=${N8N_MCP_TOKEN:?required}
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY:?required}
+      - N8N_URL=${N8N_URL:?required}
+      - N8N_HOST=${N8N_HOST:-automation.evolvededen.com}
+      - N8N_PROTOCOL=https
+      - WEBHOOK_URL=${N8N_URL:?required}
+      - SUPABASE_URL=${SUPABASE_URL:?required}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY:?required}
+      - N8N_METRICS=${N8N_METRICS:-true}
+      - N8N_METRICS_INCLUDE_DEFAULT=true
+
+  pgadmin:
+    profiles: ["disabled"]
+    deploy:
+      replicas: 0

@@ -124,7 +124,7 @@ export default async function ClientTwinPage() {
               <p className="text-sm text-white/40">View full blueprint and expansion modules</p>
             </Link>
             <Link
-              href="/blueprint/assess"
+              href="/dashboard/client/blueprint/assess"
               className="glass rounded-sm p-5 border border-white/[0.06] hover:border-[#c8ff00]/30 transition-all group"
             >
               <div className="text-xs text-[#c8ff00] tracking-widest uppercase mb-2 group-hover:opacity-80">Recalibrate</div>

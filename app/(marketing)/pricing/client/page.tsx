@@ -46,7 +46,7 @@ function PricingClientPage() {
                 Move beyond pricing and launch the real blueprint flow that builds your twin, essence boards, business OS, and deployment intake.
               </p>
             </div>
-            <Link href="/blueprint/assess?path=client" className="inline-flex items-center justify-center rounded-full bg-[#c8ff00] px-6 py-3 text-sm font-bold text-black hover:bg-white transition-all">
+            <Link href="/intake?path=client" className="inline-flex items-center justify-center rounded-full bg-[#c8ff00] px-6 py-3 text-sm font-bold text-black hover:bg-white transition-all">
               Start Full Blueprint Assessment →
             </Link>
           </div>

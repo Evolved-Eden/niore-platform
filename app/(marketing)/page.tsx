@@ -172,7 +172,7 @@ export default async function HomePage() {
                 Build the intelligence layer your business keeps trying to become.
               </h2>
             </div>
-            <Link href="/blueprint/assess" className="text-sm font-semibold text-[#c8ff00] hover:text-white">
+            <Link href="/intake" className="text-sm font-semibold text-[#c8ff00] hover:text-white">
               Start blueprint assessment
             </Link>
           </div>

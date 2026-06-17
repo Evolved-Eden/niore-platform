@@ -44,7 +44,7 @@ const NAV: Record<UserRole, { label: string; href: string }[]> = {
     { label: 'Overview',     href: '/dashboard/client' },
     { label: 'Profile',      href: '/dashboard/client/profile' },
     { label: 'Blueprint',    href: '/dashboard/client/blueprint' },
-    { label: 'Assessment',   href: '/dashboard/client/blueprint/assess' },
+    { label: 'Guided',       href: '/dashboard/client/blueprint/assess' },
     { label: 'Essence Intel',href: '/dashboard/client/essence' },
     { label: 'My Agents',    href: '/dashboard/client/agents' },
     { label: 'My Swarms',    href: '/dashboard/client/swarms' },

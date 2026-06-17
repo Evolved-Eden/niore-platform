@@ -472,10 +472,10 @@ function DoneStep({ userName, router }: { userName: string; router: ReturnType<t
       </div>
 
       <button
-        onClick={() => router.push('/blueprint/assess')}
+        onClick={() => router.push('/intake')}
         className="w-full py-4 bg-[#c8ff00] text-black font-bold rounded-sm hover:bg-white transition-colors"
       >
-        Run Your Blueprint Assessment →
+        Continue Intake →
       </button>
     </div>
   )

@@ -156,10 +156,10 @@ function StandardPricing({ path, setPath, pathname }: { path: PathType; setPath:
               </p>
             </div>
             <Link
-              href={`/blueprint/assess?path=${path}`}
+              href={`/intake?path=${path}`}
               className="inline-flex items-center justify-center rounded-full bg-[#c8ff00] px-6 py-3 text-sm font-bold text-black hover:bg-white transition-all"
             >
-              Start Full Blueprint Assessment →
+              Start Your Intelligence Intake →
             </Link>
           </div>
         </section>
@@ -357,10 +357,10 @@ function UpgradeContent({ path, setPath, user }: { path: PathType; setPath: (p: 
                   </p>
                 </div>
                 <Link
-                  href={`/blueprint/assess?path=${path}`}
+                  href={`/intake?path=${path}`}
                   className="inline-flex items-center justify-center rounded-full bg-[#c8ff00] px-6 py-3 text-sm font-bold text-black hover:bg-white transition-all shrink-0"
                 >
-                  Take Assessment →
+                  Take the Intake →
                 </Link>
               </div>
             </section>

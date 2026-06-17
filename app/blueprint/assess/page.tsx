@@ -242,14 +242,19 @@ function BlueprintAssessContent() {
       setUser(user ?? null)
 
       // Detect purchased system from client record
+      let hasActivePlan = false
       if (user) {
         const { data: client } = await supabase
           .from('clients')
-          .select('plan_tier_key, metadata')
+          .select('plan_tier_key, status, metadata')
           .eq('id', user.id)
           .maybeSingle()
+
         if (client?.plan_tier_key) {
+          const meta = (client?.metadata as Record<string, any>) ?? {}
+          const isTrial = meta?.is_trial === true
           setUserTier(client.plan_tier_key)
+          hasActivePlan = client.status === 'active'
         }
         // Also check metadata for system info (from free trial / provision)
         const meta = (client?.metadata as Record<string, any>) ?? {}
@@ -257,7 +262,19 @@ function BlueprintAssessContent() {
           setUserTier(meta.requested_plan_tier_key)
         }
       }
+
       setCheckingAuth(false)
+
+      // Guard: Blueprint assess is only for users with an active plan.
+      // Redirect unauthenticated or non-paying users to intake.
+      if (!user) {
+        router.replace('/intake')
+        return
+      }
+      if (!hasActivePlan) {
+        router.replace('/dashboard')
+        return
+      }
     }
     checkAuth()
   }, [router])
@@ -315,11 +332,13 @@ function BlueprintAssessContent() {
     clearProgress()
 
     try {
+      const planKey = pricingRec?.recommended_plan?.key || 'trial'
       const res = await fetch('/api/blueprint/trial', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           intakeRole,
+          planTierKey: planKey,
           blueprintData: { core: coreResult, extended: extResult, intake: intakeResult },
         }),
       })
@@ -339,7 +358,7 @@ function BlueprintAssessContent() {
     } finally {
       setTrialLoading(false)
     }
-  }, [intakeRole, coreResult, extResult, intakeResult, router])
+  }, [intakeRole, pricingRec, coreResult, extResult, intakeResult, router])
 
   // ──────── CORE BLUEPRINT ────────
 

@@ -44,7 +44,7 @@ export default function BlueprintResultPage() {
     if (checkingAuth) return
     const stored = sessionStorage.getItem('blueprintResult')
     if (!stored) {
-      router.push('/blueprint/assess')
+      router.push('/intake')
       return
     }
     setResult(JSON.parse(stored))
@@ -240,10 +240,10 @@ export default function BlueprintResultPage() {
                 )}
               </button>
               <button
-                onClick={() => router.push('/blueprint/assess')}
+                onClick={() => router.push('/intake')}
                 className="px-6 py-3 rounded-xl border border-white/10 text-white/60 hover:text-white transition-all text-sm"
               >
-                Retake Assessment
+                Run Intake First
               </button>
             </div>
           </>

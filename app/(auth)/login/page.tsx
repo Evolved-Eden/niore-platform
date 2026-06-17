@@ -194,7 +194,7 @@ function LoginForm() {
                       if (!email.trim()) return
                       setLoading(true)
                       const { error: resetError } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-                        redirectTo: `${window.location.origin}/auth/callback?next=/reset-password`,
+                        redirectTo: `${window.location.origin}/api/auth/callback?next=/reset-password`,
                       })
                       setLoading(false)
                       if (resetError) {

@@ -19,6 +19,7 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json()
     const intakeRole = body.intakeRole || 'client'
+    const planTierKey = body.planTierKey || 'trial'
     const blueprintData = body.blueprintData || {}
 
     // Check if user already has a client record
@@ -30,12 +31,13 @@ export async function POST(req: NextRequest) {
 
     if (existingClient) {
       const meta = existingClient.metadata as Record<string, any> || {}
-      // If they already have an active paid account or active trial, don't create another
-      if (existingClient.status === 'active' && existingClient.plan_tier_key !== 'trial') {
+      const isAlreadyTrial = meta?.is_trial === true || meta?.billing_status === 'trial'
+      // If they already have an active paid account, don't create another
+      if (existingClient.status === 'active' && !isAlreadyTrial) {
         return NextResponse.json({ error: 'You already have an active subscription' }, { status: 400 })
       }
       // If they already have a trial that hasn't expired
-      if (existingClient.plan_tier_key === 'trial') {
+      if (isAlreadyTrial) {
         const trialEnd = meta.trial_end_date ? new Date(meta.trial_end_date) : null
         if (trialEnd && trialEnd > new Date()) {
           return NextResponse.json({
@@ -50,7 +52,7 @@ export async function POST(req: NextRequest) {
     trialEnd.setDate(trialEnd.getDate() + 3)
 
     const trialMeta: Record<string, any> = {
-      plan_tier_key: 'trial',
+      plan_tier_key: planTierKey,
       billing_status: 'trial',
       is_trial: true,
       trial_started_at: new Date().toISOString(),
@@ -65,7 +67,7 @@ export async function POST(req: NextRequest) {
       id: user.id,
       full_name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'User',
       email: user.email || '',
-      plan_tier_key: 'trial',
+      plan_tier_key: planTierKey,
       client_type: intakeRole === 'creator' ? 'creator' : intakeRole === 'personal' ? 'personal' : intakeRole === 'affiliate' ? 'affiliate' : 'individual',
       status: 'active',
       onboarding_status: 'trial',
@@ -77,9 +79,9 @@ export async function POST(req: NextRequest) {
       name: `${user.email?.split('@')[0] || 'User'}'s Intelligence`,
       owner_id: user.id,
       slug: `${user.email?.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase() || 'user'}_org`,
-      subscription_plan: 'trial',
+      subscription_plan: planTierKey,
       subscription_status: 'trial',
-      settings: { plan_tier: 'trial', trial: true },
+      settings: { plan_tier: planTierKey, trial: true },
     } as any).select().single()
 
     const orgId = org?.id
@@ -164,7 +166,7 @@ export async function POST(req: NextRequest) {
     // ── 9. Update users record ──
     await supabase.from('users').update({
       metadata: {
-        plan_tier_key: 'trial',
+        plan_tier_key: planTierKey,
         organization_id: orgId,
         trial: true,
         trial_end_date: trialEnd.toISOString(),

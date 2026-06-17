@@ -46,7 +46,7 @@ function PricingCreatorPage() {
                 Move beyond pricing and launch the real blueprint flow that builds your twin, essence boards, business OS, and deployment intake.
               </p>
             </div>
-            <Link href="/blueprint/assess?path=creator" className="inline-flex items-center justify-center rounded-full bg-[#00d4ff] px-6 py-3 text-sm font-bold text-black hover:bg-white transition-all">
+            <Link href="/intake?path=creator" className="inline-flex items-center justify-center rounded-full bg-[#00d4ff] px-6 py-3 text-sm font-bold text-black hover:bg-white transition-all">
               Start Full Blueprint Assessment →
             </Link>
           </div>

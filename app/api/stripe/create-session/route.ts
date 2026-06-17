@@ -51,6 +51,7 @@ const ADDON_AMOUNTS: Record<string, number> = {
 // Standalone products (not tied to a plan tier)
 const STANDALONE_PRODUCTS: Record<string, { amount: number; name: string; desc: string; recurring: boolean }> = {
   expanded_blueprint:      { amount: 15000, name: 'Expanded Blueprint',     desc: 'Full whole-life scan + essence board links + premium suggestions (1 year)', recurring: false },
+  enhanced_blueprint:      { amount: 3500,  name: 'Enhanced Blueprint',     desc: 'Deeper intelligence analysis + priority essence board insights + cross-domain pattern recognition', recurring: false },
   domain_relationship:     { amount: 5000,  name: 'Relationship Module',    desc: 'Relationship intelligence domain assessment', recurring: false },
   domain_personal:         { amount: 5000,  name: 'Personal Module',        desc: 'Personal development intelligence domain', recurring: false },
   domain_spiritual:        { amount: 5000,  name: 'Spiritual Module',       desc: 'Spiritual intelligence domain assessment', recurring: false },

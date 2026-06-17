@@ -276,6 +276,8 @@ export async function POST(req: Request) {
       for (const pid of products) {
         if (pid === "expanded_blueprint") {
           twinMeta.blueprint_expanded = true
+        } else if (pid === "enhanced_blueprint") {
+          twinMeta.blueprint_enhanced = true
         } else if (pid.startsWith("domain_")) {
           const domains: string[] = twinMeta.purchased_domains || []
           if (!domains.includes(pid)) domains.push(pid)

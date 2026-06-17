@@ -46,6 +46,7 @@ export default function ClientBlueprintPage() {
 
   // Upgrade state
   const [purchasedExpanded, setPurchasedExpanded] = useState(false)
+  const [purchasedEnhanced, setPurchasedEnhanced] = useState(false)
   const [purchasedDomains, setPurchasedDomains] = useState<Set<string>>(new Set())
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null)
 
@@ -139,6 +140,7 @@ export default function ClientBlueprintPage() {
 
         // Check purchases in metadata
         if (meta.blueprint_expanded) setPurchasedExpanded(true)
+        if (meta.blueprint_enhanced) setPurchasedEnhanced(true)
         if (meta.purchased_domains) setPurchasedDomains(new Set(meta.purchased_domains))
       }
 
@@ -363,6 +365,48 @@ export default function ClientBlueprintPage() {
               >
                 {checkoutLoading === 'expanded_blueprint' ? 'Processing...' : 'Purchase Expanded Blueprint'}
               </button>
+            )}
+          </div>
+
+          {/* ── Enhanced Blueprint $35 ── */}
+          <div className={`glass rounded-sm p-6 border ${purchasedEnhanced ? 'border-[#00d4ff]/30' : 'border-white/[0.06] hover:border-white/15'}`}>
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-1">
+                  <h3 className="text-lg font-semibold">Enhanced Blueprint</h3>
+                  {purchasedEnhanced && (
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#00d4ff]/20 text-[#00d4ff] uppercase tracking-wider">Purchased</span>
+                  )}
+                </div>
+                <p className="text-sm text-white/50 mb-3">
+                  Upgrade your intelligence foundation with deeper analysis across all dimensions.
+                  Get priority essence board insights, cross-domain pattern recognition, and expanded AI twin intelligence.
+                </p>
+                <div className="flex flex-wrap gap-2 mb-4">
+                  <span className="text-[10px] px-2 py-1 rounded-full border border-white/10 text-white/40">Deeper Analysis</span>
+                  <span className="text-[10px] px-2 py-1 rounded-full border border-white/10 text-white/40">Essence Board Priority</span>
+                  <span className="text-[10px] px-2 py-1 rounded-full border border-white/10 text-white/40">Pattern Recognition</span>
+                  <span className="text-[10px] px-2 py-1 rounded-full border border-white/10 text-white/40">Expanded Twin Intelligence</span>
+                </div>
+              </div>
+              <div className="text-right shrink-0">
+                <div className="text-2xl font-bold text-[#00d4ff]">$35</div>
+                <div className="text-[10px] text-white/30">one-time</div>
+              </div>
+            </div>
+            {!purchasedEnhanced && (
+              <button
+                onClick={() => handlePurchase('enhanced_blueprint')}
+                disabled={checkoutLoading === 'enhanced_blueprint'}
+                className="w-full mt-4 px-5 py-2.5 bg-[#00d4ff] text-black text-xs font-bold rounded-sm hover:bg-white transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                {checkoutLoading === 'enhanced_blueprint' ? 'Processing...' : 'Purchase Enhanced Blueprint — $35'}
+              </button>
+            )}
+            {purchasedEnhanced && !purchasedExpanded && (
+              <p className="mt-3 text-xs text-[#00d4ff]/60 text-center">
+                Add the Expanded Blueprint for full whole-life intelligence scan → <Link href="/dashboard/client/blueprint/assess" className="underline hover:text-[#00d4ff]">Go to Assessment</Link>
+              </p>
             )}
           </div>
 

@@ -4,4 +4,9 @@ allowBuilds:
   sharp: true
   ssh2: true
   unrs-resolver: true
-minimumReleaseAge: 0
+onlyBuiltDependencies:
+  - '@sentry/cli'
+  - cpu-features
+  - sharp
+  - ssh2
+  - unrs-resolver

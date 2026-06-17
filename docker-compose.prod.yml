@@ -9,14 +9,14 @@
 
 services:
   postgres:
-    ports: !reset []
+    ports: []
     environment:
       POSTGRES_USER: evolved
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?required}
       POSTGRES_DB: evolved_eden
 
   n8n:
-    ports: !reset []
+    ports: []
     environment:
       - DB_TYPE=postgresdb
       - DB_POSTGRESDB_HOST=postgres

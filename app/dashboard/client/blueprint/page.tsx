@@ -5,6 +5,16 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 
+type IntakeInfo = {
+  hdType?: string
+  archetype?: string
+  profile?: string
+  profileName?: string
+  sunGate?: { number: number; name: string }
+  geneKey?: string
+  hasIntake: boolean
+}
+
 type BlueprintData = {
   overallScore: number
   archetype: string
@@ -32,6 +42,7 @@ export default function ClientBlueprintPage() {
   const [user, setUser] = useState<any>(null)
   const [blueprint, setBlueprint] = useState<BlueprintData | null>(null)
   const [twinExists, setTwinExists] = useState(false)
+  const [intake, setIntake] = useState<IntakeInfo>({ hasIntake: false })
 
   // Upgrade state
   const [purchasedExpanded, setPurchasedExpanded] = useState(false)
@@ -44,6 +55,47 @@ export default function ClientBlueprintPage() {
       const { data: { user: u } } = await supabase.auth.getUser()
       if (!u) { router.push('/login'); return }
       setUser(u)
+
+      // Flush pending intake from localStorage (filled before auth)
+      try {
+        const pending = localStorage.getItem('intake_pending')
+        if (pending) {
+          const parsed = JSON.parse(pending)
+          localStorage.removeItem('intake_pending')
+          // Save to server in background
+          for (const [section, sectionData] of Object.entries(parsed)) {
+            fetch('/api/intake/save', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ section, data: sectionData }),
+            }).catch(() => {}) // silent
+          }
+        }
+      } catch {}
+
+      // Check intake data
+      const { data: clientRec } = await supabase
+        .from('clients')
+        .select('metadata')
+        .eq('id', u.id)
+        .maybeSingle()
+      if (clientRec) {
+        const meta = (clientRec.metadata as Record<string, any>) ?? {}
+        const intakeSections = meta.intake?.sections
+        if (intakeSections?.results?.humanDesign) {
+          const hd = intakeSections.results.humanDesign
+          const gk = intakeSections.results.geneKeys
+          setIntake({
+            hasIntake: true,
+            hdType: hd.type,
+            archetype: hd.archetype,
+            profile: hd.profile,
+            profileName: hd.profileName,
+            sunGate: hd.sunGate ? { number: hd.sunGate.number, name: hd.sunGate.name } : undefined,
+            geneKey: gk?.primaryGeneKey,
+          })
+        }
+      }
 
       // Check if twin exists → read blueprint from DB
       const { data: twin } = await supabase
@@ -165,11 +217,43 @@ export default function ClientBlueprintPage() {
               <p className="text-white/50 text-sm mb-6 max-w-md mx-auto">
                 Your blueprint is the foundation of your intelligence system. Take the assessment to map your identity, vision, and capabilities.
               </p>
+
+              {/* Intake-derived profile preview */}
+              {intake.hasIntake && (
+                <div className="mb-6 p-4 rounded-sm bg-white/[0.03] border border-white/[0.06] text-left max-w-sm mx-auto space-y-1.5">
+                  <div className="text-[10px] text-white/30 tracking-widest uppercase mb-2">From Your Intake</div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-white/50">Type</span>
+                    <span className="text-[#c8ff00] font-medium">{intake.hdType}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-white/50">Archetype</span>
+                    <span className="text-white font-medium">{intake.archetype}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-white/50">Profile</span>
+                    <span className="text-[#a78bfa] font-medium">{intake.profile} {intake.profileName}</span>
+                  </div>
+                  {intake.sunGate && (
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-white/50">Sun Gate</span>
+                      <span className="text-white/80">Gate {intake.sunGate.number} — {intake.sunGate.name}</span>
+                    </div>
+                  )}
+                  {intake.geneKey && (
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-white/50">Gene Key</span>
+                      <span className="text-[#00d4ff] font-medium">{intake.geneKey}</span>
+                    </div>
+                  )}
+                </div>
+              )}
+
               <Link
                 href="/dashboard/client/blueprint/assess"
                 className="inline-block px-6 py-3 bg-[#c8ff00] text-black text-sm font-bold rounded-sm hover:bg-white transition-all"
               >
-                Start Blueprint Assessment →
+                {intake.hasIntake ? 'Complete Full Blueprint Assessment →' : 'Start Blueprint Assessment →'}
               </Link>
             </div>
           ) : (

@@ -134,11 +134,56 @@ export default function EssenceIntelligencePage() {
         if (!u) { router.push('/login'); return }
         setUser(u)
 
+        // 0. Flush pending intake from localStorage into DB
+        try {
+          const pending = localStorage.getItem('intake_pending')
+          if (pending) {
+            const parsed = JSON.parse(pending)
+            localStorage.removeItem('intake_pending')
+            for (const [section, sectionData] of Object.entries(parsed)) {
+              fetch('/api/intake/save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ section, data: sectionData }),
+              }).catch(() => {})
+            }
+          }
+        } catch {}
+
+        // 0. Fetch intake context for personalized essence
+        let intakeContext = ''
+        try {
+          const intakeRes = await fetch('/api/intake/results')
+          if (intakeRes.ok) {
+            const intakeData = await intakeRes.json()
+            if (intakeData.intake?.sections) {
+              const s = intakeData.intake.sections
+              const parts: string[] = []
+              if (s.personal) parts.push(`Name: ${s.personal.name}, DOB: ${s.personal.dob}`)
+              if (s.results?.humanDesign) {
+                const hd = s.results.humanDesign
+                parts.push(`Human Design: ${hd.type}, Profile: ${hd.profile} ${hd.profileName}, Authority: ${hd.authority.split('—')[0].trim()}`)
+                parts.push(`Archetype: ${hd.archetype}, Sun Gate: Gate ${hd.sunGate?.number} (${hd.sunGate?.name}), Design Gate: Gate ${hd.designGate?.number} (${hd.designGate?.name})`)
+              }
+              if (s.results?.geneKeys) {
+                parts.push(`Gene Keys: ${s.results.geneKeys.primaryGeneKey} (${s.results.geneKeys.primaryKeyword})`)
+              }
+              if (s.results?.recommendation) {
+                parts.push(`Suggested Path: ${s.results.recommendation.suggestedPath}`)
+              }
+              if (s.role) {
+                parts.push(`Role: sells to ${s.role.sellTo}, role type: ${s.role.roleType}, offers: ${s.role.offerType}`)
+              }
+              intakeContext = parts.join('. ')
+            }
+          }
+        } catch {}
+
         // 1. Fetch daily essence
         const essenceRes = await fetch('/api/zuri/essence', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId: u.id, userRole: 'client' }),
+          body: JSON.stringify({ userId: u.id, userRole: 'client', context: intakeContext }),
         })
         if (essenceRes.ok) {
           const essenceData = await essenceRes.json()

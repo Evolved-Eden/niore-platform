@@ -20,6 +20,19 @@ export default async function ClientTwinPage() {
     .eq('id', user.id)
     .single()
 
+  // Fetch intake data for personalized twin profile
+  const { data: clientRec } = await supabase
+    .from('clients')
+    .select('metadata, client_type')
+    .eq('id', user.id)
+    .maybeSingle()
+
+  const intakeMeta = (clientRec?.metadata as Record<string, any>)?.intake
+  const intakeSections = intakeMeta?.sections || {}
+  const hdProfile = intakeSections?.results?.humanDesign
+  const gkProfile = intakeSections?.results?.geneKeys
+  const intakeRole = intakeSections?.role
+
   const name = identity?.full_name ?? user.email?.split('@')[0] ?? 'User'
   const engagementScore = twin?.engagement_score ?? 78
   const confidenceScore = twin?.confidence_score ?? 85
@@ -61,6 +74,37 @@ export default async function ClientTwinPage() {
             {/* Intelligence Profile */}
             <div className="px-6 py-5 border-b border-white/[0.06]">
               <div className="text-xs text-white/30 tracking-widest uppercase mb-4">Intelligence Profile</div>
+
+              {/* Human Design profile from intake */}
+              {hdProfile && (
+                <div className="mb-4 p-3 rounded-sm bg-white/[0.03] border border-white/[0.06] space-y-1.5">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-white/50">Type</span>
+                    <span className="text-[#c8ff00] font-medium">{hdProfile.type}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-white/50">Archetype</span>
+                    <span className="text-white font-medium">{hdProfile.archetype}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-white/50">Profile</span>
+                    <span className="text-[#a78bfa] font-medium">{hdProfile.profile} {hdProfile.profileName}</span>
+                  </div>
+                  {hdProfile.sunGate && (
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-white/50">Sun Gate</span>
+                      <span className="text-white/80">Gate {hdProfile.sunGate.number} — {hdProfile.sunGate.name}</span>
+                    </div>
+                  )}
+                  {gkProfile && (
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-white/50">Gene Key</span>
+                      <span className="text-[#00d4ff] font-medium">{gkProfile.primaryGeneKey}</span>
+                    </div>
+                  )}
+                </div>
+              )}
+
               <div className="space-y-3">
                 {[
                   { label: 'Engagement', value: engagementScore, color: '#c8ff00' },

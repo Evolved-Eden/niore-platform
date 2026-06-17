@@ -99,6 +99,41 @@ export default function IntakePage() {
     setData(prev => ({ ...prev, [field]: value }))
   }
 
+  // ── Save intake section to DB (if authenticated) ──
+  async function saveSection(section: string, sectionData: Record<string, any>) {
+    if (!user) {
+      // Not authenticated — stash to localStorage for later
+      try {
+        const existing = JSON.parse(localStorage.getItem('intake_pending') || '{}')
+        existing[section] = { ...sectionData, saved_at: new Date().toISOString() }
+        localStorage.setItem('intake_pending', JSON.stringify(existing))
+      } catch {}
+      return
+    }
+    try {
+      await fetch('/api/intake/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ section, data: sectionData }),
+      })
+    } catch {
+      // Non-critical — silent fail
+    }
+  }
+
+  // ── Move to role section with save ──
+  function goToRole() {
+    saveSection('personal', {
+      name: data.name,
+      email: data.email,
+      dob: data.dob,
+      birthTime: data.birthTime,
+      birthLocation: data.birthLocation,
+      birthTimezone: data.birthTimezone,
+    })
+    setStep('role')
+  }
+
   async function calculateProfile() {
     if (!data.name || !data.dob) {
       setError('Name and date of birth are required')
@@ -108,6 +143,14 @@ export default function IntakePage() {
     setError(null)
 
     try {
+      // Save role section before calculating
+      saveSection('role', {
+        sellTo: data.sellTo,
+        roleType: data.roleType,
+        personalType: data.personalType,
+        offerType: data.offerType,
+      })
+
       const res = await fetch('/api/intake/calculate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -119,8 +162,12 @@ export default function IntakePage() {
         setLoading(false)
         return
       }
-      setProfile(result.fallback ?? result)
+      const profileResult = result.fallback ?? result
+      setProfile(profileResult)
       setStep('results')
+
+      // Save results section
+      saveSection('results', profileResult)
     } catch {
       setError('Failed to calculate your profile. Please try again.')
     }
@@ -293,7 +340,7 @@ export default function IntakePage() {
                   ← Back
                 </button>
                 <button
-                  onClick={() => setStep('role')}
+                  onClick={goToRole}
                   disabled={!data.name || !data.dob}
                   className="px-6 py-3 bg-[#c8ff00] text-black text-sm font-bold rounded-sm hover:bg-white transition-all disabled:opacity-40"
                 >

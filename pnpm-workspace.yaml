@@ -1,0 +1,7 @@
+allowBuilds:
+  '@sentry/cli': true
+  cpu-features: true
+  sharp: true
+  ssh2: true
+  unrs-resolver: true
+minimumReleaseAge: 0

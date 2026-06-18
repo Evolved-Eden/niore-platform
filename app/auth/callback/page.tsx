@@ -19,33 +19,59 @@ function AuthCallbackHandler() {
       return
     }
 
-    // Use implicit flow (not PKCE) for the callback exchange.
-    // The recovery email flow doesn't store a PKCE code verifier,
-    // so PKCE would fail with "PKCE code verifier not found in storage".
-    const supabase = createBrowserClient<Database>(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        auth: {
-          flowType: "implicit",
-          detectSessionInUrl: false,
-          autoRefreshToken: true,
-          persistSession: true,
-        },
-      }
-    )
-
     const exchange = async () => {
-      const { error } = await supabase.auth.exchangeCodeForSession(code)
+      try {
+        // Exchange the auth code directly via Supabase Auth REST API.
+        // We bypass @supabase/ssr's createBrowserClient because it hardcodes
+        // flowType: "pkce" (see node_modules/@supabase/ssr/dist/module/createBrowserClient.js:37),
+        // which causes "PKCE code verifier not found in storage" errors
+        // for recovery/callback flows that don't use PKCE.
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_SUPABASE_URL}/auth/v1/token?grant_type=authorization_code`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+            },
+            body: JSON.stringify({ code }),
+          }
+        )
 
-      if (error) {
-        console.error("auth callback exchange error:", error.message)
-        router.replace(`/login?error=${encodeURIComponent(error.message)}`)
-        return
+        const data = await response.json()
+
+        if (!response.ok || data.error) {
+          console.error("auth callback exchange error:", data.error || data.msg || "unknown")
+          router.replace(
+            `/login?error=${encodeURIComponent(data.error_description || data.error || "exchange_failed")}`
+          )
+          return
+        }
+
+        // Store the session in cookies via @supabase/ssr's cookie storage
+        const supabase = createBrowserClient<Database>(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+          {
+            auth: {
+              detectSessionInUrl: false,
+              autoRefreshToken: true,
+              persistSession: true,
+            },
+          }
+        )
+
+        await supabase.auth.setSession({
+          access_token: data.access_token,
+          refresh_token: data.refresh_token,
+        })
+
+        done.current = true
+        router.replace(type === "recovery" ? "/reset-password" : "/dashboard")
+      } catch (err) {
+        console.error("auth callback error:", err)
+        router.replace(`/login?error=${encodeURIComponent("unexpected_error")}`)
       }
-
-      done.current = true
-      router.replace(type === "recovery" ? "/reset-password" : "/dashboard")
     }
 
     exchange()

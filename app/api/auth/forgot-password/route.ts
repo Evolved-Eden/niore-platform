@@ -12,7 +12,8 @@ export async function POST(req: NextRequest) {
     const supabase = await createClient()
 
     // Redirect directly to the client callback page (skips the API callback route).
-    // The page uses flowType: "implicit" so no PKCE code verifier is needed.
+    // The callback page exchanges the code via direct Supabase Auth REST API
+    // because @supabase/ssr hardcodes flowType: "pkce".
     const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
       redirectTo: `${req.nextUrl.origin}/auth/callback`,
     })

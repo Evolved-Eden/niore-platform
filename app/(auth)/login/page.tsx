@@ -193,14 +193,23 @@ function LoginForm() {
                     onClick={async () => {
                       if (!email.trim()) return
                       setLoading(true)
-                      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-                        redirectTo: `${window.location.origin}/api/auth/callback?next=/reset-password`,
-                      })
-                      setLoading(false)
-                      if (resetError) {
-                        setError(resetError.message)
-                      } else {
-                        setResetSent(true)
+                      setError(null)
+                      try {
+                        const res = await fetch("/api/auth/forgot-password", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ email: email.trim() }),
+                        })
+                        if (!res.ok) {
+                          const data = await res.json()
+                          setError(data.error || "Something went wrong")
+                        } else {
+                          setResetSent(true)
+                        }
+                      } catch {
+                        setError("Network error — please try again")
+                      } finally {
+                        setLoading(false)
                       }
                     }}
                     disabled={loading || !email.trim()}

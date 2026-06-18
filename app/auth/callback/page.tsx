@@ -2,7 +2,8 @@
 
 import { Suspense, useEffect, useRef } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { createClient } from "@/lib/supabase/client"
+import { createBrowserClient } from "@supabase/ssr"
+import type { Database } from "@/types"
 
 function AuthCallbackHandler() {
   const router = useRouter()
@@ -18,36 +19,25 @@ function AuthCallbackHandler() {
       return
     }
 
-    const supabase = createClient()
-
-    // The browser client auto-detects the code in the URL and exchanges it
-    // (detectSessionInUrl defaults to true). We listen for the result.
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event) => {
-      if (event === "SIGNED_IN") {
-        done.current = true
-        router.replace(type === "recovery" ? "/reset-password" : "/dashboard")
+    // Use implicit flow (not PKCE) for the callback exchange.
+    // The recovery email flow doesn't store a PKCE code verifier,
+    // so PKCE would fail with "PKCE code verifier not found in storage".
+    const supabase = createBrowserClient<Database>(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        auth: {
+          flowType: "implicit",
+          detectSessionInUrl: false,
+          autoRefreshToken: true,
+          persistSession: true,
+        },
       }
-    })
+    )
 
-    // Fallback: if auto-detect doesn't fire within 2s, try manual exchange
-    const fallback = setTimeout(async () => {
-      if (done.current) return
-
-      // Check if auto-exchange already succeeded
-      const {
-        data: { session },
-      } = await supabase.auth.getSession()
-      if (session) {
-        done.current = true
-        subscription.unsubscribe()
-        router.replace(type === "recovery" ? "/reset-password" : "/dashboard")
-        return
-      }
-
-      // Manual exchange
+    const exchange = async () => {
       const { error } = await supabase.auth.exchangeCodeForSession(code)
+
       if (error) {
         console.error("auth callback exchange error:", error.message)
         router.replace(`/login?error=${encodeURIComponent(error.message)}`)
@@ -56,12 +46,9 @@ function AuthCallbackHandler() {
 
       done.current = true
       router.replace(type === "recovery" ? "/reset-password" : "/dashboard")
-    }, 2000)
-
-    return () => {
-      subscription.unsubscribe()
-      clearTimeout(fallback)
     }
+
+    exchange()
   }, [code, type, router])
 
   return (

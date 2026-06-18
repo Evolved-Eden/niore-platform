@@ -11,13 +11,14 @@ export async function POST(req: NextRequest) {
 
     const supabase = await createClient()
 
+    // Redirect directly to the client callback page (skips the API callback route).
+    // The page uses flowType: "implicit" so no PKCE code verifier is needed.
     const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-      redirectTo: `${req.nextUrl.origin}/api/auth/callback?next=/reset-password`,
+      redirectTo: `${req.nextUrl.origin}/auth/callback`,
     })
 
     if (error) {
       console.error("forgot-password error:", error.message)
-      // Don't reveal whether the email exists — always return 200
     }
 
     // Always return success to prevent email enumeration

@@ -75,7 +75,7 @@ export async function POST(req: NextRequest) {
 
     const { error } = await supabase
       .from('clients')
-      .update(updates)
+      .update(updates as any)
       .eq('id', user.id)
 
     if (error) throw error

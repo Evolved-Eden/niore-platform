@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -10,7 +10,7 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(searchParams.get("email") || "");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -20,6 +20,20 @@ function LoginForm() {
   const redirectTo = searchParams.get("redirect") || "/dashboard";
   const planTier = searchParams.get("tier") || "";
   const path = searchParams.get("path") || "";
+
+  // Show error passed via URL (e.g. from auth callback failures)
+  const urlError = searchParams.get("error");
+  useEffect(() => {
+    if (urlError) {
+      const messages: Record<string, string> = {
+        no_code: "Invalid reset link — missing verification code.",
+        no_session: "Session expired. Please request a new reset link.",
+        auth_failed: "Authentication failed. Please try again.",
+        invalid_reset_link: "Invalid or expired password reset link. Please request a new one.",
+      };
+      setError(messages[urlError] || urlError.replace(/_/g, " "));
+    }
+  }, [urlError]);
 
   const handleLogin = async () => {
     setLoading(true);

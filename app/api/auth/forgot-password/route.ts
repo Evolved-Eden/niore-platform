@@ -19,10 +19,11 @@ export async function POST(req: NextRequest) {
     })
 
     if (error) {
-      console.error("forgot-password error:", error.message)
+      // Log full error for debugging (check Vercel logs)
+      console.error("forgot-password supabase error:", JSON.stringify(error))
+      // Still return ok to prevent email enumeration
     }
 
-    // Always return success to prevent email enumeration
     return NextResponse.json({ ok: true })
   } catch (e) {
     console.error("forgot-password unexpected error:", e)

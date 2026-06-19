@@ -107,21 +107,87 @@ async function generateWithAnthropic(prompt: string): Promise<{ items: EssenceIt
   }
 }
 
-// ── Local / deterministic generator ──────────────────────────────────
-function generateLocal(userRole: string, context: string): { items: EssenceItem[]; dailyQuestion: string } {
-  const roleContext = userRole || 'user'
-  const items: EssenceItem[] = [
-    { type: 'focus',    content: `Align your ${roleContext} intelligence priorities for today`, priority: 'high' },
-    { type: 'action',   content: 'Complete one high-impact task before noon', priority: 'high' },
-    { type: 'timing',   content: 'Optimal engagement window: 10 AM - 2 PM', priority: 'medium' },
-    { type: 'optimization', content: 'Review yesterday\'s key insights and extract patterns', priority: 'medium' },
-    { type: 'growth',   content: 'Identify one skill to develop this week', priority: 'low' },
-    { type: 'brand',    content: 'Your authentic voice is your strongest asset', priority: 'low' },
+// ── Local / DB-driven generator ──────────────────────────────────────
+function generateLocal(userRole: string, context: string, scores?: Record<string, number>, archetype?: string, tasks?: { content: string; type: string }[]): { items: EssenceItem[]; dailyQuestion: string } {
+  const items: EssenceItem[] = []
+
+  // 1. Archetype-based focus
+  if (archetype) {
+    items.push({ type: 'focus', content: `Lean into your ${archetype} archetype strengths today`, priority: 'high' })
+  } else {
+    items.push({ type: 'focus', content: `Align your ${userRole || 'intelligence'} priorities for today`, priority: 'high' })
+  }
+
+  // 2. Low-score improvement areas from blueprint
+  if (scores) {
+    const sorted = Object.entries(scores).sort(([, a], [, b]) => a - b)
+    const weakest = sorted[0]
+    if (weakest) {
+      items.push({
+        type: 'growth',
+        content: `Your lowest score is ${weakest[0].replace(/_/g, ' ')} (${weakest[1]}). Focus one session on this area today.`,
+        priority: 'high',
+      })
+    }
+    if (sorted.length > 1) {
+      items.push({
+        type: 'optimization',
+        content: `${sorted[1][0].replace(/_/g, ' ')} scores ${sorted[1][1]} — a 10% gain here compounds quickly.`,
+        priority: 'medium',
+      })
+    }
+  } else {
+    items.push({ type: 'action', content: 'Complete your Blueprint Assessment to unlock personalized suggestions', priority: 'high' })
+    items.push({ type: 'timing', content: 'Optimal engagement window: 10 AM - 2 PM', priority: 'medium' })
+  }
+
+  // 3. Pending tasks from essence_intelligence
+  const pendingTasks = tasks?.filter(t => t.content) ?? []
+  if (pendingTasks.length > 0) {
+    items.push({
+      type: 'action',
+      content: `Continue: "${pendingTasks[0].content.slice(0, 80)}${pendingTasks[0].content.length > 80 ? '...' : ''}"`,
+      priority: 'medium',
+    })
+  }
+
+  // 4. Context-aware suggestions
+  if (context) {
+    if (context.toLowerCase().includes('human design') || context.toLowerCase().includes('profile')) {
+      const profileMatch = context.match(/Profile:\s*(\d\/\d)/)
+      if (profileMatch) {
+        items.push({ type: 'opportunity', content: `Your ${profileMatch[1]} profile benefits from collaborative input today`, priority: 'low' })
+      }
+    }
+    if (context.toLowerCase().includes('gene key') || context.toLowerCase().includes('geneKeys')) {
+      items.push({ type: 'growth', content: 'Explore your Gene Keys shadow-to-gift transformation path', priority: 'low' })
+    }
+  }
+
+  // 5. Fill remaining slots with generic items (ensure at least 4 total)
+  const fillers = [
+    { type: 'habit' as const, content: 'Take a 5-minute reset between deep work blocks', priority: 'low' as const },
+    { type: 'brand' as const, content: 'Your authentic voice is your strongest marketing asset', priority: 'low' as const },
+    { type: 'timing' as const, content: 'Schedule creative work for your peak energy window', priority: 'medium' as const },
+    { type: 'optimization' as const, content: 'Review yesterday\'s key insights and extract patterns', priority: 'medium' as const },
+    { type: 'habit' as const, content: 'Log one insight before end of day', priority: 'low' as const },
+    { type: 'brand' as const, content: 'Share one piece of original thinking today', priority: 'low' as const },
   ]
 
+  while (items.length < 4) {
+    items.push(fillers[items.length % fillers.length])
+  }
+
+  items.sort((a, b) => {
+    const p = { high: 0, medium: 1, low: 2 }
+    return (p[a.priority] ?? 3) - (p[b.priority] ?? 3)
+  })
+
   return {
-    items,
-    dailyQuestion: "What's one decision you made today that your future self would thank you for?",
+    items: items.slice(0, 6),
+    dailyQuestion: archetype
+      ? `How did your ${archetype} archetype show up in your decisions today?`
+      : "What's one decision you made today that your future self would thank you for?",
   }
 }
 
@@ -138,6 +204,35 @@ ${userId ? `\nUser ID: ${userId}` : ''}`
     let result: { items: EssenceItem[]; dailyQuestion: string } | null = null
     let usedProvider: string = provider
 
+    // Fetch blueprint scores and pending tasks for personalized fallback
+    let scores: Record<string, number> | undefined
+    let archetypeName: string | undefined
+    let pendingTasks: { content: string; type: string }[] | undefined
+
+    try {
+      const { query } = await import('@/lib/db')
+      if (userId) {
+        // Blueprint data from client_twins metadata
+        const twinRes = await query(
+          `SELECT metadata FROM client_twins WHERE client_id = $1 LIMIT 1`,
+          [userId]
+        )
+        const meta = twinRes.rows[0]?.metadata
+        if (meta?.blueprint?.core?.scores) {
+          scores = meta.blueprint.core.scores
+          archetypeName = meta.blueprint.core.archetype
+        }
+        // Pending essence intelligence tasks (up to 3)
+        const tasksRes = await query(
+          `SELECT content, type FROM essence_intelligence WHERE client_id = $1 AND status = 'pending' ORDER BY created_at DESC LIMIT 3`,
+          [userId]
+        )
+        pendingTasks = tasksRes.rows
+      }
+    } catch {
+      // Non-critical — fallback works without DB
+    }
+
     // Try the configured provider
     switch (provider) {
       case 'openai':
@@ -153,18 +248,18 @@ ${userId ? `\nUser ID: ${userId}` : ''}`
         usedProvider = 'openrouter'
         break
       case 'local':
-        result = generateLocal(userRole || 'user', context || '')
+        result = generateLocal(userRole || 'user', context || '', scores, archetypeName, pendingTasks)
         usedProvider = 'local'
         break
       case 'disabled':
-        result = generateLocal(userRole || 'user', context || '')
+        result = generateLocal(userRole || 'user', context || '', scores, archetypeName, pendingTasks)
         usedProvider = 'local'
         break
     }
 
     // If AI generation failed, fall back to deterministic
     if (!result || !result.items?.length) {
-      result = generateLocal(userRole || 'user', context || '')
+      result = generateLocal(userRole || 'user', context || '', scores, archetypeName, pendingTasks)
       usedProvider = 'local-fallback'
     }
 

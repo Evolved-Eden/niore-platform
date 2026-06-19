@@ -7,11 +7,11 @@ import Link from 'next/link'
 
 type EssenceRow = {
   id: string
-  type: string
-  content: string
+  type: string | null
+  content: string | null
   priority?: string | null
   status?: string | null
-  created_at?: string
+  created_at?: string | null
 }
 
 type DailyEssenceItem = {
@@ -64,7 +64,7 @@ export default function AdminEssencePage() {
         .select('*')
         .eq('client_id', user.id)
         .order('created_at', { ascending: false })
-      if (essenceRows) setItems(essenceRows)
+      if (essenceRows) setItems(essenceRows as EssenceRow[])
 
       setLoading(false)
     }
@@ -90,7 +90,7 @@ export default function AdminEssencePage() {
       .single()
 
     if (!error && data) {
-      setItems(prev => [data, ...prev])
+      setItems(prev => [(data as any) as EssenceRow, ...prev])
       setNewItem({ type: 'focus', content: '', priority: 'medium' })
     }
   }

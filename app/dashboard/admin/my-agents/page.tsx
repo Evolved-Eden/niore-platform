@@ -1,8 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 
 interface RegistryAgent {
@@ -38,66 +37,66 @@ const STATUS_STYLES: Record<string, string> = {
 export default function AdminMyAgentsPage() {
   const router = useRouter()
   const [tab, setTab] = useState<'deployed' | 'available'>('deployed')
-  const [userId, setUserId] = useState<string | null>(null)
   const [deployed, setDeployed] = useState<DeployedAgent[]>([])
   const [available, setAvailable] = useState<RegistryAgent[]>([])
   const [loading, setLoading] = useState(true)
   const [deploying, setDeploying] = useState<string | null>(null)
   const [search, setSearch] = useState('')
 
+  const fetchDeployed = useCallback(async () => {
+    try {
+      const res = await fetch('/api/client/agents/deploy')
+      const data = await res.json()
+      if (data.agents) setDeployed(data.agents)
+    } catch {}
+  }, [])
+
+  const fetchAvailable = useCallback(async () => {
+    try {
+      const res = await fetch('/api/admin/agent-registry?active=true')
+      const data = await res.json()
+      if (data.agents) setAvailable(data.agents)
+    } catch {}
+  }, [])
+
   useEffect(() => {
-    async function load() {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) { router.push('/login'); return }
-      setUserId(user.id)
-
-      // Load deployed agents
-      const { data: dep } = await supabase
-        .from('client_deployed_agents')
-        .select('id, agent_id, agent_name, role_type, vertical, status, created_at')
-        .eq('client_id', user.id)
-        .order('created_at', { ascending: false })
-      if (dep) setDeployed(dep as DeployedAgent[])
-
-      // Load agent registry
-      const { data: reg } = await supabase
-        .from('agent_catalog')
-        .select('*')
-        .eq('is_system_agent', false)
-        .order('name')
-      if (reg) setAvailable(reg)
-
-      setLoading(false)
-    }
-    load()
-  }, [router])
+    fetchDeployed()
+    fetchAvailable()
+    setLoading(false)
+  }, [fetchDeployed, fetchAvailable])
 
   async function deployAgent(agent: RegistryAgent) {
-    if (!userId || deploying) return
+    if (deploying) return
     setDeploying(agent.id)
-    const supabase = createClient()
-    const { error } = await supabase.from('client_deployed_agents').insert({
-      client_id: userId,
-      agent_id: agent.agent_id || agent.id,
-      agent_name: agent.name,
-      role_type: agent.agent_type || null,
-      vertical: agent.category || null,
-      status: 'active',
-    })
-    if (!error) {
-      setDeployed(prev => [{
-        id: 'temp-' + Date.now(),
-        agent_id: agent.agent_id || agent.id,
-        agent_name: agent.name,
-        role_type: agent.agent_type || null,
-        vertical: agent.category || null,
-        status: 'active',
-        created_at: new Date().toISOString(),
-      }, ...prev])
-      setAvailable(prev => prev.filter(a => a.id !== agent.id))
-    }
+    try {
+      const res = await fetch('/api/client/agents/deploy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          agentId: agent.agent_id || agent.id,
+          agentName: agent.name,
+          roleType: agent.agent_type || null,
+          vertical: agent.category || null,
+        }),
+      })
+      const data = await res.json()
+      if (data.agent) {
+        setDeployed(prev => [data.agent, ...prev])
+        setAvailable(prev => prev.filter(a => a.id !== agent.id))
+      }
+    } catch {}
     setDeploying(null)
+  }
+
+  async function undeployAgent(id: string) {
+    try {
+      await fetch('/api/client/agents/deploy', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, status: 'undeployed' }),
+      })
+      fetchDeployed()
+    } catch {}
   }
 
   const filteredAvailable = available.filter(a =>
@@ -169,6 +168,12 @@ export default function AdminMyAgentsPage() {
                   {agent.status}
                 </span>
                 <span className="text-[10px] text-white/20">{new Date(agent.created_at).toLocaleDateString()}</span>
+                <button
+                  onClick={() => undeployAgent(agent.id)}
+                  className="px-2 py-1 text-[10px] text-white/40 hover:text-white/60 transition-colors"
+                >
+                  Undeploy
+                </button>
               </div>
             </div>
           ))}

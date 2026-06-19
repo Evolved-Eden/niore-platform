@@ -1,13 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 
-/**
- * Helper to access tables not yet in the Database type definition.
- * The `client_consultations` table is defined in migration-intelligence.sql
- * but hasn't been added to types/index.ts yet.
- */
 function consultations(supabase: Awaited<ReturnType<typeof createClient>>) {
-  return supabase.from('client_consultations' as any) as any
+  return supabase.from('client_consultations')
 }
 
 /**
@@ -92,7 +87,7 @@ export async function POST(req: NextRequest) {
     // Update client's consultation_booked timestamp
     await supabase
       .from('clients')
-      .update({ consultation_booked: new Date().toISOString() } as any)
+      .update({ consultation_booked: new Date().toISOString() })
       .eq('id', user.id)
 
     return NextResponse.json({ consultation: booking })

@@ -1,13 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 
-/**
- * Helper to access tables not yet in the Database type definition.
- * The `client_zuri_sessions` table is defined in migration-intelligence.sql
- * but hasn't been added to types/index.ts yet.
- */
 function sessionsTable(supabase: Awaited<ReturnType<typeof createClient>>) {
-  return supabase.from('client_zuri_sessions' as any) as any
+  return supabase.from('client_zuri_sessions')
 }
 
 /**
@@ -77,7 +72,7 @@ export async function POST(req: NextRequest) {
       const updateField = platform === 'discord' ? 'zuri_discord_connected' : 'zuri_whatsapp_connected'
       await supabase
         .from('clients')
-        .update({ [updateField]: true, zuri_connected: true } as any)
+        .update({ [updateField]: true, zuri_connected: true })
         .eq('id', user.id)
 
       return NextResponse.json({
@@ -105,20 +100,20 @@ export async function POST(req: NextRequest) {
       const updateField = platform === 'discord' ? 'zuri_discord_connected' : 'zuri_whatsapp_connected'
       await supabase
         .from('clients')
-        .update({ [updateField]: false } as any)
+        .update({ [updateField]: false })
         .eq('id', user.id)
 
       // Check if both are disconnected — if so, set zuri_connected to false
       const { data: client } = await supabase
         .from('clients')
-        .select('zuri_discord_connected, zuri_whatsapp_connected' as any)
+        .select('zuri_discord_connected, zuri_whatsapp_connected')
         .eq('id', user.id)
         .single()
 
       if (client && !(client as any).zuri_discord_connected && !(client as any).zuri_whatsapp_connected) {
         await supabase
           .from('clients')
-          .update({ zuri_connected: false } as any)
+          .update({ zuri_connected: false })
           .eq('id', user.id)
       }
 

@@ -72,7 +72,7 @@ export async function POST(req: NextRequest) {
       const updateField = platform === 'discord' ? 'zuri_discord_connected' : 'zuri_whatsapp_connected'
       await supabase
         .from('clients')
-        .update({ [updateField]: true, zuri_connected: true })
+        .update({ [updateField]: true, zuri_connected: true } as any)
         .eq('id', user.id)
 
       return NextResponse.json({
@@ -100,7 +100,7 @@ export async function POST(req: NextRequest) {
       const updateField = platform === 'discord' ? 'zuri_discord_connected' : 'zuri_whatsapp_connected'
       await supabase
         .from('clients')
-        .update({ [updateField]: false })
+        .update({ [updateField]: false } as any)
         .eq('id', user.id)
 
       // Check if both are disconnected — if so, set zuri_connected to false

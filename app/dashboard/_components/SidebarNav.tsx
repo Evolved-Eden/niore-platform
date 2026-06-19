@@ -33,16 +33,20 @@ const NAV_SECTION: Record<string, number> = {
   Overview: 1,
   Profile: 1,
   Blueprint: 1,
+  'My Blueprint': 1,
   Assessment: 1,
   'Essence Intel': 2,
   'My Agents': 2,
   'My Swarms': 2,
   'My Twin': 2,
+  'Chat / Prompt': 2,
   Vault: 3,
   Connectors: 3,
   Concierge: 3,
   Zuri: 3,
+  'Zuri Config': 3,
   Settings: 3,
+  '── System ──': 4,
 }
 
 export default function SidebarNav({ nav, color }: { nav: NavItem[]; color: string }) {

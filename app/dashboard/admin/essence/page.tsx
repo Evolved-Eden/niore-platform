@@ -9,15 +9,8 @@ type EssenceRow = {
   id: string
   type: string | null
   content: string | null
-  priority?: string | null
   status?: string | null
   created_at?: string | null
-}
-
-type DailyEssenceItem = {
-  type: 'focus' | 'optimization' | 'timing' | 'opportunity' | 'growth' | 'brand' | 'habit' | 'action'
-  content: string
-  priority: 'high' | 'medium' | 'low'
 }
 
 const TYPE_CONFIG: Record<string, { label: string; icon: string; color: string }> = {
@@ -31,18 +24,12 @@ const TYPE_CONFIG: Record<string, { label: string; icon: string; color: string }
   action:       { label: 'Action',          icon: '✓', color: '#e879f9' },
 }
 
-const PRIORITY_COLORS: Record<string, string> = {
-  high: '#ff6b6b',
-  medium: '#fb923c',
-  low: '#22d3ee',
-}
-
 export default function AdminEssencePage() {
   const router = useRouter()
   const [loading, setLoading] = useState(true)
   const [name, setName] = useState('')
   const [items, setItems] = useState<EssenceRow[]>([])
-  const [newItem, setNewItem] = useState<{ type: string; content: string; priority: 'high' | 'medium' | 'low' }>({ type: 'focus', content: '', priority: 'medium' })
+  const [newItem, setNewItem] = useState<{ type: string; content: string }>({ type: 'focus', content: '' })
   const [generating, setGenerating] = useState(false)
   const inputRef = useRef<HTMLTextAreaElement>(null)
 
@@ -83,7 +70,6 @@ export default function AdminEssencePage() {
         client_id: user.id,
         type: newItem.type,
         content: newItem.content.trim(),
-        priority: newItem.priority,
         status: 'active',
       })
       .select()
@@ -91,7 +77,7 @@ export default function AdminEssencePage() {
 
     if (!error && data) {
       setItems(prev => [(data as any) as EssenceRow, ...prev])
-      setNewItem({ type: 'focus', content: '', priority: 'medium' })
+      setNewItem({ type: 'focus', content: '' })
     }
   }
 

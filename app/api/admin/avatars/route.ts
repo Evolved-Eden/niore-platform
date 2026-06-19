@@ -21,9 +21,9 @@ export async function POST(request: NextRequest) {
     const action = body.action as string
 
     if (action === 'upsert') {
-      const { id, avatar_id, name, archetype, bio, tone_tags, keywords, is_active, sort_order, avatar_key } = body
+      const { id, avatar_id, name, archetypes, bio, tone_tags, keywords, is_active, sort_order, avatar_key } = body
       const record = {
-        avatar_id, name, archetype, bio,
+        avatar_id, name, archetypes, bio,
         tone_tags: tone_tags || [],
         keywords: keywords || [],
         is_active: is_active ?? true,

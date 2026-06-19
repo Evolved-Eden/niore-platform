@@ -28,14 +28,22 @@ export async function GET(request: NextRequest) {
 
     if (type === 'all' || type === 'workflow') {
       const { data, error } = await supabaseAdmin
-        .from('workflow_templates')
-        .select('key, name, description, vertical_key, workflow_type, is_active, stages_json')
-        .order('key', { ascending: true });
+        .from('workflow_demos')
+        .select('id, name, description, vertical, category, stages, is_active, tags, n8n_webhook_url')
+        .order('name', { ascending: true });
       if (!error) workflows = (data || []).map((w: any) => ({
-        ...w,
+        key: w.id,
+        name: w.name,
+        description: w.description,
+        vertical_key: w.vertical,
+        workflow_type: w.category,
+        is_active: w.is_active,
+        stages_json: w.stages || [],
+        tags: w.tags,
+        n8n_webhook_url: w.n8n_webhook_url,
         _template_type: 'workflow',
-        sections_json: w.stages_json || [],
-        template_json: { workflow_type: w.workflow_type, stages: w.stages_json },
+        sections_json: w.stages || [],
+        template_json: { workflow_type: w.category, stages: w.stages },
       }));
     }
 

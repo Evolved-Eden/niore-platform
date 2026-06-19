@@ -31,9 +31,13 @@ export default function ClientVault() {
 
   async function loadEntries() {
     setLoading(true)
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) { setLoading(false); return }
+
     const { data, error } = await supabase
       .from('knowledge_base')
       .select('id, title, content, source_type, created_at, metadata')
+      .eq('organization_id', user.id)
       .order('created_at', { ascending: false })
       .limit(50)
 
@@ -61,7 +65,7 @@ export default function ClientVault() {
     }
 
     const { error } = await supabase.from('knowledge_base').insert({
-      org_id: user.id,
+      organization_id: user.id,
       title: noteTitle.trim(),
       content: noteContent.trim() || null,
       source_type: 'vault_note',
@@ -104,7 +108,7 @@ export default function ClientVault() {
 
       // Log to knowledge_base
       const { error: dbError } = await supabase.from('knowledge_base').insert({
-        org_id: user.id,
+        organization_id: user.id,
         title: file.name,
         content: `Uploaded file: ${file.name}`,
         source_type: 'vault_upload',
@@ -128,10 +132,14 @@ export default function ClientVault() {
   }
 
   async function deleteEntry(id: string) {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) { toast.error('Not authenticated'); return }
+
     const { error } = await supabase
       .from('knowledge_base')
       .delete()
       .eq('id', id)
+      .eq('organization_id', user.id)
 
     if (error) {
       toast.error('Failed to delete')

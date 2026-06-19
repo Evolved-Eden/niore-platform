@@ -234,7 +234,7 @@ function UploadStep({ onNext, userId }: { onNext: () => void; userId: string }) 
         setUploaded(u => [...u, file.name])
         // Log to knowledge_base
         await supabase.from('knowledge_base').insert({
-          org_id: userId,
+          organization_id: userId,
           title: file.name,
           content: `Onboarding upload: ${file.name}`,
           source_type: 'onboarding_upload',

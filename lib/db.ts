@@ -8,6 +8,24 @@ let pool: Pool | null = null
 
 function getPool(): Pool {
   if (!pool) {
+    // Support LOCAL_DATABASE_URL as a full connection string
+    const localUrl = process.env.LOCAL_DATABASE_URL
+    if (localUrl) {
+      const u = new URL(localUrl)
+      pool = new Pool({
+        host: u.hostname,
+        port: parseInt(u.port || '5432'),
+        user: u.username,
+        password: decodeURIComponent(u.password),
+        database: u.pathname.slice(1),
+        ssl: false, // local connections typically don't need SSL
+        max: 10,
+        idleTimeoutMillis: 30000,
+        connectionTimeoutMillis: 10000,
+      })
+      return pool
+    }
+
     const DB_HOST = process.env.DB_HOST || process.env.POSTGRES_HOST
     if (!DB_HOST) throw new Error('DB_HOST environment variable is required (auto-checks POSTGRES_HOST fallback)')
 

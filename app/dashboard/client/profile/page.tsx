@@ -120,7 +120,7 @@ export default async function ClientProfilePage() {
     supabase.from('users').select('*').eq('id', user.id).maybeSingle(),
     supabase.from('clients').select('*').eq('id', user.id).maybeSingle(),
     supabase.from('client_twins').select('*').eq('client_id', user.id).maybeSingle(),
-    supabase.from('knowledge_base').select('id', { count: 'exact', head: true }).eq('org_id', user.id),
+    supabase.from('knowledge_base').select('id', { count: 'exact', head: true }).eq('organization_id', user.id),
   ])
 
   const identity = (userRes.data ?? {}) as Record<string, any>

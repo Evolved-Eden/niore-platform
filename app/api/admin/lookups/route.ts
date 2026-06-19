@@ -4,7 +4,7 @@ import { supabaseAdmin } from '@/lib/supabase/admin';
 export async function GET() {
   const queries: Record<string, { table: string; select: string; order: string }> = {
     role_types: { table: 'role_types', select: 'role_type_id, display_name, hierarchy_rank', order: 'hierarchy_rank' },
-    avatars: { table: 'avatars', select: 'avatar_id, name, archetype', order: 'sort_order' },
+    avatars: { table: 'avatars', select: 'avatar_id, name, archetypes', order: 'sort_order' },
     decision_modes: { table: 'decision_modes', select: 'mode_id', order: 'mode_id' },
     health_statuses: { table: 'health_statuses', select: 'status_id, priority', order: 'priority' },
     evolution_statuses: { table: 'evolution_statuses', select: 'status_id', order: 'status_id' },

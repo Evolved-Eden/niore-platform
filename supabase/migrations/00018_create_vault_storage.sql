@@ -52,16 +52,16 @@ CREATE POLICY "Users can read their own vault entries"
 ON public.knowledge_base
 FOR SELECT
 TO authenticated
-USING (org_id = auth.uid());
+USING (organization_id = auth.uid());
 
 CREATE POLICY "Users can create their own vault entries"
 ON public.knowledge_base
 FOR INSERT
 TO authenticated
-WITH CHECK (org_id = auth.uid());
+WITH CHECK (organization_id = auth.uid());
 
 CREATE POLICY "Users can delete their own vault entries"
 ON public.knowledge_base
 FOR DELETE
 TO authenticated
-USING (org_id = auth.uid());
+USING (organization_id = auth.uid());

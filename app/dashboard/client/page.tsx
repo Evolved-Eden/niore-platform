@@ -29,7 +29,7 @@ export default async function ClientDashboard() {
   const { count: agentCount } = await supabase
     .from('agents')
     .select('*', { count: 'exact', head: true })
-    .eq('client_id', user.id)
+    .eq('is_system_agent', true)
 
   const name = client?.full_name ?? identity?.full_name ?? 'Client'
   const bpScore = typeof twin?.blueprint_score === 'number' ? twin.blueprint_score : null

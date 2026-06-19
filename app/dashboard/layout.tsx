@@ -4,39 +4,6 @@ import Link from 'next/link'
 import Image from 'next/image'
 import type { UserRole } from '@/types'
 
-const NAV_ICONS: Record<string, string> = {
-  'Overview':     '◈',
-  'Profile':      '✦',
-  'Blueprint':    '◆',
-  'Assessment':   '◇',
-  'Essence Intel':'⊙',
-  'My Agents':    '⊕',
-  'My Swarms':    '⊗',
-  'My Twin':      '◉',
-  'Vault':        '◎',
-  'Concierge':    '⊚',
-  'Zuri':         '☆',
-  'Settings':     '⚙',
-  'Intelligences':'⊛',
-  'Analytics':    '⊡',
-  'Payouts':      '⊘',
-  'Users':        '⊚',
-  'Clients':      '◈',
-  'Pricing':      '⊜',
-  'Verticals':    '⊟',
-  'Avatars':      '⊠',
-  'Agents':       '⊕',
-  'Agent Registry':'⊞',
-  'Swarms':       '⊗',
-  'Generators':   '⊖',
-  'Archetypes':   '⊡',
-  'Workflows':    '⊛',
-  'Zuri Agent':   '☆',
-  'Templates':    '⊟',
-  'Referrals':    '⊘',
-  'Connectors':   '⊡',
-  'Overview (Aff)':'◈',
-}
 import SidebarNav from './_components/SidebarNav'
 
 const NAV: Record<UserRole, { label: string; href: string }[]> = {
@@ -67,8 +34,8 @@ const NAV: Record<UserRole, { label: string; href: string }[]> = {
     { label: 'Overview',       href: '/dashboard/admin' },
     { label: 'My Blueprint',   href: '/dashboard/admin/blueprint' },
     { label: 'Essence Intel',  href: '/dashboard/admin/essence' },
-    { label: 'My Agents',      href: '/dashboard/admin/agents' },
-    { label: 'My Swarms',      href: '/dashboard/admin/swarms' },
+    { label: 'My Agents',      href: '/dashboard/admin/my-agents' },
+    { label: 'My Swarms',      href: '/dashboard/admin/my-swarms' },
     { label: 'My Twin',        href: '/dashboard/admin/twin' },
     { label: 'Chat / Prompt',  href: '/dashboard/chat' },
     { label: '── System ──',   href: '#' },

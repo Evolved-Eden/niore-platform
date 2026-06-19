@@ -85,6 +85,22 @@ export default async function AdminOverview() {
         </span>
       </div>
 
+      {/* Personal Hub */}
+      <div className="glass rounded-sm p-5 border border-white/[0.06]">
+        <div className="flex items-center gap-2 mb-4">
+          <div className="w-2 h-2 rounded-full bg-[#ff6b6b]" />
+          <h2 className="text-xs text-white/30 tracking-widest uppercase">Personal Hub</h2>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
+          <HubLink href="/dashboard/admin/blueprint" label="My Blueprint" icon="◆" color="#ff6b6b" />
+          <HubLink href="/dashboard/admin/essence" label="Essence Intel" icon="⊙" color="#a78bfa" />
+          <HubLink href="/dashboard/admin/twin" label="My Twin" icon="⟐" color="#22d3ee" />
+          <HubLink href="/dashboard/chat" label="Chat / Prompt" icon="☆" color="#fb923c" />
+          <HubLink href="/dashboard/admin/my-agents" label="My Agents" icon="⊕" color="#34d399" />
+          <HubLink href="/dashboard/admin/my-swarms" label="My Swarms" icon="⊗" color="#00d4ff" />
+        </div>
+      </div>
+
       {/* Core Stats — sourced from agent_catalog + swarm_catalog views */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
         <StatCard label="Agents" value={agentCount} color="#c8ff00" icon="🤖" />
@@ -235,6 +251,18 @@ function MiniStat({ label, value, color }: { label: string; value: number; color
       <div className="text-xs text-white/30 tracking-wider">{label}</div>
       <div className="text-lg font-light" style={{ color }}>{value}</div>
     </div>
+  )
+}
+
+function HubLink({ href, label, icon, color }: { href: string; label: string; icon: string; color: string }) {
+  return (
+    <Link
+      href={href}
+      className="flex items-center gap-3 px-4 py-3 rounded-sm border border-white/[0.06] hover:border-white/[0.15] hover:bg-white/[0.03] transition-all group"
+    >
+      <span className="text-sm" style={{ color }}>{icon}</span>
+      <span className="text-sm text-white/50 group-hover:text-white transition-colors">{label}</span>
+    </Link>
   )
 }
 

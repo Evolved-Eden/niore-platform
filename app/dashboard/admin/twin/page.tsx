@@ -123,7 +123,7 @@ export default async function AdminTwinPage() {
                 </div>
                 <div className="flex justify-between">
                   <dt className="text-white/30">Created</dt>
-                  <dd className="text-white/60">{new Date(twin.created_at).toLocaleDateString()}</dd>
+                  <dd className="text-white/60">{new Date((twin as any).created_at ?? Date.now()).toLocaleDateString()}</dd>
                 </div>
               </dl>
             </div>

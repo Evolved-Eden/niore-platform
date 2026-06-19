@@ -99,7 +99,7 @@ export default function AdminEssencePage() {
           .select('*')
           .eq('client_id', user.id)
           .order('created_at', { ascending: false })
-        if (fresh) setItems(fresh)
+        if (fresh) setItems(fresh as EssenceRow[])
       }
     } catch {}
     setGenerating(false)
@@ -173,7 +173,7 @@ export default function AdminEssencePage() {
         )}
 
         {items.map(item => {
-          const cfg = TYPE_CONFIG[item.type] ?? { label: item.type, icon: '◈', color: '#fff' }
+          const cfg = TYPE_CONFIG[item.type ?? ''] ?? { label: item.type ?? '', icon: '◈', color: '#fff' }
           return (
             <div key={item.id} className="glass rounded-sm p-4 border border-white/[0.06] flex items-start gap-4 group">
               <div

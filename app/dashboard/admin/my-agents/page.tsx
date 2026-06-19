@@ -54,11 +54,11 @@ export default function AdminMyAgentsPage() {
 
       // Load deployed agents
       const { data: dep } = await supabase
-        .from('deployed_agents')
+        .from('client_deployed_agents')
         .select('id, agent_id, agent_name, role_type, vertical, status, created_at')
         .eq('client_id', user.id)
         .order('created_at', { ascending: false })
-      if (dep) setDeployed(dep)
+      if (dep) setDeployed(dep as DeployedAgent[])
 
       // Load agent registry
       const { data: reg } = await supabase
@@ -77,7 +77,7 @@ export default function AdminMyAgentsPage() {
     if (!userId || deploying) return
     setDeploying(agent.id)
     const supabase = createClient()
-    const { error } = await supabase.from('deployed_agents').insert({
+    const { error } = await supabase.from('client_deployed_agents').insert({
       client_id: userId,
       agent_id: agent.agent_id || agent.id,
       agent_name: agent.name,

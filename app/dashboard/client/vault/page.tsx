@@ -37,7 +37,7 @@ export default function ClientVault() {
     const { data, error } = await supabase
       .from('knowledge_base')
       .select('id, title, content, source_type, created_at, metadata')
-      .eq('organization_id', user.id)
+      .eq('organization_id' as any, user.id)
       .order('created_at', { ascending: false })
       .limit(50)
 
@@ -70,7 +70,7 @@ export default function ClientVault() {
       content: noteContent.trim() || null,
       source_type: 'vault_note',
       metadata: { created_by: user.id, kind: 'note' },
-    })
+    } as any)
 
     if (error) {
       toast.error(error.message)
@@ -118,7 +118,7 @@ export default function ClientVault() {
           file_type: file.type,
           bucket: 'onboarding',
         },
-      })
+      } as any)
 
       if (!dbError) uploaded++
     }
@@ -139,7 +139,7 @@ export default function ClientVault() {
       .from('knowledge_base')
       .delete()
       .eq('id', id)
-      .eq('organization_id', user.id)
+      .eq('organization_id' as any, user.id)
 
     if (error) {
       toast.error('Failed to delete')

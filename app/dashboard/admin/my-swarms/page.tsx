@@ -50,11 +50,11 @@ export default function AdminMySwarmsPage() {
 
       // Load deployed swarms
       const { data: dep } = await supabase
-        .from('deployed_swarms')
+        .from('client_deployed_swarms')
         .select('id, swarm_id, swarm_name, vertical, member_agent_ids, status, created_at')
         .eq('client_id', user.id)
         .order('created_at', { ascending: false })
-      if (dep) setDeployed(dep)
+      if (dep) setDeployed(dep as DeployedSwarm[])
 
       // Load swarm templates from catalog
       const { data: templates } = await supabase
@@ -73,14 +73,14 @@ export default function AdminMySwarmsPage() {
     const key = template.swarm_key || template.name || ''
     setDeploying(key)
     const supabase = createClient()
-    const { error } = await supabase.from('deployed_swarms').insert({
+    const { error } = await supabase.from('client_deployed_swarms').insert({
       client_id: userId,
       swarm_id: key,
       swarm_name: template.swarm_name || template.name || key,
       vertical: template.vertical_key || null,
       member_agent_ids: template.member_agents || [],
       status: 'active',
-    })
+    } as any)
     if (!error) {
       setDeployed(prev => [{
         id: 'temp-' + Date.now(),

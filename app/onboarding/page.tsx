@@ -239,7 +239,7 @@ function UploadStep({ onNext, userId }: { onNext: () => void; userId: string }) 
           content: `Onboarding upload: ${file.name}`,
           source_type: 'onboarding_upload',
           metadata: { storage_path: path, upload_type: 'onboarding' },
-        })
+        } as any)
       }
     }
 

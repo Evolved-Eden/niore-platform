@@ -42,7 +42,7 @@ export default function AdminEssencePage() {
   const [loading, setLoading] = useState(true)
   const [name, setName] = useState('')
   const [items, setItems] = useState<EssenceRow[]>([])
-  const [newItem, setNewItem] = useState({ type: 'focus', content: '', priority: 'medium' as const })
+  const [newItem, setNewItem] = useState<{ type: string; content: string; priority: 'high' | 'medium' | 'low' }>({ type: 'focus', content: '', priority: 'medium' })
   const [generating, setGenerating] = useState(false)
   const inputRef = useRef<HTMLTextAreaElement>(null)
 
@@ -169,7 +169,7 @@ export default function AdminEssencePage() {
           />
           <select
             value={newItem.priority}
-            onChange={e => setNewItem(p => ({ ...p, priority: e.target.value as any }))}
+            onChange={e => setNewItem(p => ({ ...p, priority: e.target.value as 'high' | 'medium' | 'low' }))}
             className="shrink-0 bg-white/[0.04] border border-white/[0.1] rounded-sm px-2 py-2 text-xs text-white/60"
           >
             <option value="high">🔴 High</option>

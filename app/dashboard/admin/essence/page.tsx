@@ -6,9 +6,9 @@ import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 
 type EssenceRow = {
-  id: string
-  type: string | null
-  content: string | null
+  id?: string
+  type?: string | null
+  content?: string | null
   status?: string | null
   created_at?: string | null
 }
@@ -153,15 +153,6 @@ export default function AdminEssencePage() {
             rows={1}
             onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); addItem() } }}
           />
-          <select
-            value={newItem.priority}
-            onChange={e => setNewItem(p => ({ ...p, priority: e.target.value as 'high' | 'medium' | 'low' }))}
-            className="shrink-0 bg-white/[0.04] border border-white/[0.1] rounded-sm px-2 py-2 text-xs text-white/60"
-          >
-            <option value="high">🔴 High</option>
-            <option value="medium">🟠 Medium</option>
-            <option value="low">🔵 Low</option>
-          </select>
           <button
             onClick={addItem}
             className="shrink-0 px-4 py-2 rounded-sm text-sm bg-white/[0.06] hover:bg-white/[0.1] text-white/60 hover:text-white transition-colors"
@@ -194,14 +185,6 @@ export default function AdminEssencePage() {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
                   <span className="text-xs font-medium" style={{ color: cfg.color }}>{cfg.label}</span>
-                  {item.priority && (
-                    <span
-                      className="text-[10px] px-1.5 py-0.5 rounded-sm uppercase tracking-wider"
-                      style={{ background: `${PRIORITY_COLORS[item.priority] ?? '#fff'}20`, color: PRIORITY_COLORS[item.priority] ?? '#fff' }}
-                    >
-                      {item.priority}
-                    </span>
-                  )}
                 </div>
                 <p className="text-sm text-white/70 leading-relaxed">{item.content}</p>
                 {item.created_at && (

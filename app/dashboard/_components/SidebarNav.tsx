@@ -12,6 +12,7 @@ const NAV_ICONS: Record<string, string> = {
   Overview:       '◈',
   Profile:        '✦',
   Blueprint:      '◆',
+  'My Blueprint': '◆',
   Assessment:     '◇',
   'Essence Intel':'⊙',
   'My Agents':    '⊕',
@@ -21,7 +22,10 @@ const NAV_ICONS: Record<string, string> = {
   Connectors:     '⊡',
   Concierge:      '✦',
   Zuri:           '◈',
+  'Chat / Prompt':'☆',
+  'Zuri Config':  '⊚',
   Settings:       '⚙',
+  '── System ──': '',
 }
 
 /** Groups nav items into sections separated by dividers */
@@ -47,11 +51,22 @@ export default function SidebarNav({ nav, color }: { nav: NavItem[]; color: stri
   return (
     <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
       {nav.map((item, index) => {
+        const isSeparator = item.label.startsWith('──')
         const isActive = pathname === item.href
         const icon = NAV_ICONS[item.label] ?? '◈'
         const section = NAV_SECTION[item.label] ?? 0
         const prevSection = index > 0 ? NAV_SECTION[nav[index - 1]?.label] ?? 0 : 0
         const showDivider = index > 0 && section !== prevSection
+
+        if (isSeparator) {
+          return (
+            <div key={item.href} className="flex items-center gap-2 px-3 py-2">
+              <div className="flex-1 border-t border-white/[0.06]" />
+              <span className="text-[10px] tracking-[0.2em] text-white/15 uppercase">{item.label.replace(/─/g, '').trim()}</span>
+              <div className="flex-1 border-t border-white/[0.06]" />
+            </div>
+          )
+        }
 
         return (
           <div key={item.href}>

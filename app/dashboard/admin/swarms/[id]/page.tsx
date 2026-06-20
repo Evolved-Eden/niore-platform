@@ -43,8 +43,8 @@ export default function EditSwarmPage({ params }: { params: Promise<{ id: string
     setSaving(true);
     try {
       const { id } = await params;
-      const res = await fetch(`/api/admin/swarms`, {
-        method: 'POST',
+      const res = await fetch(`/api/admin/swarms/${id}`, {
+        method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
       });

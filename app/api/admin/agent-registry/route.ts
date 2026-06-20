@@ -8,6 +8,7 @@ export async function GET(request: NextRequest) {
     if (auth instanceof NextResponse) return auth;
     const { searchParams } = new URL(request.url);
     const category = searchParams.get('category');
+    const isPublished = searchParams.get('is_published')
 
     let sbQuery = supabaseAdmin
       .from('agents')
@@ -15,6 +16,12 @@ export async function GET(request: NextRequest) {
 
     if (category) {
       sbQuery = sbQuery.eq('mas_category', category);
+    }
+
+    if (isPublished === 'true') {
+      sbQuery = sbQuery.eq('is_published', true)
+    } else if (isPublished === 'false') {
+      sbQuery = sbQuery.eq('is_published', false)
     }
 
     const { data, error } = await sbQuery.order('agent_name', { ascending: true });
@@ -40,6 +47,7 @@ export async function GET(request: NextRequest) {
         agent_type: a.agent_type || 'ai',
         category: (meta.category as string) || a.mas_category || a.vertical || null,
         is_active: (a as any).status === 'active',
+        is_published: (a as any).is_published ?? false,
         metadata: meta,
       };
     });

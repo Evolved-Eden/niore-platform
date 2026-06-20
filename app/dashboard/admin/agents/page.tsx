@@ -95,14 +95,15 @@ function AgentsContent() {
               <th className="px-6 py-3 text-left text-xs text-white/30 tracking-widest uppercase font-normal">Role</th>
               <th className="px-6 py-3 text-left text-xs text-white/30 tracking-widest uppercase font-normal">Vertical</th>
               <th className="px-6 py-3 text-left text-xs text-white/30 tracking-widest uppercase font-normal">Status</th>
+              <th className="px-6 py-3 text-left text-xs text-white/30 tracking-widest uppercase font-normal">Published</th>
               <th className="px-6 py-3 text-right text-xs text-white/30 tracking-widest uppercase font-normal"></th>
             </tr>
           </thead>
           <tbody className="divide-y divide-white/[0.04]">
             {loading ? (
-              <tr><td colSpan={6} className="px-6 py-12 text-center text-white/30 text-sm">Loading...</td></tr>
+              <tr><td colSpan={7} className="px-6 py-12 text-center text-white/30 text-sm">Loading...</td></tr>
             ) : agents.length === 0 ? (
-              <tr><td colSpan={6} className="px-6 py-12 text-center text-white/30 text-sm">No agents found</td></tr>
+              <tr><td colSpan={7} className="px-6 py-12 text-center text-white/30 text-sm">No agents found</td></tr>
             ) : agents.map((agent: any) => (
               <tr key={agent.agent_id || agent.id} className="hover:bg-white/[0.02] transition-colors">
                 <td className="px-6 py-4 text-sm font-mono text-white/50">{agent.agent_id || agent.id || '—'}</td>
@@ -121,6 +122,13 @@ function AgentsContent() {
                   }`}>
                     {agent.health_status || 'UNKNOWN'}
                   </span>
+                </td>
+                <td className="px-6 py-4">
+                  {agent.is_published ? (
+                    <span className="px-2 py-0.5 rounded text-xs font-medium bg-green-500/10 text-green-400 border border-green-500/20">Yes</span>
+                  ) : (
+                    <span className="px-2 py-0.5 rounded text-xs font-medium bg-white/5 text-white/30 border border-white/10">No</span>
+                  )}
                 </td>
                 <td className="px-6 py-4 text-right">
                   <Link

@@ -15,6 +15,7 @@ interface RegistryAgent {
   agent_type: string | null
   category: string | null
   is_active: boolean
+  deployed: boolean
 }
 
 interface DeployedAgent {
@@ -84,7 +85,7 @@ export default function ClientAgentsPage() {
 
   // ── Fetch registry agents ──
   useEffect(() => {
-    fetch('/api/admin/agent-registry?active=true')
+    fetch('/api/client/agents/catalog')
       .then(r => r.json())
       .then(data => {
         setRegistryAgents(data.agents || [])
@@ -348,12 +349,18 @@ export default function ClientAgentsPage() {
                         <p className="text-xs text-white/40 mt-1 line-clamp-1">{agent.tagline}</p>
                       )}
                     </div>
-                    <button
-                      onClick={() => openDeployModal(agent)}
-                      className="px-3 py-1.5 bg-[#c8ff00] text-black text-[10px] font-bold rounded-sm hover:bg-white transition-all shrink-0"
-                    >
-                      Deploy
-                    </button>
+                    {agent.deployed ? (
+                      <span className="px-3 py-1.5 bg-green-500/10 text-green-400 border border-green-500/20 text-[10px] font-medium rounded-sm shrink-0">
+                        Deployed ✓
+                      </span>
+                    ) : (
+                      <button
+                        onClick={() => openDeployModal(agent)}
+                        className="px-3 py-1.5 bg-[#c8ff00] text-black text-[10px] font-bold rounded-sm hover:bg-white transition-all shrink-0"
+                      >
+                        Deploy
+                      </button>
+                    )}
                   </div>
 
                   {/* Capabilities */}

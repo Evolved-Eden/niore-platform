@@ -19,6 +19,7 @@ export default function EditAgentPage({ params }: { params: Promise<{ id: string
   const [masPriority, setMasPriority] = useState('Stable');
   const [saving, setSaving] = useState(false);
   const [saveMsg, setSaveMsg] = useState<string | null>(null);
+  const [isPublished, setIsPublished] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -26,6 +27,7 @@ export default function EditAgentPage({ params }: { params: Promise<{ id: string
       const res = await fetch(`/api/admin/agents/${id}`);
       const json = await res.json();
       setAgent(json.agent || null);
+      setIsPublished(json.agent?.is_published ?? false);
       if (json.mas_scores) {
         setScores({
           capability: json.mas_scores.capability ?? 50,
@@ -50,9 +52,9 @@ export default function EditAgentPage({ params }: { params: Promise<{ id: string
     setSaveMsg(null);
     try {
       const res = await fetch(`/api/admin/agents/${id}`, {
-        method: 'PUT',
+        method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(scores),
+        body: JSON.stringify({ ...scores, is_published: isPublished }),
       });
       const json = await res.json();
       if (json.error) {
@@ -171,6 +173,26 @@ export default function EditAgentPage({ params }: { params: Promise<{ id: string
             <ScoreSlider label="Activation" value={scores.activation} onChange={(v) => updateScore('activation', v)} />
             <ScoreSlider label="Evolution" value={scores.evolution} onChange={(v) => updateScore('evolution', v)} />
             <ScoreSlider label="Risk (Higher = Worse)" value={scores.risk} onChange={(v) => updateScore('risk', v)} inverted />
+          </div>
+
+          {/* Published Toggle */}
+          <div className="flex items-center justify-between pt-4 border-t border-white/[0.06]">
+            <div>
+              <div className="text-sm font-medium text-white/80">Published</div>
+              <p className="text-xs text-white/40 mt-0.5">Make this agent visible to clients in the catalog</p>
+            </div>
+            <button
+              onClick={() => setIsPublished(!isPublished)}
+              className={`relative w-12 h-6 rounded-full transition-colors ${
+                isPublished ? 'bg-[#c8ff00]' : 'bg-white/10'
+              }`}
+            >
+              <div
+                className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${
+                  isPublished ? 'translate-x-6' : 'translate-x-0.5'
+                }`}
+              />
+            </button>
           </div>
 
           {/* Save button */}

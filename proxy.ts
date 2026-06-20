@@ -71,7 +71,7 @@ export async function proxy(request: NextRequest) {
   }
 
   // Public routes
-  const isPublic = ['/', '/login', '/register', '/demo', '/define-intelligence', '/pricing', '/blueprint', '/intake', '/chat/demo', '/privacy', '/terms', '/contact']
+  const isPublic = ['/', '/login', '/register', '/forgot-password', '/reset-password', '/auth/', '/demo', '/define-intelligence', '/pricing', '/blueprint', '/intake', '/chat/demo', '/privacy', '/terms', '/contact']
     .some(r => path === r || path.startsWith(r))
   if (isPublic) return supabaseResponse
 

@@ -1,13 +1,13 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
+import type { User } from '@supabase/supabase-js'
 
 /**
  * Verify the request user is authenticated with admin role.
  * Returns `{ user, profile }` on success, or a `NextResponse` error to return.
  */
 export async function requireAdmin(): Promise<
-  | { user: NonNullable<Awaited<ReturnType<typeof createClient>>['data']['user']>; profile: { role: string } }
-  | NextResponse
+  { user: User; profile: { role: string } } | NextResponse
 > {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -21,9 +21,9 @@ export async function requireAdmin(): Promise<
     .eq('id', user.id)
     .single()
 
-  if (profile?.role !== 'admin') {
+  if (!profile || profile.role !== 'admin') {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
-  return { user, profile }
+  return { user, profile: { role: profile.role } }
 }

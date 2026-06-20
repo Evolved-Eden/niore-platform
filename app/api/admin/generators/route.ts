@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase/admin';
+import { requireAdmin } from '@/lib/admin-auth';
 
 export async function GET() {
   try {
+    const auth = await requireAdmin();
+    if (auth instanceof NextResponse) return auth;
     const { data, count, error } = await supabaseAdmin
       .from('agent_generators')
       .select('*', { count: 'exact' })

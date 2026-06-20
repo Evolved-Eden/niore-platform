@@ -15,6 +15,8 @@ import { supabaseAdmin } from '@/lib/supabase/admin'
  */
 export async function POST(req: NextRequest) {
   try {
+    const auth = await requireAdmin()
+    if (auth instanceof NextResponse) return auth
     const body = await req.json()
     const {
       email, password, fullName, role = 'client',

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
+import { requireAdmin } from '@/lib/admin-auth'
 
 type ConnectorConfig = {
   id: string
@@ -13,6 +14,8 @@ type ConnectorConfig = {
 
 export async function GET() {
   try {
+    const auth = await requireAdmin()
+    if (auth instanceof NextResponse) return auth
     const { data, error } = await supabaseAdmin
       .from('connector_configs')
       .select('id, platform, config_name, config_data, is_active, created_at, updated_at')
@@ -27,6 +30,8 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
+    const auth = await requireAdmin()
+    if (auth instanceof NextResponse) return auth
     const body = await req.json()
     const { platform, config_name, config_data, is_active } = body
 
@@ -92,6 +97,8 @@ export async function POST(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   try {
+    const auth = await requireAdmin()
+    if (auth instanceof NextResponse) return auth
     const { id } = await req.json()
 
     if (!id) {

@@ -1,7 +1,10 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase/admin';
+import { requireAdmin } from '@/lib/admin-auth';
 
 export async function GET() {
+  const auth = await requireAdmin();
+  if (auth instanceof NextResponse) return auth;
   const queries: Record<string, { table: string; select: string; order: string }> = {
     role_types: { table: 'role_types', select: 'role_type_id, display_name, hierarchy_rank', order: 'hierarchy_rank' },
     avatars: { table: 'avatars', select: 'avatar_id, name, archetypes', order: 'sort_order' },

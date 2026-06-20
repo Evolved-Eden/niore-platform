@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
+import { requireAdmin } from '@/lib/admin-auth'
 
 /**
  * Admin deployment management
@@ -9,6 +10,8 @@ import { supabaseAdmin } from '@/lib/supabase/admin'
  */
 export async function GET(req: NextRequest) {
   try {
+    const auth = await requireAdmin()
+    if (auth instanceof NextResponse) return auth
     const { searchParams } = new URL(req.url)
     const clientId = searchParams.get('client_id')
 
@@ -58,6 +61,8 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    const auth = await requireAdmin()
+    if (auth instanceof NextResponse) return auth
     const { client_id, agent_id, agent_name, role_type, action } = await req.json()
 
     if (!client_id) {
@@ -105,6 +110,8 @@ export async function POST(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   try {
+    const auth = await requireAdmin()
+    if (auth instanceof NextResponse) return auth
     const { client_id, agent_id } = await req.json()
     if (!client_id || !agent_id) {
       return NextResponse.json({ error: 'client_id and agent_id required' }, { status: 400 })

@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
+import { requireAdmin } from '@/lib/admin-auth'
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const auth = await requireAdmin()
+    if (auth instanceof NextResponse) return auth
     const { id } = await params
     const { data, error } = await supabaseAdmin
       .from('agents')
@@ -43,6 +46,8 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
 export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const auth = await requireAdmin();
+    if (auth instanceof NextResponse) return auth;
     const { id } = await params
     const { error } = await supabaseAdmin
       .from('agents')

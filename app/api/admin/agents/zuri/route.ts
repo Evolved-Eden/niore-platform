@@ -1,8 +1,11 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase/admin';
+import { requireAdmin } from '@/lib/admin-auth';
 
 export async function PUT(request: Request) {
   try {
+    const auth = await requireAdmin();
+    if (auth instanceof NextResponse) return auth;
     const body = await request.json();
     const { agentId, agentName, tagline, vertical, autonomyLevel, authorityLevel, riskLevel, primaryTemplate, secondaryTemplate, metadata } = body;
 

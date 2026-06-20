@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/server'
+import { requireAdmin } from '@/lib/admin-auth'
 
 /**
  * Full account provisioning — called when:
@@ -191,6 +192,8 @@ async function provisionAccount({
 
 export async function POST(request: NextRequest) {
   try {
+    const auth = await requireAdmin()
+    if (auth instanceof NextResponse) return auth
     const body: Record<string, unknown> = await request.json()
     const userId = body.userId as string
     const email = body.email as string

@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
+import { requireAdmin } from '@/lib/admin-auth'
 
 export async function GET() {
   try {
+    const auth = await requireAdmin()
+    if (auth instanceof NextResponse) return auth
     const [tiersRes, entitlementsRes] = await Promise.all([
       supabaseAdmin.from('membership_tiers').select('*').order('created_at', { ascending: true }),
       supabaseAdmin.from('tier_entitlements').select('*').order('plan_key', { ascending: true }),
@@ -22,6 +25,8 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    const auth = await requireAdmin()
+    if (auth instanceof NextResponse) return auth
     const body = await request.json()
     const action = body.action as string
 

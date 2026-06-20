@@ -1,10 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/server';
 import { supabaseAdmin } from '@/lib/supabase/admin';
+import { requireAdmin } from '@/lib/admin-auth';
 import { provisionAccount } from '@/app/api/admin/provision/route';
 
 export async function POST(request: NextRequest) {
   try {
+    const auth = await requireAdmin();
+    if (auth instanceof NextResponse) return auth;
     const body = await request.json();
     const { email, password, fullName, role, planTier, isTestAccount, autoApprove } = body;
 

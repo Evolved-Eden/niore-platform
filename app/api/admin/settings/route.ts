@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { getAllConfig, setConfig, deleteConfig } from '@/lib/config'
+import { requireAdmin } from '@/lib/admin-auth'
 
 /**
  * GET /api/admin/settings
@@ -8,6 +9,8 @@ import { getAllConfig, setConfig, deleteConfig } from '@/lib/config'
  */
 export async function GET() {
   try {
+    const auth = await requireAdmin()
+    if (auth instanceof NextResponse) return auth
     const dbConfigs = await getAllConfig()
 
     // Annotate with env var source info for the admin panel
@@ -46,18 +49,8 @@ export async function GET() {
  */
 export async function POST(req: NextRequest) {
   try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-
-    const { data: profile } = await supabase
-      .from('users')
-      .select('role')
-      .eq('id', user.id)
-      .single()
-    if (profile?.role !== 'admin') {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-    }
+    const auth = await requireAdmin()
+    if (auth instanceof NextResponse) return auth
 
     const { key, value, value_type, category, description } = await req.json()
 
@@ -80,18 +73,8 @@ export async function POST(req: NextRequest) {
  */
 export async function DELETE(req: NextRequest) {
   try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-
-    const { data: profile } = await supabase
-      .from('users')
-      .select('role')
-      .eq('id', user.id)
-      .single()
-    if (profile?.role !== 'admin') {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-    }
+    const auth = await requireAdmin()
+    if (auth instanceof NextResponse) return auth
 
     const { key } = await req.json()
     if (!key) return NextResponse.json({ error: 'key is required' }, { status: 400 })

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
+import { requireAdmin } from '@/lib/admin-auth'
 
 function parseMemberAgents(val: unknown): string[] {
   if (!val) return []
@@ -16,6 +17,8 @@ function parseMemberAgents(val: unknown): string[] {
 
 export async function GET(request: NextRequest) {
   try {
+    const auth = await requireAdmin()
+    if (auth instanceof NextResponse) return auth
     const { searchParams } = new URL(request.url)
     const search = searchParams.get('search') || ''
     const vertical = searchParams.get('vertical') || ''
@@ -54,6 +57,8 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const auth = await requireAdmin()
+    if (auth instanceof NextResponse) return auth
     const body: Record<string, unknown> = await request.json()
     const { error } = await supabaseAdmin
       .from('swarm_templates')

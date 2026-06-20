@@ -25,10 +25,13 @@ services:
       - DB_POSTGRESDB_PASSWORD=${POSTGRES_PASSWORD:?required}
       - DB_POSTGRESDB_DATABASE=evolved_eden
       - N8N_MCP_TOKEN=${N8N_MCP_TOKEN:?required}
+      - N8N_MCP_ACCESS_ENABLED=true
+      - N8N_MCP_MANAGED_BY_ENV=false
       - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY:?required}
       - N8N_URL=${N8N_URL:?required}
       - N8N_HOST=${N8N_HOST:-automation.evolvededen.com}
       - N8N_PROTOCOL=https
+      - N8N_PUBLIC_API_KEY=${N8N_PUBLIC_API_KEY}
       - WEBHOOK_URL=${N8N_URL:?required}
       - SUPABASE_URL=${SUPABASE_URL:?required}
       - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY:?required}

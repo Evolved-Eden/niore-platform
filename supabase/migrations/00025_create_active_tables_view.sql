@@ -8,7 +8,7 @@
 
 CREATE OR REPLACE VIEW public.active_tables AS
 SELECT
-  tablename AS table_name,
+  relname AS table_name,
   n_live_tup AS row_estimate
 FROM pg_stat_user_tables
 WHERE schemaname = 'public'

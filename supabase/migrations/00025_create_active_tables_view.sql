@@ -6,9 +6,11 @@
 -- This view wraps pg_stat_user_tables for the public schema only.
 -- ============================================================
 
-CREATE OR REPLACE VIEW public.active_tables AS
+DROP VIEW IF EXISTS public.active_tables CASCADE;
+
+CREATE VIEW public.active_tables AS
 SELECT
-  relname AS table_name,
+  relname::text AS table_name,
   n_live_tup AS row_estimate
 FROM pg_stat_user_tables
 WHERE schemaname = 'public'

@@ -21,7 +21,7 @@
     "@anthropic-ai/sdk": "^0.104.0",
     "@hello-pangea/dnd": "^18.0.1",
     "@modelcontextprotocol/sdk": "^1.29.0",
-    "@sentry/nextjs": "^10.57.0",
+    "@sentry/nextjs": "^10.62.0",
     "@stripe/react-stripe-js": "^6.2.0",
     "@stripe/stripe-js": "^9.2.0",
     "@supabase/ssr": "^0.10.2",

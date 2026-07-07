@@ -224,7 +224,7 @@ export default function EssenceIntelligencePage() {
           .from('client_twins')
           .select('id, metadata')
           .eq('client_id', u.id)
-          .single()
+          .maybeSingle()
 
         if (twin) {
           const meta: any = twin?.metadata || {}

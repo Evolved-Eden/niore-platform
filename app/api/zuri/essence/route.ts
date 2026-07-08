@@ -113,7 +113,7 @@ async function generateWithAnthropic(prompt: string): Promise<{ items: EssenceIt
 }
 
 // ── Local / DB-driven generator ──────────────────────────────────────
-function generateLocal(userRole: string, context: string, scores?: Record<string, number>, archetype?: string, tasks?: { content: string; type: string }[]): { items: EssenceItem[]; dailyQuestion: string } {
+function generateLocal(userRole: string, context: string, scores?: Record<string, number>, archetype?: string, tasks?: { content: string; type: string }[], recentMemories?: string[]): { items: EssenceItem[]; dailyQuestion: string } {
   const items: EssenceItem[] = []
 
   // 1. Archetype-based focus
@@ -202,10 +202,6 @@ export async function POST(req: NextRequest) {
     const { userId, userRole, context } = await req.json()
     const provider = await getProvider()
 
-    const prompt = `Generate a daily Essence Board for a ${userRole ?? 'user'} in the Evolved Eden intelligence ecosystem.
-${context ? `\nUser context: ${context}` : ''}
-${userId ? `\nUser ID: ${userId}` : ''}`
-
     let result: { items: EssenceItem[]; dailyQuestion: string } | null = null
     let usedProvider: string = provider
 
@@ -213,6 +209,7 @@ ${userId ? `\nUser ID: ${userId}` : ''}`
     let scores: Record<string, number> | undefined
     let archetypeName: string | undefined
     let pendingTasks: { content: string; type: string }[] | undefined
+    let recentMemories: string[] = []
 
     try {
       const { query } = await import('@/lib/db')
@@ -238,6 +235,33 @@ ${userId ? `\nUser ID: ${userId}` : ''}`
       // Non-critical — fallback works without DB
     }
 
+    // Fetch recent memories from ai_memories (try Supabase as fallback)
+    try {
+      const { createClient: createSupabaseClient } = await import('@/lib/supabase/server')
+      const supabase = await createSupabaseClient()
+      const { data: memories } = await supabase
+        .from('ai_memories')
+        .select('content, memory_type')
+        .eq('entity_id', userId)
+        .order('created_at', { ascending: false })
+        .limit(5)
+
+      if (memories?.length) {
+        recentMemories = memories.map(m => `[${m.memory_type}] ${m.content}`)
+      }
+    } catch {
+      // Non-critical
+    }
+
+    // Build prompt with context and memories
+    const memoryBlock = recentMemories.length > 0
+      ? `\nRecent memories:\n${recentMemories.join('\n')}`
+      : ''
+
+    const prompt = `Generate a daily Essence Board for a ${userRole ?? 'user'} in the Evolved Eden intelligence ecosystem.
+${context ? `\nUser context: ${context}` : ''}
+${userId ? `\nUser ID: ${userId}` : ''}${memoryBlock}`
+
     // Try the configured provider
     switch (provider) {
       case 'openai':
@@ -253,18 +277,18 @@ ${userId ? `\nUser ID: ${userId}` : ''}`
         usedProvider = 'openrouter'
         break
       case 'local':
-        result = generateLocal(userRole || 'user', context || '', scores, archetypeName, pendingTasks)
+        result = generateLocal(userRole || 'user', context || '', scores, archetypeName, pendingTasks, recentMemories)
         usedProvider = 'local'
         break
       case 'disabled':
-        result = generateLocal(userRole || 'user', context || '', scores, archetypeName, pendingTasks)
+        result = generateLocal(userRole || 'user', context || '', scores, archetypeName, pendingTasks, recentMemories)
         usedProvider = 'local'
         break
     }
 
     // If AI generation failed, fall back to deterministic
     if (!result || !result.items?.length) {
-      result = generateLocal(userRole || 'user', context || '', scores, archetypeName, pendingTasks)
+      result = generateLocal(userRole || 'user', context || '', scores, archetypeName, pendingTasks, recentMemories)
       usedProvider = 'local-fallback'
     }
 

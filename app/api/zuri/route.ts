@@ -55,14 +55,29 @@ Always respond in Zuri's voice: direct, confident, visionary. Never generic.`
 
   const reply = completion.choices[0].message.content
 
-  // Save to AI memory
-  await supabase.from('ai_memories').insert({
-    entity_id: user.id,
-    entity_type: 'user',
-    content: `User asked: ${messages[messages.length - 1]?.content?.slice(0, 200)}`,
-    memory_type: 'interaction',
-    title: `Zuri interaction - ${new Date().toISOString().split('T')[0]}`,
-  })
+  // Save both sides of the conversation as separate memory entries
+  const userMsg = messages[messages.length - 1]?.content?.slice(0, 500)
+  const today = new Date().toISOString().split('T')[0]
+
+  if (userMsg) {
+    await supabase.from('ai_memories').insert({
+      entity_id: user.id,
+      entity_type: 'user',
+      content: userMsg,
+      memory_type: 'user_message',
+      title: `User asked - ${today}`,
+    })
+  }
+
+  if (reply) {
+    await supabase.from('ai_memories').insert({
+      entity_id: user.id,
+      entity_type: 'user',
+      content: reply.slice(0, 1000),
+      memory_type: 'zuri_response',
+      title: `Zuri response - ${today}`,
+    })
+  }
 
   return NextResponse.json({ reply })
 }

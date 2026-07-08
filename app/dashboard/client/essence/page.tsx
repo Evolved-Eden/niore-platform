@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
+import ErrorBoundary from '@/components/ErrorBoundary'
 
 // ─────────────────────────────────────────────
 // Types
@@ -99,7 +100,7 @@ const ACTION_TYPE_ICON: Record<string, string> = {
 // Component
 // ─────────────────────────────────────────────
 
-export default function EssenceIntelligencePage() {
+function EssenceIntelligencePage() {
   const router = useRouter()
   const supabase = createClient()
 
@@ -946,5 +947,13 @@ export default function EssenceIntelligencePage() {
         </div>
       )}
     </div>
+  )
+}
+
+export default function WrappedEssencePage() {
+  return (
+    <ErrorBoundary>
+      <EssenceIntelligencePage />
+    </ErrorBoundary>
   )
 }

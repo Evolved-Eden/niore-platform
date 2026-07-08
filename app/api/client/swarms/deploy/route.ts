@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { query } from '@/lib/db'
+import { supabaseAdmin } from '@/lib/supabase/admin'
 import crypto from 'crypto'
 
 export const dynamic = 'force-dynamic'
@@ -14,12 +14,15 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { rows } = await query(
-      `SELECT * FROM client_deployed_swarms WHERE client_id = $1 ORDER BY created_at DESC`,
-      [user.id]
-    )
+    const { data: swarms, error: fetchError } = await supabaseAdmin
+      .from('client_deployed_swarms')
+      .select('*')
+      .eq('client_id', user.id)
+      .order('created_at', { ascending: false })
 
-    return NextResponse.json({ swarms: rows || [] })
+    if (fetchError) throw fetchError
+
+    return NextResponse.json({ swarms: swarms || [] })
   } catch (error: any) {
     console.error('GET /api/client/swarms/deploy failed:', error)
     return NextResponse.json({ error: error.message }, { status: 500 })
@@ -49,37 +52,46 @@ export async function POST(request: NextRequest) {
     const now = new Date().toISOString()
 
     // Insert the deployed swarm record
-    await query(
-      `INSERT INTO client_deployed_swarms (id, client_id, swarm_id, swarm_name, vertical, member_agent_ids, configuration, status, created_at, updated_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
-      [
-        id,
-        user.id,
-        swarmId,
-        swarmName,
-        vertical || null,
-        memberAgentIds ? JSON.stringify(memberAgentIds) : '[]',
-        configuration ? JSON.stringify(configuration) : null,
-        'active',
-        now,
-        now,
-      ]
-    )
+    const { error: insertError } = await supabaseAdmin.from('client_deployed_swarms').insert({
+      id,
+      client_id: user.id,
+      swarm_id: swarmId,
+      swarm_name: swarmName,
+      vertical: vertical || null,
+      member_agent_ids: memberAgentIds ? JSON.stringify(memberAgentIds) : '[]',
+      configuration: configuration ? JSON.stringify(configuration) : null,
+      status: 'active',
+      created_at: now,
+      updated_at: now,
+    })
+
+    if (insertError) throw insertError
 
     // Increment the swarm_deployments counter on the client record
-    await query(
-      `UPDATE clients SET swarm_deployments = COALESCE(swarm_deployments, 0) + 1 WHERE id = $1`,
-      [user.id]
-    )
+    const { data: clientData } = await supabaseAdmin
+      .from('clients')
+      .select('swarm_deployments')
+      .eq('id', user.id)
+      .single()
+
+    const { error: updateClientError } = await supabaseAdmin
+      .from('clients')
+      .update({ swarm_deployments: (clientData?.swarm_deployments ?? 0) + 1 })
+      .eq('id', user.id)
+
+    if (updateClientError) throw updateClientError
 
     // Fetch back the inserted record
-    const { rows } = await query(
-      `SELECT * FROM client_deployed_swarms WHERE id = $1`,
-      [id]
-    )
+    const { data: inserted, error: fetchBackError } = await supabaseAdmin
+      .from('client_deployed_swarms')
+      .select('*')
+      .eq('id', id)
+      .single()
+
+    if (fetchBackError) throw fetchBackError
 
     return NextResponse.json({
-      swarm: rows[0] || null,
+      swarm: inserted || null,
       status: 'deployed',
     })
   } catch (error: any) {
@@ -105,48 +117,58 @@ export async function PATCH(request: NextRequest) {
     }
 
     // Verify ownership
-    const { rows: existing } = await query(
-      `SELECT * FROM client_deployed_swarms WHERE id = $1 AND client_id = $2`,
-      [id, user.id]
-    )
-    if (!existing || existing.length === 0) {
+    const { data: existing, error: checkError } = await supabaseAdmin
+      .from('client_deployed_swarms')
+      .select('id')
+      .eq('id', id)
+      .eq('client_id', user.id)
+      .maybeSingle()
+
+    if (checkError) throw checkError
+    if (!existing) {
       return NextResponse.json({ error: 'Not found' }, { status: 404 })
     }
 
     const now = new Date().toISOString()
-    const updates: string[] = ['updated_at = $1']
-    const params: unknown[] = [now]
-    let idx = 2
-
-    if (status) {
-      updates.push(`status = $${idx++}`)
-      params.push(status)
-    }
+    const updateData: Record<string, unknown> = { updated_at: now }
+    if (status) updateData.status = status
     if (configuration !== undefined) {
-      updates.push(`configuration = $${idx++}`)
-      params.push(typeof configuration === 'string' ? configuration : JSON.stringify(configuration))
+      updateData.configuration = typeof configuration === 'string' ? configuration : JSON.stringify(configuration)
     }
 
-    params.push(id)
-    await query(
-      `UPDATE client_deployed_swarms SET ${updates.join(', ')} WHERE id = $${idx}`,
-      params
-    )
+    const { error: updateError } = await supabaseAdmin
+      .from('client_deployed_swarms')
+      .update(updateData)
+      .eq('id', id)
+      .eq('client_id', user.id)
+
+    if (updateError) throw updateError
 
     // If undeployed, decrement the counter
     if (status === 'undeployed') {
-      await query(
-        `UPDATE clients SET swarm_deployments = GREATEST(COALESCE(swarm_deployments, 1) - 1, 0) WHERE id = $1`,
-        [user.id]
-      )
+      const { data: clientData } = await supabaseAdmin
+        .from('clients')
+        .select('swarm_deployments')
+        .eq('id', user.id)
+        .single()
+
+      const { error: decError } = await supabaseAdmin
+        .from('clients')
+        .update({ swarm_deployments: Math.max((clientData?.swarm_deployments ?? 1) - 1, 0) })
+        .eq('id', user.id)
+
+      if (decError) throw decError
     }
 
-    const { rows } = await query(
-      `SELECT * FROM client_deployed_swarms WHERE id = $1`,
-      [id]
-    )
+    const { data: updatedSwarm, error: fetchError } = await supabaseAdmin
+      .from('client_deployed_swarms')
+      .select('*')
+      .eq('id', id)
+      .single()
 
-    return NextResponse.json({ swarm: rows[0] || null })
+    if (fetchError) throw fetchError
+
+    return NextResponse.json({ swarm: updatedSwarm || null })
   } catch (error: any) {
     console.error('PATCH /api/client/swarms/deploy failed:', error)
     return NextResponse.json({ error: error.message }, { status: 500 })

@@ -20,8 +20,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
+    // Try direct PG connection first
     try {
-      // Build SQL query dynamically
       let sql = 'SELECT * FROM essence_intelligence WHERE client_id = $1'
       const params: any[] = [targetClientId]
       let paramIndex = 2
@@ -49,20 +49,45 @@ export async function POST(req: NextRequest) {
         status: 'active',
       })
     } catch (dbError: any) {
-      // Table doesn't exist yet — system initializing
+      // Direct PG failed — try Supabase fallback
       if (
         dbError.code === '42P01' ||
         dbError.message?.includes('does not exist') ||
         dbError.message?.includes('relation')
       ) {
-        return NextResponse.json({
-          items: [],
-          status: 'initializing',
-          message:
-            'Essence Intelligence system is initializing. Your stored suggestions will appear here once the system is ready.',
-        })
+        // Table doesn't exist
       }
-      throw dbError
+      console.warn('Direct PG essence_intelligence query failed, trying Supabase:', dbError.message)
+    }
+
+    // Fallback: try Supabase
+    try {
+      const { supabaseAdmin } = await import('@/lib/supabase/admin')
+      let query = supabaseAdmin
+        .from('essence_intelligence')
+        .select('*')
+        .eq('client_id', targetClientId)
+
+      if (type) query = query.eq('type', type)
+      if (status) query = query.eq('status', status)
+      if (limit && typeof limit === 'number') query = query.limit(limit)
+
+      query = query.order('created_at', { ascending: false })
+
+      const { data: items, error } = await query
+      if (error) throw error
+
+      return NextResponse.json({
+        items: items ?? [],
+        status: 'active',
+      })
+    } catch (supabaseError: any) {
+      console.error('Both direct PG and Supabase essence fetch failed:', supabaseError)
+      return NextResponse.json({
+        items: [],
+        status: 'initializing',
+        message: 'Essence Intelligence system is initializing. Stored suggestions will appear here once ready.',
+      })
     }
   } catch (error: any) {
     console.error('Essence intelligence fetch error:', error)

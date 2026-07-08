@@ -38,19 +38,24 @@ Rules:
 
 // ── Detect which AI provider to use ────────────────────────────────
 async function getProvider(): Promise<AIProvider> {
-  // Check configured provider from DB config first, then env
-  const configured = (await getEssenceProvider() || '').toLowerCase() as AIProvider
-  if (configured === 'openai' || configured === 'anthropic' || configured === 'openrouter' || configured === 'local' || configured === 'disabled') {
-    return configured
+  // Check env vars directly first (fastest, no DB dependency)
+  if (process.env.OPENROUTER_API_KEY) return 'openrouter'
+  if (process.env.OPENAI_API_KEY) return 'openai'
+  if (process.env.ANTHROPIC_API_KEY || process.env.CLAUDE_API_KEY) return 'anthropic'
+  // Fallback: check DB config (may fail gracefully depending on env setup)
+  try {
+    const configured = (await getEssenceProvider() || '').toLowerCase() as AIProvider
+    if (configured === 'openai' || configured === 'anthropic' || configured === 'openrouter' || configured === 'local' || configured === 'disabled') {
+      return configured
+    }
+    const openaiKey = await getOpenAIKey()
+    const anthropicKey = await getAnthropicKey()
+    if (openaiKey) return 'openai'
+    if (anthropicKey) return 'anthropic'
+  } catch {
+    // DB config unavailable — ignore
   }
-  // Auto-detect: prefer OpenRouter, then OpenAI, then Anthropic, then local
-  const openrouterKey = process.env.OPENROUTER_API_KEY
-  const openaiKey = await getOpenAIKey()
-  const anthropicKey = await getAnthropicKey()
-  if (openrouterKey) return 'openrouter'
-  if (openaiKey) return 'openai'
-  if (anthropicKey) return 'anthropic'
-  return 'disabled' // No AI available — use curated/DB-driven fallback
+  return 'disabled' // No AI available — use deterministic fallback
 }
 
 // ── OpenAI / OpenRouter generator ────────────────────────────────────

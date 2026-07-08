@@ -152,7 +152,14 @@ export default async function ClientTwinPage() {
           </div>
 
           {/* Quick actions */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Link
+              href="/dashboard/client/twin/configure"
+              className="glass rounded-sm p-5 border border-white/[0.06] hover:border-[#fb923c]/30 transition-all group"
+            >
+              <div className="text-xs text-[#fb923c] tracking-widest uppercase mb-2 group-hover:opacity-80">Configure Twin</div>
+              <p className="text-sm text-white/40">Edit personality, autonomy, memory & settings</p>
+            </Link>
             <Link
               href="/dashboard/chat"
               className="glass rounded-sm p-5 border border-white/[0.06] hover:border-[#c8ff00]/30 transition-all group"

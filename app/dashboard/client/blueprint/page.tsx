@@ -103,7 +103,7 @@ export default function ClientBlueprintPage() {
         .from('client_twins')
         .select('id, metadata')
         .eq('client_id', u.id)
-        .single()
+        .maybeSingle()
       
       if (twin) {
         setTwinExists(true)

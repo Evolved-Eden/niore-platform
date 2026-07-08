@@ -82,7 +82,7 @@ export async function POST(req: Request) {
   const { messages, context } = await req.json();
 
   const systemPrompt = context
-    ? `${SYSTEM_PROMPT}\n\n## HUMAN DESIGN CONTEXT — This visitor's design profile:\n${context}\n\nUse their Human Design to personalize. If they're a Generator, emphasize sustainable energy. If Manifestor, initiator power. If Projector, guiding intelligence. Refer to their archetype naturally.`
+    ? `${SYSTEM_PROMPT}\n\n## INTELLIGENCE BLUEPRINT CONTEXT — This visitor's profile:\n${context}\n\nReference their archetype naturally in conversation. Use their energy type to guide interaction style: aligned types benefit from paced validation, mind architectures benefit from clarity and structure.`
     : SYSTEM_PROMPT;
 
   const result = await streamText({

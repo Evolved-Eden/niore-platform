@@ -53,7 +53,7 @@ export default async function ClientSettingsPage() {
       <section className="glass rounded-sm p-6 border border-white/[0.06]">
         <h2 className="text-sm font-semibold mb-4">Intake & Design</h2>
         <p className="text-xs text-white/40 mb-4">
-          Your Human Design profile and intake information. Update your design at any time.
+          Your Intelligence Blueprint profile and assessment results. Update your profile at any time.
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
           <div>
@@ -65,8 +65,8 @@ export default async function ClientSettingsPage() {
             <span className="text-white/80">{(client as any)?.birth_location || '—'}</span>
           </div>
           <div>
-            <span className="text-xs text-white/30 block mb-1">Human Design Type</span>
-            <span className="text-white/80">{(client as any)?.hd_type || '—'}</span>
+            <span className="text-xs text-white/30 block mb-1">Energy Type</span>
+            <span className="text-white/80">{(client as any)?.energy_type || '—'}</span>
           </div>
           <div>
             <span className="text-xs text-white/30 block mb-1">Archetype</span>

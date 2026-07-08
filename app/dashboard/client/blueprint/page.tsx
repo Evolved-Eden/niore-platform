@@ -6,12 +6,12 @@ import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 
 type IntakeInfo = {
-  hdType?: string
   archetype?: string
-  profile?: string
-  profileName?: string
-  sunGate?: { number: number; name: string }
-  geneKey?: string
+  coreArch?: string
+  energyType?: string
+  naturalGift?: string
+  growthEdge?: string
+  mindArchitecture?: string
   hasIntake: boolean
 }
 
@@ -83,17 +83,17 @@ export default function ClientBlueprintPage() {
       if (clientRec) {
         const meta = (clientRec.metadata as Record<string, any>) ?? {}
         const intakeSections = meta.intake?.sections
-        if (intakeSections?.results?.humanDesign) {
-          const hd = intakeSections.results.humanDesign
-          const gk = intakeSections.results.geneKeys
+        if (intakeSections?.results?.blueprint) {
+          const bp = intakeSections.results.blueprint
+          const es = intakeSections.results.essence
           setIntake({
             hasIntake: true,
-            hdType: hd.type,
-            archetype: hd.archetype,
-            profile: hd.profile,
-            profileName: hd.profileName,
-            sunGate: hd.sunGate ? { number: hd.sunGate.number, name: hd.sunGate.name } : undefined,
-            geneKey: gk?.primaryGeneKey,
+            archetype: bp.archetype,
+            coreArch: bp.foundation?.coreArch,
+            energyType: bp.foundation?.energyType,
+            naturalGift: bp.foundation?.naturalGift,
+            growthEdge: bp.foundation?.growthEdge,
+            mindArchitecture: es?.mindArchitecture,
           })
         }
       }
@@ -225,27 +225,25 @@ export default function ClientBlueprintPage() {
                 <div className="mb-6 p-4 rounded-sm bg-white/[0.03] border border-white/[0.06] text-left max-w-sm mx-auto space-y-1.5">
                   <div className="text-[10px] text-white/30 tracking-widest uppercase mb-2">From Your Intake</div>
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-white/50">Type</span>
-                    <span className="text-[#c8ff00] font-medium">{intake.hdType}</span>
-                  </div>
-                  <div className="flex items-center justify-between text-sm">
                     <span className="text-white/50">Archetype</span>
-                    <span className="text-white font-medium">{intake.archetype}</span>
+                    <span className="text-[#c8ff00] font-medium">{intake.archetype}</span>
                   </div>
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-white/50">Profile</span>
-                    <span className="text-[#a78bfa] font-medium">{intake.profile} {intake.profileName}</span>
+                    <span className="text-white/50">Core Architecture</span>
+                    <span className="text-white font-medium">{intake.coreArch}</span>
                   </div>
-                  {intake.sunGate && (
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-white/50">Energy Type</span>
+                    <span className="text-[#a78bfa] font-medium">{intake.energyType}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-white/50">Natural Gift</span>
+                    <span className="text-white/80">{intake.naturalGift}</span>
+                  </div>
+                  {intake.growthEdge && (
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-white/50">Sun Gate</span>
-                      <span className="text-white/80">Gate {intake.sunGate.number} — {intake.sunGate.name}</span>
-                    </div>
-                  )}
-                  {intake.geneKey && (
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-white/50">Gene Key</span>
-                      <span className="text-[#00d4ff] font-medium">{intake.geneKey}</span>
+                      <span className="text-white/50">Growth Edge</span>
+                      <span className="text-[#00d4ff] font-medium">{intake.growthEdge}</span>
                     </div>
                   )}
                 </div>

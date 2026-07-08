@@ -58,17 +58,14 @@ function DemoContent() {
   const searchParams = useSearchParams();
 
   const name = searchParams.get("name") || "";
-  const hdType = searchParams.get("hd_type") || "";
-  const hdProfileName = searchParams.get("hd_profile_name") || "";
   const archetypeParam = searchParams.get("archetype") || "";
-  const sunGate = searchParams.get("sun_gate") || "";
-  const designGate = searchParams.get("design_gate") || "";
-  const geneKey = searchParams.get("gene_key") || "";
+  const energyType = searchParams.get("energy") || "";
+  const mindArch = searchParams.get("mind") || "";
 
-  const hasIntake = !!(name && hdType);
+  const hasIntake = !!(name && archetypeParam);
 
   const intakeContext = hasIntake
-    ? `Name: ${name}\nHuman Design type: ${hdType}\nProfile: ${hdProfileName}\nArchetype: ${archetypeParam}\nSun Gate: ${sunGate}\nDesign Gate: ${designGate}\nGene Key: ${geneKey}`
+    ? `Name: ${name}\nArchetype: ${archetypeParam}\nEnergy Type: ${energyType}\nMind Architecture: ${mindArch}`
     : "";
 
   const [messages, setMessages] = useState<Message[]>([]);
@@ -135,13 +132,13 @@ function DemoContent() {
       const greeting: Message = hasIntake
         ? {
             role: "assistant",
-            content: `${name} — welcome back. I see your Human Design profile. A ${hdType} with a ${hdProfileName} archetype.\n\nLet me ask you a few quick questions so I can tailor your demo. What's your email address?`,
+            content: `${name} — welcome back. I see your Intelligence Blueprint. A ${archetypeParam} with an ${energyType} energy type.\n\nLet me ask you a few quick questions so I can tailor your demo. What's your email address?`,
           }
         : DEFAULT_GREETING;
       setMessages([greeting]);
       setGreetingReady(true);
     }
-  }, [hasIntake, name, hdType, hdProfileName, archetypeParam, sunGate, designGate, geneKey, greetingReady]);
+  }, [hasIntake, name, archetypeParam, energyType, mindArch, greetingReady]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });

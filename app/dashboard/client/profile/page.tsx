@@ -31,7 +31,7 @@ function profileComplete(user: Record<string, any>, client: Record<string, any>,
   if (user.full_name) score += 20
   if (client?.dob) score += 15
   if (client?.birth_location) score += 15
-  if (client?.hd_type) score += 20
+  if (client?.archetype) score += 20
   if (client?.archetype) score += 15
   if (hasBlueprint) score += 15
   return Math.min(score, 100)
@@ -148,7 +148,7 @@ export default async function ClientProfilePage() {
   const agentDeployments = client?.agent_deployments ?? 0
   const dob = client?.dob
   const birthLocation = client?.birth_location
-  const hdType = client?.hd_type
+  const energyType = client?.energy_type
   const archetype = client?.archetype
   const vertical = client?.primary_vertical ?? client?.vertical
 
@@ -301,7 +301,7 @@ export default async function ClientProfilePage() {
             />
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {[
-                { label: 'Human Design Type', value: hdType ?? '—' },
+                { label: 'Energy Type', value: energyType ?? '—' },
                 { label: 'Birth Date', value: dob ?? '—' },
                 { label: 'Birth Location', value: birthLocation ?? '—' },
                 { label: 'Archetype', value: archetype ?? '—' },
@@ -325,7 +325,7 @@ export default async function ClientProfilePage() {
                 </div>
               ))}
             </div>
-            {(!hdType && !dob && !archetype) && (
+            {(!energyType && !dob && !archetype) && (
               <div className="mt-5 pt-4 border-t border-white/[0.06]">
                 <Link
                   href="/intake"

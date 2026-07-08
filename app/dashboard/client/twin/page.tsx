@@ -106,9 +106,9 @@ export default function ClientTwinPage() {
   })
   const [saveMessage, setSaveMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
 
-  // HD / intake context
-  const [hdProfile, setHdProfile] = useState<any>(null)
-  const [gkProfile, setGkProfile] = useState<any>(null)
+  // EE / intake context
+  const [blueprintProfile, setBlueprintProfile] = useState<any>(null)
+  const [essenceProfile, setEssenceProfile] = useState<any>(null)
 
   // ── Memory tab state ──
   const [memories, setMemories] = useState<MemoryItem[]>([])
@@ -179,8 +179,8 @@ export default function ClientTwinPage() {
         .eq('id', user.id)
         .maybeSingle()
       const intakeMeta = (clientRec?.metadata as Record<string, any>)?.intake?.sections
-      setHdProfile(intakeMeta?.results?.blueprint ?? null)
-      setGkProfile(intakeMeta?.results?.essence ?? null)
+      setBlueprintProfile(intakeMeta?.results?.blueprint ?? null)
+      setEssenceProfile(intakeMeta?.results?.essence ?? null)
 
       setLoading(false)
     }
@@ -510,34 +510,34 @@ export default function ClientTwinPage() {
               {!editingOverview && (
                 <div className="px-6 py-5 border-b border-white/[0.06]">
                   <div className="text-xs text-white/30 tracking-widest uppercase mb-4">Intelligence Profile</div>
-                  {hdProfile ? (
+                  {blueprintProfile ? (
                     <div className="space-y-1.5">
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-white/50">Archetype</span>
-                        <span className="text-[#c8ff00] font-medium">{hdProfile.archetype ?? '—'}</span>
+                        <span className="text-[#c8ff00] font-medium">{blueprintProfile.archetype ?? '—'}</span>
                       </div>
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-white/50">Core Architecture</span>
-                        <span className="text-white font-medium">{hdProfile.foundation?.coreArch ?? '—'}</span>
+                        <span className="text-white font-medium">{blueprintProfile.foundation?.coreArch ?? '—'}</span>
                       </div>
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-white/50">Energy Type</span>
-                        <span className="text-[#a78bfa] font-medium">{hdProfile.foundation?.energyType ?? '—'}</span>
+                        <span className="text-[#a78bfa] font-medium">{blueprintProfile.foundation?.energyType ?? '—'}</span>
                       </div>
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-white/50">Natural Gift</span>
-                        <span className="text-white/70">{hdProfile.foundation?.naturalGift ?? '—'}</span>
+                        <span className="text-white/70">{blueprintProfile.foundation?.naturalGift ?? '—'}</span>
                       </div>
-                      {hdProfile.foundation?.growthEdge && (
+                      {blueprintProfile.foundation?.growthEdge && (
                         <div className="flex items-center justify-between text-sm">
                           <span className="text-white/50">Growth Edge</span>
-                          <span className="text-[#00d4ff] font-medium">{hdProfile.foundation.growthEdge}</span>
+                          <span className="text-[#00d4ff] font-medium">{blueprintProfile.foundation.growthEdge}</span>
                         </div>
                       )}
-                      {gkProfile && (
+                      {essenceProfile && (
                         <div className="flex items-center justify-between text-sm">
                           <span className="text-white/50">Mind Architecture</span>
-                          <span className="text-[#fb923c] font-medium">{gkProfile.mindArchitecture ?? '—'}</span>
+                          <span className="text-[#fb923c] font-medium">{essenceProfile.mindArchitecture ?? '—'}</span>
                         </div>
                       )}
                     </div>

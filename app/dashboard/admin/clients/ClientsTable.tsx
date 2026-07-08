@@ -79,6 +79,16 @@ export default function ClientsTable({ initialClients }: { initialClients: Clien
   const [detailClient, setDetailClient] = useState<ClientRow | null>(null)
   const [editKey, setEditKey] = useState('')
   const [editVal, setEditVal] = useState('')
+  const [twinClient, setTwinClient] = useState<ClientRow | null>(null)
+  const [twinMeta, setTwinMeta] = useState<Record<string, any>>({})
+  const [twinFields, setTwinFields] = useState({
+    personality_summary: '',
+    communication_style: '',
+    preference_summary: '',
+  })
+  const [twinStatus, setTwinStatus] = useState('active')
+  const [twinVersion, setTwinVersion] = useState(1)
+  const [twinSaving, setTwinSaving] = useState(false)
 
   const statusColor = (s: string | null) => {
     switch (s) {
@@ -90,6 +100,62 @@ export default function ClientsTable({ initialClients }: { initialClients: Clien
       case 'admin_approved': return 'bg-purple-900/40 text-purple-400'
       default: return 'bg-white/[0.04] text-white/30'
     }
+  }
+
+  // ── Twin panel ──
+  async function loadTwinMeta(clientId: string) {
+    try {
+      const res = await fetch('/api/admin/twins')
+      if (!res.ok) return
+      const data = await res.json()
+      const twins: any[] = data.twins || []
+      const twin = twins.find((t: any) => t.client_id === clientId)
+      if (twin) {
+        const meta = twin.metadata || {}
+        setTwinMeta(meta)
+        setTwinFields({
+          personality_summary: twin.personality_summary || meta.personality_summary || '',
+          communication_style: twin.communication_style || meta.communication_style || '',
+          preference_summary: twin.preference_summary || meta.preference_summary || '',
+        })
+        setTwinStatus(twin.twin_status || 'active')
+        setTwinVersion(twin.version || 1)
+      } else {
+        setTwinMeta({})
+        setTwinFields({ personality_summary: '', communication_style: '', preference_summary: '' })
+        setTwinStatus('active')
+        setTwinVersion(1)
+      }
+    } catch { /* ignore */ }
+  }
+
+  async function handleSaveTwin() {
+    if (!twinClient) return
+    setTwinSaving(true)
+    try {
+      const res = await fetch('/api/admin/twins', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          clientId: twinClient.id,
+          action: 'save_twin',
+          updates: {
+            personality_summary: twinFields.personality_summary,
+            communication_style: twinFields.communication_style,
+            preference_summary: twinFields.preference_summary,
+            twin_status: twinStatus,
+          },
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error)
+      setActionMsg({ type: 'ok', text: 'Twin saved' })
+      setTimeout(() => setActionMsg(null), 3000)
+      loadTwinMeta(twinClient.id)
+    } catch (err: any) {
+      setActionMsg({ type: 'err', text: err.message })
+    }
+    setTwinSaving(false)
   }
 
   return (
@@ -200,9 +266,12 @@ export default function ClientsTable({ initialClients }: { initialClients: Clien
                       <button onClick={() => { setAddonsModal({ id: c.id, current: c.addons || [] }); setAddonsValue(c.addons || []) }}
                         className="px-2.5 py-1 text-xs rounded-sm bg-cyan-900/30 text-cyan-400 hover:bg-cyan-900/60"
                       >Add-ons</button>
+                      <button onClick={() => { setTwinClient(c); loadTwinMeta(c.id) }}
+                         className="px-2.5 py-1 text-xs rounded-sm bg-[#ff6b6b]/20 text-[#ff6b6b] hover:bg-[#ff6b6b]/40"
+                       >Twin</button>
                       <button onClick={() => { setDetailClient(c) }}
-                        className="px-2.5 py-1 text-xs rounded-sm bg-white/5 text-white/50 hover:text-white/80"
-                      >Edit</button>
+                         className="px-2.5 py-1 text-xs rounded-sm bg-white/5 text-white/50 hover:text-white/80"
+                       >Edit</button>
                       {(c.status === 'rejected' || c.status === 'pending_approval') && (
                         <button onClick={() => setDeleteConfirm(c.id)}
                           className="px-2.5 py-1 text-xs rounded-sm bg-red-900/30 text-red-400 hover:bg-red-900/60"
@@ -364,6 +433,73 @@ export default function ClientsTable({ initialClients }: { initialClients: Clien
 
             <div className="flex justify-end gap-3">
               <button onClick={() => setDetailClient(null)} className="px-4 py-2 text-sm text-white/50 hover:text-white/80">Close</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Twin panel */}
+      {twinClient && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+          <div className="glass rounded-sm p-6 border border-white/[0.06] max-w-lg w-full max-h-[80vh] overflow-y-auto">
+            <h3 className="text-lg font-semibold text-white/80 mb-1">Twin Configuration</h3>
+            <p className="text-sm text-white/40 mb-5">
+              {twinClient.full_name || twinClient.email || 'User'} &mdash; v{twinVersion}
+            </p>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs text-white/40 mb-1">Status</label>
+                <select value={twinStatus} onChange={e => setTwinStatus(e.target.value)}
+                  className="w-full px-3 py-2 bg-white/[0.04] border border-white/10 rounded-sm text-sm text-white/70 focus:outline-none focus:border-[#ff6b6b]/40"
+                >
+                  <option value="active">Active</option>
+                  <option value="suspended">Suspended</option>
+                  <option value="archived">Archived</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs text-white/40 mb-1">Personality Summary</label>
+                <textarea value={twinFields.personality_summary}
+                  onChange={e => setTwinFields(f => ({ ...f, personality_summary: e.target.value }))}
+                  rows={3}
+                  className="w-full px-3 py-2 bg-white/[0.04] border border-white/10 rounded-sm text-sm text-white/70 resize-none focus:outline-none focus:border-[#ff6b6b]/40"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-white/40 mb-1">Communication Style</label>
+                <textarea value={twinFields.communication_style}
+                  onChange={e => setTwinFields(f => ({ ...f, communication_style: e.target.value }))}
+                  rows={2}
+                  className="w-full px-3 py-2 bg-white/[0.04] border border-white/10 rounded-sm text-sm text-white/70 resize-none focus:outline-none focus:border-[#ff6b6b]/40"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-white/40 mb-1">Preference Summary</label>
+                <textarea value={twinFields.preference_summary}
+                  onChange={e => setTwinFields(f => ({ ...f, preference_summary: e.target.value }))}
+                  rows={2}
+                  className="w-full px-3 py-2 bg-white/[0.04] border border-white/10 rounded-sm text-sm text-white/70 resize-none focus:outline-none focus:border-[#ff6b6b]/40"
+                />
+              </div>
+
+              <div className="flex items-center gap-3 pt-2">
+                <button onClick={handleSaveTwin} disabled={twinSaving}
+                  className="px-5 py-2 bg-[#ff6b6b] text-black text-xs font-bold rounded-sm hover:bg-white transition-all disabled:opacity-40"
+                >
+                  {twinSaving ? 'Saving...' : 'Save Twin'}
+                </button>
+                <button onClick={() => { setTwinClient(null); window.open(`/dashboard/admin/twin`, '_blank') }}
+                  className="px-4 py-2 border border-white/10 text-white/30 text-xs rounded-sm hover:border-white/30 transition-all"
+                >
+                  Full Management &rarr;
+                </button>
+                <button onClick={() => setTwinClient(null)}
+                  className="px-4 py-2 text-xs text-white/30 hover:text-white/60"
+                >
+                  Close
+                </button>
+              </div>
             </div>
           </div>
         </div>

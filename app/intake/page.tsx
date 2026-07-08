@@ -20,24 +20,49 @@ type IntakeData = {
   offerType: string
 }
 
-type HDProfile = {
-  humanDesign: {
-    type: string
-    strategy: string
-    authority: string
-    profile: string
-    profileName: string
-    profileDesc: string
-    sunGate: { number: number; name: string; keyword: string }
-    designGate: { number: number; name: string; keyword: string }
+type EEProfile = {
+  blueprint: {
     archetype: string
+    completeness: number
+    foundation: {
+      coreArch: string
+      naturalGift: string
+      growthEdge: string
+      energyType: string
+      operatingRhythm: string
+    }
+    scores: {
+      visionary: number
+      building: number
+      connecting: number
+      analyzing: number
+      leading: number
+      creating: number
+    }
+    summary: string
   }
-  geneKeys: {
-    primaryGate: number
-    primaryGeneKey: string
-    primaryKeyword: string
-    insights: string[]
-    birthInsight: string
+  essence: {
+    mindArchitecture: string
+    decisionStyle: string
+    communicationStyle: string
+    emotionalPattern: string
+    creativityStyle: string
+    summary: string
+  }
+  archetype: {
+    primary: string
+    avatar: string
+    description: string
+    domains: string[]
+  }
+  rhythm: {
+    energyType: string
+    peakTimes: string
+    recoveryNeed: string
+  }
+  timing: {
+    personalYear: number
+    currentCycle: string
   }
   recommendation: {
     archetype: string
@@ -64,7 +89,7 @@ export default function IntakePage() {
   const router = useRouter()
   const [step, setStep] = useState<Step>('welcome')
   const [loading, setLoading] = useState(false)
-  const [profile, setProfile] = useState<HDProfile | null>(null)
+  const [profile, setProfile] = useState<EEProfile | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [user, setUser] = useState<any>(null)
   const [userRole, setUserRole] = useState<string | null>(null)
@@ -186,7 +211,7 @@ export default function IntakePage() {
       }
     }
 
-    const params = new URLSearchParams({ name: data.name, path, hd_type: profile.humanDesign.type, hd_profile: profile.humanDesign.profile, hd_profile_name: profile.humanDesign.profileName, archetype: profile.recommendation.archetype, sun_gate: `Gate ${profile.humanDesign.sunGate.number} (${profile.humanDesign.sunGate.name})`, design_gate: `Gate ${profile.humanDesign.designGate.number} (${profile.humanDesign.designGate.name})`, gene_key: profile.geneKeys.primaryGeneKey })
+    const params = new URLSearchParams({ name: data.name, path, archetype: profile.archetype.primary, energy: profile.rhythm.energyType, mind: profile.essence.mindArchitecture })
     return { path: `/demo?${params.toString()}`, label: path }
   }
 
@@ -258,8 +283,8 @@ export default function IntakePage() {
           <div className="animate-fade-in">
             <h2 className="font-display text-2xl font-bold mb-1">Tell us about yourself</h2>
             <p className="text-white/40 text-sm mb-8">
-              Your birth data helps us calculate your Human Design and Gene Keys — ancient systems
-              that reveal your natural intelligence architecture.
+              Your birth data helps us calculate your intelligence architecture — the foundational
+              blueprint that reveals your natural rhythms, gifts, and growth edges.
             </p>
 
             <div className="space-y-5">
@@ -477,7 +502,7 @@ export default function IntakePage() {
                   {loading ? (
                     <>
                       <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
-                      Reading your design...
+                      Reading your blueprint...
                     </>
                   ) : 'Reveal My Design'}
                 </button>
@@ -489,7 +514,7 @@ export default function IntakePage() {
         {/* ── RESULTS ── */}
         {step === 'results' && profile && (
           <div className="animate-fade-in">
-            {/* Human Design Profile */}
+            {/* Profile Header */}
             <div className="text-center mb-8">
               <div className="w-16 h-16 rounded-full bg-[#c8ff00]/10 border-2 border-[#c8ff00]/30 flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl font-bold text-[#c8ff00]">
@@ -497,82 +522,81 @@ export default function IntakePage() {
                 </span>
               </div>
               <h1 className="font-display text-2xl font-bold mb-1">{data.name}</h1>
-              <p className="text-white/40 text-sm">{profile.humanDesign.type} &bull; {profile.humanDesign.profileName}</p>
+              <p className="text-white/40 text-sm">{profile.rhythm.energyType} &bull; {profile.essence.mindArchitecture}</p>
             </div>
 
             {/* Intelligence Archetype */}
             <div className="glass rounded-sm p-6 mb-6 border border-[#c8ff00]/10 text-center">
               <div className="text-xs text-white/30 tracking-widest uppercase mb-2">Your Intelligence Archetype</div>
               <div className="font-display text-3xl font-bold text-[#c8ff00] mb-2">
-                {profile.recommendation.archetype}
+                {profile.archetype.primary}
               </div>
               <p className="text-sm text-white/50">{profile.recommendation.reason}</p>
             </div>
 
+            {/* Blueprint Scores */}
+            <div className="glass rounded-sm p-5 mb-6">
+              <div className="text-xs text-white/30 tracking-widest uppercase mb-4">Blueprint Scores</div>
+              <div className="space-y-3">
+                {Object.entries(profile.blueprint.scores)
+                  .sort(([,a], [,b]) => b - a)
+                  .map(([key, val]) => (
+                    <div key={key}>
+                      <div className="flex items-center justify-between text-sm mb-1">
+                        <span className="text-white/60 capitalize">{key}</span>
+                        <span className="text-white/40">{val}/100</span>
+                      </div>
+                      <div className="h-1.5 bg-white/[0.06] rounded-full overflow-hidden">
+                        <div className="h-full rounded-full bg-[#c8ff00]" style={{ width: `${val}%` }} />
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            </div>
+
+            {/* Foundation & Rhythm */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-              {/* Type & Strategy */}
               <div className="glass rounded-sm p-5">
-                <div className="text-xs text-white/30 tracking-widest uppercase mb-3">Your Type</div>
-                <div className="text-lg font-semibold text-[#c8ff00] mb-2">{profile.humanDesign.type}</div>
-                <p className="text-sm text-white/50">{profile.humanDesign.strategy}</p>
-              </div>
-
-              {/* Authority */}
-              <div className="glass rounded-sm p-5">
-                <div className="text-xs text-white/30 tracking-widest uppercase mb-3">Your Authority</div>
-                <div className="text-lg font-semibold text-[#00d4ff] mb-2">
-                  {profile.humanDesign.authority.split('—')[0].trim()}
+                <div className="text-xs text-white/30 tracking-widest uppercase mb-3">Core Architecture</div>
+                <div className="text-lg font-semibold text-[#c8ff00] mb-1">{profile.blueprint.foundation.coreArch}</div>
+                <div className="space-y-1 mt-3 text-sm">
+                  <div className="flex justify-between"><span className="text-white/40">Gift</span><span className="text-white/60">{profile.blueprint.foundation.naturalGift}</span></div>
+                  <div className="flex justify-between"><span className="text-white/40">Growth Edge</span><span className="text-white/60">{profile.blueprint.foundation.growthEdge}</span></div>
+                  <div className="flex justify-between"><span className="text-white/40">Energy Type</span><span className="text-white/60">{profile.blueprint.foundation.energyType}</span></div>
                 </div>
-                <p className="text-sm text-white/50">{profile.humanDesign.authority}</p>
+              </div>
+              <div className="glass rounded-sm p-5">
+                <div className="text-xs text-white/30 tracking-widest uppercase mb-3">Operating Rhythm</div>
+                <p className="text-sm text-white/50 mb-3">{profile.blueprint.foundation.operatingRhythm}</p>
+                <div className="space-y-1 text-sm">
+                  <div className="flex justify-between"><span className="text-white/40">Peak Times</span><span className="text-white/60">{profile.rhythm.peakTimes}</span></div>
+                  <div className="flex justify-between"><span className="text-white/40">Recovery</span><span className="text-white/60">{profile.rhythm.recoveryNeed}</span></div>
+                  <div className="flex justify-between"><span className="text-white/40">Current Cycle</span><span className="text-white/60">{profile.timing.currentCycle}</span></div>
+                </div>
               </div>
             </div>
 
-            {/* Profile */}
-            <div className="glass rounded-sm p-5 mb-6">
-              <div className="text-xs text-white/30 tracking-widest uppercase mb-2">Profile</div>
-              <div className="text-lg font-semibold text-[#a78bfa] mb-1">
-                {profile.humanDesign.profile} — {profile.humanDesign.profileName}
+            {/* Decision Style & Communication */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              <div className="glass rounded-sm p-5">
+                <div className="text-xs text-white/30 tracking-widest uppercase mb-3">Decision Style</div>
+                <div className="text-lg font-semibold text-[#00d4ff] mb-2">{profile.essence.decisionStyle}</div>
+                <p className="text-sm text-white/50">{profile.essence.summary}</p>
               </div>
-              <p className="text-sm text-white/50">{profile.humanDesign.profileDesc}</p>
-            </div>
-
-            {/* Gates */}
-            <div className="grid grid-cols-2 gap-4 mb-6">
-              <div className="glass rounded-sm p-4">
-                <div className="text-[10px] text-white/30 tracking-widest uppercase mb-2">Personality Gate</div>
-                <div className="text-lg font-semibold text-[#c8ff00]">Gate {profile.humanDesign.sunGate.number}</div>
-                <div className="text-sm text-white/60">{profile.humanDesign.sunGate.name}</div>
-                <div className="text-xs text-white/30">Keyword: {profile.humanDesign.sunGate.keyword}</div>
-              </div>
-              <div className="glass rounded-sm p-4">
-                <div className="text-[10px] text-white/30 tracking-widest uppercase mb-2">Design Gate</div>
-                <div className="text-lg font-semibold text-[#00d4ff]">Gate {profile.humanDesign.designGate.number}</div>
-                <div className="text-sm text-white/60">{profile.humanDesign.designGate.name}</div>
-                <div className="text-xs text-white/30">Keyword: {profile.humanDesign.designGate.keyword}</div>
+              <div className="glass rounded-sm p-5">
+                <div className="text-xs text-white/30 tracking-widest uppercase mb-3">Communication</div>
+                <div className="text-lg font-semibold text-[#fb923c] mb-2">{profile.essence.communicationStyle}</div>
+                <div className="space-y-1 text-sm mt-2">
+                  <div className="flex justify-between"><span className="text-white/40">Creative Style</span><span className="text-white/60">{profile.essence.creativityStyle}</span></div>
+                  <div className="flex justify-between"><span className="text-white/40">Pattern</span><span className="text-white/60">{profile.essence.emotionalPattern}</span></div>
+                </div>
               </div>
             </div>
 
-            {/* Gene Keys Insights */}
-            <div className="glass rounded-sm p-5 mb-6">
-              <div className="text-xs text-white/30 tracking-widest uppercase mb-3">Gene Keys Insights</div>
-              <div className="mb-3">
-                <span className="text-sm text-[#c8ff00] font-medium">Primary: {profile.geneKeys.primaryGeneKey}</span>
-                <span className="text-xs text-white/30 ml-2">— {profile.geneKeys.primaryKeyword}</span>
-              </div>
-              <div className="space-y-2">
-                {profile.geneKeys.insights.map((insight, i) => (
-                  <div key={i} className="flex items-start gap-2 text-sm text-white/50">
-                    <span className="text-[#c8ff00] mt-0.5">✦</span>
-                    {insight}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Birth Insight */}
+            {/* Summary */}
             <div className="glass rounded-sm p-5 mb-8 border border-white/[0.06]">
-              <div className="text-xs text-white/30 tracking-widest uppercase mb-2">Birth Insight</div>
-              <p className="text-sm text-white/50 italic">{profile.geneKeys.birthInsight}</p>
+              <div className="text-xs text-white/30 tracking-widest uppercase mb-2">Blueprint Summary</div>
+              <p className="text-sm text-white/50 leading-relaxed">{profile.blueprint.summary}</p>
             </div>
 
             {/* CTA */}
@@ -587,7 +611,7 @@ export default function IntakePage() {
                 Enter Your {determinePath().label} Ecosystem →
               </a>
               <p className="text-xs text-white/20 mt-3">
-                Your design data will be shared with Zuri for a personalized experience
+                Your profile will be shared with Zuri for a personalized experience
               </p>
             </div>
           </div>

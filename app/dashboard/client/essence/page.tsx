@@ -161,13 +161,14 @@ function EssenceIntelligencePage() {
               const s = intakeData.intake.sections
               const parts: string[] = []
               if (s.personal) parts.push(`Name: ${s.personal.name}, DOB: ${s.personal.dob}`)
-              if (s.results?.humanDesign) {
-                const hd = s.results.humanDesign
-                parts.push(`Human Design: ${hd.type}, Profile: ${hd.profile} ${hd.profileName}, Authority: ${hd.authority.split('—')[0].trim()}`)
-                parts.push(`Archetype: ${hd.archetype}, Sun Gate: Gate ${hd.sunGate?.number} (${hd.sunGate?.name}), Design Gate: Gate ${hd.designGate?.number} (${hd.designGate?.name})`)
+              if (s.results?.blueprint) {
+                const bp = s.results.blueprint
+                parts.push(`Blueprint: ${bp.archetype}, Energy Type: ${bp.foundation?.energyType || ''}, Core Architecture: ${bp.foundation?.coreArch || ''}`)
+                parts.push(`Natural Gift: ${bp.foundation?.naturalGift || ''}, Growth Edge: ${bp.foundation?.growthEdge || ''}`)
               }
-              if (s.results?.geneKeys) {
-                parts.push(`Gene Keys: ${s.results.geneKeys.primaryGeneKey} (${s.results.geneKeys.primaryKeyword})`)
+              if (s.results?.essence) {
+                const es = s.results.essence
+                parts.push(`Mind Architecture: ${es.mindArchitecture || ''}, Decision Style: ${es.decisionStyle || ''}, Communication: ${es.communicationStyle || ''}`)
               }
               if (s.results?.recommendation) {
                 parts.push(`Suggested Path: ${s.results.recommendation.suggestedPath}`)

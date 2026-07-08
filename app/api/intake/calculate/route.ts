@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-// ── Human Design Calculation Engine ──────────────────────────
+// ── EE Core Engine ─────────────────────────────────────────────
+// Calculates the user's foundational profile from birth data.
+// Uses gate/degree mathematics internally but outputs EE proprietary domains.
 // Gates 1-64 map to specific degrees of the ecliptic (each ~5.625°)
-// Gate 1 (Creativity) starts at ~0° Aries (Vernal Equinox)
 
 const GATES: Record<number, { name: string; hexagram: number; geneKey: string; keyword: string }> = {
   1:  { name: 'Creativity', hexagram: 1, geneKey: 'The Creative', keyword: 'Self-Expression' },
@@ -169,7 +170,7 @@ function getProfile(sunGate: number): { profile: string; name: string; desc: str
   return profiles[(sunGate - 1) % profiles.length]
 }
 
-function getGeneKeysInsights(gate: number): string[] {
+function getGateInsights(gate: number): string[] {
   const insights: Record<number, string[]> = {
     1:  ['Your gift is creativity — you bring new forms into existence.', 'Shadow: Chaos when your creative energy has no outlet.', 'Siddhi: Pure self-expression that inspires others.'],
     2:  ['You have a natural magnetism that draws the right resources.', 'Shadow: Withdrawal when you feel unsupported.', 'Siddhi: Unshakeable alignment with your path.'],
@@ -252,39 +253,66 @@ export async function POST(req: NextRequest) {
     const authority = getAuthority(type)
     const profile = getProfile(sunGate)
     const archetype = getArchetypeRecommendation(sunGate)
-    const geneKeyInsights = getGeneKeysInsights(sunGate)
     const birthMonthInsight = getBirthMonthInsight(birthDate.getUTCMonth() + 1)
 
+    // ── Calculate EE domain scores from gate data ──
+    const visionaryScore   = Math.min(100, Math.round(50 + (sunGate * 0.8)))
+    const buildingScore    = Math.min(100, Math.round(50 + (designGate * 0.7)))
+    const connectingScore  = Math.min(100, Math.round(40 + ((64 - sunGate) * 0.9)))
+    const analyzingScore   = Math.min(100, Math.round(45 + (Math.abs(sunGate - designGate) * 1.2)))
+    const leadingScore     = Math.min(100, Math.round(50 + ((sunGate + designGate) * 0.4)))
+    const creatingScore    = Math.min(100, Math.round(55 + ((64 - designGate) * 0.6)))
+
+    const summary = `Your profile reveals a ${profile.name} operating pattern with a natural gift for ${sunGateInfo.keyword}. Your growth edge lies in ${designGateInfo.name}. As a ${archetype}, you thrive when you follow your ${type.toLowerCase()} energy rhythm.`
+
     return NextResponse.json({
-      humanDesign: {
-        type,
-        strategy,
-        authority,
-        profile: profile.profile,
-        profileName: profile.name,
-        profileDesc: profile.desc,
-        profileNum: profile.profile,
-        sunGate: { number: sunGate, ...sunGateInfo },
-        designGate: { number: designGate, ...designGateInfo },
-        definedGates: [sunGate, designGate],
+      blueprint: {
         archetype,
+        completeness: 65,
+        foundation: {
+          coreArch: profile.name,
+          naturalGift: sunGateInfo.keyword,
+          growthEdge: designGateInfo.name,
+          energyType: type,
+          operatingRhythm: strategy,
+        },
+        scores: {
+          visionary: visionaryScore,
+          building: buildingScore,
+          connecting: connectingScore,
+          analyzing: analyzingScore,
+          leading: leadingScore,
+          creating: creatingScore,
+        },
+        summary,
       },
-      geneKeys: {
-        primaryGate: sunGate,
-        primaryGeneKey: sunGateInfo?.geneKey,
-        primaryKeyword: sunGateInfo?.keyword,
-        insights: geneKeyInsights,
-        birthInsight: birthMonthInsight,
+      essence: {
+        mindArchitecture: profile.name,
+        decisionStyle: authority.split('—')[0].trim(),
+        communicationStyle: sunGateInfo.name,
+        emotionalPattern: designGateInfo.geneKey,
+        creativityStyle: sunGateInfo.keyword,
+        summary: profile.desc,
+      },
+      archetype: {
+        primary: archetype,
+        avatar: archetype.toLowerCase().replace(/\s+/g, '_'),
+        description: profile.desc,
+        domains: [archetype.toLowerCase(), 'growth', 'creation', 'connection'],
+      },
+      rhythm: {
+        energyType: type,
+        peakTimes: sunGate <= 32 ? 'Late morning, early evening' : 'Afternoon, late night',
+        recoveryNeed: designGate <= 32 ? 'Solitude and quiet reflection' : 'Social connection and movement',
+      },
+      timing: {
+        personalYear: ((sunGate % 9) + 9) % 9 + 1,
+        currentCycle: (['New Beginnings', 'Growth', 'Expansion', 'Integration', 'Transformation', 'Re-evaluation', 'Depth', 'Harvest', 'Completion'])[((sunGate % 9) + 9) % 9],
       },
       recommendation: {
         archetype,
         suggestedPath: getSuggestedPath(type, roleType, sellTo, offerType, personalType).path,
-        reason: `Based on your Human Design (${type}, ${profile.profile}) and your preference for ${
-          roleType === 'creator' ? 'building and selling AI' :
-          roleType === 'client' ? 'using ready-made AI solutions' :
-          roleType === 'both' ? 'both creating and using AI' :
-          'exploring AI possibilities'
-        }, the ${archetype} path is your best fit.`,
+        reason: `Based on your ${archetype} profile and your ${roleType === 'creator' ? 'builder' : roleType === 'client' ? 'strategic' : 'balanced'} orientation, the path best aligned with your natural rhythm is the ${archetype} archetype.`,
       },
     })
 
@@ -293,21 +321,25 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       error: 'Failed to calculate intelligence profile',
       fallback: {
-        humanDesign: {
-          type: 'Generator',
-          strategy: 'Wait to respond. Let life bring opportunities to you before investing your energy.',
-          authority: 'Sacral Authority — trust your gut response.',
-          profile: '1/3',
-          profileName: 'Investigative Martyr',
-          profileDesc: 'You learn through deep research and trial & error.',
+        blueprint: {
           archetype: 'Innovator',
+          completeness: 35,
+          foundation: { coreArch: 'Explorer', naturalGift: 'Spontaneity', growthEdge: 'Patience', energyType: 'Generator', operatingRhythm: 'Respond and Build' },
+          scores: { visionary: 65, building: 58, connecting: 62, analyzing: 55, leading: 60, creating: 68 },
+          summary: 'Your profile reveals an Explorer operating pattern with a gift for spontaneity.',
         },
-        geneKeys: {
-          primaryGate: 25,
-          primaryGeneKey: 'Innocence',
-          insights: ['Your spontaneity is your superpower.', 'Trust your natural curiosity.', 'You bring fresh energy wherever you go.'],
-          birthInsight: 'You are uniquely positioned to bring something new into the world.',
+        essence: {
+          mindArchitecture: 'Explorer', decisionStyle: 'Sacral Authority', communicationStyle: 'Creativity',
+          emotionalPattern: 'Innocence', creativityStyle: 'Self-Expression',
+          summary: 'You learn through deep exploration and active engagement.',
         },
+        archetype: {
+          primary: 'Innovator', avatar: 'innovator', description: 'You learn through deep exploration.',
+          domains: ['innovator', 'growth', 'creation', 'connection'],
+        },
+        rhythm: { energyType: 'Generator', peakTimes: 'Late morning, early evening', recoveryNeed: 'Solitude and quiet' },
+        timing: { personalYear: 7, currentCycle: 'Growth' },
+        recommendation: { archetype: 'Innovator', suggestedPath: 'Client', reason: 'Based on your Innovator profile and balanced orientation...' },
       },
     }, { status: 200 })
   }

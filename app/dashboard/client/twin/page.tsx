@@ -172,15 +172,15 @@ export default function ClientTwinPage() {
         setTrainings(meta.trainings ?? [])
       }
 
-      // Fetch intake / HD profile
+      // Fetch intake / EE profile
       const { data: clientRec } = await supabase
         .from('clients')
         .select('metadata')
         .eq('id', user.id)
         .maybeSingle()
       const intakeMeta = (clientRec?.metadata as Record<string, any>)?.intake?.sections
-      setHdProfile(intakeMeta?.results?.humanDesign ?? null)
-      setGkProfile(intakeMeta?.results?.geneKeys ?? null)
+      setHdProfile(intakeMeta?.results?.blueprint ?? null)
+      setGkProfile(intakeMeta?.results?.essence ?? null)
 
       setLoading(false)
     }
@@ -513,27 +513,31 @@ export default function ClientTwinPage() {
                   {hdProfile ? (
                     <div className="space-y-1.5">
                       <div className="flex items-center justify-between text-sm">
-                        <span className="text-white/50">Human Design Type</span>
-                        <span className="text-[#c8ff00] font-medium">{hdProfile.type}</span>
-                      </div>
-                      <div className="flex items-center justify-between text-sm">
                         <span className="text-white/50">Archetype</span>
-                        <span className="text-white font-medium">{hdProfile.archetype ?? '—'}</span>
+                        <span className="text-[#c8ff00] font-medium">{hdProfile.archetype ?? '—'}</span>
                       </div>
                       <div className="flex items-center justify-between text-sm">
-                        <span className="text-white/50">Profile</span>
-                        <span className="text-[#a78bfa] font-medium">{hdProfile.profile} {hdProfile.profileName ?? ''}</span>
+                        <span className="text-white/50">Core Architecture</span>
+                        <span className="text-white font-medium">{hdProfile.foundation?.coreArch ?? '—'}</span>
                       </div>
-                      {hdProfile.sunGate && (
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-white/50">Energy Type</span>
+                        <span className="text-[#a78bfa] font-medium">{hdProfile.foundation?.energyType ?? '—'}</span>
+                      </div>
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-white/50">Natural Gift</span>
+                        <span className="text-white/70">{hdProfile.foundation?.naturalGift ?? '—'}</span>
+                      </div>
+                      {hdProfile.foundation?.growthEdge && (
                         <div className="flex items-center justify-between text-sm">
-                          <span className="text-white/50">Sun Gate</span>
-                          <span className="text-white/70">Gate {hdProfile.sunGate.number} — {hdProfile.sunGate.name}</span>
+                          <span className="text-white/50">Growth Edge</span>
+                          <span className="text-[#00d4ff] font-medium">{hdProfile.foundation.growthEdge}</span>
                         </div>
                       )}
                       {gkProfile && (
                         <div className="flex items-center justify-between text-sm">
-                          <span className="text-white/50">Gene Key</span>
-                          <span className="text-[#00d4ff] font-medium">{gkProfile.primaryGeneKey}</span>
+                          <span className="text-white/50">Mind Architecture</span>
+                          <span className="text-[#fb923c] font-medium">{gkProfile.mindArchitecture ?? '—'}</span>
                         </div>
                       )}
                     </div>
@@ -871,7 +875,7 @@ export default function ClientTwinPage() {
                 value={instructions}
                 onChange={e => setInstructions(e.target.value)}
                 rows={6}
-                placeholder="e.g. Always consider the user's Human Design type before making recommendations. Prioritize strategic alignment over speed. Never share raw personality scores with third parties..."
+                placeholder="e.g. Always consider the user's Blueprint archetype before making recommendations. Prioritize strategic alignment over speed. Never share raw personality scores with third parties..."
                 className="w-full px-3 py-2.5 bg-white/[0.04] border border-white/10 rounded-sm text-sm text-white/70 focus:outline-none focus:border-[#c8ff00]/40 resize-none"
               />
               <div className="flex justify-end mt-3">

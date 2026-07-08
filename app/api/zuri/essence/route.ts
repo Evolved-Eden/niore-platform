@@ -158,14 +158,11 @@ function generateLocal(userRole: string, context: string, scores?: Record<string
 
   // 4. Context-aware suggestions
   if (context) {
-    if (context.toLowerCase().includes('human design') || context.toLowerCase().includes('profile')) {
-      const profileMatch = context.match(/Profile:\s*(\d\/\d)/)
-      if (profileMatch) {
-        items.push({ type: 'opportunity', content: `Your ${profileMatch[1]} profile benefits from collaborative input today`, priority: 'low' })
-      }
+    if (context.toLowerCase().includes('archetype') || context.toLowerCase().includes('gift')) {
+      items.push({ type: 'growth', content: 'Lean into your natural gifts today — they are your edge', priority: 'low' })
     }
-    if (context.toLowerCase().includes('gene key') || context.toLowerCase().includes('geneKeys')) {
-      items.push({ type: 'growth', content: 'Explore your Gene Keys shadow-to-gift transformation path', priority: 'low' })
+    if (context.toLowerCase().includes('gene key') || context.toLowerCase().includes('human design') || context.toLowerCase().includes('sun gate')) {
+      items.push({ type: 'growth', content: 'Your intelligence blueprint reveals patterns worth exploring today', priority: 'low' })
     }
   }
 

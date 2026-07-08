@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
     .from('canonical_agent_map')
     .select('*')
     .eq('slug', 'zuri')
-    .single()
+    .maybeSingle()
 
   // Fetch recent AI memories for this user
   const { data: memories } = await supabase

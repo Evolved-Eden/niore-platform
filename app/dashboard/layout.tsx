@@ -10,8 +10,9 @@ const NAV: Record<UserRole, { label: string; href: string }[]> = {
   client: [
     { label: 'Overview',     href: '/dashboard/client' },
     { label: 'Profile',      href: '/dashboard/client/profile' },
+    { label: 'Intake',       href: '/intake' },
     { label: 'Blueprint',    href: '/dashboard/client/blueprint' },
-    { label: 'Guided',       href: '/dashboard/client/blueprint/assess' },
+    { label: 'Assessment',   href: '/dashboard/client/blueprint/assess' },
     { label: 'Essence Intel',href: '/dashboard/client/essence' },
     { label: 'My Agents',    href: '/dashboard/client/agents' },
     { label: 'My Swarms',    href: '/dashboard/client/swarms' },

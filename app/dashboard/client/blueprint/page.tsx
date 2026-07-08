@@ -262,14 +262,22 @@ export default function ClientBlueprintPage() {
             <>
               {/* Score Overview */}
               <div className="glass rounded-sm p-6">
-                <div className="flex items-center justify-between mb-6">
+                <div className="flex items-start justify-between mb-6">
                   <div>
                     <div className="text-xs text-white/30 tracking-widest uppercase">Blueprint Score</div>
                     <div className="text-4xl font-bold text-[#c8ff00] mt-1">{blueprint.overallScore}</div>
                   </div>
-                  <div className="text-right">
-                    <div className="text-xs text-white/30 tracking-widest uppercase">Archetype</div>
-                    <div className="text-sm text-white/70 mt-1">{blueprint.archetype}</div>
+                  <div className="text-right flex flex-col items-end gap-2">
+                    <div>
+                      <div className="text-xs text-white/30 tracking-widest uppercase">Archetype</div>
+                      <div className="text-sm text-white/70 mt-1">{blueprint.archetype}</div>
+                    </div>
+                    <Link
+                      href="/dashboard/client/blueprint/assess"
+                      className="text-[10px] font-bold px-3 py-1.5 rounded-sm border border-[#c8ff00]/40 text-[#c8ff00] hover:bg-[#c8ff00]/10 transition-all"
+                    >
+                      Edit Blueprint →
+                    </Link>
                   </div>
                 </div>
 
@@ -508,7 +516,10 @@ export default function ClientBlueprintPage() {
               → Ask Zuri
             </Link>
             <Link href="/dashboard/client/blueprint/assess" className="block text-xs text-white/40 hover:text-white/70 transition-colors">
-              → Re-take Assessment
+              → Edit / Re-take Assessment
+            </Link>
+            <Link href="/intake" className="block text-xs text-white/40 hover:text-white/70 transition-colors">
+              → Intake & Profile
             </Link>
             <Link href="/pricing" className="block text-xs text-white/40 hover:text-white/70 transition-colors">
               → Upgrade Plan

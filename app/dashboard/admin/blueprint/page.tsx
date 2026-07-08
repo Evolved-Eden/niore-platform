@@ -55,13 +55,31 @@ export default function AdminBlueprintPage() {
         }
       }
 
-      // Check intake
+      // Check intake & fallback to intake blueprint data
       const { data: clientRec } = await supabase
         .from('clients')
         .select('metadata')
         .eq('id', user.id)
         .maybeSingle()
-      setHasIntake(!!clientRec?.metadata?.intake)
+      const intakeMeta = clientRec?.metadata as Record<string, any> | undefined
+      setHasIntake(!!intakeMeta?.intake)
+
+      // Fallback: use intake results if twin blueprint not found
+      if (!blueprint && intakeMeta?.intake?.sections?.results?.blueprint) {
+        const bp = intakeMeta.intake.sections.results.blueprint
+        const scores = bp.scores || {}
+        setBlueprint({
+          overallScore: Object.values(scores).length > 0
+            ? Math.round(Object.values(scores).reduce((a: number, b: any) => a + b, 0) / Object.keys(scores).length)
+            : 0,
+          archetype: bp.archetype || 'Integrator',
+          scores,
+          summary: bp.summary || '',
+          recommended_agents: [],
+          intake_role: '',
+        })
+      }
+
       setLoading(false)
     }
     load()

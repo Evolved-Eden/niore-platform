@@ -255,7 +255,7 @@ export default function IntakePage() {
               </svg>
             </div>
             <h1 className="font-display text-3xl font-bold tracking-tight mb-3">
-              Discover Your Intelligence <span className="text-[#c8ff00]">Blueprint</span>
+              Welcome to Your <span className="text-[#c8ff00]">Intelligence</span> Discovery
             </h1>
             <p className="text-white/40 leading-relaxed mb-8 max-w-md mx-auto">
               Before we begin, let us understand who you are. Share a few details about yourself,
@@ -283,8 +283,8 @@ export default function IntakePage() {
           <div className="animate-fade-in">
             <h2 className="font-display text-2xl font-bold mb-1">Tell us about yourself</h2>
             <p className="text-white/40 text-sm mb-8">
-              Your birth data helps us calculate your intelligence architecture — the foundational
-              blueprint that reveals your natural rhythms, gifts, and growth edges.
+              Your birth data helps us map your natural intelligence architecture — revealing your
+              natural rhythms, gifts, and growth edges.
             </p>
 
             <div className="space-y-5">
@@ -502,9 +502,9 @@ export default function IntakePage() {
                   {loading ? (
                     <>
                       <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
-                      Reading your blueprint...
+                      Reading your profile...
                     </>
-                  ) : 'Reveal My Design'}
+                  ) : 'Reveal My Profile'}
                 </button>
               </div>
             </div>

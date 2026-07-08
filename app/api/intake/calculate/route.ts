@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createAdminClient } from '@/lib/supabase/server'
 
 // ── EE Core Engine ─────────────────────────────────────────────
 // Calculates the user's foundational profile from birth data.
@@ -265,7 +266,7 @@ export async function POST(req: NextRequest) {
 
     const summary = `Your profile reveals a ${profile.name} operating pattern with a natural gift for ${sunGateInfo.keyword}. Your growth edge lies in ${designGateInfo.name}. As a ${archetype}, you thrive when you follow your ${type.toLowerCase()} energy rhythm.`
 
-    return NextResponse.json({
+    const result = {
       blueprint: {
         archetype,
         completeness: 65,
@@ -314,7 +315,45 @@ export async function POST(req: NextRequest) {
         suggestedPath: getSuggestedPath(type, roleType, sellTo, offerType, personalType).path,
         reason: `Based on your ${archetype} profile and your ${roleType === 'creator' ? 'builder' : roleType === 'client' ? 'strategic' : 'balanced'} orientation, the path best aligned with your natural rhythm is the ${archetype} archetype.`,
       },
-    })
+    }
+
+    // ── Persist results to DB ──
+    try {
+      const supabase = await createAdminClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        const { data: existing } = await supabase
+          .from('clients')
+          .select('metadata')
+          .eq('id', user.id)
+          .maybeSingle()
+        const existingMeta = (existing?.metadata as Record<string, any>) ?? {}
+        const intake = {
+          ...(existingMeta.intake || {}),
+          sections: {
+            ...((existingMeta.intake as any)?.sections || {}),
+            results: {
+              ...result,
+              saved_at: new Date().toISOString(),
+            },
+          },
+          last_section: 'results',
+          updated_at: new Date().toISOString(),
+        }
+
+        await supabase
+          .from('clients')
+          .upsert({
+            id: user.id,
+            metadata: { ...existingMeta, intake },
+            updated_at: new Date().toISOString(),
+          } as any, { onConflict: 'id' })
+      }
+    } catch (dbErr) {
+      console.error('Failed to persist intake results:', dbErr)
+    }
+
+    return NextResponse.json(result)
 
   } catch (err) {
     console.error('Intake calculation error:', err)

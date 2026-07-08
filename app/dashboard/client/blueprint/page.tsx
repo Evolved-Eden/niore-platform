@@ -144,6 +144,23 @@ export default function ClientBlueprintPage() {
         if (meta.purchased_domains) setPurchasedDomains(new Set(meta.purchased_domains))
       }
 
+      // Fallback: use intake results as blueprint data if no twin blueprint exists
+      if (!blueprint && intakeSections?.results?.blueprint) {
+        const bp = intakeSections.results.blueprint
+        const scores = bp.scores || {}
+        const overallScore = Object.values(scores).length > 0
+          ? Math.round(Object.values(scores).reduce((a: number, b: any) => a + b, 0) / Object.keys(scores).length)
+          : 0
+        setBlueprint({
+          overallScore,
+          archetype: bp.archetype || 'Custom',
+          scores,
+          summary: bp.summary || '',
+          recommended_agents: [],
+          intake_role: intakeSections.results?.essence?.mindArchitecture || 'client',
+        })
+      }
+
       setLoading(false)
     }
     load()

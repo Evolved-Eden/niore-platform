@@ -73,10 +73,16 @@ export async function POST(req: NextRequest) {
       updates.client_type = roleMap[data.roleType as string] || 'individual'
     }
 
+    // Use upsert so a clients row is created if it doesn't exist yet
+    const upsertPayload = {
+      id: user.id,
+      ...updates,
+      updated_at: new Date().toISOString(),
+    }
+
     const { error } = await supabase
       .from('clients')
-      .update(updates as any)
-      .eq('id', user.id)
+      .upsert(upsertPayload as any, { onConflict: 'id' })
 
     if (error) throw error
 

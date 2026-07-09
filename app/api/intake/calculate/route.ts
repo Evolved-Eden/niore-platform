@@ -353,6 +353,44 @@ export async function POST(req: NextRequest) {
       console.error('Failed to persist intake results:', dbErr)
     }
 
+    // ── Also create/update the client_twin with blueprint data ──
+    try {
+      const supabase = await createAdminClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        const { data: existingTwin } = await supabase
+          .from('client_twins')
+          .select('id, metadata')
+          .eq('client_id', user.id)
+          .maybeSingle()
+        const twinMeta = (existingTwin?.metadata as Record<string, any>) ?? {}
+        await supabase
+          .from('client_twins')
+          .upsert({
+            id: existingTwin?.id ?? undefined,
+            client_id: user.id,
+            name: name || user.email?.split('@')[0] || 'User',
+            metadata: {
+              ...twinMeta,
+              blueprint: {
+                core: {
+                  overallScore: Math.round(Object.values(result.blueprint.scores).reduce((a, b) => a + b, 0) / Object.keys(result.blueprint.scores).length),
+                  archetype: result.blueprint.archetype,
+                  scores: result.blueprint.scores,
+                  summary: result.blueprint.summary,
+                  recommended_agents: [],
+                },
+                intake: {
+                  role: result.recommendation.suggestedPath?.toLowerCase() || 'client',
+                },
+              },
+            },
+          } as any, { onConflict: 'id' })
+      }
+    } catch (twinErr) {
+      console.error('Failed to create twin blueprint:', twinErr)
+    }
+
     return NextResponse.json(result)
 
   } catch (err) {

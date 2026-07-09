@@ -199,6 +199,23 @@ export default function IntakePage() {
     setLoading(false)
   }
 
+  async function finishIntake() {
+    // Save results, generate essence, show complete step
+    const profileResult = profile
+    if (profileResult) {
+      saveSection('results', profileResult)
+      // Trigger essence generation in background
+      if (user) {
+        fetch('/api/zuri/essence', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: user.id, userRole: userRole || 'client' }),
+        }).catch(() => {})
+      }
+    }
+    setStep('complete')
+  }
+
   function determinePath(): { path: string; label: string } {
     if (!profile) return { path: '/demo', label: 'Creator' }
     const path = profile.recommendation?.suggestedPath ?? 'Creator'
@@ -604,16 +621,48 @@ export default function IntakePage() {
               <p className="text-sm text-white/40 mb-4">
                 Now let Zuri show you what your personalized intelligence ecosystem looks like.
               </p>
-              <a
-                href={determinePath().path}
+              <button
+                onClick={() => finishIntake()}
                 className="inline-block px-8 py-3.5 bg-[#c8ff00] text-black font-bold text-sm rounded-sm hover:bg-white transition-all glow-acid"
               >
-                Enter Your {determinePath().label} Ecosystem →
-              </a>
-              <p className="text-xs text-white/20 mt-3">
-                Your profile will be shared with Zuri for a personalized experience
-              </p>
+                Complete & Enter Your Ecosystem →
+              </button>
             </div>
+          </div>
+        )}
+
+        {/* ── COMPLETE ── */}
+        {step === 'complete' && (
+          <div className="text-center animate-fade-in">
+            <div className="w-16 h-16 rounded-full bg-[#c8ff00]/10 border-2 border-[#c8ff00]/30 flex items-center justify-center mx-auto mb-6">
+              <span className="text-3xl text-[#c8ff00]">✓</span>
+            </div>
+            <h1 className="font-display text-3xl font-bold mb-3">
+              Intake <span className="text-[#c8ff00]">Complete</span>
+            </h1>
+            <p className="text-white/40 leading-relaxed mb-8 max-w-md mx-auto">
+              Your profile has been saved. Zuri is synthesizing your intelligence blueprint
+              to deliver personalized insights.
+            </p>
+            <div className="glass rounded-sm p-6 mb-8 text-left max-w-sm mx-auto space-y-3">
+              {[
+                'Intelligence profile calculated',
+                'Blueprint data saved',
+                'Zuri essence being generated',
+                'Dashboard access activated',
+              ].map(item => (
+                <div key={item} className="flex items-center gap-3 text-sm text-white/60">
+                  <span className="text-[#c8ff00]">✓</span>
+                  {item}
+                </div>
+              ))}
+            </div>
+            <a
+              href={determinePath().path}
+              className="inline-block px-8 py-3.5 bg-[#c8ff00] text-black font-bold text-sm rounded-sm hover:bg-white transition-all glow-acid"
+            >
+              Enter Your {determinePath().label} Ecosystem →
+            </a>
           </div>
         )}
       </div>

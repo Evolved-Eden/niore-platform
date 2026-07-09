@@ -139,8 +139,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
       const paidAccess = status === 'active' && hasAnyPlan
       const isTestAccount = clientRecord?.metadata?.is_test_account === true
       const isOnboarding = ['onboarding', 'pending', 'pending_approval'].includes(status)
+      const hasIntakeData = !!clientRecord?.metadata?.intake?.sections?.results
 
-      if (!paidAccess && !approvedByAdmin && !isTestAccount && !isOnboarding) {
+      if (!paidAccess && !approvedByAdmin && !isTestAccount && !isOnboarding && !hasIntakeData) {
         const requestedPlan = typeof clientRecord?.metadata?.requested_plan_tier_key === 'string' ? clientRecord.metadata.requested_plan_tier_key : ''
         if (requestedPlan && requestedPlan !== 'personal_free') {
           redirect(`/onboarding?tier=${encodeURIComponent(requestedPlan)}&reason=payment_required`)

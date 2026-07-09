@@ -242,7 +242,6 @@ function BlueprintAssessContent() {
       setUser(user ?? null)
 
       // Detect purchased system from client record
-      let hasActivePlan = false
       if (user) {
         const { data: client } = await supabase
           .from('clients')
@@ -251,10 +250,7 @@ function BlueprintAssessContent() {
           .maybeSingle()
 
         if (client?.plan_tier_key) {
-          const meta = (client?.metadata as Record<string, any>) ?? {}
-          const isTrial = meta?.is_trial === true
           setUserTier(client.plan_tier_key)
-          hasActivePlan = client.status === 'active'
         }
         // Also check metadata for system info (from free trial / provision)
         const meta = (client?.metadata as Record<string, any>) ?? {}
@@ -264,17 +260,6 @@ function BlueprintAssessContent() {
       }
 
       setCheckingAuth(false)
-
-      // Guard: Blueprint assess is only for users with an active plan.
-      // Redirect unauthenticated or non-paying users to intake.
-      if (!user) {
-        router.replace('/intake')
-        return
-      }
-      if (!hasActivePlan) {
-        router.replace('/dashboard')
-        return
-      }
     }
     checkAuth()
   }, [router])

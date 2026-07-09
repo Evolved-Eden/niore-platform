@@ -317,7 +317,7 @@ export async function POST(req: NextRequest) {
       },
     }
 
-    // ── Persist results to DB ──
+    // ── Persist ALL intake data to DB ──
     try {
       const supabase = await createAdminClient()
       const { data: { user } } = await supabase.auth.getUser()
@@ -328,10 +328,28 @@ export async function POST(req: NextRequest) {
           .eq('id', user.id)
           .maybeSingle()
         const existingMeta = (existing?.metadata as Record<string, any>) ?? {}
+
+        // Build full intake object with personal, role, and results sections
         const intake = {
           ...(existingMeta.intake || {}),
           sections: {
             ...((existingMeta.intake as any)?.sections || {}),
+            personal: {
+              name: name || '',
+              email: email || '',
+              dob: dob || '',
+              birthTime: birthTime || '',
+              birthLocation: birthLocation || '',
+              birthTimezone: birthTimezone || '',
+              saved_at: new Date().toISOString(),
+            },
+            role: {
+              sellTo: sellTo || '',
+              roleType: roleType || '',
+              personalType: personalType || '',
+              offerType: offerType || '',
+              saved_at: new Date().toISOString(),
+            },
             results: {
               ...result,
               saved_at: new Date().toISOString(),
@@ -345,6 +363,8 @@ export async function POST(req: NextRequest) {
           .from('clients')
           .upsert({
             id: user.id,
+            full_name: name || existingMeta.full_name,
+            email: email || undefined,
             metadata: { ...existingMeta, intake },
             updated_at: new Date().toISOString(),
           } as any, { onConflict: 'id' })

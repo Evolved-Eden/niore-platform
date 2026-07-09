@@ -180,17 +180,25 @@ export default function AdminBlueprintPage() {
                 )}
               </div>
             ) : (
-              <div className="px-6 py-8 text-center">
+              <div className="px-6 py-8 text-center space-y-4">
                 <div className="text-3xl mb-3 opacity-30">◆</div>
-                <p className="text-white/30 text-sm mb-4">No blueprint profile yet</p>
-                {!hasIntake && (
+                <p className="text-white/30 text-sm">No blueprint profile yet</p>
+                <div className="flex flex-wrap justify-center gap-3">
                   <Link
-                    href="/dashboard/admin/essence"
-                    className="inline-flex px-4 py-2 rounded-sm text-sm bg-white/[0.06] hover:bg-white/[0.1] text-white/60 hover:text-white transition-colors"
+                    href="/blueprint/assess"
+                    className="inline-flex px-5 py-2.5 rounded-sm text-sm font-bold bg-[#ff6b6b] text-white hover:bg-[#ff6b6b]/80 transition-colors"
                   >
-                    Start with Essence Board
+                    Take Blueprint Assessment →
                   </Link>
-                )}
+                  {!hasIntake && (
+                    <Link
+                      href="/dashboard/admin/essence"
+                      className="inline-flex px-4 py-2.5 rounded-sm text-sm bg-white/[0.06] hover:bg-white/[0.1] text-white/60 hover:text-white transition-colors"
+                    >
+                      Start with Essence Board
+                    </Link>
+                  )}
+                </div>
               </div>
             )}
           </div>
@@ -198,6 +206,15 @@ export default function AdminBlueprintPage() {
 
         {/* Sidebar */}
         <div className="space-y-4">
+          {blueprint && (
+            <Link
+              href="/blueprint/assess"
+              className="block p-4 rounded-sm glass-hover border border-[#ff6b6b]/20 hover:border-[#ff6b6b]/40 transition-colors"
+            >
+              <div className="text-xs text-[#ff6b6b] tracking-widest uppercase mb-1">Re-Assess</div>
+              <div className="text-sm text-white/60">Update your blueprint →</div>
+            </Link>
+          )}
           <Link
             href="/dashboard/admin/essence"
             className="block p-4 rounded-sm glass-hover border border-white/[0.06] hover:border-white/[0.12] transition-colors"

@@ -233,13 +233,16 @@ function UploadStep({ onNext, userId }: { onNext: () => void; userId: string }) 
       if (!error) {
         setUploaded(u => [...u, file.name])
         // Log to knowledge_base
-        await supabase.from('knowledge_base').insert({
+        const { error: dbErr } = await supabase.from('knowledge_base').insert({
           organization_id: userId,
           title: file.name,
           content: `Onboarding upload: ${file.name}`,
           source_type: 'onboarding_upload',
           metadata: { storage_path: path, upload_type: 'onboarding' },
         } as any)
+        if (dbErr) {
+          console.warn('knowledge_base insert skipped:', dbErr.message)
+        }
       }
     }
 

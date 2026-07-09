@@ -353,6 +353,31 @@ export async function POST(req: NextRequest) {
       console.error('Failed to persist intake results:', dbErr)
     }
 
+    // ── Ensure user has an organization (for vault/knowledge_base FK) ──
+    try {
+      const supabase = await createAdminClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        const { data: existingOrg } = await supabase
+          .from('organizations')
+          .select('id')
+          .eq('id', user.id)
+          .maybeSingle()
+        if (!existingOrg) {
+          await supabase
+            .from('organizations')
+            .insert({
+              id: user.id,
+              name: name || user.email?.split('@')[0] || 'User',
+              owner_id: user.id,
+              status: 'active',
+            } as any)
+        }
+      }
+    } catch (orgErr) {
+      console.error('Failed to ensure organization:', orgErr)
+    }
+
     // ── Also create/update the client_twin with blueprint data ──
     try {
       const supabase = await createAdminClient()

@@ -73,7 +73,11 @@ export default function ClientVault() {
     } as any)
 
     if (error) {
-      toast.error(error.message)
+      if (error.message?.includes('foreign key') || error.code === '23503') {
+        toast.error('Organization not set up yet. Complete your intake first.')
+      } else {
+        toast.error(error.message)
+      }
     } else {
       toast.success('Note saved')
       setShowNewNote(false)
@@ -120,7 +124,11 @@ export default function ClientVault() {
         },
       } as any)
 
-      if (!dbError) uploaded++
+      if (dbError && (dbError.message?.includes('foreign key') || dbError.code === '23503')) {
+        toast.error('Organization not set up yet. Complete your intake first.')
+      } else if (!dbError) {
+        uploaded++
+      }
     }
 
     if (uploaded > 0) {

@@ -281,7 +281,7 @@ function DemoContent() {
       {hasIntake && (
         <div className="px-6 py-2 bg-[#c8ff00]/[0.03] border-b border-[#c8ff00]/10 flex items-center gap-3 text-xs text-white/40">
           <span className="text-[#c8ff00]">●</span>
-          <span className="truncate">{name} &middot; {hdType} &middot; {archetypeParam}</span>
+          <span className="truncate">{name} &middot; {archetypeParam} &middot; {energyType}</span>
           <Link href="/intake" className="ml-auto text-[#c8ff00]/60 hover:text-[#c8ff00]">Edit</Link>
         </div>
       )}

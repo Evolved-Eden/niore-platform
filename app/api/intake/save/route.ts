@@ -86,6 +86,27 @@ export async function POST(req: NextRequest) {
 
     if (error) throw error
 
+    // Ensure user has an organization (for vault/knowledge_base FK)
+    try {
+      const { data: existingOrg } = await supabase
+        .from('organizations')
+        .select('id')
+        .eq('id', user.id)
+        .maybeSingle()
+      if (!existingOrg) {
+        await supabase
+          .from('organizations')
+          .insert({
+            id: user.id,
+            name: data.name || user.email?.split('@')[0] || 'User',
+            owner_id: user.id,
+            status: 'active',
+          } as any)
+      }
+    } catch (orgErr) {
+      console.error('Failed to ensure organization:', orgErr)
+    }
+
     return NextResponse.json({
       success: true,
       section,

@@ -35,6 +35,7 @@ export default function AdminBlueprintPage() {
       setName(identity?.full_name ?? user.email?.split('@')[0] ?? 'Admin')
 
       // Load blueprint from client_twins metadata
+      let foundBlueprint: BlueprintData | null = null
       const { data: twin } = await supabase
         .from('client_twins')
         .select('metadata')
@@ -44,14 +45,14 @@ export default function AdminBlueprintPage() {
         const meta = (twin.metadata as Record<string, any>) ?? {}
         const bp = meta.blueprint
         if (bp?.core) {
-          setBlueprint({
+          foundBlueprint = {
             overallScore: bp.core.overallScore ?? 0,
             archetype: bp.core.archetype ?? 'Integrator',
             scores: bp.core.scores ?? {},
             summary: bp.core.summary ?? '',
             recommended_agents: bp.core.recommended_agents ?? [],
             intake_role: bp.intake?.role ?? '',
-          })
+          }
         }
       }
 
@@ -65,10 +66,10 @@ export default function AdminBlueprintPage() {
       setHasIntake(!!intakeMeta?.intake)
 
       // Fallback: use intake results if twin blueprint not found
-      if (!blueprint && intakeMeta?.intake?.sections?.results?.blueprint) {
+      if (!foundBlueprint && intakeMeta?.intake?.sections?.results?.blueprint) {
         const bp = intakeMeta.intake.sections.results.blueprint
         const scores = bp.scores || {}
-        setBlueprint({
+        foundBlueprint = {
           overallScore: Object.values(scores).length > 0
             ? Math.round(Object.values(scores).reduce((a: number, b: any) => a + b, 0) / Object.keys(scores).length)
             : 0,
@@ -77,7 +78,11 @@ export default function AdminBlueprintPage() {
           summary: bp.summary || '',
           recommended_agents: [],
           intake_role: '',
-        })
+        }
+      }
+
+      if (foundBlueprint) {
+        setBlueprint(foundBlueprint)
       }
 
       setLoading(false)

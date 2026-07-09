@@ -148,8 +148,8 @@ export default function IntakePage() {
   }
 
   // ── Move to role section with save ──
-  function goToRole() {
-    saveSection('personal', {
+  async function goToRole() {
+    await saveSection('personal', {
       name: data.name,
       email: data.email,
       dob: data.dob,
@@ -170,7 +170,7 @@ export default function IntakePage() {
 
     try {
       // Save role section before calculating
-      saveSection('role', {
+      await saveSection('role', {
         sellTo: data.sellTo,
         roleType: data.roleType,
         personalType: data.personalType,
@@ -202,7 +202,7 @@ export default function IntakePage() {
   async function finishIntake() {
     const profileResult = profile
     if (profileResult) {
-      // Save results to DB
+      // Save results to DB (already saved by calculate, but ensure it's persisted)
       await saveSection('results', profileResult)
       // Trigger essence generation
       if (user) {

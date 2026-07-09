@@ -99,7 +99,8 @@ export default function ClientBlueprintPage() {
         }
       }
 
-      // Check if twin exists → read blueprint from DB
+      // Check if twin exists and read blueprint from DB
+      let foundBlueprint: BlueprintData | null = null
       const { data: twin } = await supabase
         .from('client_twins')
         .select('id, metadata')
@@ -113,28 +114,28 @@ export default function ClientBlueprintPage() {
         // Read blueprint from DB (saved by /api/blueprint/save)
         const bp = meta.blueprint
         if (bp?.core) {
-          setBlueprint({
+          foundBlueprint = {
             overallScore: bp.core.overallScore ?? 0,
             archetype: bp.core.archetype ?? 'Custom',
             scores: bp.core.scores ?? {},
             summary: bp.core.summary ?? '',
             recommended_agents: bp.core.recommended_agents ?? [],
             intake_role: bp.intake?.role ?? 'client',
-          })
+          }
         } else {
           // Fallback: try sessionStorage (legacy)
           const stored = sessionStorage.getItem('blueprintResult')
           if (stored) {
             try {
               const parsed = JSON.parse(stored)
-              setBlueprint({
+              foundBlueprint = {
                 overallScore: parsed.scores ? Math.round(Object.values(parsed.scores).reduce((a: number, b: any) => a + b, 0) / Object.keys(parsed.scores).length) : 0,
                 archetype: parsed.template_name || 'Custom',
                 scores: parsed.scores || {},
                 summary: parsed.summary || '',
                 recommended_agents: parsed.recommended_agents || [],
                 intake_role: parsed.vertical_key || 'client',
-              })
+              }
             } catch {}
           }
         }
@@ -146,20 +147,24 @@ export default function ClientBlueprintPage() {
       }
 
       // Fallback: use intake results as blueprint data if no twin blueprint exists
-      if (!blueprint && intakeSections?.results?.blueprint) {
+      if (!foundBlueprint && intakeSections?.results?.blueprint) {
         const bp = intakeSections.results.blueprint
         const scores = bp.scores || {}
         const overallScore = Object.values(scores).length > 0
           ? Math.round(Object.values(scores).reduce((a: number, b: any) => a + b, 0) / Object.keys(scores).length)
           : 0
-        setBlueprint({
+        foundBlueprint = {
           overallScore,
           archetype: bp.archetype || 'Custom',
           scores,
           summary: bp.summary || '',
           recommended_agents: [],
           intake_role: intakeSections.results?.essence?.mindArchitecture || 'client',
-        })
+        }
+      }
+
+      if (foundBlueprint) {
+        setBlueprint(foundBlueprint)
       }
 
       setLoading(false)

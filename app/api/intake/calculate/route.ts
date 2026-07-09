@@ -317,123 +317,121 @@ export async function POST(req: NextRequest) {
       },
     }
 
-    // ── Persist ALL intake data to DB ──
+    // ── Persist ALL intake data to DB (single admin client, single user fetch) ──
     try {
       const supabase = await createAdminClient()
       const { data: { user } } = await supabase.auth.getUser()
-      if (user) {
-        const { data: existing } = await supabase
-          .from('clients')
-          .select('metadata')
-          .eq('id', user.id)
-          .maybeSingle()
-        const existingMeta = (existing?.metadata as Record<string, any>) ?? {}
+      if (!user) {
+        console.warn('No authenticated user — skipping persistence')
+        return NextResponse.json(result)
+      }
 
-        // Build full intake object with personal, role, and results sections
-        const intake = {
-          ...(existingMeta.intake || {}),
-          sections: {
-            ...((existingMeta.intake as any)?.sections || {}),
-            personal: {
-              name: name || '',
-              email: email || '',
-              dob: dob || '',
-              birthTime: birthTime || '',
-              birthLocation: birthLocation || '',
-              birthTimezone: birthTimezone || '',
-              saved_at: new Date().toISOString(),
-            },
-            role: {
-              sellTo: sellTo || '',
-              roleType: roleType || '',
-              personalType: personalType || '',
-              offerType: offerType || '',
-              saved_at: new Date().toISOString(),
-            },
-            results: {
-              ...result,
-              saved_at: new Date().toISOString(),
+      // 1. Get existing client record
+      const { data: existing } = await supabase
+        .from('clients')
+        .select('metadata, full_name')
+        .eq('id', user.id)
+        .maybeSingle()
+      const existingMeta = (existing?.metadata as Record<string, any>) ?? {}
+
+      // Build full intake object with personal, role, and results sections
+      const intake = {
+        ...(existingMeta.intake || {}),
+        sections: {
+          ...((existingMeta.intake as any)?.sections || {}),
+          personal: {
+            name: name || '',
+            email: email || '',
+            dob: dob || '',
+            birthTime: birthTime || '',
+            birthLocation: birthLocation || '',
+            birthTimezone: birthTimezone || '',
+            saved_at: new Date().toISOString(),
+          },
+          role: {
+            sellTo: sellTo || '',
+            roleType: roleType || '',
+            personalType: personalType || '',
+            offerType: offerType || '',
+            saved_at: new Date().toISOString(),
+          },
+          results: {
+            ...result,
+            saved_at: new Date().toISOString(),
+          },
+        },
+        last_section: 'results',
+        updated_at: new Date().toISOString(),
+      }
+
+      // 2. Upsert clients row with intake data
+      const { error: clientErr } = await supabase
+        .from('clients')
+        .upsert({
+          id: user.id,
+          full_name: name || existing?.full_name || user.email?.split('@')[0] || 'User',
+          email: email || undefined,
+          metadata: { ...existingMeta, intake },
+          updated_at: new Date().toISOString(),
+        } as any, { onConflict: 'id' })
+
+      if (clientErr) {
+        console.error('Failed to persist intake results:', clientErr)
+      }
+
+      // 3. Ensure user has an organization (for vault/knowledge_base FK)
+      const { data: existingOrg } = await supabase
+        .from('organizations')
+        .select('id')
+        .eq('id', user.id)
+        .maybeSingle()
+      if (!existingOrg) {
+        const { error: orgErr } = await supabase
+          .from('organizations')
+          .insert({
+            id: user.id,
+            name: name || user.email?.split('@')[0] || 'User',
+            owner_id: user.id,
+            status: 'active',
+          } as any)
+        if (orgErr) console.error('Failed to create organization:', orgErr)
+      }
+
+      // 4. Create/update the client_twin with blueprint data
+      const { data: existingTwin } = await supabase
+        .from('client_twins')
+        .select('id, metadata')
+        .eq('client_id', user.id)
+        .maybeSingle()
+      const twinMeta = (existingTwin?.metadata as Record<string, any>) ?? {}
+      const { error: twinErr } = await supabase
+        .from('client_twins')
+        .upsert({
+          id: existingTwin?.id ?? undefined,
+          client_id: user.id,
+          name: name || user.email?.split('@')[0] || 'User',
+          metadata: {
+            ...twinMeta,
+            blueprint: {
+              core: {
+                overallScore: Math.round(Object.values(result.blueprint.scores).reduce((a, b) => a + b, 0) / Object.keys(result.blueprint.scores).length),
+                archetype: result.blueprint.archetype,
+                scores: result.blueprint.scores,
+                summary: result.blueprint.summary,
+                recommended_agents: [],
+              },
+              intake: {
+                role: result.recommendation.suggestedPath?.toLowerCase() || 'client',
+              },
             },
           },
-          last_section: 'results',
-          updated_at: new Date().toISOString(),
-        }
+        } as any, { onConflict: 'id' })
 
-        await supabase
-          .from('clients')
-          .upsert({
-            id: user.id,
-            full_name: name || existingMeta.full_name,
-            email: email || undefined,
-            metadata: { ...existingMeta, intake },
-            updated_at: new Date().toISOString(),
-          } as any, { onConflict: 'id' })
+      if (twinErr) {
+        console.error('Failed to create twin blueprint:', twinErr)
       }
     } catch (dbErr) {
       console.error('Failed to persist intake results:', dbErr)
-    }
-
-    // ── Ensure user has an organization (for vault/knowledge_base FK) ──
-    try {
-      const supabase = await createAdminClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      if (user) {
-        const { data: existingOrg } = await supabase
-          .from('organizations')
-          .select('id')
-          .eq('id', user.id)
-          .maybeSingle()
-        if (!existingOrg) {
-          await supabase
-            .from('organizations')
-            .insert({
-              id: user.id,
-              name: name || user.email?.split('@')[0] || 'User',
-              owner_id: user.id,
-              status: 'active',
-            } as any)
-        }
-      }
-    } catch (orgErr) {
-      console.error('Failed to ensure organization:', orgErr)
-    }
-
-    // ── Also create/update the client_twin with blueprint data ──
-    try {
-      const supabase = await createAdminClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      if (user) {
-        const { data: existingTwin } = await supabase
-          .from('client_twins')
-          .select('id, metadata')
-          .eq('client_id', user.id)
-          .maybeSingle()
-        const twinMeta = (existingTwin?.metadata as Record<string, any>) ?? {}
-        await supabase
-          .from('client_twins')
-          .upsert({
-            id: existingTwin?.id ?? undefined,
-            client_id: user.id,
-            name: name || user.email?.split('@')[0] || 'User',
-            metadata: {
-              ...twinMeta,
-              blueprint: {
-                core: {
-                  overallScore: Math.round(Object.values(result.blueprint.scores).reduce((a, b) => a + b, 0) / Object.keys(result.blueprint.scores).length),
-                  archetype: result.blueprint.archetype,
-                  scores: result.blueprint.scores,
-                  summary: result.blueprint.summary,
-                  recommended_agents: [],
-                },
-                intake: {
-                  role: result.recommendation.suggestedPath?.toLowerCase() || 'client',
-                },
-              },
-            },
-          } as any, { onConflict: 'id' })
-      }
-    } catch (twinErr) {
-      console.error('Failed to create twin blueprint:', twinErr)
     }
 
     return NextResponse.json(result)

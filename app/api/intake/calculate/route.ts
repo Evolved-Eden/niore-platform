@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/server'
+import { getN8nUrl } from '@/lib/config'
 
 // ── EE Core Engine ─────────────────────────────────────────────
 // Calculates the user's foundational profile from birth data.
@@ -453,6 +454,25 @@ export async function POST(req: NextRequest) {
       if (intelErr) {
         console.error('Failed to create intelligence profile:', intelErr)
       }
+
+      // ── 6. Fire n8n post-intake workflow (fire-and-forget) ──
+      const n8nWebhookUrl = `${getN8nUrl()}/webhook/intake/complete`
+      const personalityTraits = Object.fromEntries(
+        Object.entries(result.blueprint.scores).map(([k, v]) => [k, +(v / 100).toFixed(2)])
+      )
+      fetch(n8nWebhookUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: user.id,
+          email: email || user.email,
+          archetype: result.blueprint.archetype,
+          blueprint_summary: result.blueprint.summary,
+          confidence_score: +(overallScore / 100).toFixed(2),
+          personality_traits: personalityTraits,
+          source: 'intake_calculate',
+        }),
+      }).catch(e => console.error('n8n webhook failed:', e))
     } catch (dbErr) {
       console.error('Failed to persist intake results:', dbErr)
     }

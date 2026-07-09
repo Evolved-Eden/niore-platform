@@ -142,3 +142,7 @@ export async function getN8nMcpToken(): Promise<string> {
 export async function getN8nApiKey(): Promise<string> {
   return getConfig('N8N_PUBLIC_API_KEY')
 }
+
+export function getN8nUrl(): string {
+  return process.env.N8N_URL || process.env.N8N_BASE_URL || 'http://localhost:5678'
+}

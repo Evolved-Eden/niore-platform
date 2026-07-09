@@ -1,0 +1,104 @@
+{
+  "id": "postIntakeKlMnOpQrStUv",
+  "name": "WF7 — Post-Intake Processor",
+  "nodes": [
+    {
+      "id": "b1b2c3d4-e5f6-7890-abcd-ef1234567801",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.2,
+      "position": [250, 300],
+      "parameters": {
+        "path": "intake/complete",
+        "httpMethod": "POST",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "webhookId": "intake/complete"
+    },
+    {
+      "id": "b1b2c3d4-e5f6-7890-abcd-ef1234567802",
+      "name": "Validate Payload",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [450, 300],
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "typeValidation": "strict" },
+          "conditions": [
+            {
+              "id": "check-user",
+              "leftValue": "={{ $json.user_id }}",
+              "rightValue": "",
+              "operator": { "type": "string", "operation": "isNotEmpty" }
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "b1b2c3d4-e5f6-7890-abcd-ef1234567803",
+      "name": "Create Intelligence Profile",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [650, 200],
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO public.intelligence_profiles (\n  entity_type, entity_id, organization_id,\n  profile_kind, identity_summary, profile_type,\n  confidence_score, version, daily_essence,\n  personality_traits\n)\nVALUES (\n  'user',\n  '{{ $json.user_id }}'::uuid,\n  '{{ $json.user_id }}'::uuid,\n  'business_intelligence',\n  '{{ $json.blueprint_summary || \"Intelligence profile from intake\" }}',\n  'intake',\n  {{ $json.confidence_score || 0.5 }},\n  1,\n  '{{ $json.archetype || \"\" }}',\n  '{{ $json.personality_traits || \"{}\" }}'::jsonb\n)\nON CONFLICT (entity_type, entity_id) DO UPDATE SET\n  identity_summary = EXCLUDED.identity_summary,\n  confidence_score = EXCLUDED.confidence_score,\n  personality_traits = EXCLUDED.personality_traits,\n  daily_essence = EXCLUDED.daily_essence,\n  version = intelligence_profiles.version + 1\nRETURNING id;",
+        "options": {}
+      },
+      "credentials": {
+        "postgres": { "id": "V3Efv1mtgcNnSJUZ", "name": "Supabase Postgres" }
+      }
+    },
+    {
+      "id": "b1b2c3d4-e5f6-7890-abcd-ef1234567804",
+      "name": "Discord Welcome",
+      "type": "n8n-nodes-base.discordBotApi",
+      "typeVersion": 1,
+      "position": [650, 400],
+      "parameters": {
+        "operation": "sendMessageToChannel",
+        "channelId": "={{ $json.discord_channel_id || $env.DISCORD_WELCOME_CHANNEL }}",
+        "content": "=🎉 **New Intake Complete!**\n**User:** {{ $json.email || $json.user_id }}\n**Archetype:** {{ $json.archetype || 'N/A' }}\n**Source:** {{ $json.source || 'web' }}"
+      },
+      "credentials": {
+        "discordBotApi": { "id": "OaWvPfFh7kjpswjH", "name": "Discord Alerts" }
+      }
+    },
+    {
+      "id": "b1b2c3d4-e5f6-7890-abcd-ef1234567805",
+      "name": "Webhook Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [850, 300],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ {\n  \"status\": \"success\",\n  \"message\": \"Post-intake processing complete\",\n  \"intelligence_profile_id\": $json.id\n} }}"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [[{"node": "Validate Payload", "type": "main", "index": 0}]]
+    },
+    "Validate Payload": {
+      "main": [[{"node": "Create Intelligence Profile", "type": "main", "index": 0}, {"node": "Discord Welcome", "type": "main", "index": 0}]]
+    },
+    "Create Intelligence Profile": {
+      "main": [[{"node": "Webhook Response", "type": "main", "index": 0}]]
+    },
+    "Discord Welcome": {
+      "main": [[{"node": "Webhook Response", "type": "main", "index": 0}]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "timezone": "UTC"
+  },
+  "staticData": null,
+  "tags": [],
+  "active": false
+}

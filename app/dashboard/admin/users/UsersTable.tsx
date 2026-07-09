@@ -58,6 +58,10 @@ export default function UsersTable({ initialUsers }: { initialUsers: UserRow[] }
   const [planValue, setPlanValue] = useState('')
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
   const [detailUser, setDetailUser] = useState<UserRow | null>(null)
+  const [resetPassModal, setResetPassModal] = useState<{ id: string; email: string | null } | null>(null)
+  const [newPassword, setNewPassword] = useState('')
+  const [cleanupConfirm, setCleanupConfirm] = useState(false)
+  const [cleanupResult, setCleanupResult] = useState<string | null>(null)
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -68,6 +72,12 @@ export default function UsersTable({ initialUsers }: { initialUsers: UserRow[] }
           <p className="text-white/40 text-sm mt-1">{users.length} user{users.length !== 1 ? 's' : ''}</p>
         </div>
         <div className="flex items-center gap-3">
+          <button
+            onClick={() => setCleanupConfirm(true)}
+            className="px-4 py-2 text-xs rounded-sm bg-red-900/30 text-red-400 hover:bg-red-900/60 transition-colors tracking-wider uppercase font-medium"
+          >
+            Cleanup Test Users
+          </button>
           <Link href="/dashboard/admin/users/new" className="px-4 py-2 text-xs rounded-sm bg-[#c8ff00]/20 text-[#c8ff00] hover:bg-[#c8ff00]/30 transition-colors tracking-wider uppercase font-medium">
             + Add User
           </Link>
@@ -145,6 +155,10 @@ export default function UsersTable({ initialUsers }: { initialUsers: UserRow[] }
                         onClick={() => { setPlanModal({ id: u.id, current: u.plan_tier }); setPlanValue(u.plan_tier || '') }}
                         className="px-3 py-1 text-xs rounded-sm bg-blue-900/30 text-blue-400 hover:bg-blue-900/60 transition-colors"
                       >Plan</button>
+                      <button
+                        onClick={() => { setResetPassModal({ id: u.id, email: u.email }); setNewPassword('') }}
+                        className="px-3 py-1 text-xs rounded-sm bg-purple-900/30 text-purple-400 hover:bg-purple-900/60 transition-colors"
+                      >Reset PW</button>
                       {u.client_status !== 'active' && (
                         <button
                           onClick={() => setDeleteConfirm(u.id)}
@@ -191,6 +205,70 @@ export default function UsersTable({ initialUsers }: { initialUsers: UserRow[] }
               <button onClick={() => setPlanModal(null)} className="px-4 py-2 text-sm text-white/50 hover:text-white/80">Cancel</button>
               <button onClick={() => { doAction(planModal.id, 'set_plan', { plan: planValue }); setPlanModal(null) }} className="px-4 py-2 text-sm bg-blue-900/40 text-blue-400 hover:bg-blue-900/60 rounded-sm">Save</button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Reset Password modal */}
+      {resetPassModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+          <div className="glass rounded-sm p-6 border border-white/[0.06] max-w-sm w-full">
+            <h3 className="text-lg font-semibold text-white/80 mb-2">Reset Password</h3>
+            <p className="text-sm text-white/40 mb-4">User: {resetPassModal.email || resetPassModal.id}</p>
+            <input
+              type="password"
+              value={newPassword}
+              onChange={e => setNewPassword(e.target.value)}
+              placeholder="New password (min 6 chars)"
+              className="w-full bg-white/[0.04] border border-white/[0.08] rounded-sm px-4 py-2 text-sm text-white/70 mb-4 focus:outline-none"
+              minLength={6}
+            />
+            <div className="flex justify-end gap-3">
+              <button onClick={() => setResetPassModal(null)} className="px-4 py-2 text-sm text-white/50 hover:text-white/80">Cancel</button>
+              <button
+                onClick={async () => {
+                  if (!newPassword || newPassword.length < 6) return
+                  const res = await fetch('/api/admin/reset-password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: resetPassModal.id, newPassword }),
+                  })
+                  const data = await res.json()
+                  setActionMsg({ type: data.success ? 'ok' : 'err', text: data.success ? 'Password reset' : data.error })
+                  setResetPassModal(null)
+                }}
+                className="px-4 py-2 text-sm bg-purple-900/40 text-purple-400 hover:bg-purple-900/60 rounded-sm"
+              >Set Password</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Cleanup confirmation */}
+      {cleanupConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+          <div className="glass rounded-sm p-6 border border-white/[0.06] max-w-sm w-full">
+            <h3 className="text-lg font-semibold text-white/80 mb-2">Cleanup Test Users?</h3>
+            <p className="text-sm text-white/40 mb-4">This will delete ALL users except you (edensevolutions). Their auth accounts, client records, twins, and data will be removed. Cannot be undone.</p>
+            {cleanupResult ? (
+              <div className="text-sm text-white/60 mb-4">{cleanupResult}</div>
+            ) : (
+              <div className="flex justify-end gap-3">
+                <button onClick={() => setCleanupConfirm(false)} className="px-4 py-2 text-sm text-white/50 hover:text-white/80">Cancel</button>
+                <button
+                  onClick={async () => {
+                    const res = await fetch('/api/admin/cleanup-users', { method: 'POST' })
+                    const data = await res.json()
+                    setCleanupResult(data.success ? `Deleted ${data.deleted} of ${data.total_found} users` : `Error: ${data.error}`)
+                    if (data.success) {
+                      // Refresh user list
+                      setTimeout(() => window.location.reload(), 2000)
+                    }
+                  }}
+                  className="px-4 py-2 text-sm bg-red-900/40 text-red-400 hover:bg-red-900/60 rounded-sm"
+                >Delete All Other Users</button>
+              </div>
+            )}
           </div>
         </div>
       )}

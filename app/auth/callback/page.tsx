@@ -67,7 +67,13 @@ function AuthCallbackHandler() {
         })
 
         done.current = true
-        router.replace(type === "recovery" ? "/reset-password" : "/dashboard")
+        // For recovery (password reset), redirect to reset-password page
+        // which is in the (auth) route group and won't trigger the dashboard plan guard
+        if (type === "recovery") {
+          router.replace("/reset-password")
+        } else {
+          router.replace("/dashboard")
+        }
       } catch (err) {
         console.error("auth callback error:", err)
         router.replace(`/login?error=${encodeURIComponent("unexpected_error")}`)

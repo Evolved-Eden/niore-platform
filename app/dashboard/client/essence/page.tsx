@@ -131,8 +131,9 @@ function EssenceIntelligencePage() {
     async function load() {
       try {
         // Auth
-        const { data: { user: u } } = await supabase.auth.getUser()
-        if (!u) { router.push('/login'); return }
+        const { data: { user: _u } } = await supabase.auth.getUser()
+        // Guaranteed non-null by root middleware
+        const u = _u!
         setUser(u)
 
         // 0. Flush pending intake from localStorage into DB

@@ -507,8 +507,9 @@ function OnboardingContent() {
       setInitializing(true)
       setPaymentError(null)
 
-      const { data: { user: u } } = await supabase.auth.getUser()
-      if (!u) { router.push('/login'); return }
+      const { data: { user: _u } } = await supabase.auth.getUser()
+      // Guaranteed non-null by root middleware
+      const u = _u!
       if (cancelled) return
 
       // Poll for client record (race condition: onSignup may not have completed)

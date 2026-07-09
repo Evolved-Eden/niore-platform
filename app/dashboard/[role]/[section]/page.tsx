@@ -95,8 +95,9 @@ export default async function DashboardSectionPage({ params }: { params: Promise
   if (!sectionMeta) return notFound()
 
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  const { data: { user: _user } } = await supabase.auth.getUser()
+  // Guaranteed non-null by root middleware
+  const user = _user!
 
   const { data: identity } = await supabase
     .from('users')

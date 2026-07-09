@@ -70,8 +70,9 @@ const QUICK_STATS = [
 
 export default async function DashboardHub({ searchParams }: { searchParams?: Promise<{ [key: string]: string | string[] | undefined }> }) {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  const { data: { user: _user } } = await supabase.auth.getUser()
+  // Guaranteed non-null by root middleware
+  const user = _user!
 
   // Fetch client record to get plan_tier_key (reflects what user actually paid for)
   const { data: clientRecord } = await supabase

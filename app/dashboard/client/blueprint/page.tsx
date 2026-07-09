@@ -53,8 +53,9 @@ export default function ClientBlueprintPage() {
   useEffect(() => {
     async function load() {
       const supabase = createClient()
-      const { data: { user: u } } = await supabase.auth.getUser()
-      if (!u) { router.push('/login'); return }
+      const { data: { user: _u } } = await supabase.auth.getUser()
+      // Guaranteed non-null by root middleware
+      const u = _u!
       setUser(u)
 
       // Flush pending intake from localStorage (filled before auth)

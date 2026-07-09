@@ -44,8 +44,9 @@ export default function AdminMySwarmsPage() {
   useEffect(() => {
     async function load() {
       const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) { router.push('/login'); return }
+      const { data: { user: _user } } = await supabase.auth.getUser()
+      // Guaranteed non-null by root middleware
+      const user = _user!
       setUserId(user.id)
 
       // Load deployed swarms

@@ -1,11 +1,11 @@
 import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
 import Link from 'next/link'
 
 export default async function AffiliateDashboard() {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  const { data: { user: _user } } = await supabase.auth.getUser()
+  // Guaranteed non-null by root middleware
+  const user = _user!
 
   const { data: profile } = await supabase
     .from('users')

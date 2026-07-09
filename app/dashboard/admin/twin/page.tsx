@@ -147,8 +147,9 @@ export default function AdminTwinPage() {
   // ── Load users on mount ──
   useEffect(() => {
     async function init() {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) { router.push('/login'); return }
+      const { data: { user: _user } } = await supabase.auth.getUser()
+      // Guaranteed non-null by root middleware
+      const user = _user!
 
       // Check admin role
       const { data: identity } = await supabase

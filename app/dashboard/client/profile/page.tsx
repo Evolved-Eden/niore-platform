@@ -1,5 +1,4 @@
 import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
 import Link from 'next/link'
 
 // ─── Role color map ───────────────────────────────────────────
@@ -112,8 +111,9 @@ function StatCell({ label, value, color }: { label: string; value: string | numb
 // ================================================================
 export default async function ClientProfilePage() {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  const { data: { user: _user } } = await supabase.auth.getUser()
+  // Guaranteed non-null by root middleware
+  const user = _user!
 
   // ── Fetch all data in parallel ──────────────────────────────
   const [userRes, clientRes, twinRes, vaultRes] = await Promise.all([

@@ -11,7 +11,7 @@ export default async function CreatorDashboard() {
     .select('*')
     .eq('entity_id', user.id)
     .eq('entity_type', 'user')
-    .single()
+    .maybeSingle()
 
   const stats = [
     { label: 'Profile Version', value: profile?.version ?? 1,                   color: '#00d4ff' },

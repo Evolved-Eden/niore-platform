@@ -430,6 +430,29 @@ export async function POST(req: NextRequest) {
       if (twinErr) {
         console.error('Failed to create twin blueprint:', twinErr)
       }
+
+      // 5. Create/update intelligence profile (for creator dashboard)
+      const overallScore = Object.values(result.blueprint.scores).reduce((a, b) => a + b, 0) / Object.keys(result.blueprint.scores).length
+      const { error: intelErr } = await supabase
+        .from('intelligence_profiles')
+        .upsert({
+          entity_type: 'user',
+          entity_id: user.id,
+          organization_id: user.id,
+          profile_kind: 'business_intelligence',
+          identity_summary: result.blueprint.summary,
+          personality_traits: Object.fromEntries(
+            Object.entries(result.blueprint.scores).map(([k, v]) => [k, +(v / 100).toFixed(2)])
+          ),
+          profile_type: 'intake',
+          confidence_score: +(overallScore / 100).toFixed(2),
+          daily_essence: result.blueprint.archetype,
+          version: 1,
+        } as any, { onConflict: 'entity_type,entity_id' })
+
+      if (intelErr) {
+        console.error('Failed to create intelligence profile:', intelErr)
+      }
     } catch (dbErr) {
       console.error('Failed to persist intake results:', dbErr)
     }

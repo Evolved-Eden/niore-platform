@@ -80,9 +80,10 @@ export default function ClientBlueprintPage() {
         .select('metadata')
         .eq('id', u.id)
         .maybeSingle()
+      let intakeSections: any = null
       if (clientRec) {
         const meta = (clientRec.metadata as Record<string, any>) ?? {}
-        const intakeSections = meta.intake?.sections
+        intakeSections = meta.intake?.sections
         if (intakeSections?.results?.blueprint) {
           const bp = intakeSections.results.blueprint
           const es = intakeSections.results.essence

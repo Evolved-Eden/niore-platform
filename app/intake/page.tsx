@@ -126,23 +126,24 @@ export default function IntakePage() {
 
   // ── Save intake section to DB (if authenticated) ──
   async function saveSection(section: string, sectionData: Record<string, any>) {
-    if (!user) {
-      // Not authenticated — stash to localStorage for later
-      try {
-        const existing = JSON.parse(localStorage.getItem('intake_pending') || '{}')
-        existing[section] = { ...sectionData, saved_at: new Date().toISOString() }
-        localStorage.setItem('intake_pending', JSON.stringify(existing))
-      } catch {}
-      return
-    }
+    // Always stash to localStorage as backup
     try {
-      await fetch('/api/intake/save', {
+      const existing = JSON.parse(localStorage.getItem('intake_pending') || '{}')
+      existing[section] = { ...sectionData, saved_at: new Date().toISOString() }
+      localStorage.setItem('intake_pending', JSON.stringify(existing))
+    } catch {}
+
+    if (!user) return
+
+    try {
+      const res = await fetch('/api/intake/save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ section, data: sectionData }),
       })
-    } catch {
-      // Non-critical — silent fail
+      if (!res.ok) console.warn('Intake save failed:', await res.text())
+    } catch (e) {
+      console.warn('Intake save error:', e)
     }
   }
 
@@ -182,17 +183,16 @@ export default function IntakePage() {
         body: JSON.stringify(data),
       })
       const result = await res.json()
-      if (result.error && !result.fallback) {
-        setError(result.error)
+      if (!res.ok || result.error) {
+        setError(result.error || 'Calculation failed')
         setLoading(false)
         return
       }
-      const profileResult = result.fallback ?? result
-      setProfile(profileResult)
+      setProfile(result)
       setStep('results')
 
       // Save results section
-      saveSection('results', profileResult)
+      saveSection('results', result)
     } catch {
       setError('Failed to calculate your profile. Please try again.')
     }
@@ -200,17 +200,21 @@ export default function IntakePage() {
   }
 
   async function finishIntake() {
-    // Save results, generate essence, show complete step
     const profileResult = profile
     if (profileResult) {
-      saveSection('results', profileResult)
-      // Trigger essence generation in background
+      // Save results to DB
+      await saveSection('results', profileResult)
+      // Trigger essence generation
       if (user) {
-        fetch('/api/zuri/essence', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId: user.id, userRole: userRole || 'client' }),
-        }).catch(() => {})
+        try {
+          await fetch('/api/zuri/essence', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId: user.id, userRole: userRole || 'client' }),
+          })
+        } catch (e) {
+          console.warn('Essence generation trigger failed:', e)
+        }
       }
     }
     setStep('complete')

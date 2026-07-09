@@ -420,29 +420,7 @@ export async function POST(req: NextRequest) {
 
   } catch (err) {
     console.error('Intake calculation error:', err)
-    return NextResponse.json({
-      error: 'Failed to calculate intelligence profile',
-      fallback: {
-        blueprint: {
-          archetype: 'Innovator',
-          completeness: 35,
-          foundation: { coreArch: 'Explorer', naturalGift: 'Spontaneity', growthEdge: 'Patience', energyType: 'Generator', operatingRhythm: 'Respond and Build' },
-          scores: { visionary: 65, building: 58, connecting: 62, analyzing: 55, leading: 60, creating: 68 },
-          summary: 'Your profile reveals an Explorer operating pattern with a gift for spontaneity.',
-        },
-        essence: {
-          mindArchitecture: 'Explorer', decisionStyle: 'Sacral Authority', communicationStyle: 'Creativity',
-          emotionalPattern: 'Innocence', creativityStyle: 'Self-Expression',
-          summary: 'You learn through deep exploration and active engagement.',
-        },
-        archetype: {
-          primary: 'Innovator', avatar: 'innovator', description: 'You learn through deep exploration.',
-          domains: ['innovator', 'growth', 'creation', 'connection'],
-        },
-        rhythm: { energyType: 'Generator', peakTimes: 'Late morning, early evening', recoveryNeed: 'Solitude and quiet' },
-        timing: { personalYear: 7, currentCycle: 'Growth' },
-        recommendation: { archetype: 'Innovator', suggestedPath: 'Client', reason: 'Based on your Innovator profile and balanced orientation...' },
-      },
-    }, { status: 200 })
+    const message = err instanceof Error ? err.message : 'Unknown error'
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }

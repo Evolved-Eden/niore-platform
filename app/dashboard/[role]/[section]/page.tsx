@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
 import type { UserRole } from '@/types'
+import { deriveRoleFromPlanTier } from '@/types'
 
 const SECTION_META: Record<UserRole, Record<string, { title: string; description: string }>> = {
   client: {
@@ -103,8 +104,18 @@ export default async function DashboardSectionPage({ params }: { params: Promise
     .eq('id', user.id)
     .single()
 
-  const currentRole = identity?.role as UserRole | undefined
-  if (!currentRole) redirect('/dashboard/client')
+  const userRole = identity?.role as UserRole | undefined
+  if (!userRole) redirect('/dashboard/client')
+
+  // Derive role from plan_tier_key first (what they paid for), fall back to users.role
+  const { data: clientRecord } = await supabase
+    .from('clients')
+    .select('plan_tier_key')
+    .eq('id', user.id)
+    .maybeSingle()
+  const planRole = deriveRoleFromPlanTier(clientRecord?.plan_tier_key)
+  const currentRole = planRole ?? userRole
+
   if (currentRole !== role) redirect(`/dashboard/${currentRole}`)
 
   return (

@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import type { UserRole } from '@/types'
+import { deriveRoleFromPlanTier } from '@/types'
 
 import SidebarNav from './_components/SidebarNav'
 
@@ -104,31 +105,36 @@ export default async function DashboardLayout({ children }: { children: React.Re
     .eq('id', user.id)
     .single()
 
-  const role: UserRole = (identity?.role as UserRole) ?? 'client'
+  const userRole = (identity?.role as UserRole) ?? 'client'
   const name = identity?.full_name ?? user.email?.split('@')[0] ?? 'User'
+
+  // Fetch client record to get plan_tier_key (reflects what user actually paid for)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let clientRecord: any = null
+  let rlsError = false
+  try {
+    const { data, error } = await supabase
+      .from('clients')
+      .select('plan_tier_key, additional_plans, addons, status, metadata')
+      .eq('id', user.id)
+      .maybeSingle()
+    if (error) {
+      console.warn('Plan guard query failed (RLS?):', error.message)
+      rlsError = true
+    } else {
+      clientRecord = data
+    }
+  } catch (e) {
+    console.warn('Plan guard exception:', e)
+    rlsError = true
+  }
+
+  // Derive role from plan_tier_key first (what they paid for), fall back to users.role
+  const planRole = deriveRoleFromPlanTier(clientRecord?.plan_tier_key)
+  const role: UserRole = planRole ?? (userRole === 'admin' ? 'admin' : userRole)
 
   // Plan guard: non-admin dashboard access requires at least one active plan.
   if (role !== 'admin') {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let clientRecord: any = null
-    let rlsError = false
-    try {
-      const { data, error } = await supabase
-        .from('clients')
-        .select('plan_tier_key, additional_plans, addons, status, metadata')
-        .eq('id', user.id)
-        .maybeSingle()
-      if (error) {
-        console.warn('Plan guard query failed (RLS?):', error.message)
-        rlsError = true
-      } else {
-        clientRecord = data
-      }
-    } catch (e) {
-      console.warn('Plan guard exception:', e)
-      rlsError = true
-    }
-
     if (!rlsError) {
       const status = clientRecord?.status ?? ''
       const approvedByAdmin = ['approved', 'admin_approved'].includes(status)

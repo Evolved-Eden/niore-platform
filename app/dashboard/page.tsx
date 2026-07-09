@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import EssenceBoard from '@/components/EssenceBoard'
+import { deriveRoleFromPlanTier } from '@/types'
 
 const ROLE_COLOR: Record<string, string> = {
   admin: '#ff6b6b',
@@ -72,19 +73,12 @@ export default async function DashboardHub({ searchParams }: { searchParams?: Pr
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  // Handle checkout=success — redirect to role-specific dashboard
-  const sp = await searchParams
-  const checkout = sp?.checkout as string
-
-  if (checkout === 'success') {
-    const { data: identity } = await supabase
-      .from('users')
-      .select('role')
-      .eq('id', user.id)
-      .single()
-    const role = (identity?.role as string) ?? 'client'
-    redirect(`/dashboard/${role}`)
-  }
+  // Fetch client record to get plan_tier_key (reflects what user actually paid for)
+  const { data: clientRecord } = await supabase
+    .from('clients')
+    .select('plan_tier_key, metadata')
+    .eq('id', user.id)
+    .maybeSingle()
 
   const { data: identity } = await supabase
     .from('users')
@@ -92,8 +86,20 @@ export default async function DashboardHub({ searchParams }: { searchParams?: Pr
     .eq('id', user.id)
     .single()
 
-  const role: string = (identity?.role as string) ?? 'client'
+  const userRole = (identity?.role as string) ?? 'client'
   const name = identity?.full_name ?? user.email?.split('@')[0] ?? 'User'
+
+  // Derive role from plan_tier_key first (what they paid for), fall back to users.role
+  const planRole = deriveRoleFromPlanTier(clientRecord?.plan_tier_key)
+  const role: string = planRole ?? userRole
+
+  // Handle checkout=success — redirect to role-specific dashboard
+  const sp = await searchParams
+  const checkout = sp?.checkout as string
+
+  if (checkout === 'success') {
+    redirect(`/dashboard/${role}`)
+  }
   const color = ROLE_COLOR[role] ?? '#c8ff00'
   const actions = QUICK_ACTIONS[role] ?? QUICK_ACTIONS.client
   const kpis = KPI_ITEMS

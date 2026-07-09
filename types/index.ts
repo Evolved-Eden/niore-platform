@@ -175,6 +175,19 @@ export type SwarmTemplateRow = {
 
 export type UserRole = 'admin' | 'client' | 'creator' | 'personal' | 'affiliate'
 
+/**
+ * Derive the dashboard role from a plan tier key.
+ * Plan tier keys follow the pattern: {role}_{type} (e.g., client_founder, creator_studio)
+ * This ensures users are routed to the correct dashboard based on what they paid for,
+ * not what role was set during registration.
+ */
+export function deriveRoleFromPlanTier(planTierKey: string | null | undefined): UserRole | null {
+  if (!planTierKey) return null
+  const prefix = planTierKey.split('_')[0] as UserRole
+  const validRoles: UserRole[] = ['client', 'creator', 'personal', 'affiliate']
+  return validRoles.includes(prefix) ? prefix : null
+}
+
 // ── Users & Identity ────────────────────────────────────────
 export type User = {
   id: string

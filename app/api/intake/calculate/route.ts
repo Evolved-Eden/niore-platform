@@ -456,7 +456,7 @@ export async function POST(req: NextRequest) {
       }
 
       // ── 6. Fire n8n post-intake workflow (fire-and-forget) ──
-      const n8nWebhookUrl = `${getN8nUrl()}/webhook/intake/complete`
+      const n8nWebhookUrl = `${getN8nUrl()}/webhook/intake-complete`
       const personalityTraits = Object.fromEntries(
         Object.entries(result.blueprint.scores).map(([k, v]) => [k, +(v / 100).toFixed(2)])
       )

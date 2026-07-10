@@ -9,12 +9,12 @@
       "typeVersion": 1.2,
       "position": [250, 300],
       "parameters": {
-        "path": "intake/complete",
+        "path": "intake-complete",
         "httpMethod": "POST",
         "responseMode": "lastNode",
         "options": {}
       },
-      "webhookId": "intake/complete"
+      "webhookId": "intake-complete"
     },
     {
       "id": "b1b2c3d4-e5f6-7890-abcd-ef1234567802",
@@ -53,18 +53,44 @@
       }
     },
     {
+      "id": "b1b2c3d4-e5f6-7890-abcd-ef1234567899",
+      "name": "Has Discord URL?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [550, 400],
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "typeValidation": "strict" },
+          "conditions": [
+            {
+              "id": "check-url",
+              "leftValue": "={{ $env.DISCORD_WEBHOOK_URL || '' }}",
+              "rightValue": "",
+              "operator": { "type": "string", "operation": "isNotEmpty" }
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
       "id": "b1b2c3d4-e5f6-7890-abcd-ef1234567804",
       "name": "Discord Welcome",
-      "type": "n8n-nodes-base.discordBotApi",
-      "typeVersion": 1,
-      "position": [650, 400],
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [750, 360],
       "parameters": {
-        "operation": "sendMessageToChannel",
-        "channelId": "={{ $json.discord_channel_id || $env.DISCORD_WELCOME_CHANNEL }}",
-        "content": "=🎉 **New Intake Complete!**\n**User:** {{ $json.email || $json.user_id }}\n**Archetype:** {{ $json.archetype || 'N/A' }}\n**Source:** {{ $json.source || 'web' }}"
-      },
-      "credentials": {
-        "discordBotApi": { "id": "OaWvPfFh7kjpswjH", "name": "Discord Alerts" }
+        "method": "POST",
+        "url": "={{ $env.DISCORD_WEBHOOK_URL || '' }}",
+        "authentication": "none",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"content\": \"🎉 **New Intake Complete!**\\n**User:** {{ $json.email || $json.user_id }}\\n**Archetype:** {{ $json.archetype || 'N/A' }}\"\n}",
+        "options": {
+          "timeout": 5000,
+          "allowUnauthorizedCerts": false
+        },
+        "sendHeaders": false
       }
     },
     {
@@ -84,10 +110,13 @@
       "main": [[{"node": "Validate Payload", "type": "main", "index": 0}]]
     },
     "Validate Payload": {
-      "main": [[{"node": "Create Intelligence Profile", "type": "main", "index": 0}, {"node": "Discord Welcome", "type": "main", "index": 0}]]
+      "main": [[{"node": "Create Intelligence Profile", "type": "main", "index": 0}, {"node": "Has Discord URL?", "type": "main", "index": 0}]]
     },
     "Create Intelligence Profile": {
       "main": [[{"node": "Webhook Response", "type": "main", "index": 0}]]
+    },
+    "Has Discord URL?": {
+      "main": [[{"node": "Discord Welcome", "type": "main", "index": 0}], [{"node": "Webhook Response", "type": "main", "index": 0}]]
     },
     "Discord Welcome": {
       "main": [[{"node": "Webhook Response", "type": "main", "index": 0}]]

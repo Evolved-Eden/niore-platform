@@ -226,6 +226,9 @@ function BlueprintAssessContent() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: user.id, blueprint_data: blueprintData }),
       })
+
+      // Trigger multi-lens profile calculation (astrology, numerology, etc.)
+      fetch('/api/profile/calculate', { method: 'POST' }).catch(() => {})
     }, 2000)
 
     return () => clearTimeout(timer)

@@ -53,6 +53,9 @@ importers:
       ai:
         specifier: ^6.0.168
         version: 6.0.206(zod@4.4.3)
+      astronomy-engine:
+        specifier: ^2.1.19
+        version: 2.1.19
       eventsource:
         specifier: ^4.1.0
         version: 4.1.0
@@ -1753,6 +1756,9 @@ packages:
   astring@1.9.0:
     resolution: {integrity: sha512-LElXdjswlqjWrPpJFg1Fx4wpkOCxj1TDHlSV4PlaRxHGWko024xICaa97ZkMfs6DRKlCguiAI+rbXv5GWwXIkg==}
     hasBin: true
+
+  astronomy-engine@2.1.19:
+    resolution: {integrity: sha512-8yWKNf7UeNbH458h3sAJ6ZgAjE5jTXp/mNNRFoC20j2SHwZIjAQeEsBB2Q3uCFRaTCCJRv33K2XhkhZQMXoX6w==}
 
   async-function@1.0.0:
     resolution: {integrity: sha512-hsU18Ae8CDTR6Kgu9DYf0EbCr/a5iGL0rytQDobUcdpYOKokk8LEjVphnXkDkgpi0wYVsqrXuP0bZxJaTqdgoA==}
@@ -6123,6 +6129,8 @@ snapshots:
   ast-types-flow@0.0.8: {}
 
   astring@1.9.0: {}
+
+  astronomy-engine@2.1.19: {}
 
   async-function@1.0.0: {}
 

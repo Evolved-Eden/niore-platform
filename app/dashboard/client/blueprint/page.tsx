@@ -44,6 +44,348 @@ const EMPTY_LENS = {
   color: '#ffffff30',
 }
 
+// ── Lens Detail Panel Components ─────────────────────
+
+function AstrologyDetail({ data }: { data: any }) {
+  if (!data) return null
+  const planets = data.planets || {}
+  const aspects = data.aspects || []
+  return (
+    <div className="space-y-3">
+      <div className="grid grid-cols-2 gap-2">
+        {['Sun','Moon','Mercury','Venus','Mars','Jupiter','Saturn','Uranus','Neptune','Pluto'].map(p => {
+          const pl = planets[p]
+          if (!pl) return null
+          return (
+            <div key={p} className="flex items-center gap-2 p-2 rounded-sm bg-white/[0.03] border border-white/[0.06]">
+              <span className="text-[10px] font-bold text-white/50 w-14">{p}</span>
+              <span className="text-[11px] text-white/80">{pl.sign} {Math.floor(pl.degrees)}°</span>
+              <span className="text-[9px] text-white/30">H{pl.house || '?'}</span>
+              {pl.isRetrograde && <span className="text-[9px] text-[#fb923c]">R</span>}
+            </div>
+          )
+        })}
+      </div>
+      {aspects.length > 0 && (
+        <div>
+          <div className="text-[10px] text-white/30 tracking-widest uppercase mb-1.5">Aspects</div>
+          <div className="flex flex-wrap gap-1.5">
+            {aspects.slice(0, 8).map((asp: any, i: number) => (
+              <span key={i} className="px-2 py-0.5 rounded-full bg-white/[0.04] text-[9px] text-white/50 border border-white/[0.06]">
+                {asp.planet1} {asp.type} {asp.planet2}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+      <div className="flex gap-3 text-[10px] text-white/40">
+        <span>Elements: {data.elementCounts?.fire || 0}F / {data.elementCounts?.earth || 0}E / {data.elementCounts?.air || 0}A / {data.elementCounts?.water || 0}W</span>
+      </div>
+    </div>
+  )
+}
+
+function VedicDetail({ data }: { data: any }) {
+  if (!data) return null
+  const planets = data.planets || {}
+  return (
+    <div className="space-y-3">
+      <div className="grid grid-cols-2 gap-2">
+        {['Sun','Moon','Mercury','Venus','Mars','Jupiter','Saturn'].map(p => {
+          const pl = planets[p]
+          if (!pl) return null
+          return (
+            <div key={p} className="flex items-center gap-2 p-2 rounded-sm bg-white/[0.03] border border-white/[0.06]">
+              <span className="text-[10px] font-bold text-white/50 w-14">{p}</span>
+              <span className="text-[11px] text-white/80">{pl.sign} {Math.floor(pl.degrees)}°</span>
+              <span className="text-[9px] text-white-30">H{pl.house || '?'}</span>
+            </div>
+          )
+        })}
+      </div>
+      {data.moonNakshatra && (
+        <div className="p-2 rounded-sm bg-[#a78bfa]/[0.08] border border-[#a78bfa]/[0.12]">
+          <span className="text-[10px] text-white/50">Moon Nakshatra: </span>
+          <span className="text-[11px] text-[#a78bfa] font-medium">{data.moonNakshatra} (Pada {data.moonPada})</span>
+        </div>
+      )}
+      <div className="flex gap-2 text-[10px] text-white/40">
+        <span>Doshas: Vata {data.tattvas?.vata || 0}% / Pitta {data.tattvas?.pitta || 0}% / Kapha {data.tattvas?.kapha || 0}%</span>
+      </div>
+    </div>
+  )
+}
+
+function NumerologyDetail({ data }: { data: any }) {
+  if (!data) return null
+  const items = [
+    { label: 'Life Path', value: data.lifePath?.label },
+    { label: 'Expression', value: data.expression?.label },
+    { label: "Heart's Desire", value: data.heartsDesire?.label },
+    { label: 'Personality', value: data.personality?.label },
+    { label: 'Maturity', value: data.maturity?.label },
+    { label: 'Birthday', value: data.birthday?.label },
+    { label: 'Balance', value: data.balance?.label },
+    { label: 'Hidden Passion', value: data.hiddenPassion },
+    { label: 'Personal Year', value: data.personalYear },
+    { label: 'Personal Month', value: data.personalMonth },
+    { label: 'Personal Day', value: data.personalDay },
+  ]
+  return (
+    <div className="space-y-2">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+        {items.filter(i => i.value != null).map(i => (
+          <div key={i.label} className="p-2 rounded-sm bg-white/[0.03] border border-white/[0.06]">
+            <div className="text-[9px] text-white/30 uppercase tracking-wider">{i.label}</div>
+            <div className="text-sm font-bold text-[#34d399]">{String(i.value)}</div>
+          </div>
+        ))}
+      </div>
+      {data.challenges && (
+        <div className="flex flex-wrap gap-2 text-[10px] text-white/40">
+          <span>Challenges: {data.firstChallenge?.label} · {data.secondChallenge?.label} · {data.thirdChallenge?.label} · {data.fourthChallenge?.label}</span>
+        </div>
+      )}
+      {data.karmicLessons?.length > 0 && (
+        <div className="text-[10px] text-white/50">
+          Karmic Lessons: {data.karmicLessons.join(', ')}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function ChineseZodiacDetail({ data }: { data: any }) {
+  if (!data) return null
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center gap-3 p-3 rounded-sm bg-[#fb923c]/[0.06] border border-[#fb923c]/[0.1]">
+        <span className="text-2xl">{data.animal === 'Rat' ? '🐀' : data.animal === 'Ox' ? '🐂' : data.animal === 'Tiger' ? '🐅' : data.animal === 'Rabbit' ? '🐇' : data.animal === 'Dragon' ? '🐉' : data.animal === 'Snake' ? '🐍' : data.animal === 'Horse' ? '🐎' : data.animal === 'Goat' ? '🐐' : data.animal === 'Monkey' ? '🐒' : data.animal === 'Rooster' ? '🐓' : data.animal === 'Dog' ? '🐕' : '🐖'}</span>
+        <div>
+          <div className="text-sm font-bold text-white">{data.animal}</div>
+          <div className="text-[10px] text-white/50">{data.element} {data.yinYang} · Fixed element: {data.fixedElement}</div>
+        </div>
+      </div>
+      {data.personality && <p className="text-xs text-white/60">{data.personality}</p>}
+      {data.strengths?.length > 0 && (
+        <div>
+          <div className="text-[10px] text-white/30 uppercase tracking-wider mb-1">Strengths</div>
+          <div className="flex flex-wrap gap-1">
+            {data.strengths.map((s: string, i: number) => (
+              <span key={i} className="px-2 py-0.5 rounded-full bg-[#34d399]/[0.1] text-[9px] text-[#34d399] border border-[#34d399]/[0.2]">{s}</span>
+            ))}
+          </div>
+        </div>
+      )}
+      {data.compatibility?.length > 0 && (
+        <div className="text-[10px] text-white/40">Best matches: {data.compatibility.join(', ')} · Opposing: {data.opposing}</div>
+      )}
+    </div>
+  )
+}
+
+function HumanDesignDetail({ data }: { data: any }) {
+  if (!data) return null
+  const items = [
+    { label: 'Archetype', value: data.archetype },
+    { label: 'Energy Type', value: data.foundation?.energyType },
+    { label: 'Core Architecture', value: data.foundation?.coreArch },
+    { label: 'Natural Gift', value: data.foundation?.naturalGift },
+    { label: 'Growth Edge', value: data.foundation?.growthEdge },
+    { label: 'Operating Rhythm', value: data.foundation?.operatingRhythm },
+    { label: 'Lunar Node', value: data.foundation?.lunarNode },
+    { label: 'Sun Gate', value: data.gates?.sun?.keyword },
+    { label: 'Design Gate', value: data.gates?.design?.keyword },
+  ]
+  return (
+    <div className="space-y-2">
+      <div className="grid grid-cols-2 gap-2">
+        {items.filter(i => i.value).map(i => (
+          <div key={i.label} className="p-2 rounded-sm bg-white/[0.03] border border-white/[0.06]">
+            <div className="text-[9px] text-white/30 uppercase tracking-wider">{i.label}</div>
+            <div className="text-[11px] text-white/70">{i.value}</div>
+          </div>
+        ))}
+      </div>
+      {data.scores && (
+        <div className="space-y-1.5">
+          <div className="text-[10px] text-white/30 uppercase tracking-wider">Scores</div>
+          {Object.entries(data.scores).map(([k, v]) => (
+            <div key={k} className="flex items-center gap-2">
+              <span className="text-[10px] text-white/40 w-20 capitalize">{k.replace(/_/g, ' ')}</span>
+              <div className="flex-1 h-1.5 bg-white/[0.06] rounded-full overflow-hidden">
+                <div className="h-full bg-[#22d3ee] rounded-full" style={{ width: `${v}%` }} />
+              </div>
+              <span className="text-[9px] text-white/30">{v}%</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function BiorhythmDetail({ data }: { data: any }) {
+  if (!data) return null
+  const cycles = [
+    { name: 'Physical', score: data.today?.physicalScore, period: '23d', color: '#f472b6' },
+    { name: 'Emotional', score: data.today?.emotionalScore, period: '28d', color: '#a78bfa' },
+    { name: 'Intellectual', score: data.today?.intellectualScore, period: '33d', color: '#22d3ee' },
+    { name: 'Spiritual', score: data.today?.spiritualScore, period: '53d', color: '#c8ff00' },
+  ]
+  return (
+    <div className="space-y-3">
+      {cycles.map(c => {
+        const barWidth = Math.abs(c.score || 0)
+        const isPositive = (c.score || 0) >= 0
+        return (
+          <div key={c.name}>
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-[10px] text-white/50">{c.name} ({c.period})</span>
+              <span className="text-[10px]" style={{ color: c.color }}>{c.score > 0 ? '+' : ''}{c.score}%</span>
+            </div>
+            <div className="h-2 bg-white/[0.06] rounded-full overflow-hidden relative">
+              <div className="h-full rounded-full transition-all" style={{
+                width: `${barWidth}%`,
+                background: isPositive ? c.color : '#ff6b6b',
+                marginLeft: isPositive ? '50%' : `${50 - barWidth}%`,
+              }} />
+            </div>
+          </div>
+        )
+      })}
+      {data.overall?.interpretation && (
+        <p className="text-[10px] text-white/40 italic">{data.overall.interpretation}</p>
+      )}
+    </div>
+  )
+}
+
+function ElementalDetail({ data }: { data: any }) {
+  if (!data) return null
+  const elements = [
+    { name: 'Fire', pct: data.elementBalance?.fire || 0, color: '#fb923c' },
+    { name: 'Earth', pct: data.elementBalance?.earth || 0, color: '#34d399' },
+    { name: 'Air', pct: data.elementBalance?.air || 0, color: '#22d3ee' },
+    { name: 'Water', pct: data.elementBalance?.water || 0, color: '#a78bfa' },
+  ]
+  return (
+    <div className="space-y-3">
+      <div className="grid grid-cols-4 gap-2">
+        {elements.map(e => (
+          <div key={e.name} className="text-center p-2 rounded-sm bg-white/[0.03] border border-white/[0.06]">
+            <div className="text-lg font-bold" style={{ color: e.color }}>{e.pct}%</div>
+            <div className="text-[9px] text-white/40 uppercase">{e.name}</div>
+          </div>
+        ))}
+      </div>
+      <div className="p-3 rounded-sm bg-white/[0.03] border border-white/[0.06]">
+        <div className="text-[10px] text-white/30 uppercase tracking-wider mb-1">Temperament</div>
+        <div className="text-sm text-white/70 font-medium">{data.temperament}</div>
+        <p className="text-[10px] text-white/50 mt-1">{data.expressionStyle}</p>
+      </div>
+      {data.learningStyle && (
+        <div className="text-[10px] text-white/40">
+          <span className="text-white/50">Learning: </span>{data.learningStyle}
+        </div>
+      )}
+      {data.stressPattern && (
+        <div className="text-[10px] text-white/40">
+          <span className="text-white/50">Stress: </span>{data.stressPattern}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function LifeThemeDetail({ data }: { data: any }) {
+  if (!data) return null
+  return (
+    <div className="space-y-3">
+      <div className="p-3 rounded-sm bg-[#00d4ff]/[0.06] border border-[#00d4ff]/[0.1]">
+        <div className="text-[10px] text-white/30 uppercase tracking-wider mb-1">Soul Purpose</div>
+        <p className="text-sm text-white/80 font-medium">{data.soulPurpose || 'Discovering...'}</p>
+      </div>
+      {data.lifeStage && (
+        <div className="flex items-center justify-between p-2 rounded-sm bg-white/[0.03] border border-white/[0.06]">
+          <div>
+            <div className="text-[9px] text-white/30 uppercase tracking-wider">Life Stage</div>
+            <div className="text-[11px] text-white/70">{data.lifeStage.current}</div>
+          </div>
+          <div className="text-right">
+            <div className="text-[9px] text-white/30 uppercase tracking-wider">Age</div>
+            <div className="text-[11px] text-white/70">{data.lifeStage.age || '?'}</div>
+          </div>
+          <div className="text-right max-w-[200px]">
+            <div className="text-[9px] text-white/30 uppercase tracking-wider">Description</div>
+            <div className="text-[10px] text-white/50">{data.lifeStage.description}</div>
+          </div>
+        </div>
+      )}
+      {data.coreLesson && (
+        <div className="p-2 rounded-sm bg-white/[0.03] border border-white/[0.06]">
+          <div className="text-[9px] text-white/30 uppercase tracking-wider mb-0.5">Core Lesson</div>
+          <p className="text-[11px] text-white/60">{data.coreLesson}</p>
+        </div>
+      )}
+      {data.growthPath?.length > 0 && (
+        <div>
+          <div className="text-[10px] text-white/30 uppercase tracking-wider mb-1">Growth Path</div>
+          <div className="space-y-1">
+            {data.growthPath.slice(0, 4).map((g: string, i: number) => (
+              <div key={i} className="flex items-start gap-2 text-[10px] text-white/50">
+                <span className="text-[#00d4ff] mt-0.5">→</span>
+                <span>{g}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      {data.missionStatement && (
+        <p className="text-[10px] text-white/30 italic border-t border-white/[0.06] pt-2">{data.missionStatement}</p>
+      )}
+    </div>
+  )
+}
+
+function SoulProfileDetail({ data }: { data: any }) {
+  if (!data) return null
+  return (
+    <div className="space-y-3">
+      <div className="flex gap-3 p-3 rounded-sm bg-[#ff6b6b]/[0.06] border border-[#ff6b6b]/[0.1]">
+        <div>
+          <div className="text-[9px] text-white/30 uppercase tracking-wider">Soul Age</div>
+          <div className="text-sm font-bold text-white">{data.soulAge || '?'}</div>
+        </div>
+        <div className="flex-1">
+          <div className="text-[9px] text-white/30 uppercase tracking-wider">Dharma</div>
+          <div className="text-[11px] text-white/60">{data.dharma || data.soulPurpose || '?'}</div>
+        </div>
+      </div>
+      {data.karmicPatterns?.length > 0 && (
+        <div>
+          <div className="text-[10px] text-white/30 uppercase tracking-wider mb-1">Karmic Patterns</div>
+          {data.karmicPatterns.map((p: string, i: number) => (
+            <div key={i} className="text-[10px] text-white/50 flex items-start gap-1.5 mb-0.5">
+              <span className="text-[#ff6b6b]">•</span> {p}
+            </div>
+          ))}
+        </div>
+      )}
+      {data.soulContracts?.length > 0 && (
+        <div>
+          <div className="text-[10px] text-white/30 uppercase tracking-wider mb-1">Soul Contracts</div>
+          {data.soulContracts.map((c: string, i: number) => (
+            <div key={i} className="text-[10px] text-white/50 flex items-start gap-1.5 mb-0.5">
+              <span className="text-[#c8ff00]">◇</span> {c}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 const EXPANDED_PRICE = 150
 const DOMAIN_PRICE = 50
 
@@ -64,12 +406,124 @@ export default function ClientBlueprintPage() {
   const [twinExists, setTwinExists] = useState(false)
   const [intake, setIntake] = useState<IntakeInfo>({ hasIntake: false })
   const [lenses, setLenses] = useState<Record<string, any> | null>(null)
+  const [expandedLens, setExpandedLens] = useState<string | null>(null)
 
   // Upgrade state
   const [purchasedExpanded, setPurchasedExpanded] = useState(false)
   const [purchasedEnhanced, setPurchasedEnhanced] = useState(false)
   const [purchasedDomains, setPurchasedDomains] = useState<Set<string>>(new Set())
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null)
+
+  // ── Lens detail panel helpers ───────────────────
+
+  function renderLensDetail(key: string, data: any): React.ReactNode {
+    switch (key) {
+      case 'astrology':
+        return <AstrologyDetail data={data} />
+      case 'vedicAstrology':
+        return <VedicDetail data={data} />
+      case 'numerology':
+        return <NumerologyDetail data={data} />
+      case 'chineseZodiac':
+        return <ChineseZodiacDetail data={data} />
+      case 'humanDesign':
+        return <HumanDesignDetail data={data} />
+      case 'biorhythms':
+        return <BiorhythmDetail data={data} />
+      case 'elementalArchetype':
+        return <ElementalDetail data={data} />
+      case 'lifeTheme':
+        return <LifeThemeDetail data={data} />
+      case 'soulProfile':
+        return <SoulProfileDetail data={data} />
+      default:
+        return <pre className="text-xs text-white/50">{JSON.stringify(data, null, 2)}</pre>
+    }
+  }
+
+  // ── Blueprint Download ─────────────────────────
+
+  function downloadBlueprint() {
+    if (!blueprint && !lenses) return
+    const lines: string[] = []
+    lines.push('========================================')
+    lines.push('  EVOLVED EDEN — BLUEPRINT REPORT')
+    lines.push(`  Generated: ${new Date().toLocaleDateString()}`)
+    lines.push('========================================')
+    lines.push('')
+
+    if (blueprint) {
+      lines.push(`SCORE: ${blueprint.overallScore}`)
+      lines.push(`ARCHETYPE: ${blueprint.archetype}`)
+      lines.push('')
+      lines.push('DIMENSION SCORES:')
+      for (const [k, v] of Object.entries(blueprint.scores)) {
+        lines.push(`  ${k.replace(/_/g, ' ')}: ${v}/100`)
+      }
+      if (blueprint.summary) {
+        lines.push('')
+        lines.push(`SUMMARY: ${blueprint.summary}`)
+      }
+      lines.push('')
+    }
+
+    if (lenses) {
+      lines.push('--- MULTI-LENS PROFILE ---')
+      lines.push('')
+
+      const a = lenses.astrology?.data
+      if (a) {
+        lines.push('[Western Astrology]')
+        lines.push(`  Sun: ${a.sunSign} | Moon: ${a.moonSign} | Rising: ${a.risingSign}`)
+        lines.push(`  Elements: ${a.elementCounts?.fire || 0}F / ${a.elementCounts?.earth || 0}E / ${a.elementCounts?.air || 0}A / ${a.elementCounts?.water || 0}W`)
+        lines.push('')
+      }
+
+      const v = lenses.vedicAstrology?.data
+      if (v) {
+        lines.push('[Vedic Astrology]')
+        lines.push(`  Sun: ${v.sunSign} | Moon: ${v.moonSign} (${v.moonNakshatra || ''}) | Rising: ${v.risingSign}`)
+        lines.push(`  Doshas: Vata ${v.tattvas?.vata || 0}% / Pitta ${v.tattvas?.pitta || 0}% / Kapha ${v.tattvas?.kapha || 0}%`)
+        lines.push('')
+      }
+
+      const n = lenses.numerology?.data
+      if (n) {
+        lines.push('[Numerology]')
+        lines.push(`  Life Path: ${n.lifePath?.label || '?'}`)
+        lines.push(`  Expression: ${n.expression?.label || '?'}`)
+        lines.push(`  Heart's Desire: ${n.heartsDesire?.label || '?'}`)
+        lines.push(`  Personal Year/Month/Day: ${n.personalYear}/${n.personalMonth}/${n.personalDay}`)
+        if (n.karmicLessons?.length) lines.push(`  Karmic Lessons: ${n.karmicLessons.join(', ')}`)
+        lines.push('')
+      }
+
+      const cz = lenses.chineseZodiac?.data
+      if (cz) {
+        lines.push('[Chinese Zodiac]')
+        lines.push(`  ${cz.animal} — ${cz.element} ${cz.yinYang}`)
+        lines.push(`  Personality: ${cz.personality || ''}`)
+        lines.push('')
+      }
+
+      const lt = lenses.lifeTheme?.data
+      if (lt) {
+        lines.push('[Life Theme]')
+        lines.push(`  Purpose: ${lt.soulPurpose || ''}`)
+        lines.push(`  Stage: ${lt.lifeStage?.current || ''}`)
+        if (lt.missionStatement) lines.push(`  Mission: ${lt.missionStatement}`)
+        lines.push('')
+      }
+    }
+
+    const blob = new Blob([lines.join('\n')], { type: 'text/plain' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `blueprint-${new Date().toISOString().slice(0, 10)}.txt`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
 
   useEffect(() => {
     async function load() {
@@ -251,11 +705,22 @@ export default function ClientBlueprintPage() {
   return (
     <div className="max-w-5xl mx-auto animate-fade-in">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="font-display text-2xl font-bold tracking-tight mb-1">
-          My <span className="text-[#c8ff00]">Blueprint</span>
-        </h1>
-        <p className="text-white/30 text-sm">Your complete intelligence assessment and expansion modules</p>
+      <div className="flex items-start justify-between mb-8">
+        <div>
+          <h1 className="font-display text-2xl font-bold tracking-tight mb-1">
+            My <span className="text-[#c8ff00]">Blueprint</span>
+          </h1>
+          <p className="text-white/30 text-sm">Your complete intelligence assessment and expansion modules</p>
+        </div>
+        {(blueprint || lenses) && (
+          <button
+            onClick={downloadBlueprint}
+            className="shrink-0 flex items-center gap-2 px-4 py-2 border border-white/10 text-white/50 text-[11px] font-bold rounded-sm hover:bg-white/[0.04] hover:text-white/70 transition-all"
+          >
+            <span>⬇</span>
+            <span>Download Report</span>
+          </button>
+        )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -434,26 +899,35 @@ export default function ClientBlueprintPage() {
                       summary = `${data.soulAge || '?'} · ${(data.soulPurpose || '').slice(0, 40)}...`
                     }
 
+                    const cfg2 = cfg as { icon: string; label: string; color: string }
                     return (
-                      <div
+                      <button
                         key={key}
-                        className={`rounded-sm border p-3 transition-all ${
+                        onClick={() => isReady && setExpandedLens(expandedLens === key ? null : key)}
+                        className={`rounded-sm border p-3 transition-all text-left w-full ${
                           isReady
-                            ? 'border-white/[0.08] bg-white/[0.02] hover:border-white/[0.15]'
-                            : 'border-white/[0.04] bg-white/[0.01] opacity-50'
+                            ? 'border-white/[0.08] bg-white/[0.02] hover:border-white/[0.15] cursor-pointer'
+                            : 'border-white/[0.04] bg-white/[0.01] opacity-50 cursor-default'
                         }`}
                       >
                         <div className="flex items-center gap-2 mb-1.5">
-                          <span className="text-sm" style={{ color: cfg.color }}>{cfg.icon}</span>
-                          <span className="text-[10px] font-bold text-white/50 uppercase tracking-wider">{cfg.label}</span>
-                          {isReady && <span className="ml-auto w-1.5 h-1.5 rounded-full" style={{ backgroundColor: cfg.color }} />}
+                          <span className="text-sm" style={{ color: cfg2.color }}>{cfg2.icon}</span>
+                          <span className="text-[10px] font-bold text-white/50 uppercase tracking-wider">{cfg2.label}</span>
+                          {isReady && <span className="ml-auto w-1.5 h-1.5 rounded-full" style={{ backgroundColor: cfg2.color }} />}
                         </div>
                         {isReady ? (
-                          <p className="text-[11px] text-white/60 leading-snug">{summary}</p>
+                          <>
+                            <p className="text-[11px] text-white/60 leading-snug">{summary}</p>
+                            {expandedLens === key && (
+                              <div className="mt-2 pt-2 border-t border-white/[0.06]" onClick={e => e.stopPropagation()}>
+                                {renderLensDetail(key, data)}
+                              </div>
+                            )}
+                          </>
                         ) : (
                           <p className="text-[10px] text-white/20 italic">Run calculation to populate</p>
                         )}
-                      </div>
+                      </button>
                     )
                   })}
                 </div>

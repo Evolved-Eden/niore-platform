@@ -85,15 +85,33 @@ export default async function ClientSettingsPage() {
       <section className="glass rounded-sm p-6 border border-white/[0.06]">
         <h2 className="text-sm font-semibold mb-4">Plan & Billing</h2>
         <p className="text-xs text-white/40 mb-4">Your current subscription and billing information.</p>
-        <div className="text-sm">
-          <span className="text-xs text-white/30 block mb-1">Current Plan</span>
-          <span className="text-white/80">{(client as any)?.plan_tier || 'Free / No plan'}</span>
+        <div className="space-y-3 text-sm">
+          <div>
+            <span className="text-xs text-white/30 block mb-1">Current Plan</span>
+            <span className="text-white/80">
+              {(client as any)?.plan_tier_key
+                ? ((client as any)?.plan_tier_key as string).replace(/^[a-z]+_/, '').replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase())
+                : 'Free / No plan'}
+            </span>
+          </div>
+          {(client as any)?.additional_plans?.length > 0 && (
+            <div>
+              <span className="text-xs text-white/30 block mb-1">Additional Plans</span>
+              <span className="text-white/80 text-xs">{(client as any)?.additional_plans.join(', ')}</span>
+            </div>
+          )}
+          {(client as any)?.addons?.length > 0 && (
+            <div>
+              <span className="text-xs text-white/30 block mb-1">Add-ons</span>
+              <span className="text-white/80 text-xs">{(client as any)?.addons.join(', ')}</span>
+            </div>
+          )}
         </div>
         <Link
-          href="/pricing"
+          href="/dashboard/client/profile"
           className="inline-block mt-4 text-xs text-[#c8ff00]/60 hover:text-[#c8ff00] transition-colors"
         >
-          View plans →
+          View profile & plan details →
         </Link>
       </section>
 

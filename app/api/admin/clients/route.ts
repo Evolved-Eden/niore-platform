@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { requireAdmin } from '@/lib/admin-auth'
+import { provisionAccount } from '@/app/api/admin/provision/route'
 
 export async function GET(request: NextRequest) {
   try {
@@ -124,6 +125,29 @@ export async function POST(request: NextRequest) {
           .eq('id', clientId)
         if (error) throw error
         return NextResponse.json({ success: true, message: 'Client updated' })
+      }
+
+      if (action === 'provision') {
+        // Fetch client record to get email, full_name, etc.
+        const { data: client } = await supabaseAdmin
+          .from('clients')
+          .select('id, email, full_name, plan_tier_key, client_type, primary_vertical')
+          .eq('id', clientId)
+          .single()
+        if (!client) {
+          return NextResponse.json({ error: 'Client not found' }, { status: 404 })
+        }
+        const planTierKey = client.plan_tier_key || 'client_founder'
+        const result = await provisionAccount({
+          userId: client.id,
+          email: client.email || '',
+          fullName: client.full_name || null,
+          planTierKey,
+          role: client.client_type === 'creator' ? 'creator' : 'client',
+          verticalKey: client.primary_vertical || null,
+          swarmKey: null,
+        })
+        return NextResponse.json({ success: true, message: 'Account provisioned', orgId: result.orgId })
       }
 
       return NextResponse.json({ error: `Unknown action: ${action}` }, { status: 400 })

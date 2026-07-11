@@ -64,6 +64,8 @@ export default function ClientsTable({ initialClients }: { initialClients: Clien
       setClients(prev => prev.map(c => c.id === id ? { ...c, addons: extra.addons } : c))
     } else if (action === 'delete') {
       if (data.success) setClients(prev => prev.filter(c => c.id !== id))
+    } else if (action === 'provision') {
+      // fetch will automatically attach org data
     }
     setActionMsg({ type: 'ok', text: `${action} — ok` })
     setTimeout(() => setActionMsg(null), 3000)
@@ -89,6 +91,7 @@ export default function ClientsTable({ initialClients }: { initialClients: Clien
   const [twinStatus, setTwinStatus] = useState('active')
   const [twinVersion, setTwinVersion] = useState(1)
   const [twinSaving, setTwinSaving] = useState(false)
+  const [provisioning, setProvisioning] = useState<string | null>(null)
 
   const statusColor = (s: string | null) => {
     switch (s) {
@@ -269,6 +272,15 @@ export default function ClientsTable({ initialClients }: { initialClients: Clien
                       <button onClick={() => { setTwinClient(c); loadTwinMeta(c.id) }}
                          className="px-2.5 py-1 text-xs rounded-sm bg-[#ff6b6b]/20 text-[#ff6b6b] hover:bg-[#ff6b6b]/40"
                        >Twin</button>
+                      {!c.plan_tier_key?.includes('trial') && c.status === 'active' && (
+                        <button onClick={async () => {
+                          setProvisioning(c.id)
+                          await doAction(c.id, 'provision')
+                          setProvisioning(null)
+                        }} disabled={provisioning === c.id}
+                          className="px-2.5 py-1 text-xs rounded-sm bg-amber-900/30 text-amber-400 hover:bg-amber-900/60 disabled:opacity-40"
+                        >{provisioning === c.id ? '...' : 'Provision'}</button>
+                      )}
                       <button onClick={() => { setDetailClient(c) }}
                          className="px-2.5 py-1 text-xs rounded-sm bg-white/5 text-white/50 hover:text-white/80"
                        >Edit</button>

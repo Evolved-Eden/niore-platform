@@ -619,10 +619,10 @@ export default async function ClientProfilePage() {
               </div>
             </div>
             <Link
-              href="/pricing"
-              className="inline-block mt-4 text-xs text-white/30 hover:text-white/60 transition-colors"
+              href="/dashboard/client/plan"
+              className="inline-block mt-4 text-xs text-[#c8ff00]/60 hover:text-[#c8ff00] transition-colors"
             >
-              Manage subscription →
+              View plan details →
             </Link>
           </div>
 

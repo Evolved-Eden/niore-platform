@@ -488,6 +488,56 @@ export async function POST(req: NextRequest) {
         .eq('client_id', user.id)
         .maybeSingle()
       const twinMeta = (existingTwin?.metadata as Record<string, any>) ?? {}
+
+      // ── 4a. Run multi-lens calculations (astrology, numerology) ──
+      let astrologyData: any = null
+      let numerologyData: any = null
+      try {
+        const { calculateNumerology, calculateAstrology } = await import('@/lib/profile')
+        const birthDate = new Date(dob)
+        if (birthTime) {
+          const [h, m] = birthTime.split(':').map(Number)
+          if (!isNaN(h) && !isNaN(m)) birthDate.setUTCHours(h, m, 0, 0)
+        }
+        const lat = birthLocation ? undefined : undefined // would need geo lookup
+        const lng = birthLocation ? undefined : undefined
+
+        numerologyData = calculateNumerology(
+          (name || '').split(' ')[0] || '',
+          undefined,
+          (name || '').split(' ').slice(-1)[0] || '',
+          dob,
+        )
+        astrologyData = calculateAstrology({
+          date: birthDate,
+          latitude: lat,
+          longitude: lng,
+        })
+      } catch (lensErr) {
+        console.error('Multi-lens calculation error:', lensErr)
+      }
+
+      const lenses: Record<string, any> = {
+        ...(twinMeta.lenses || {}),
+        humanDesign: {
+          status: 'calculated',
+          data: {
+            archetype: result.blueprint.archetype,
+            scores: result.blueprint.scores,
+            gates: result.blueprint.gates,
+            foundation: result.blueprint.foundation,
+            summary: result.blueprint.summary,
+          },
+          calculatedAt: new Date().toISOString(),
+        },
+      }
+      if (numerologyData) {
+        lenses.numerology = { status: 'calculated', data: numerologyData, calculatedAt: new Date().toISOString() }
+      }
+      if (astrologyData) {
+        lenses.astrology = { status: 'calculated', data: astrologyData, calculatedAt: new Date().toISOString() }
+      }
+
       const { error: twinErr } = await svc
         .from('client_twins')
         .upsert({
@@ -495,6 +545,7 @@ export async function POST(req: NextRequest) {
           client_id: user.id,
           metadata: {
             ...twinMeta,
+            lenses,
             blueprint: {
               core: {
                 overallScore: Math.round(Object.values(result.blueprint.scores).reduce((a, b) => a + b, 0) / Object.keys(result.blueprint.scores).length),

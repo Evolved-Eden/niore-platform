@@ -29,6 +29,7 @@
     "@vercel/analytics": "^1.6.1",
     "@vercel/kv": "^2.0.0",
     "ai": "^6.0.168",
+    "astronomy-engine": "^2.1.19",
     "eventsource": "^4.1.0",
     "framer-motion": "^11.3.19",
     "next": "^16.2.4",

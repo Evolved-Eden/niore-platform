@@ -119,6 +119,7 @@ function EssenceIntelligencePage() {
 
   // Execute modal
   const [executingItem, setExecutingItem] = useState<DailyEssenceItem | IntelligenceItem | null>(null)
+  const [modalTab, setModalTab] = useState<'review' | 'deploy'>('review')
   const [selectedAgent, setSelectedAgent] = useState('')
   const [promptText, setPromptText] = useState('')
   const [deployLoading, setDeployLoading] = useState(false)
@@ -222,28 +223,33 @@ function EssenceIntelligencePage() {
           // Agents fetch is non-critical
         }
 
-        // 4. Fetch blueprint info from twin metadata
-        const { data: twin } = await supabase
-          .from('client_twins')
-          .select('id, metadata')
-          .eq('client_id', u.id)
-          .maybeSingle()
-
-        if (twin) {
-          const meta: any = twin?.metadata || {}
-          const bp = meta.blueprint
-          if (bp?.core) {
-            setBlueprint({
-              overallScore: bp.core.overallScore ?? 0,
-              archetype: bp.core.archetype ?? 'Custom',
-              scores: bp.core.scores ?? {},
-              summary: bp.core.summary ?? '',
-              exists: true,
-            })
+        // 4. Fetch blueprint info from twin metadata (via API to bypass RLS)
+        try {
+          const twinRes = await fetch('/api/client/twin')
+          if (twinRes.ok) {
+            const twinData = await twinRes.json()
+            const twin = twinData.twin
+            if (twin) {
+              const meta: any = twin.metadata || {}
+              const bp = meta.blueprint
+              if (bp?.core) {
+                setBlueprint({
+                  overallScore: bp.core.overallScore ?? 0,
+                  archetype: bp.core.archetype ?? 'Custom',
+                  scores: bp.core.scores ?? {},
+                  summary: bp.core.summary ?? '',
+                  exists: true,
+                })
+              } else {
+                setBlueprint({ exists: false, overallScore: 0, archetype: '', scores: {}, summary: '' })
+              }
+            } else {
+              setBlueprint({ exists: false, overallScore: 0, archetype: '', scores: {}, summary: '' })
+            }
           } else {
             setBlueprint({ exists: false, overallScore: 0, archetype: '', scores: {}, summary: '' })
           }
-        } else {
+        } catch {
           setBlueprint({ exists: false, overallScore: 0, archetype: '', scores: {}, summary: '' })
         }
       } catch (err: any) {
@@ -275,8 +281,9 @@ function EssenceIntelligencePage() {
 
   // ── Handlers ──
 
-  function openExecuteModal(item: DailyEssenceItem | IntelligenceItem) {
+  function openExecuteModal(item: DailyEssenceItem | IntelligenceItem, tab: 'review' | 'deploy' = 'review') {
     setExecutingItem(item)
+    setModalTab(tab)
     setSelectedAgent('')
     setPromptText(item.content)
     setIntelFile(null)
@@ -515,12 +522,20 @@ function EssenceIntelligencePage() {
                           {/* Actions row */}
                           <div className="flex items-center gap-2">
                             {isPending && (
-                              <button
-                                onClick={() => openExecuteModal(item)}
-                                className="px-3 py-1.5 bg-[#c8ff00] text-black text-[10px] font-bold rounded-sm hover:bg-white transition-all"
-                              >
-                                Execute as Agent
-                              </button>
+                              <>
+                                <button
+                                  onClick={() => openExecuteModal(item, 'review')}
+                                  className="px-3 py-1.5 bg-white/[0.06] text-white/70 text-[10px] font-bold rounded-sm hover:bg-white/[0.1] transition-all"
+                                >
+                                  Review
+                                </button>
+                                <button
+                                  onClick={() => openExecuteModal(item, 'deploy')}
+                                  className="px-3 py-1.5 bg-[#c8ff00] text-black text-[10px] font-bold rounded-sm hover:bg-white transition-all"
+                                >
+                                  Execute as Agent
+                                </button>
+                              </>
                             )}
                             {isStoredWithId && item.status === 'active' && (
                               <button
@@ -560,12 +575,26 @@ function EssenceIntelligencePage() {
                     No blueprint assessment found. Run your assessment to unlock
                     personalized essence intelligence calibrated to your profile.
                   </p>
-                  <Link
-                    href="/dashboard/client/blueprint/assess"
-                    className="inline-block px-5 py-2 bg-[#c8ff00] text-black text-xs font-bold rounded-sm hover:bg-white transition-all"
-                  >
-                    Run Blueprint Assessment \u2192
-                  </Link>
+                  <div className="flex items-center justify-center gap-3">
+                    <Link
+                      href="/intake"
+                      className="px-5 py-2 border border-white/10 text-white/50 text-xs font-bold rounded-sm hover:text-white hover:border-white/30 transition-all"
+                    >
+                      Review Your Intake \u2190
+                    </Link>
+                    <Link
+                      href="/dashboard/client/blueprint/assess"
+                      className="px-5 py-2 bg-[#c8ff00] text-black text-xs font-bold rounded-sm hover:bg-white transition-all"
+                    >
+                      Run Blueprint Assessment \u2192
+                    </Link>
+                  </div>
+                  <p className="text-[10px] text-white/20 mt-3">
+                    Already have a blueprint?{' '}
+                    <Link href="/dashboard/client/blueprint" className="text-white/40 hover:text-white/60 underline">
+                      View it here
+                    </Link>
+                  </p>
                 </div>
               ) : (
                 <div>
@@ -824,126 +853,218 @@ function EssenceIntelligencePage() {
             </button>
 
             <div className="p-6">
-              {/* Header */}
-              <div className="flex items-center gap-3 mb-6">
-                <span className="text-lg">{'\u2699\uFE0F'}</span>
-                <div>
-                  <h2 className="font-display text-lg font-bold text-white">
-                    Execute as Agent
-                  </h2>
-                  <p className="text-xs text-white/40">
-                    Deploy this essence suggestion to an agent
-                  </p>
-                </div>
-              </div>
-
-              {/* Essence Preview */}
-              <div className="mb-5 p-3 rounded-sm bg-white/[0.03] border border-white/[0.06]">
-                <div className="flex items-center gap-2 mb-1">
-                  {renderTypeBadge(executingItem.type)}
-                </div>
-                <p className="text-sm text-white/60">{executingItem.content}</p>
-              </div>
-
-              {/* Agent Selector */}
-              <div className="mb-5">
-                <label className="block text-xs text-white/30 tracking-widest uppercase mb-2">
-                  Agent Type
-                </label>
-                <select
-                  value={selectedAgent}
-                  onChange={(e) => setSelectedAgent(e.target.value)}
-                  className="w-full px-3 py-2.5 bg-white/[0.04] border border-white/[0.1] rounded-sm text-sm text-white/70 focus:outline-none focus:border-[#c8ff00]/40 transition-all appearance-none"
+              {/* Tabs */}
+              <div className="flex gap-1 mb-6 bg-white/[0.03] rounded-sm p-1">
+                <button
+                  onClick={() => setModalTab('review')}
+                  className={`flex-1 px-3 py-2 text-xs font-bold rounded-sm transition-all ${
+                    modalTab === 'review'
+                      ? 'bg-[#c8ff00] text-black'
+                      : 'text-white/40 hover:text-white/70'
+                  }`}
                 >
-                  <option value="" disabled>
-                    {agents.length > 0 ? 'Select an agent...' : 'Loading agents...'}
-                  </option>
-                  {agents.map((agent) => (
-                    <option key={agent.id} value={agent.agent_id}>
-                      {agent.name}{agent.tagline ? ` \u2014 ${agent.tagline}` : ''}
-                    </option>
-                  ))}
-                </select>
-                {agents.length === 0 && (
-                  <p className="text-[10px] text-white/20 mt-1">
-                    No agents registered yet. Your execution will be queued.
-                  </p>
-                )}
-              </div>
-
-              {/* Prompt */}
-              <div className="mb-5">
-                <label className="block text-xs text-white/30 tracking-widest uppercase mb-2">
-                  Prompt
-                </label>
-                <textarea
-                  value={promptText}
-                  onChange={(e) => setPromptText(e.target.value)}
-                  rows={3}
-                  className="w-full px-3 py-2.5 bg-white/[0.04] border border-white/[0.1] rounded-sm text-sm text-white/70 focus:outline-none focus:border-[#c8ff00]/40 transition-all resize-none"
-                  placeholder="Customize the prompt for the agent..."
-                />
-              </div>
-
-              {/* Intelligence Upload */}
-              <div className="mb-6">
-                <label className="block text-xs text-white/30 tracking-widest uppercase mb-2">
-                  Intelligence Upload
-                  <span className="text-white/20 ml-1">(optional)</span>
-                </label>
-                <div
-                  onClick={() => fileInputRef.current?.click()}
-                  className="w-full px-3 py-4 bg-white/[0.02] border border-dashed border-white/[0.1] rounded-sm text-center cursor-pointer hover:border-white/20 transition-all"
+                  \uD83D\uDCDD Review Details
+                </button>
+                <button
+                  onClick={() => setModalTab('deploy')}
+                  className={`flex-1 px-3 py-2 text-xs font-bold rounded-sm transition-all ${
+                    modalTab === 'deploy'
+                      ? 'bg-[#c8ff00] text-black'
+                      : 'text-white/40 hover:text-white/70'
+                  }`}
                 >
-                  {intelFile ? (
-                    <div className="flex items-center justify-center gap-2">
-                      <span className="text-xs text-[#c8ff00]">{intelFile.name}</span>
+                  \u2699\uFE0F Deploy to Agent
+                </button>
+              </div>
+
+              {modalTab === 'review' ? (
+                /* ═══ REVIEW TAB ═══ */
+                <div className="space-y-5">
+                  <div>
+                    <h2 className="font-display text-lg font-bold text-white mb-1">
+                      Suggestion Detail
+                    </h2>
+                    <p className="text-xs text-white/40">
+                      Review this intelligence suggestion in full
+                    </p>
+                  </div>
+
+                  {/* Metadata */}
+                  <div className="flex items-center gap-3 flex-wrap">
+                    {renderTypeBadge(executingItem.type)}
+                    {executingItem.priority && (
                       <span className="text-[10px] text-white/30">
-                        ({(intelFile.size / 1024).toFixed(1)} KB)
+                        Priority: <span style={{ color: PRIORITY_COLORS[executingItem.priority] }}>{executingItem.priority}</span>
                       </span>
-                    </div>
-                  ) : (
-                    <div>
-                      <span className="text-sm text-white/20 block mb-1">{'\uD83D\uDCC4'}</span>
-                      <span className="text-xs text-white/30">
-                        Drop a knowledge document or click to browse
+                    )}
+                    {'_source' in executingItem && (executingItem as any)._source === 'daily' && (
+                      <span className="text-[10px] text-white/20">
+                        Today&apos;s Suggestion
                       </span>
-                    </div>
-                  )}
-                </div>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept=".txt,.pdf,.md,.doc,.docx"
-                  className="hidden"
-                  onChange={(e) => setIntelFile(e.target.files?.[0] ?? null)}
-                />
-              </div>
+                    )}
+                  </div>
 
-              {/* Deploy Button */}
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={handleDeploy}
-                  disabled={deployLoading || !selectedAgent}
-                  className="flex-1 px-5 py-2.5 bg-[#c8ff00] text-black text-xs font-bold rounded-sm hover:bg-white transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-                >
-                  {deployLoading ? (
-                    <span className="flex items-center justify-center gap-2">
-                      <span className="w-3 h-3 border-2 border-black border-t-transparent rounded-full animate-spin" />
-                      Deploying...
-                    </span>
-                  ) : (
-                    'Deploy to Agent'
+                  {/* Full content */}
+                  <div className="p-4 rounded-sm bg-white/[0.03] border border-white/[0.06]">
+                    <p className="text-sm text-white/70 leading-relaxed">{executingItem.content}</p>
+                  </div>
+
+                  {/* Context / next steps */}
+                  <div className="p-4 rounded-sm bg-[#c8ff00]/[0.04] border border-[#c8ff00]/[0.1]">
+                    <p className="text-xs text-white/50 leading-relaxed">
+                      This suggestion is based on your current intelligence profile. You can deploy it to an agent for execution, or dismiss it if it doesn&apos;t apply right now. Suggestions refresh daily as your context evolves.
+                    </p>
+                  </div>
+
+                  {/* Action buttons */}
+                  <div className="flex items-center gap-3 pt-2">
+                    <button
+                      onClick={() => setModalTab('deploy')}
+                      className="flex-1 px-5 py-2.5 bg-[#c8ff00] text-black text-xs font-bold rounded-sm hover:bg-white transition-all"
+                    >
+                      Deploy to Agent \u2192
+                    </button>
+                    <button
+                      onClick={() => setExecutingItem(null)}
+                      className="px-4 py-2.5 border border-white/10 text-white/30 text-xs font-bold rounded-sm hover:text-white/50 hover:border-white/30 transition-all"
+                    >
+                      Dismiss
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                /* ═══ DEPLOY TAB ═══ */
+                <div className="space-y-5">
+                  <div>
+                    <h2 className="font-display text-lg font-bold text-white mb-1">
+                      Execute as Agent
+                    </h2>
+                    <p className="text-xs text-white/40">
+                      Deploy this essence suggestion to an agent
+                    </p>
+                  </div>
+
+                  {/* Essence Preview */}
+                  <div className="p-3 rounded-sm bg-white/[0.03] border border-white/[0.06]">
+                    <div className="flex items-center gap-2 mb-1">
+                      {renderTypeBadge(executingItem.type)}
+                    </div>
+                    <p className="text-sm text-white/60">{executingItem.content}</p>
+                  </div>
+
+                  {/* No blueprint warning */}
+                  {!blueprint?.exists && (
+                    <div className="p-3 rounded-sm bg-[#fb923c]/[0.08] border border-[#fb923c]/[0.15]">
+                      <p className="text-[10px] text-[#fb923c] font-medium mb-1">
+                        No Blueprint Found
+                      </p>
+                      <p className="text-[11px] text-white/50">
+                        For best results, run your Blueprint Assessment first. Agent execution will still work without it.
+                      </p>
+                    </div>
                   )}
-                </button>
-                <button
-                  onClick={() => setExecutingItem(null)}
-                  disabled={deployLoading}
-                  className="px-4 py-2.5 border border-white/10 text-white/30 text-xs font-bold rounded-sm hover:text-white/50 hover:border-white/30 transition-all disabled:opacity-40"
-                >
-                  Cancel
-                </button>
-              </div>
+
+                  {/* Agent Selector */}
+                  <div>
+                    <label className="block text-xs text-white/30 tracking-widest uppercase mb-2">
+                      Agent Type
+                    </label>
+                    <select
+                      value={selectedAgent}
+                      onChange={(e) => setSelectedAgent(e.target.value)}
+                      className="w-full px-3 py-2.5 bg-white/[0.04] border border-white/[0.1] rounded-sm text-sm text-white/70 focus:outline-none focus:border-[#c8ff00]/40 transition-all appearance-none"
+                    >
+                      <option value="" disabled>
+                        {agents.length > 0 ? 'Select an agent...' : 'Loading agents...'}
+                      </option>
+                      {agents.map((agent) => (
+                        <option key={agent.id} value={agent.agent_id}>
+                          {agent.name}{agent.tagline ? ` \u2014 ${agent.tagline}` : ''}
+                        </option>
+                      ))}
+                    </select>
+                    {agents.length === 0 && (
+                      <p className="text-[10px] text-white/20 mt-1">
+                        No agents registered yet. Your execution will be queued.
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Prompt */}
+                  <div>
+                    <label className="block text-xs text-white/30 tracking-widest uppercase mb-2">
+                      Prompt
+                    </label>
+                    <textarea
+                      value={promptText}
+                      onChange={(e) => setPromptText(e.target.value)}
+                      rows={3}
+                      className="w-full px-3 py-2.5 bg-white/[0.04] border border-white/[0.1] rounded-sm text-sm text-white/70 focus:outline-none focus:border-[#c8ff00]/40 transition-all resize-none"
+                      placeholder="Customize the prompt for the agent..."
+                    />
+                  </div>
+
+                  {/* Intelligence Upload */}
+                  <div>
+                    <label className="block text-xs text-white/30 tracking-widest uppercase mb-2">
+                      Intelligence Upload
+                      <span className="text-white/20 ml-1">(optional)</span>
+                    </label>
+                    <div
+                      onClick={() => fileInputRef.current?.click()}
+                      className="w-full px-3 py-4 bg-white/[0.02] border border-dashed border-white/[0.1] rounded-sm text-center cursor-pointer hover:border-white/20 transition-all"
+                    >
+                      {intelFile ? (
+                        <div className="flex items-center justify-center gap-2">
+                          <span className="text-xs text-[#c8ff00]">{intelFile.name}</span>
+                          <span className="text-[10px] text-white/30">
+                            ({(intelFile.size / 1024).toFixed(1)} KB)
+                          </span>
+                        </div>
+                      ) : (
+                        <div>
+                          <span className="text-sm text-white/20 block mb-1">{'\uD83D\uDCC4'}</span>
+                          <span className="text-xs text-white/30">
+                            Drop a knowledge document or click to browse
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept=".txt,.pdf,.md,.doc,.docx"
+                      className="hidden"
+                      onChange={(e) => setIntelFile(e.target.files?.[0] ?? null)}
+                    />
+                  </div>
+
+                  {/* Deploy Button */}
+                  <div className="flex items-center gap-3 pt-1">
+                    <button
+                      onClick={handleDeploy}
+                      disabled={deployLoading || !selectedAgent}
+                      className="flex-1 px-5 py-2.5 bg-[#c8ff00] text-black text-xs font-bold rounded-sm hover:bg-white transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      {deployLoading ? (
+                        <span className="flex items-center justify-center gap-2">
+                          <span className="w-3 h-3 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                          Deploying...
+                        </span>
+                      ) : (
+                        'Deploy to Agent'
+                      )}
+                    </button>
+                    <button
+                      onClick={() => setModalTab('review')}
+                      disabled={deployLoading}
+                      className="px-4 py-2.5 border border-white/10 text-white/30 text-xs font-bold rounded-sm hover:text-white/50 hover:border-white/30 transition-all disabled:opacity-40"
+                    >
+                      \u2190 Review
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

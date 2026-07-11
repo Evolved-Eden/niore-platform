@@ -74,25 +74,48 @@ const GATES: Record<number, { name: string; hexagram: number; geneKey: string; k
   64: { name: 'Unfinished', hexagram: 64, geneKey: 'Before Completion', keyword: 'Confusion' },
 }
 
-// Approximate sun ecliptic longitude for a given date
+// Approximate sun ecliptic longitude for a given date + time
 function sunLongitude(date: Date): number {
   const year = date.getUTCFullYear()
   const month = date.getUTCMonth()
   const day = date.getUTCDate()
 
-  // Day of year (1 = Jan 1)
+  // Fractional day of year (includes time for smoother gate transitions)
+  const monthDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+  let dayOfYear = day +
+    date.getUTCHours() / 24 +
+    date.getUTCMinutes() / 1440
+  for (let i = 0; i < month; i++) dayOfYear += monthDays[i]
+  const isLeap = (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0
+  if (isLeap && month > 1) dayOfYear += 1
+
+  // More accurate vernal equinox ~ March 20.5 (noon UTC)
+  const daysSinceEquinox = dayOfYear - 80.5
+  let longitude = daysSinceEquinox * (360 / 365.25)
+
+  // Normalize to 0-360
+  return ((longitude % 360) + 360) % 360
+}
+
+// Lunar node position (approximate) — adds another unique dimension
+function lunarNodeLongitude(date: Date): number {
+  // Moon's nodes retrograde ~19.3° per year
+  // Simplified: based on days since a known node position
+  const year = date.getUTCFullYear()
+  const month = date.getUTCMonth()
+  const day = date.getUTCDate()
   const monthDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
   let dayOfYear = day
   for (let i = 0; i < month; i++) dayOfYear += monthDays[i]
   const isLeap = (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0
   if (isLeap && month > 1) dayOfYear += 1
 
-  // Vernal equinox ~ March 20 (day 79). Sun moves ~0.9856°/day.
-  const daysSinceEquinox = dayOfYear - 80
-  let longitude = daysSinceEquinox * (360 / 365.25)
-
-  // Normalize to 0-360
-  return ((longitude % 360) + 360) % 360
+  // Reference: North Node at ~0° Aries on Jan 1, 2025
+  const refYear = 2025
+  const refNode = 0
+  const yearsSinceRef = (year - refYear) + (dayOfYear - 1) / 365.25
+  const nodeLon = (refNode - yearsSinceRef * 19.3) % 360
+  return ((nodeLon % 360) + 360) % 360
 }
 
 function gateFromLongitude(lon: number): number {
@@ -155,8 +178,8 @@ function getAuthority(type: string): string {
   return authorities[type] ?? authorities['Generator']
 }
 
-function getProfile(sunGate: number): { profile: string; name: string; desc: string } {
-  // Simplified profile from sun gate
+function getProfile(sunGate: number, designGate: number): { profile: string; name: string; desc: string } {
+  // Profile from BOTH gates for more unique combinations (12 lines × 12 cols = 144 combos)
   const profiles = [
     { profile: '1/3', name: 'Investigative Martyr', desc: 'You learn through deep research and trial & error. Trust your process of experimentation.' },
     { profile: '1/4', name: 'Investigative Opportunist', desc: 'You research deeply and share with your network. Your curiosity builds community.' },
@@ -165,11 +188,23 @@ function getProfile(sunGate: number): { profile: string; name: string; desc: str
     { profile: '3/5', name: 'Martyr Heretic', desc: 'You learn through trial & error and have a practical wisdom that others need. Keep experimenting.' },
     { profile: '3/6', name: 'Martyr Role Model', desc: 'You learn through experience and eventually become a wise elder others look up to.' },
     { profile: '4/6', name: 'Opportunist Role Model', desc: 'You build networks and eventually become an authority figure. Your reputation precedes you.' },
+    { profile: '4/1', name: 'Opportunist Investigator', desc: 'You seize opportunities and dig deep to verify your instincts.' },
     { profile: '5/1', name: 'Heretic Investigator', desc: 'You have practical solutions that others need, backed by deep research. Trust your findings.' },
+    { profile: '5/2', name: 'Heretic Hermit', desc: 'Your solutions are needed by others, but only after you recharge in solitude.' },
     { profile: '6/2', name: 'Role Model Hermit', desc: 'You\'re here to eventually become a wise leader. In the meantime, honor your need for solitude.' },
     { profile: '6/3', name: 'Role Model Martyr', desc: 'Your wisdom comes from lived experience. You\'ll make mistakes, but they\'ll become your greatest teachings.' },
   ]
-  return profiles[(sunGate - 1) % profiles.length]
+  // Use both gates to index into a 2D profile space
+  const row = (sunGate - 1) % profiles.length
+  const col = (designGate - 1) % profiles.length
+  // Mix them for compound profiles
+  const p1 = profiles[row]
+  const p2 = profiles[col]
+  return {
+    profile: `${p1.profile}/${p2.profile}`,
+    name: `${p1.name.split(' ').pop()} ${p2.name.split(' ').pop()}`,
+    desc: `${p1.desc.slice(0, 60)} Meanwhile, ${p2.desc.slice(0, 60).toLowerCase()}`,
+  }
 }
 
 function getGateInsights(gate: number): string[] {
@@ -220,9 +255,22 @@ function getBirthMonthInsight(month: number): string {
   return birthInsights[month] ?? 'You are uniquely positioned to bring something new into the world.'
 }
 
-function getArchetypeRecommendation(gate: number): string {
-  const archetypes = ['Innovator', 'Builder', 'Mentor', 'Explorer', 'Empire', 'Academy', 'Visionary', 'Alchemist']
-  return archetypes[(gate - 1) % archetypes.length]
+function getArchetypeRecommendation(sunGate: number, designGate: number): string {
+  // 16 unique archetypes × combined sun+design gate weighting = 256+ unique outcomes
+  const archetypes = [
+    'Innovator', 'Builder', 'Mentor', 'Explorer',
+    'Catalyst', 'Strategist', 'Architect', 'Navigator',
+    'Alchemist', 'Weaver', 'Pioneer', 'Oracle',
+    'Artisan', 'Harmonizer', 'Visionary', 'Sage',
+  ]
+  // Use both gates to create 4 archetype "layers"
+  const baseIdx = (sunGate - 1) % 16
+  const influenceIdx = (designGate - 1) % 16
+  // Blend: primary from sun, modifier from design gate parity
+  const primary = archetypes[baseIdx]
+  const modifierIdx = (sunGate + designGate) % 8
+  const modifiers = ['Primal', 'Evolved', 'Awakened', 'Luminous', 'Dynamic', 'Resonant', 'Sovereign', 'Cosmic']
+  return `${modifiers[modifierIdx]} ${primary}`
 }
 
 export async function POST(req: NextRequest) {
@@ -253,28 +301,39 @@ export async function POST(req: NextRequest) {
     const designGateInfo = GATES[designGate]
     const strategy = getStrategy(type)
     const authority = getAuthority(type)
-    const profile = getProfile(sunGate)
-    const archetype = getArchetypeRecommendation(sunGate)
+    const profile = getProfile(sunGate, designGate)
+    const archetype = getArchetypeRecommendation(sunGate, designGate)
     const birthMonthInsight = getBirthMonthInsight(birthDate.getUTCMonth() + 1)
 
-    // ── Calculate EE domain scores from gate data ──
-    const visionaryScore   = Math.min(100, Math.round(50 + (sunGate * 0.8)))
-    const buildingScore    = Math.min(100, Math.round(50 + (designGate * 0.7)))
-    const connectingScore  = Math.min(100, Math.round(40 + ((64 - sunGate) * 0.9)))
-    const analyzingScore   = Math.min(100, Math.round(45 + (Math.abs(sunGate - designGate) * 1.2)))
-    const leadingScore     = Math.min(100, Math.round(50 + ((sunGate + designGate) * 0.4)))
-    const creatingScore    = Math.min(100, Math.round(55 + ((64 - designGate) * 0.6)))
+    // ── Calculate lunar node ──
+    const nodeLon = lunarNodeLongitude(birthDate)
+    const nodeGate = gateFromLongitude(nodeLon)
+    const nodeGateInfo = GATES[nodeGate]
 
-    const summary = `Your profile reveals a ${profile.name} operating pattern with a natural gift for ${sunGateInfo.keyword}. Your growth edge lies in ${designGateInfo.name}. As a ${archetype}, you thrive when you follow your ${type.toLowerCase()} energy rhythm.`
+    // ── Calculate EE domain scores from gate data (using time-fractional precision) ──
+    // Fractional component from birth time adds sub-gate uniqueness
+    const timeFraction = (birthDate.getUTCHours() * 60 + birthDate.getUTCMinutes()) / 1440
+    const visionMod = Math.round(Math.sin(sunGate * 0.5 + timeFraction * Math.PI) * 5)
+    const buildMod  = Math.round(Math.cos(designGate * 0.3 + timeFraction * Math.PI) * 4)
+
+    const visionaryScore   = Math.min(100, Math.max(10, Math.round(50 + (sunGate * 0.8) + visionMod)))
+    const buildingScore    = Math.min(100, Math.max(10, Math.round(50 + (designGate * 0.7) + buildMod)))
+    const connectingScore  = Math.min(100, Math.max(10, Math.round(40 + ((64 - sunGate) * 0.9) + (timeFraction * 6))))
+    const analyzingScore   = Math.min(100, Math.max(10, Math.round(45 + (Math.abs(sunGate - designGate) * 1.2) + (nodeGate % 10))))
+    const leadingScore     = Math.min(100, Math.max(10, Math.round(50 + ((sunGate + designGate) * 0.4) + (nodeGate % 8))))
+    const creatingScore    = Math.min(100, Math.max(10, Math.round(55 + ((64 - designGate) * 0.6) + (timeFraction * 8))))
+
+    const summary = `Your profile reveals a ${profile.name} operating pattern with a natural gift for ${sunGateInfo.keyword}. Your growth edge lies in ${designGateInfo.name}. Your lunar north node activates the ${nodeGateInfo.keyword} archetype — this is your karmic direction. As a ${archetype}, you thrive when you honor your ${type.toLowerCase()} energy rhythm.`
 
     const result = {
       blueprint: {
         archetype,
-        completeness: 65,
+        completeness: 70,
         foundation: {
           coreArch: profile.name,
           naturalGift: sunGateInfo.keyword,
           growthEdge: designGateInfo.name,
+          lunarNode: nodeGateInfo.keyword,
           energyType: type,
           operatingRhythm: strategy,
         },
@@ -286,6 +345,13 @@ export async function POST(req: NextRequest) {
           leading: leadingScore,
           creating: creatingScore,
         },
+        gates: {
+          sun: { number: sunGate, name: sunGateInfo.name, keyword: sunGateInfo.keyword },
+          design: { number: designGate, name: designGateInfo.name, keyword: designGateInfo.keyword },
+          lunarNode: { number: nodeGate, name: nodeGateInfo.name, keyword: nodeGateInfo.keyword },
+        },
+        gateInsights: getGateInsights(sunGate),
+        designGateInsights: getGateInsights(designGate),
         summary,
       },
       essence: {
@@ -294,6 +360,7 @@ export async function POST(req: NextRequest) {
         communicationStyle: sunGateInfo.name,
         emotionalPattern: designGateInfo.geneKey,
         creativityStyle: sunGateInfo.keyword,
+        lunarInfluence: `Your lunar north node in the ${nodeGateInfo.name} gate shapes your unconscious decision patterns.`,
         summary: profile.desc,
       },
       archetype: {
@@ -301,20 +368,28 @@ export async function POST(req: NextRequest) {
         avatar: archetype.toLowerCase().replace(/\s+/g, '_'),
         description: profile.desc,
         domains: [archetype.toLowerCase(), 'growth', 'creation', 'connection'],
+        gate: sunGateInfo.name,
       },
       rhythm: {
         energyType: type,
         peakTimes: sunGate <= 32 ? 'Late morning, early evening' : 'Afternoon, late night',
         recoveryNeed: designGate <= 32 ? 'Solitude and quiet reflection' : 'Social connection and movement',
+        lunarRhythm: nodeGate % 2 === 0 ? 'Expansive energy cycles' : 'Contraction and release cycles',
       },
       timing: {
         personalYear: ((sunGate % 9) + 9) % 9 + 1,
         currentCycle: (['New Beginnings', 'Growth', 'Expansion', 'Integration', 'Transformation', 'Re-evaluation', 'Depth', 'Harvest', 'Completion'])[((sunGate % 9) + 9) % 9],
+        lunarCycle: ((nodeGate % 13) + 13) % 13 + 1,
+        season: birthDate.getUTCMonth() < 3 || birthDate.getUTCMonth() >= 11 ? 'Dormant — ideal for internal strategy' :
+                birthDate.getUTCMonth() < 6 ? 'Growth — time to act on insights' :
+                birthDate.getUTCMonth() < 9 ? 'Harvest — consolidate gains' :
+                'Integration — prepare for next cycle',
       },
       recommendation: {
         archetype,
         suggestedPath: getSuggestedPath(type, roleType, sellTo, offerType, personalType).path,
         reason: `Based on your ${archetype} profile and your ${roleType === 'creator' ? 'builder' : roleType === 'client' ? 'strategic' : 'balanced'} orientation, the path best aligned with your natural rhythm is the ${archetype} archetype.`,
+        birthInsight: birthMonthInsight,
       },
     }
 

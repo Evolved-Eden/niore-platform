@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient, createServiceClient } from '@/lib/supabase/server'
 
 // Blueprint data lives in client_twins.metadata.blueprint (set by intake/calculate)
 function extractBlueprint(clientTwin: any) {
@@ -15,12 +15,14 @@ function extractBlueprint(clientTwin: any) {
 }
 
 export default async function CreatorDashboard() {
-  const supabase = await createClient()
-  const { data: { user: _user } } = await supabase.auth.getUser()
-  // Guaranteed non-null by root middleware
+  // 1. Verify identity via cookie-based admin client
+  const auth = await createAdminClient()
+  const { data: { user: _user } } = await auth.auth.getUser()
   const user = _user!
 
-  const { data: twin } = await supabase
+  // 2. All DB work goes through the service-role client (bypasses RLS)
+  const svc = createServiceClient()
+  const { data: twin } = await svc
     .from('client_twins')
     .select('metadata')
     .eq('client_id', user.id)

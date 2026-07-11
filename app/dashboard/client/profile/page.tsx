@@ -22,6 +22,52 @@ const PLAN_LABELS: Record<string, string> = {
   growth: 'Growth',
   premium: 'Premium',
   enterprise: 'Enterprise',
+  trial: 'Trial',
+  none: 'None',
+  // client_*
+  client_founder: 'Founder',
+  client_team: 'Team',
+  client_enterprise: 'Enterprise',
+  // creator_*
+  creator_studio: 'Studio',
+  creator_premium: 'Premium Creator',
+  creator_concierge: 'Concierge Creator',
+  // personal_*
+  personal_free: 'Free Personal',
+  personal_plus: 'Personal Plus',
+  personal_premium: 'Premium Personal',
+  // affiliate_*
+  affiliate_starter: 'Affiliate Starter',
+  affiliate_pro: 'Affiliate Pro',
+  affiliate_enterprise: 'Affiliate Enterprise',
+  // service_*
+  service_free: 'Free Service',
+  service_basic: 'Basic Service',
+  service_premium: 'Premium Service',
+  // employee_*
+  employee_starter: 'Employee Starter',
+  employee_growth: 'Employee Growth',
+  employee_pro: 'Employee Pro',
+  employee_enterprise: 'Employee Enterprise',
+  // department_*
+  department_starter: 'Department Starter',
+  department_premium: 'Department Premium',
+  // os_*
+  os_creator: 'OS Creator',
+  os_founder: 'OS Founder',
+  os_business: 'OS Business',
+  os_agency: 'OS Agency',
+  os_family: 'OS Family',
+  os_wellness: 'OS Wellness',
+  // enterprise_*
+  enterprise_concierge: 'Enterprise Concierge',
+  enterprise_eden_force: 'Eden Force',
+  enterprise_omnigrid: 'Omnigrid',
+}
+
+function planLabel(key: string | null | undefined): string {
+  if (!key || key === 'none' || key === 'free') return 'Free / Starter'
+  return PLAN_LABELS[key] ?? key.replace(/^[a-z]+_/, '').replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
 }
 
 // ─── Helpers ──────────────────────────────────────────────────
@@ -549,7 +595,7 @@ export default async function ClientProfilePage() {
               <div className="flex items-center justify-between">
                 <span className="text-xs text-white/40">Current Plan</span>
                 <Badge
-                  label={PLAN_LABELS[planTier] ?? planTier}
+                  label={planLabel(planTier)}
                   color={planTier === 'free' ? '#6b7280' : '#c8ff00'}
                 />
               </div>

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { requireAdmin } from '@/lib/admin-auth'
+import { provisionAccount } from '../provision/route'
 
 export async function GET(request: NextRequest) {
   try {
@@ -83,43 +84,48 @@ export async function POST(request: NextRequest) {
     const userId = body.userId as string
 
     if (action === 'approve') {
-      const planTier = (body.plan as string) || 'enterprise'
-
-      const { error: clientErr } = await supabaseAdmin
-        .from('clients')
-        .update({ status: 'admin_approved', plan_tier_key: planTier, onboarding_status: 'approved' })
-        .eq('id', userId)
-
-      if (clientErr) throw clientErr
+      // Preserve existing plan or default
+      let planTier = body.plan as string | undefined
+      if (!planTier) {
+        const { data: existing } = await supabaseAdmin
+          .from('clients')
+          .select('plan_tier_key, email, full_name')
+          .eq('id', userId)
+          .maybeSingle()
+        planTier = existing?.plan_tier_key || 'enterprise'
+      }
 
       const role = (body.role as string) || 'client'
       const { error: userErr } = await supabaseAdmin
         .from('users')
         .update({ role })
         .eq('id', userId)
-
       if (userErr) throw userErr
 
+      // Fetch current client + user data for provisioning
       const [userRes, clientRes] = await Promise.all([
         supabaseAdmin.from('users').select('email, full_name').eq('id', userId).maybeSingle(),
         supabaseAdmin.from('clients').select('email, full_name').eq('id', userId).maybeSingle(),
       ])
+      const email = clientRes.data?.email || userRes.data?.email || ''
+      const fullName = clientRes.data?.full_name || userRes.data?.full_name || null
 
-      try {
-        const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
-        await fetch(`${appUrl}/api/admin/provision`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            userId,
-            email: clientRes.data?.email || userRes.data?.email || '',
-            fullName: clientRes.data?.full_name || userRes.data?.full_name || null,
-            planTierKey: planTier,
-            role,
-          }),
+      // Update plan_tier_key and status on clients (reliable — uses supabaseAdmin directly)
+      const { error: clientErr } = await supabaseAdmin
+        .from('clients')
+        .update({
+          status: 'active',
+          plan_tier_key: planTier,
+          onboarding_status: 'provisioning',
         })
-      } catch {
-        // Provisioning is optional
+        .eq('id', userId)
+      if (clientErr) console.error('Failed to update client plan:', clientErr)
+
+      // Call provisionAccount directly (not via HTTP fetch) to avoid auth/cookie issues
+      try {
+        await provisionAccount({ userId, email, fullName, planTierKey: planTier, role })
+      } catch (provisionErr) {
+        console.error('Provisioning failed:', provisionErr)
       }
 
       return NextResponse.json({ success: true, message: 'User approved' })

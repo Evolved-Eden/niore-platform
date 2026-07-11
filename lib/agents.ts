@@ -14,6 +14,22 @@ export interface BrandKit {
   logo_url: string | null
 }
 
+export interface AgentRecord {
+  id: string
+  agent_id: string
+  agent_name: string | null
+  description: string | null
+  long_description: string | null
+  tagline: string | null
+  role_type: string | null
+  vertical: string | null
+  capabilities: unknown
+  model: string | null
+  system_prompt: string | null
+  brand_kit_id: string | null
+  business_id: string | null
+}
+
 /**
  * Resolves the brand kit an agent should use when generating output.
  * Resolution order: the agent's own brand_kit_id -> its business's
@@ -70,6 +86,47 @@ export function applyBrandKitToSystemPrompt(baseSystem: string, brandKit: BrandK
   return `${baseSystem}${brandBlock}`
 }
 
+/**
+ * Most agents don't have an explicit system_prompt set yet. Rather than
+ * blocking execution on that being filled in for every agent, build a
+ * reasonable one from the descriptive fields that do exist.
+ */
+export function buildFallbackSystemPrompt(agent: AgentRecord): string {
+  if (agent.system_prompt) return agent.system_prompt
+
+  const capabilitiesText = agent.capabilities
+    ? `\nCapabilities: ${JSON.stringify(agent.capabilities)}`
+    : ""
+
+  return [
+    `You are ${agent.agent_name || agent.agent_id}, an AI agent${agent.role_type ? ` (${agent.role_type})` : ""}.`,
+    agent.tagline || null,
+    agent.long_description || agent.description || null,
+    agent.vertical ? `Vertical: ${agent.vertical}` : null,
+    capabilitiesText || null,
+  ]
+    .filter(Boolean)
+    .join("\n")
+}
+
+/**
+ * Fetches an agent by its agent_id (the human-readable slug/id used
+ * throughout the app, e.g. 'AGT-001') rather than its internal uuid.
+ */
+export async function getAgentByAgentId(agentId: string): Promise<AgentRecord | null> {
+  const { data, error } = await supabaseAdmin
+    .from("agents")
+    .select(
+      "id, agent_id, agent_name, description, long_description, tagline, role_type, vertical, capabilities, model, system_prompt, brand_kit_id, business_id"
+    )
+    .eq("agent_id", agentId)
+    .is("deleted_at", null)
+    .maybeSingle()
+
+  if (error || !data) return null
+  return data as AgentRecord
+}
+
 export async function executeAgent(
   agent: {
     model?: string
@@ -91,4 +148,30 @@ export async function executeAgent(
   })
 
   return response
+}
+
+/**
+ * High-level entry point: look an agent up by its agent_id, resolve its
+ * system prompt (explicit or built from descriptive fields) and brand kit,
+ * run it, and return both the output and what was actually sent - callers
+ * that log executions (like the essence execute route) can persist both.
+ */
+export async function runAgentByAgentId(agentId: string, input: string) {
+  const agent = await getAgentByAgentId(agentId)
+  if (!agent) {
+    throw new Error(`Agent not found: ${agentId}`)
+  }
+
+  const baseSystem = buildFallbackSystemPrompt(agent)
+  const output = await executeAgent(
+    {
+      model: agent.model || undefined,
+      system: baseSystem,
+      brand_kit_id: agent.brand_kit_id,
+      business_id: agent.business_id,
+    },
+    input
+  )
+
+  return { agent, output }
 }

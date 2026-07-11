@@ -126,6 +126,9 @@ function EssenceIntelligencePage() {
   const [intelFile, setIntelFile] = useState<File | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  // Execution history
+  const [recentActions, setRecentActions] = useState<any[]>([])
+
   // ── Load everything on mount ──
 
   useEffect(() => {
@@ -221,6 +224,17 @@ function EssenceIntelligencePage() {
           }
         } catch {
           // Agents fetch is non-critical
+        }
+
+        // 3b. Fetch recent execution history
+        try {
+          const actionsRes = await fetch('/api/client/essence/execute')
+          if (actionsRes.ok) {
+            const actionsData = await actionsRes.json()
+            setRecentActions(actionsData.actions ?? [])
+          }
+        } catch {
+          // non-critical
         }
 
         // 4. Fetch blueprint info from twin metadata (via API to bypass RLS)
@@ -347,11 +361,24 @@ function EssenceIntelligencePage() {
       }
 
       setExecutingItem(null)
+      loadRecentActions()
     } catch (err: any) {
       console.error('Deploy error:', err)
       alert(err.message || 'Failed to deploy agent execution')
     } finally {
       setDeployLoading(false)
+    }
+  }
+
+  async function loadRecentActions() {
+    try {
+      const res = await fetch('/api/client/essence/execute')
+      if (res.ok) {
+        const data = await res.json()
+        setRecentActions(data.actions ?? [])
+      }
+    } catch {
+      // non-critical
     }
   }
 
@@ -715,6 +742,53 @@ function EssenceIntelligencePage() {
 
         {/* ══════════ Sidebar — 1/3 ══════════ */}
         <div className="lg:col-span-1 space-y-6">
+          {/* Recent Executions */}
+          <div className="glass rounded-sm border border-white/[0.06] overflow-hidden">
+            <div className="px-5 py-4 border-b border-white/[0.06]">
+              <span className="text-xs text-white/30 tracking-widest uppercase">
+                Recent Executions
+              </span>
+            </div>
+            {recentActions.length === 0 ? (
+              <div className="px-5 py-6 text-center">
+                <p className="text-xs text-white/20">
+                  Nothing executed yet — deploy an agent above to see results here.
+                </p>
+              </div>
+            ) : (
+              <div className="divide-y divide-white/[0.04] max-h-96 overflow-y-auto">
+                {recentActions.map((action) => (
+                  <div key={action.id} className="px-5 py-3">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs text-white/70 font-medium">
+                        {action.agent_id || 'Agent'}
+                      </span>
+                      <span
+                        className={
+                          'text-[10px] px-1.5 py-0.5 rounded-sm ' +
+                          (action.status === 'completed'
+                            ? 'bg-[#c8ff00]/10 text-[#c8ff00]'
+                            : action.status === 'failed'
+                            ? 'bg-red-500/10 text-red-400'
+                            : 'bg-white/10 text-white/40')
+                        }
+                      >
+                        {action.status}
+                      </span>
+                    </div>
+                    {action.result_summary ? (
+                      <p className="text-[11px] text-white/40 line-clamp-3">
+                        {action.result_summary}
+                      </p>
+                    ) : (
+                      <p className="text-[11px] text-white/20 italic">No result yet</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
           {/* Intelligence Summary */}
           <div className="glass rounded-sm border border-white/[0.06] overflow-hidden">
             <div className="px-5 py-4 border-b border-white/[0.06]">

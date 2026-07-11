@@ -936,7 +936,7 @@ export default function ClientBlueprintPage() {
                 {lenses && (
                   <div className="mt-4 flex items-center gap-2 text-[10px] text-white/30">
                     <span className="w-1.5 h-1.5 rounded-full bg-[#c8ff00]" />
-                    {Object.values(LENS_DISPLAY).filter(k => (lenses as any)?.[k]?.status === 'calculated').length} / {Object.keys(LENS_DISPLAY).length} lenses active
+                    {Object.keys(LENS_DISPLAY).filter(k => (lenses as any)?.[k]?.status === 'calculated').length} / {Object.keys(LENS_DISPLAY).length} lenses active
                     <span className="ml-auto">
                       {lenses.astrology?.calculatedAt
                         ? `Last calculated: ${new Date(lenses.astrology.calculatedAt).toLocaleDateString()}`

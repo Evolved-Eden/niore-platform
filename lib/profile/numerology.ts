@@ -185,7 +185,7 @@ export function calculateNumerology(
   const maturity = simpleLabel(lifePath.value + expression.value)
 
   // Balance = sum of initials (first letter of each name)
-  const nameParts = [firstName, middleName, lastName].filter(Boolean)
+  const nameParts = [firstName, middleName, lastName].filter((n): n is string => !!n)
   const initSum = nameParts.reduce((sum, part) => {
     const ch = part[0]?.toLowerCase()
     return sum + (ch && ch in PYTHAGOREAN ? PYTHAGOREAN[ch] : 0)

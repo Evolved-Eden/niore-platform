@@ -295,10 +295,10 @@ export async function POST(req: Request) {
           .from("client_twins")
           .insert({
             client_id: userId,
-            name: "Primary Intelligence",
-            status: "active",
+            twin_status: "active",
+            version: 1,
             metadata: twinMeta,
-          })
+          } as any)
       }
     }
 

@@ -49,68 +49,49 @@ async function provisionAccount({
   }, { onConflict: 'id' })
 
   // ── 2. Create organization ──
-  const { data: org } = await supabase.from('organizations').insert({
+  const { data: org, error: orgErr } = await supabase.from('organizations').insert({
     name: `${name}'s Intelligence`,
     owner_id: userId,
     slug: `${email.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase()}_org`,
     industry: verticalKey || null,
     subscription_plan: planTierKey,
     subscription_status: 'active',
+    organization_type: role,
     settings: {
       vertical_key: verticalKey,
       swarm_key: swarmKey,
       plan_tier: planTierKey,
     },
   } as any).select().single()
+  if (orgErr) console.error('provisionAccount: organizations insert failed:', orgErr.message)
 
   const orgId = org?.id
 
-  // ── 3. Create human profile (blueprint/essence anchor) ──
-  const { data: hp } = await (supabase.from('human_profiles') as any).insert({
-    user_id: userId,
-    email,
-    first_name: fullName?.split(' ')[0] || email.split('@')[0],
-    last_name: fullName?.split(' ').slice(1).join(' ') || null,
-    identity_summary: `Business intelligence for ${name}`,
-    daily_essence: null,
-  }).select('id').single()
-
-  // ── 4. Create intelligence profile (AI Twin data) ──
-  let intelProfileId: string | null = null
+  // ── 3. Add the owner as an org member ──
   if (orgId) {
-    const { data: intel } = await supabase.from('intelligence_profiles').insert({
-      entity_type: 'organization',
-      entity_id: orgId,
+    const { error: memberErr } = await supabase.from('organization_members').insert({
       organization_id: orgId,
-      profile_kind: 'business_intelligence',
-      identity_summary: `Business intelligence for ${name}`,
-      profile_type: 'blueprint_derived',
-      confidence_score: 0.5,
-      version: 1,
-    }).select('id').single()
-    intelProfileId = (intel as any)?.id || null
+      user_id: userId,
+      role: 'owner',
+      is_active: true,
+    } as any)
+    if (memberErr) console.error('provisionAccount: organization_members insert failed:', memberErr.message)
   }
 
-  // ── 5. Create AI Twin (joins human_profile + intelligence_profile) ──
-  if (hp && intelProfileId) {
-    await (supabase.from('ai_twins') as any).insert({
-      human_profile_id: hp.id,
-      intelligence_profile_id: intelProfileId,
-      client_id: userId,
-      twin_name: `${name}'s Twin`,
-      twin_type: 'blueprint',
-      active: true,
-    })
-  }
-
-  // ── 6. Create Client Twin ──
-  await supabase.from('client_twins').upsert({
+  // ── 4. Create Client Twin (the human's actual twin record) ──
+  // Note: earlier versions of this function also inserted into human_profiles,
+  // intelligence_profiles, and ai_twins — none of those tables exist in the live
+  // database, so those inserts were silently failing (no error was ever checked)
+  // on every single signup. client_twins is the real, live twin table; removed
+  // the dead steps rather than leave code that always no-ops.
+  const { error: twinErr } = await supabase.from('client_twins').upsert({
     client_id: userId,
     organization_id: orgId || null,
     twin_status: 'active',
     version: 1,
     confidence_score: 0.5,
   }, { onConflict: 'client_id' })
+  if (twinErr) console.error('provisionAccount: client_twins upsert failed:', twinErr.message)
 
   // ── 7. Create Zuri agent ──
   const { data: zuriAgent } = await supabase.from('agents').insert({

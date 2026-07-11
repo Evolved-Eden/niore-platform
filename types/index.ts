@@ -924,6 +924,7 @@ export type Database = {
       catalogs: TableWithDefaults<{ id: string; key: string; name: string; kind?: string; is_active?: boolean; metadata?: unknown; created_at?: string; updated_at?: string }>
       client_consultations: TableWithDefaults<ClientConsultationRow>
       client_deployed_agents: TableWithDefaults<ClientDeployedAgentRow>
+      client_intelligence_memories: TableWithDefaults<AIMemory>
       client_twins: TableWithDefaults<ClientTwin>
       client_zuri_sessions: TableWithDefaults<ClientZuriSessionRow>
       clients: TableWithDefaults<Client>

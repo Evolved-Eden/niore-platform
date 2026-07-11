@@ -475,9 +475,19 @@ export async function POST(req: NextRequest) {
         },
       } as any
 
-      const { error: memErr } = existingMem
-        ? await svc.from('client_intelligence_memories').update(memPayload).eq('id', existingMem.id)
-        : await svc.from('client_intelligence_memories').insert(memPayload)
+      let memErr: any = null
+      if (existingMem) {
+        const { error } = await svc
+          .from('client_intelligence_memories')
+          .update(memPayload)
+          .eq('id', existingMem.id as string)
+        memErr = error
+      } else {
+        const { error } = await svc
+          .from('client_intelligence_memories')
+          .insert(memPayload)
+        memErr = error
+      }
 
       if (memErr) {
         console.error('Failed to create intelligence memory:', memErr)

@@ -115,7 +115,7 @@ export async function POST(request: NextRequest) {
         .from('clients')
         .update({
           status: 'active',
-          plan_tier_key: planTier,
+          plan_tier_key: planTier ?? 'enterprise',
           onboarding_status: 'provisioning',
         })
         .eq('id', userId)
@@ -123,7 +123,7 @@ export async function POST(request: NextRequest) {
 
       // Call provisionAccount directly (not via HTTP fetch) to avoid auth/cookie issues
       try {
-        await provisionAccount({ userId, email, fullName, planTierKey: planTier, role })
+        await provisionAccount({ userId, email, fullName, planTierKey: planTier ?? 'enterprise', role })
       } catch (provisionErr) {
         console.error('Provisioning failed:', provisionErr)
       }

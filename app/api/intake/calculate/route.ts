@@ -406,6 +406,7 @@ export async function POST(req: NextRequest) {
       }
 
       // 4. Create/update the client_twin with blueprint data
+      // NOTE: client_twins has no 'name' column, only metadata/blueprint fields
       const { data: existingTwin } = await svc
         .from('client_twins')
         .select('id, metadata')
@@ -417,7 +418,6 @@ export async function POST(req: NextRequest) {
         .upsert({
           id: existingTwin?.id ?? undefined,
           client_id: user.id,
-          name: name || user.email?.split('@')[0] || 'User',
           metadata: {
             ...twinMeta,
             blueprint: {
@@ -439,39 +439,48 @@ export async function POST(req: NextRequest) {
         console.error('Failed to create twin blueprint:', twinErr)
       }
 
-      // 5. Create/update intelligence profile (for creator dashboard)
+      // 5. Create/update intelligence memory record (for dashboard)
+      // The production table is client_intelligence_memories, not intelligence_profiles
       const overallScore = Object.values(result.blueprint.scores).reduce((a, b) => a + b, 0) / Object.keys(result.blueprint.scores).length
       const personalityTraits = Object.fromEntries(
         Object.entries(result.blueprint.scores).map(([k, v]) => [k, +(v / 100).toFixed(2)])
       )
 
-      // Check if profile already exists (no unique constraint on entity_type+entity_id for upsert)
-      const { data: existingIntel } = await svc
-        .from('intelligence_profiles')
+      // Check if memory record already exists
+      const { data: existingMem } = await svc
+        .from('client_intelligence_memories')
         .select('id')
         .eq('entity_type', 'user')
         .eq('entity_id', user.id)
+        .eq('memory_type', 'intake_blueprint')
         .maybeSingle()
 
-      const intelPayload = {
+      const memPayload = {
         entity_type: 'user',
         entity_id: user.id,
         organization_id: user.id,
-        profile_kind: 'business_intelligence',
-        identity_summary: result.blueprint.summary,
-        personality_traits: personalityTraits,
+        client_id: user.id,
+        memory_type: 'intake_blueprint',
         profile_type: 'intake',
-        confidence_score: +(overallScore / 100).toFixed(2),
-        daily_essence: result.blueprint.archetype,
-        version: existingIntel ? undefined : 1,
+        profile_version: existingMem ? undefined : 1,
+        title: result.blueprint.archetype,
+        content: result.blueprint.summary,
+        content_type: 'intake_profile',
+        metadata: {
+          ...(existingMem ? undefined : {}),
+          scores: result.blueprint.scores,
+          personality_traits: personalityTraits,
+          confidence_score: +(overallScore / 100).toFixed(2),
+          archetype: result.blueprint.archetype,
+        },
       } as any
 
-      const { error: intelErr } = existingIntel
-        ? await svc.from('intelligence_profiles').update(intelPayload).eq('id', existingIntel.id)
-        : await svc.from('intelligence_profiles').insert(intelPayload)
+      const { error: memErr } = existingMem
+        ? await svc.from('client_intelligence_memories').update(memPayload).eq('id', existingMem.id)
+        : await svc.from('client_intelligence_memories').insert(memPayload)
 
-      if (intelErr) {
-        console.error('Failed to create intelligence profile:', intelErr)
+      if (memErr) {
+        console.error('Failed to create intelligence memory:', memErr)
       }
 
       // ── 6. Fire n8n post-intake workflow (fire-and-forget) ──

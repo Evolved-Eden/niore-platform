@@ -1,23 +1,38 @@
 import { createClient } from '@/lib/supabase/server'
 
+// Blueprint data lives in client_twins.metadata.blueprint (set by intake/calculate)
+function extractBlueprint(clientTwin: any) {
+  const blueprint = clientTwin?.metadata?.blueprint?.core ?? null
+  if (!blueprint) return null
+  return {
+    version: 1,
+    confidence_score: blueprint.overallScore != null ? `${blueprint.overallScore}%` : '—',
+    daily_essence: blueprint.archetype || null,
+    profile_kind: 'active',
+    identity_summary: blueprint.summary || null,
+    personality_traits: blueprint.scores || null,
+  }
+}
+
 export default async function CreatorDashboard() {
   const supabase = await createClient()
   const { data: { user: _user } } = await supabase.auth.getUser()
   // Guaranteed non-null by root middleware
   const user = _user!
 
-  const { data: profile } = await supabase
-    .from('intelligence_profiles')
-    .select('*')
-    .eq('entity_id', user.id)
-    .eq('entity_type', 'user')
+  const { data: twin } = await supabase
+    .from('client_twins')
+    .select('metadata')
+    .eq('client_id', user.id)
     .maybeSingle()
 
+  const profile = extractBlueprint(twin)
+
   const stats = [
-    { label: 'Profile Version', value: profile?.version ?? 1,                   color: '#00d4ff' },
-    { label: 'Confidence',      value: profile?.confidence_score ?? '—',         color: '#c8ff00' },
+    { label: 'Profile Version', value: profile?.version ?? 1,                color: '#00d4ff' },
+    { label: 'Confidence',      value: profile?.confidence_score ?? '—',     color: '#c8ff00' },
     { label: 'Daily Essence',   value: profile?.daily_essence ? 'Active' : '—', color: '#a78bfa' },
-    { label: 'Status',          value: profile?.profile_kind ?? '—',            color: '#fb923c' },
+    { label: 'Status',          value: profile?.profile_kind ?? '—',         color: '#fb923c' },
   ]
 
   const VERTICAL_COLOR: Record<string, string> = {

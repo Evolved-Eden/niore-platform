@@ -76,26 +76,29 @@ function RegisterForm() {
     setLoading(true);
     setError(null);
 
-    const { error: signUpError, data } = await supabase.auth.signUp({
-      email,
-      password,
-    });
-
-    if (signUpError) {
-      setError(signUpError.message);
-      setLoading(false);
-      return;
-    }
-
-    if (!data.user) {
-      setError("Failed to create account. Please try again.");
-      setLoading(false);
-      return;
-    }
-
-    // Create profile via onSignup — await before navigating
+    // Use server-side sign-up (service-role key bypasses broken anon key)
     try {
-      const res = await fetch("/api/auth/onSignup", {
+      const res = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        setError(data.error || "Failed to create account");
+        setLoading(false);
+        return;
+      }
+
+      if (!data.user?.id) {
+        setError("Failed to create account. Please try again.");
+        setLoading(false);
+        return;
+      }
+
+      // Create profile via onSignup
+      const profileRes = await fetch("/api/auth/onSignup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -110,15 +113,15 @@ function RegisterForm() {
         }),
       });
 
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
+      if (!profileRes.ok) {
+        const body = await profileRes.json().catch(() => ({}));
         const message = body?.error || 'Failed to save profile'
         setError(message)
         setLoading(false)
         return
       }
     } catch (err) {
-      console.error("onSignup network error:", err);
+      console.error("signup network error:", err);
       setError('Network error during signup. Please try again.')
       setLoading(false)
       return

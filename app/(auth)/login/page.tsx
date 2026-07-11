@@ -39,19 +39,27 @@ function LoginForm() {
     setLoading(true);
     setError(null);
 
-    const { error: signInError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    // Use server-side sign-in — the server uses the service-role key and sets
+    // the auth cookies directly in the response (bypasses the broken anon key).
+    try {
+      const res = await fetch('/api/auth/signin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      })
+      const data = await res.json()
+      if (!res.ok || data.error) {
+        setError(data.error || 'Sign-in failed')
+        setLoading(false)
+        return
+      }
 
-    if (signInError) {
-      setError(signInError.message);
-      setLoading(false);
-      return;
+      router.push(planTier ? `/onboarding?tier=${encodeURIComponent(planTier)}${path ? `&path=${encodeURIComponent(path)}` : ""}` : redirectTo);
+      router.refresh();
+    } catch (e: any) {
+      setError(e.message || 'Network error')
+      setLoading(false)
     }
-
-    router.push(planTier ? `/onboarding?tier=${encodeURIComponent(planTier)}${path ? `&path=${encodeURIComponent(path)}` : ""}` : redirectTo);
-    router.refresh();
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createAdminClient } from '@/lib/supabase/server'
+import { createAdminClient, createServiceClient } from '@/lib/supabase/server'
 import { getN8nUrl } from '@/lib/config'
 
 // ── EE Core Engine ─────────────────────────────────────────────
@@ -318,17 +318,24 @@ export async function POST(req: NextRequest) {
       },
     }
 
-    // ── Persist ALL intake data to DB (single admin client, single user fetch) ──
+    // ── Persist ALL intake data to DB ──
+    // IMPORTANT: createAdminClient() is used ONLY for auth.getUser() (session
+    // verification). All DB operations use createServiceClient() — a raw
+    // service-role client that never tracks user sessions, so queries bypass
+    // RLS. (If we mixed them, after getUser() succeeds the SSR client would
+    // switch to the user's access token and lose RLS bypass.)
     try {
-      const supabase = await createAdminClient()
-      const { data: { user } } = await supabase.auth.getUser()
+      const auth = await createAdminClient()
+      const { data: { user } } = await auth.auth.getUser()
       if (!user) {
         console.warn('No authenticated user — skipping persistence')
         return NextResponse.json(result)
       }
 
+      const svc = createServiceClient()
+
       // 1. Get existing client record
-      const { data: existing } = await supabase
+      const { data: existing } = await svc
         .from('clients')
         .select('metadata, full_name')
         .eq('id', user.id)
@@ -366,7 +373,7 @@ export async function POST(req: NextRequest) {
       }
 
       // 2. Upsert clients row with intake data
-      const { error: clientErr } = await supabase
+      const { error: clientErr } = await svc
         .from('clients')
         .upsert({
           id: user.id,
@@ -381,13 +388,13 @@ export async function POST(req: NextRequest) {
       }
 
       // 3. Ensure user has an organization (for vault/knowledge_base FK)
-      const { data: existingOrg } = await supabase
+      const { data: existingOrg } = await svc
         .from('organizations')
         .select('id')
         .eq('id', user.id)
         .maybeSingle()
       if (!existingOrg) {
-        const { error: orgErr } = await supabase
+        const { error: orgErr } = await svc
           .from('organizations')
           .insert({
             id: user.id,
@@ -399,13 +406,13 @@ export async function POST(req: NextRequest) {
       }
 
       // 4. Create/update the client_twin with blueprint data
-      const { data: existingTwin } = await supabase
+      const { data: existingTwin } = await svc
         .from('client_twins')
         .select('id, metadata')
         .eq('client_id', user.id)
         .maybeSingle()
       const twinMeta = (existingTwin?.metadata as Record<string, any>) ?? {}
-      const { error: twinErr } = await supabase
+      const { error: twinErr } = await svc
         .from('client_twins')
         .upsert({
           id: existingTwin?.id ?? undefined,
@@ -434,22 +441,34 @@ export async function POST(req: NextRequest) {
 
       // 5. Create/update intelligence profile (for creator dashboard)
       const overallScore = Object.values(result.blueprint.scores).reduce((a, b) => a + b, 0) / Object.keys(result.blueprint.scores).length
-      const { error: intelErr } = await supabase
+      const personalityTraits = Object.fromEntries(
+        Object.entries(result.blueprint.scores).map(([k, v]) => [k, +(v / 100).toFixed(2)])
+      )
+
+      // Check if profile already exists (no unique constraint on entity_type+entity_id for upsert)
+      const { data: existingIntel } = await svc
         .from('intelligence_profiles')
-        .upsert({
-          entity_type: 'user',
-          entity_id: user.id,
-          organization_id: user.id,
-          profile_kind: 'business_intelligence',
-          identity_summary: result.blueprint.summary,
-          personality_traits: Object.fromEntries(
-            Object.entries(result.blueprint.scores).map(([k, v]) => [k, +(v / 100).toFixed(2)])
-          ),
-          profile_type: 'intake',
-          confidence_score: +(overallScore / 100).toFixed(2),
-          daily_essence: result.blueprint.archetype,
-          version: 1,
-        } as any, { onConflict: 'entity_type,entity_id' })
+        .select('id')
+        .eq('entity_type', 'user')
+        .eq('entity_id', user.id)
+        .maybeSingle()
+
+      const intelPayload = {
+        entity_type: 'user',
+        entity_id: user.id,
+        organization_id: user.id,
+        profile_kind: 'business_intelligence',
+        identity_summary: result.blueprint.summary,
+        personality_traits: personalityTraits,
+        profile_type: 'intake',
+        confidence_score: +(overallScore / 100).toFixed(2),
+        daily_essence: result.blueprint.archetype,
+        version: existingIntel ? undefined : 1,
+      } as any
+
+      const { error: intelErr } = existingIntel
+        ? await svc.from('intelligence_profiles').update(intelPayload).eq('id', existingIntel.id)
+        : await svc.from('intelligence_profiles').insert(intelPayload)
 
       if (intelErr) {
         console.error('Failed to create intelligence profile:', intelErr)
@@ -457,9 +476,6 @@ export async function POST(req: NextRequest) {
 
       // ── 6. Fire n8n post-intake workflow (fire-and-forget) ──
       const n8nWebhookUrl = `${getN8nUrl()}/webhook/intake-complete`
-      const personalityTraits = Object.fromEntries(
-        Object.entries(result.blueprint.scores).map(([k, v]) => [k, +(v / 100).toFixed(2)])
-      )
       fetch(n8nWebhookUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

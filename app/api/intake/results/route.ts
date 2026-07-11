@@ -1,22 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createAdminClient } from '@/lib/supabase/server'
+import { createAdminClient, createServiceClient } from '@/lib/supabase/server'
 
 /**
  * GET /api/intake/results
  *
  * Returns the stored intake data for the authenticated user.
  * Used by dashboard pages (essence, twin, blueprint) to pre-populate.
+ *
+ * IMPORTANT: createAdminClient() is used ONLY for auth.getUser().
+ * DB queries use createServiceClient() (service-role key, no RLS).
  */
 export async function GET(req: NextRequest) {
   try {
-    const supabase = await createAdminClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const auth = await createAdminClient()
+    const { data: { user } } = await auth.auth.getUser()
 
     if (!user) {
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
     }
 
-    const { data: client } = await supabase
+    const svc = createServiceClient()
+    const { data: client } = await svc
       .from('clients')
       .select('metadata, full_name, email, client_type')
       .eq('id', user.id)

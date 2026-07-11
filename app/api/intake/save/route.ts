@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createAdminClient } from '@/lib/supabase/server'
+import { createAdminClient, createServiceClient } from '@/lib/supabase/server'
 
 /**
  * POST /api/intake/save
@@ -7,15 +7,25 @@ import { createAdminClient } from '@/lib/supabase/server'
  * Saves intake section data to the authenticated user's client record.
  * Section examples: 'personal', 'role', 'results'
  * Stores under clients.metadata -> intake -> sections
+ *
+ * IMPORTANT: We use createAdminClient ONLY for auth.getUser() (session
+ * verification). All DB operations use createServiceClient() — a raw
+ * service-role client that never tracks user sessions, so every query
+ * bypasses RLS. (If we mixed them, after getUser() succeeds the SSR
+ * client would switch to the user's access token and lose RLS bypass.)
  */
 export async function POST(req: NextRequest) {
   try {
-    const supabase = await createAdminClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    // 1. Verify identity via cookie-based admin client
+    const auth = await createAdminClient()
+    const { data: { user } } = await auth.auth.getUser()
 
     if (!user) {
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
     }
+
+    // 2. All DB work goes through the service-role client (no RLS)
+    const svc = createServiceClient()
 
     const body = await req.json()
     const { section, data } = body
@@ -30,7 +40,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Get existing client record
-    const { data: existing } = await supabase
+    const { data: existing } = await svc
       .from('clients')
       .select('metadata')
       .eq('id', user.id)
@@ -80,7 +90,7 @@ export async function POST(req: NextRequest) {
       updated_at: new Date().toISOString(),
     }
 
-    const { error } = await supabase
+    const { error } = await svc
       .from('clients')
       .upsert(upsertPayload as any, { onConflict: 'id' })
 
@@ -88,13 +98,13 @@ export async function POST(req: NextRequest) {
 
     // Ensure user has an organization (for vault/knowledge_base FK)
     try {
-      const { data: existingOrg } = await supabase
+      const { data: existingOrg } = await svc
         .from('organizations')
         .select('id')
         .eq('id', user.id)
         .maybeSingle()
       if (!existingOrg) {
-        await supabase
+        await svc
           .from('organizations')
           .insert({
             id: user.id,

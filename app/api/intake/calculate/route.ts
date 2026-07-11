@@ -530,17 +530,27 @@ export async function POST(req: NextRequest) {
         }
       }
 
+      // Compute overall score for both metadata and top-level columns
+      const overallScore = Math.round(
+        Object.values(result.blueprint.scores).reduce((a: number, b: number) => a + b, 0) /
+        Math.max(Object.keys(result.blueprint.scores).length, 1)
+      )
+
       const { error: twinErr } = await svc
         .from('client_twins')
         .upsert({
           id: existingTwin?.id ?? undefined,
           client_id: user.id,
+          twin_status: 'active',
+          blueprint_score: overallScore,
+          intelligence_score: +(overallScore / 100).toFixed(2),
+          engagement_score: +(overallScore / 100).toFixed(2),
           metadata: {
             ...twinMeta,
             lenses,
             blueprint: {
               core: {
-                overallScore: Math.round(Object.values(result.blueprint.scores).reduce((a, b) => a + b, 0) / Object.keys(result.blueprint.scores).length),
+                overallScore,
                 archetype: result.blueprint.archetype,
                 scores: result.blueprint.scores,
                 summary: result.blueprint.summary,
@@ -559,7 +569,6 @@ export async function POST(req: NextRequest) {
 
       // 5. Create/update intelligence memory record (for dashboard)
       // The production table is client_intelligence_memories, not intelligence_profiles
-      const overallScore = Object.values(result.blueprint.scores).reduce((a, b) => a + b, 0) / Object.keys(result.blueprint.scores).length
       const personalityTraits = Object.fromEntries(
         Object.entries(result.blueprint.scores).map(([k, v]) => [k, +(v / 100).toFixed(2)])
       )
@@ -609,6 +618,21 @@ export async function POST(req: NextRequest) {
 
       if (memErr) {
         console.error('Failed to create intelligence memory:', memErr)
+      }
+
+      // Also seed ai_memories so the essence API finds memory context
+      try {
+        const memContent = `Blueprint: ${result.blueprint.archetype}. ${result.blueprint.summary}`
+        await svc.from('ai_memories').insert({
+          entity_type: 'user',
+          entity_id: user.id,
+          memory_type: 'intake_blueprint',
+          content: memContent.slice(0, 1000),
+          title: `${result.blueprint.archetype} Blueprint - ${new Date().toISOString().split('T')[0]}`,
+          client_id: user.id,
+        } as any)
+      } catch (memSeedErr) {
+        console.error('Failed to seed ai_memories:', memSeedErr)
       }
 
       // ── 6. Fire n8n post-intake workflow (fire-and-forget) ──

@@ -37,14 +37,18 @@ export async function POST(req: NextRequest) {
 
     if (existing?.id) {
       await (supabase.from('client_twins') as any)
-        .update({ metadata: meta })
+        .update({
+          metadata: meta,
+          twin_status: 'active',
+        })
         .eq('id', existing.id)
     } else {
       await (supabase.from('client_twins') as any)
         .insert({
           client_id: user_id,
-          name: 'Primary Intelligence',
-          status: 'active',
+          twin_status: 'active',
+          version: 1,
+          confidence_score: 0.5,
           metadata: meta,
         })
     }

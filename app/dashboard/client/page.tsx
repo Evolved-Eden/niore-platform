@@ -32,9 +32,23 @@ export default async function ClientDashboard() {
     .eq('is_system_agent', true)
 
   const name = client?.full_name ?? identity?.full_name ?? 'Client'
-  const bpScore = typeof twin?.blueprint_score === 'number' ? twin.blueprint_score : null
+
+  // Fall back to metadata for existing users without top-level columns
+  const meta = twin?.metadata as Record<string, any> | null
+  const metaBpScore = meta?.blueprint?.core?.overallScore
+  const bpScore = typeof twin?.blueprint_score === 'number'
+    ? twin.blueprint_score
+    : typeof metaBpScore === 'number'
+      ? metaBpScore
+      : null
   const blueprintScore = bpScore !== null ? `${bpScore}%` : twin ? 'Processing' : '—'
-  const engagementScore = twin?.engagement_score ?? '—'
+
+  const metaEngScore = meta?.blueprint?.core?.overallScore
+  const engagementScore = typeof twin?.engagement_score === 'number'
+    ? twin.engagement_score
+    : typeof metaEngScore === 'number'
+      ? `${metaEngScore}%`
+      : '—'
 
   const stats = [
     { label: 'Intelligence Score', value: engagementScore, color: '#c8ff00', icon: '◈' },

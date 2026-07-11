@@ -607,11 +607,10 @@ export async function POST(req: NextRequest) {
       // Non-critical — fallback works without DB
     }
 
-    // Fetch recent memories from ai_memories (try Supabase as fallback)
+    // Fetch recent memories from ai_memories (use admin client to bypass RLS)
     try {
-      const { createClient: createSupabaseClient } = await import('@/lib/supabase/server')
-      const supabase = await createSupabaseClient()
-      const { data: memories } = await supabase
+      const { supabaseAdmin } = await import('@/lib/supabase/admin')
+      const { data: memories } = await supabaseAdmin
         .from('ai_memories')
         .select('content, memory_type')
         .eq('entity_id', userId)

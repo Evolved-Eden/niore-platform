@@ -216,7 +216,7 @@ function HumanDesignDetail({ data }: { data: any }) {
               <div className="flex-1 h-1.5 bg-white/[0.06] rounded-full overflow-hidden">
                 <div className="h-full bg-[#22d3ee] rounded-full" style={{ width: `${v}%` }} />
               </div>
-              <span className="text-[9px] text-white/30">{v}%</span>
+              <span className="text-[9px] text-white/30">{v as number}%</span>
             </div>
           ))}
         </div>

@@ -513,44 +513,85 @@ export async function POST(req: NextRequest) {
         lensAstro = lenses?.astrology?.data
         lensNumer = lenses?.numerology?.data
 
-        // Astrology context
+        // ── Western Astrology ──
         if (lensAstro) {
           const a = lensAstro
-          const parts: string[] = ['Astrology:']
-          if (a.sunSign) parts.push(`Sun in ${a.sunSign}`)
-          if (a.moonSign) parts.push(`Moon in ${a.moonSign}`)
+          const parts: string[] = ['[Western Astrology]']
+          if (a.sunSign) parts.push(`Sun ${a.sunSign}`)
+          if (a.moonSign) parts.push(`Moon ${a.moonSign}`)
           if (a.risingSign) parts.push(`Rising ${a.risingSign}`)
-          if (a.elementCounts) parts.push(`Elements: ${a.elementCounts.fire}F/${a.elementCounts.earth}E/${a.elementCounts.air}A/${a.elementCounts.water}W`)
-          if (a.modalityCounts) parts.push(`Modalities: ${a.modalityCounts.cardinal}C/${a.modalityCounts.fixed}F/${a.modalityCounts.mutable}M`)
+          if (a.elementCounts) parts.push(`Elements ${a.elementCounts.fire}F/${a.elementCounts.earth}E/${a.elementCounts.air}A/${a.elementCounts.water}W`)
           if (a.aspects?.length) {
             const topAspects = a.aspects.slice(0, 3).map((asp: any) => `${asp.planet1} ${asp.type} ${asp.planet2}`)
-            parts.push(`Key aspects: ${topAspects.join(', ')}`)
+            parts.push(`Key aspects ${topAspects.join(', ')}`)
           }
           lensContext += parts.join('. ') + '\n'
         }
 
-        // Numerology context
-        if (lenses?.numerology?.data) {
-          const n = lenses.numerology.data
-          const parts: string[] = ['Numerology:']
-          if (n.lifePath) parts.push(`Life Path ${n.lifePath.label}`)
-          if (n.expression) parts.push(`Expression ${n.expression.label}`)
-          if (n.heartsDesire) parts.push(`Heart's Desire ${n.heartsDesire.label}`)
-          if (n.personalYear) parts.push(`Personal Year ${n.personalYear}, Month ${n.personalMonth}, Day ${n.personalDay}`)
-          if (n.karmicLessons?.length) parts.push(`Karmic Lessons: ${n.karmicLessons.join(', ')}`)
+        // ── Vedic Astrology ──
+        if (lenses?.vedicAstrology?.data) {
+          const v = lenses.vedicAstrology.data
+          const parts: string[] = ['[Vedic Astrology]']
+          if (v.sunSign) parts.push(`Sun ${v.sunSign}`)
+          if (v.moonSign) parts.push(`Moon ${v.moonSign} in ${v.moonNakshatra || ''}`)
+          if (v.risingSign) parts.push(`Rising ${v.risingSign}`)
+          if (v.tattvas) parts.push(`Doshas Vata ${v.tattvas.vata}%/Pitta ${v.tattvas.pitta}%/Kapha ${v.tattvas.kapha}%`)
           lensContext += parts.join('. ') + '\n'
         }
 
-        // Human Design context
+        // ── Numerology ──
+        if (lenses?.numerology?.data) {
+          const n = lenses.numerology.data
+          const parts: string[] = ['[Numerology]']
+          if (n.lifePath) parts.push(`Life Path ${n.lifePath.label}`)
+          if (n.expression) parts.push(`Expression ${n.expression.label}`)
+          if (n.heartsDesire) parts.push(`Heart's Desire ${n.heartsDesire.label}`)
+          if (n.personalYear) parts.push(`Personal Year ${n.personalYear}/${n.personalMonth}/${n.personalDay}`)
+          if (n.karmicLessons?.length) parts.push(`Karmic Lessons ${n.karmicLessons.join(', ')}`)
+          lensContext += parts.join('. ') + '\n'
+        }
+
+        // ── Chinese Zodiac ──
+        if (lenses?.chineseZodiac?.data) {
+          const cz = lenses.chineseZodiac.data
+          lensContext += `[Chinese Zodiac] ${cz.animal} (${cz.element} ${cz.yinYang}). ${cz.personality}\n`
+        }
+
+        // ── Biorhythms ──
+        if (lenses?.biorhythms?.data) {
+          const b = lenses.biorhythms.data
+          lensContext += `[Biorhythms] Physical ${b.today.physicalScore > 0 ? '+' : ''}${b.today.physicalScore}% | Emotional ${b.today.emotionalScore > 0 ? '+' : ''}${b.today.emotionalScore}% | Intellectual ${b.today.intellectualScore > 0 ? '+' : ''}${b.today.intellectualScore}%\n`
+          if (b.overall?.interpretation) {
+            lensContext += `Biorhythm overall: ${b.overall.interpretation}\n`
+          }
+        }
+
+        // ── Elemental Archetype ──
+        if (lenses?.elementalArchetype?.data) {
+          const ea = lenses.elementalArchetype.data
+          lensContext += `[Elemental] Primary ${ea.primaryElement}, Secondary ${ea.secondaryElement}. Temperament: ${ea.temperament}. ${ea.expressionStyle}\n`
+        }
+
+        // ── Life Theme ──
+        if (lenses?.lifeTheme?.data) {
+          const lt = lenses.lifeTheme.data
+          lensContext += `[Life Theme] ${lt.soulPurpose}. Current stage: ${lt.lifeStage.current} — ${lt.lifeStage.description}\n`
+          if (lt.missionStatement) {
+            lensContext += `Mission: ${lt.missionStatement}\n`
+          }
+        }
+
+        // ── Human Design ──
         if (lenses?.humanDesign?.data) {
           const hd = lenses.humanDesign.data
-          const parts: string[] = ['Human Design:']
-          if (hd.archetype) parts.push(`Archetype: ${hd.archetype}`)
-          if (hd.foundation?.energyType) parts.push(`Type: ${hd.foundation.energyType}`)
-          if (hd.gates?.sun?.keyword) parts.push(`Sun Gate: ${hd.gates.sun.keyword}`)
+          const parts: string[] = ['[Human Design]']
+          if (hd.archetype) parts.push(`Archetype ${hd.archetype}`)
+          if (hd.foundation?.energyType) parts.push(`Type ${hd.foundation.energyType}`)
+          if (hd.foundation?.operatingRhythm) parts.push(`Strategy ${hd.foundation.operatingRhythm}`)
+          if (hd.gates?.sun?.keyword) parts.push(`Sun Gate ${hd.gates.sun.keyword}`)
           lensContext += parts.join('. ') + '\n'
         } else if (archetypeName) {
-          lensContext += `Human Design Archetype: ${archetypeName}\n`
+          lensContext += `[Human Design] Archetype: ${archetypeName}\n`
         }
 
         // Pending essence intelligence tasks (up to 3)

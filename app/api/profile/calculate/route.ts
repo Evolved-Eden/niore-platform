@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
-import { calculateFullProfile, calculateNumerology, calculateAstrology } from '@/lib/profile'
+import { calculateFullProfile } from '@/lib/profile'
 
 export const dynamic = 'force-dynamic'
 
 /**
  * POST /api/profile/calculate
- * Runs all lens calculations (astrology, numerology) for the current user
- * and stores results in client_twins.metadata
+ * Runs ALL lens calculations for the current user
+ * and stores results in client_twins.metadata.lenses
  */
 export async function POST(req: NextRequest) {
   try {
@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Fetch current intake/twin data
+    // Fetch current twin data
     const { data: twin } = await supabaseAdmin
       .from('client_twins')
       .select('id, metadata')
@@ -31,71 +31,85 @@ export async function POST(req: NextRequest) {
 
     const metadata = (twin.metadata as any) || {}
     const intake = metadata.intake || {}
+    const sections = intake.sections || intake
 
-    // Parse intake data for calculations
-    const firstName = intake.personal?.firstName || intake.name?.split(' ')[0] || ''
-    const lastName = intake.personal?.lastName || intake.name?.split(' ').slice(-1)[0] || ''
-    const birthDate = intake.personal?.dob || intake.dob || ''
-    const birthTime = intake.personal?.birthTime || intake.birthTime || ''
-    const latitude = intake.personal?.latitude || intake.latitude
-    const longitude = intake.personal?.longitude || intake.longitude
+    // Parse intake data
+    const personal = sections.personal || sections
+    const firstName = sections.firstName || personal.name?.split(' ')[0] || user.email?.split('@')[0] || ''
+    const lastName = sections.lastName || personal.name?.split(' ').slice(-1)[0] || ''
+    const middleName = sections.middleName || personal.middleName
+    const birthDate = sections.dob || personal.dob || personal.birthDate || ''
+    const birthTime = sections.birthTime || personal.birthTime || ''
+    const latitude = sections.latitude || personal.latitude
+    const longitude = sections.longitude || personal.longitude
 
     if (!birthDate) {
-      return NextResponse.json({ error: 'Birth date not found in intake data' }, { status: 400 })
+      return NextResponse.json({ error: 'Birth date not found in intake' }, { status: 400 })
     }
 
-    // Run calculations
+    // Run ALL lens calculations
     const result = await calculateFullProfile({
       firstName,
-      middleName: intake.personal?.middleName,
+      middleName,
       lastName,
       birthDate,
       birthTime,
       latitude,
       longitude,
-      role: intake.role,
-      personal: intake.personal,
+      role: sections.role,
+      personal: sections.personal,
     })
 
-    // Merge lens data into metadata
-    const updatedMetadata = {
-      ...metadata,
-      lenses: {
-        ...(metadata.lenses || {}),
-        astrology: result.core.astrology ? {
-          status: 'calculated',
-          data: result.core.astrology,
+    // Build lenses block from all calculated systems
+    const lensSystems = [
+      { key: 'astrology', data: result.core.astrology },
+      { key: 'vedicAstrology', data: result.core.vedicAstrology },
+      { key: 'numerology', data: result.core.numerology },
+      { key: 'chineseZodiac', data: result.core.chineseZodiac },
+      { key: 'biorhythms', data: result.core.biorhythms },
+      { key: 'elementalArchetype', data: result.core.elementalArchetype },
+      { key: 'lifeTheme', data: result.core.lifeTheme },
+      { key: 'soulProfile', data: result.core.soulProfile },
+    ]
+
+    const lenses: Record<string, any> = {
+      ...(metadata.lenses || {}),
+    }
+
+    for (const ls of lensSystems) {
+      if (ls.data) {
+        lenses[ls.key] = {
+          status: 'calculated' as const,
+          data: ls.data,
           calculatedAt: result.calculatedAt,
-        } : { status: 'failed' },
-        numerology: result.core.numerology ? {
-          status: 'calculated',
-          data: result.core.numerology,
-          calculatedAt: result.calculatedAt,
-        } : { status: 'failed' },
-        humanDesign: metadata.lenses?.humanDesign || metadata.blueprint ? {
-          status: 'calculated',
-          data: metadata.blueprint || {},
-          calculatedAt: metadata.calculatedAt || result.calculatedAt,
-        } : { status: 'pending' },
-      },
+        }
+      } else {
+        // Don't overwrite existing data with 'failed'
+        if (!lenses[ls.key]) {
+          lenses[ls.key] = { status: 'failed' as const }
+        }
+      }
     }
 
     // Save to database
     const { error: updateError } = await supabaseAdmin
       .from('client_twins')
-      .update({ metadata: updatedMetadata })
+      .update({ metadata: { ...metadata, lenses } })
       .eq('id', twin.id)
 
     if (updateError) {
       return NextResponse.json({ error: updateError.message }, { status: 500 })
     }
 
+    // Return summary of calculated systems
+    const calculated = Object.entries(lenses)
+      .filter(([, v]: [string, any]) => v?.status === 'calculated')
+      .map(([k]) => k)
+
     return NextResponse.json({
       success: true,
-      lenses: {
-        astrology: result.core.astrology ? 'calculated' : 'failed',
-        numerology: result.core.numerology ? 'calculated' : 'failed',
-      },
+      calculated,
+      total: lensSystems.length,
     })
   } catch (err: any) {
     console.error('Profile calculate error:', err)

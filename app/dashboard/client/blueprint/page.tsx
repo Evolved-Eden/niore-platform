@@ -24,6 +24,26 @@ type BlueprintData = {
   intake_role: string
 }
 
+// ── Lens display config ─────────────────────────────
+
+const LENS_DISPLAY: Record<string, { icon: string; label: string; color: string }> = {
+  astrology:          { icon: '☉', label: 'Western Astrology', color: '#c8ff00' },
+  vedicAstrology:    { icon: '☽', label: 'Vedic Astrology', color: '#a78bfa' },
+  numerology:        { icon: '7', label: 'Numerology', color: '#34d399' },
+  chineseZodiac:     { icon: '🐉', label: 'Chinese Zodiac', color: '#fb923c' },
+  humanDesign:       { icon: '◈', label: 'Human Design', color: '#22d3ee' },
+  biorhythms:        { icon: '〰', label: 'Biorhythms', color: '#f472b6' },
+  elementalArchetype:{ icon: '🔥', label: 'Elemental Type', color: '#e879f9' },
+  lifeTheme:         { icon: '✦', label: 'Life Theme', color: '#00d4ff' },
+  soulProfile:       { icon: '∞', label: 'Soul Profile', color: '#ff6b6b' },
+}
+
+const EMPTY_LENS = {
+  icon: '◇',
+  label: 'Pending',
+  color: '#ffffff30',
+}
+
 const EXPANDED_PRICE = 150
 const DOMAIN_PRICE = 50
 
@@ -43,6 +63,7 @@ export default function ClientBlueprintPage() {
   const [blueprint, setBlueprint] = useState<BlueprintData | null>(null)
   const [twinExists, setTwinExists] = useState(false)
   const [intake, setIntake] = useState<IntakeInfo>({ hasIntake: false })
+  const [lenses, setLenses] = useState<Record<string, any> | null>(null)
 
   // Upgrade state
   const [purchasedExpanded, setPurchasedExpanded] = useState(false)
@@ -139,6 +160,11 @@ export default function ClientBlueprintPage() {
               }
             } catch {}
           }
+        }
+
+        // Extract lens data
+        if (meta.lenses) {
+          setLenses(meta.lenses)
         }
 
         // Check purchases in metadata
@@ -273,6 +299,37 @@ export default function ClientBlueprintPage() {
                 </div>
               )}
 
+              {/* Omnigrid — lens preview (no blueprint but lenses exist) */}
+              {lenses && (
+                <div className="mb-6 text-left">
+                  <div className="text-[10px] text-white/30 tracking-widest uppercase mb-3">Multi-Lens Profile</div>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    {Object.entries(LENS_DISPLAY).map(([key, cfg]) => {
+                      const entry = (lenses as any)?.[key]
+                      const isReady = entry?.status === 'calculated' && entry?.data
+                      return (
+                        <div key={key} className={`p-2 rounded-sm border ${isReady ? 'border-white/[0.08] bg-white/[0.02]' : 'border-white/[0.04] opacity-40'}`}>
+                          <div className="flex items-center gap-1.5 mb-0.5">
+                            <span className="text-xs" style={{ color: cfg.color }}>{cfg.icon}</span>
+                            <span className="text-[9px] text-white/40 font-bold uppercase">{cfg.label}</span>
+                          </div>
+                          <p className="text-[9px] text-white/30">{isReady ? 'Active' : 'Pending'}</p>
+                        </div>
+                      )
+                    })}
+                  </div>
+                  <button
+                    onClick={async () => {
+                      await fetch('/api/profile/calculate', { method: 'POST' })
+                      window.location.reload()
+                    }}
+                    className="mt-3 text-[10px] font-bold px-3 py-1.5 rounded-sm border border-[#c8ff00]/40 text-[#c8ff00] hover:bg-[#c8ff00]/10 transition-all"
+                  >
+                    Calculate All Lenses
+                  </button>
+                </div>
+              )}
+
               <Link
                 href="/dashboard/client/blueprint/assess"
                 className="inline-block px-6 py-3 bg-[#c8ff00] text-black text-sm font-bold rounded-sm hover:bg-white transition-all"
@@ -325,6 +382,93 @@ export default function ClientBlueprintPage() {
                   <p className="text-sm text-white/50 mt-6 pt-4 border-t border-white/[0.06] leading-relaxed">
                     {blueprint.summary}
                   </p>
+                )}
+              </div>
+
+              {/* ══════ Omnigrid — Multi-Lens Intelligence ══════ */}
+              <div className="glass rounded-sm p-6 border border-white/[0.06]">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h3 className="text-lg font-semibold">Omnigrid</h3>
+                    <p className="text-xs text-white/40">Multi-lens intelligence profile synthesized from your birth data</p>
+                  </div>
+                  <button
+                    onClick={async () => {
+                      try {
+                        await fetch('/api/profile/calculate', { method: 'POST' })
+                        window.location.reload()
+                      } catch {}
+                    }}
+                    className="text-[10px] font-bold px-3 py-1.5 rounded-sm border border-[#c8ff00]/40 text-[#c8ff00] hover:bg-[#c8ff00]/10 transition-all"
+                  >
+                    Recalculate All Lenses
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                  {Object.entries(LENS_DISPLAY).map(([key, cfg]) => {
+                    const lensEntry = (lenses as any)?.[key]
+                    const data = lensEntry?.data
+                    const status = lensEntry?.status || 'pending'
+                    const isReady = status === 'calculated' && data
+
+                    let summary = 'Not available'
+                    if (key === 'astrology' && data) {
+                      summary = `${data.sunSign || '?'} ☉ · ${data.moonSign || '?'} ☽ · ${data.risingSign || '?'} ↑`
+                    } else if (key === 'vedicAstrology' && data) {
+                      summary = `${data.sunSign} ☉ · ${data.moonSign} ☽ · ${data.moonNakshatra || ''}`
+                    } else if (key === 'numerology' && data) {
+                      summary = `LP ${data.lifePath?.label || '?'} · EX ${data.expression?.label || '?'} · HD ${data.heartsDesire?.label || '?'}`
+                    } else if (key === 'chineseZodiac' && data) {
+                      summary = `${data.animal} · ${data.element} ${data.yinYang}`
+                    } else if (key === 'humanDesign' && data) {
+                      summary = `${data.archetype || data.foundation?.energyType || '?'} · ${data.foundation?.coreArch || ''}`
+                    } else if (key === 'biorhythms' && data) {
+                      const t = data.today || {}
+                      summary = `P:${t.physicalScore > 0 ? '+' : ''}${t.physicalScore || 0}% E:${t.emotionalScore > 0 ? '+' : ''}${t.emotionalScore || 0}%`
+                    } else if (key === 'elementalArchetype' && data) {
+                      summary = `${data.primaryElement} · ${data.temperament}`
+                    } else if (key === 'lifeTheme' && data) {
+                      summary = `${data.lifeStage?.current || '?'} · ${(data.soulPurpose || '').slice(0, 50)}...`
+                    } else if (key === 'soulProfile' && data) {
+                      summary = `${data.soulAge || '?'} · ${(data.soulPurpose || '').slice(0, 40)}...`
+                    }
+
+                    return (
+                      <div
+                        key={key}
+                        className={`rounded-sm border p-3 transition-all ${
+                          isReady
+                            ? 'border-white/[0.08] bg-white/[0.02] hover:border-white/[0.15]'
+                            : 'border-white/[0.04] bg-white/[0.01] opacity-50'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2 mb-1.5">
+                          <span className="text-sm" style={{ color: cfg.color }}>{cfg.icon}</span>
+                          <span className="text-[10px] font-bold text-white/50 uppercase tracking-wider">{cfg.label}</span>
+                          {isReady && <span className="ml-auto w-1.5 h-1.5 rounded-full" style={{ backgroundColor: cfg.color }} />}
+                        </div>
+                        {isReady ? (
+                          <p className="text-[11px] text-white/60 leading-snug">{summary}</p>
+                        ) : (
+                          <p className="text-[10px] text-white/20 italic">Run calculation to populate</p>
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+
+                {/* Status bar */}
+                {lenses && (
+                  <div className="mt-4 flex items-center gap-2 text-[10px] text-white/30">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#c8ff00]" />
+                    {Object.values(LENS_DISPLAY).filter(k => (lenses as any)?.[k]?.status === 'calculated').length} / {Object.keys(LENS_DISPLAY).length} lenses active
+                    <span className="ml-auto">
+                      {lenses.astrology?.calculatedAt
+                        ? `Last calculated: ${new Date(lenses.astrology.calculatedAt).toLocaleDateString()}`
+                        : ''}
+                    </span>
+                  </div>
                 )}
               </div>
 

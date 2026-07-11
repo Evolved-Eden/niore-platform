@@ -171,13 +171,123 @@ export interface NumerologyProfile {
   letterCounts: Record<number, number>
 }
 
+// ── Chinese Zodiac ────────────────────────────────────────────
+
+export interface ChineseZodiacProfile {
+  animal: string           // Rat, Ox, Tiger, Rabbit, Dragon, Snake, Horse, Goat, Monkey, Rooster, Dog, Pig
+  animalIndex: number      // 0-11
+  element: string          // Wood, Fire, Earth, Metal, Water
+  elementIndex: number     // 0-4
+  yinYang: 'yin' | 'yang'
+  fixedElement: string     // The animal's fixed element (separate from yearly element)
+  personality: string
+  strengths: string[]
+  weaknesses: string[]
+  compatibility: string[]  // Most compatible animals
+  opposing: string         // Least compatible animal
+  season: string
+  aspect: string           // The phase/aspect of the animal
+}
+
+// ── Vedic Astrology ───────────────────────────────────────────
+
+export interface VedicAstrologyProfile {
+  ayanamsa: number
+  planets: Record<string, PlanetPlacement>  // Same structure but sidereal
+  houses: Record<number, HouseCusp>
+  aspects: Aspect[]
+  risingSign: string       // Vedic lagna
+  sunSign: string           // Vedic rashi
+  moonSign: string
+  moonNakshatra: string    // The lunar mansion (27 nakshatras)
+  moonNakshatraIndex: number
+  moonPada: number         // 1-4, the quarter of the nakshatra
+  elementCounts: { fire: number; earth: number; air: number; water: number }
+  tattvas: { vata: number; pitta: number; kapha: number }  // Ayurvedic doshas from chart
+}
+
+// ── Biorhythms ────────────────────────────────────────────────
+
+export interface BiorhythmProfile {
+  physical: { value: number; trend: 'rising' | 'falling' | 'peak' | 'critical'; daysSinceBirth: number }
+  emotional: { value: number; trend: 'rising' | 'falling' | 'peak' | 'critical'; daysSinceBirth: number }
+  intellectual: { value: number; trend: 'rising' | 'falling' | 'peak' | 'critical'; daysSinceBirth: number }
+  spiritual: { value: number; trend: 'rising' | 'falling' | 'peak' | 'critical'; daysSinceBirth: number }
+  overall: { value: number; interpretation: string }
+  today: {
+    physicalScore: number    // -100 to 100
+    emotionalScore: number
+    intellectualScore: number
+    spiritualScore: number
+  }
+}
+
+// ── Life Theme / Soul Matrix ──────────────────────────────────
+
+export interface LifeThemeProfile {
+  soulPurpose: string
+  lifeTheme: string
+  coreLesson: string
+  lifeStage: {
+    current: string
+    age: number
+    description: string
+  }
+  shadowTheme: string
+  giftTheme: string
+  relationshipTheme: string
+  careerTheme: string
+  growthPath: string[]
+  soulAges: string[]        // Past life themes / soul age indicators
+  missionStatement: string
+}
+
+// ── Elemental Archetype (deep dive) ───────────────────────────
+
+export interface ElementalArchetypeProfile {
+  primaryElement: 'fire' | 'earth' | 'air' | 'water'
+  secondaryElement: 'fire' | 'earth' | 'air' | 'water'
+  elementBalance: {
+    fire: number
+    earth: number
+    air: number
+    water: number
+  }
+  temperament: string       // e.g. "Sanguine", "Choleric", "Phlegmatic", "Melancholic"
+  expressionStyle: string
+  learningStyle: string
+  stressPattern: string
+  naturalHealing: string
+  seasonalAffinity: string  // Spring, Summer, Autumn, Winter
+  timeOfDay: string         // Dawn, Noon, Dusk, Midnight
+}
+
+// ── Soul Profile (synthesis of all lenses) ────────────────────
+
+export interface SoulProfile {
+  soulAge: string           // Young, Maturing, Mature, Old, Timeless
+  soulPurpose: string
+  primaryLifeTheme: string
+  currentIncarnation: string
+  karmicPatterns: string[]
+  dharma: string
+  evolutionaryGoal: string
+  soulContracts: string[]
+}
+
 // ── Aggregate Profile ─────────────────────────────────────────
 
 export interface ProfileLevel {
   humanDesign?: HDProfile
   geneKeys?: GeneKeysProfile
   astrology?: AstrologyProfile
+  vedicAstrology?: VedicAstrologyProfile
   numerology?: NumerologyProfile
+  chineseZodiac?: ChineseZodiacProfile
+  biorhythms?: BiorhythmProfile
+  elementalArchetype?: ElementalArchetypeProfile
+  lifeTheme?: LifeThemeProfile
+  soulProfile?: SoulProfile
 }
 
 export interface ProfileResult {

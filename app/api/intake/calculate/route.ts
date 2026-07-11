@@ -489,34 +489,25 @@ export async function POST(req: NextRequest) {
         .maybeSingle()
       const twinMeta = (existingTwin?.metadata as Record<string, any>) ?? {}
 
-      // ── 4a. Run multi-lens calculations (astrology, numerology) ──
-      let astrologyData: any = null
-      let numerologyData: any = null
+      // ── 4a. Run ALL multi-lens calculations ──
+      let multiLensResult: any = null
       try {
-        const { calculateNumerology, calculateAstrology } = await import('@/lib/profile')
-        const birthDate = new Date(dob)
-        if (birthTime) {
-          const [h, m] = birthTime.split(':').map(Number)
-          if (!isNaN(h) && !isNaN(m)) birthDate.setUTCHours(h, m, 0, 0)
-        }
-        const lat = birthLocation ? undefined : undefined // would need geo lookup
-        const lng = birthLocation ? undefined : undefined
-
-        numerologyData = calculateNumerology(
-          (name || '').split(' ')[0] || '',
-          undefined,
-          (name || '').split(' ').slice(-1)[0] || '',
-          dob,
-        )
-        astrologyData = calculateAstrology({
-          date: birthDate,
-          latitude: lat,
-          longitude: lng,
+        const { calculateFullProfile } = await import('@/lib/profile')
+        const nameParts = (name || '').split(' ')
+        multiLensResult = await calculateFullProfile({
+          firstName: nameParts[0] || '',
+          middleName: nameParts.length > 2 ? nameParts.slice(1, -1).join(' ') : undefined,
+          lastName: nameParts.slice(-1)[0] || '',
+          birthDate: dob,
+          birthTime: birthTime || undefined,
+          latitude: undefined,
+          longitude: undefined,
         })
       } catch (lensErr) {
         console.error('Multi-lens calculation error:', lensErr)
       }
 
+      const lensData = multiLensResult?.core || {}
       const lenses: Record<string, any> = {
         ...(twinMeta.lenses || {}),
         humanDesign: {
@@ -531,11 +522,12 @@ export async function POST(req: NextRequest) {
           calculatedAt: new Date().toISOString(),
         },
       }
-      if (numerologyData) {
-        lenses.numerology = { status: 'calculated', data: numerologyData, calculatedAt: new Date().toISOString() }
-      }
-      if (astrologyData) {
-        lenses.astrology = { status: 'calculated', data: astrologyData, calculatedAt: new Date().toISOString() }
+
+      const lensSystems = ['astrology', 'vedicAstrology', 'numerology', 'chineseZodiac', 'biorhythms', 'elementalArchetype', 'lifeTheme', 'soulProfile']
+      for (const key of lensSystems) {
+        if ((lensData as any)[key]) {
+          lenses[key] = { status: 'calculated', data: (lensData as any)[key], calculatedAt: new Date().toISOString() }
+        }
       }
 
       const { error: twinErr } = await svc

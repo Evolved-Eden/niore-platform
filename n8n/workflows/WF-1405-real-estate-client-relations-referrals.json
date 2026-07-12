@@ -1,0 +1,72 @@
+{
+  "name": "WF-1405 — Real Estate: Client Relations & Referrals",
+  "nodes": [
+    {
+      "parameters": { "rule": { "interval": [ { "field": "cronExpression", "expression": "0 9 * * 1" } ] } },
+      "id": "trigger-1", "name": "Weekly Monday 9am",
+      "type": "n8n-nodes-base.scheduleTrigger", "typeVersion": 1.2, "position": [-1300, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{$env.SUPABASE_URL}}/rest/v1/organization_os_activations?select=organization_id&item_type=eq.vertical_pack&item_key=eq.real_estate_land&state=eq.active",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth"
+      },
+      "id": "fetch-orgs", "name": "Fetch Orgs With Real Estate Pack Active",
+      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [-1060, 300],
+      "credentials": { "httpHeaderAuth": { "id": "PLACEHOLDER_SUPABASE_SERVICE_ROLE", "name": "Supabase Service Role" } }
+    },
+    {
+      "parameters": {
+        "jsCode": "const ids = $input.all().map(i => i.json.organization_id).filter(Boolean);\nif (ids.length === 0) return [];\nreturn [{ json: { org_ids: ids.join(',') } }];"
+      },
+      "id": "build-org-filter", "name": "Build Org ID Filter",
+      "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [-820, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{$env.SUPABASE_URL}}/rest/v1/clients?select=id,full_name,organization_id,referral_score&organization_id=in.({{$json.org_ids}})&primary_vertical=eq.real_estate&status=eq.active&lifecycle_stage=eq.closed",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth"
+      },
+      "id": "fetch-past-clients", "name": "Fetch Past Clients (closed)",
+      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [-580, 300],
+      "credentials": { "httpHeaderAuth": { "id": "PLACEHOLDER_SUPABASE_SERVICE_ROLE", "name": "Supabase Service Role" } }
+    },
+    { "parameters": { "batchSize": 1, "options": {} }, "id": "split-1", "name": "One Past Client At A Time",
+      "type": "n8n-nodes-base.splitInBatches", "typeVersion": 3, "position": [-340, 300] },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.NIORE_APP_URL}}/api/internal/verticals/run-agent",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [ { "name": "x-internal-secret", "value": "={{$env.INTERNAL_CRON_SECRET}}" } ] },
+        "sendBody": true,
+        "bodyParameters": { "parameters": [
+          { "name": "clientId", "value": "={{$json.id}}" },
+          { "name": "agentId", "value": "AGT-010" },
+          { "name": "actionType", "value": "real_estate_client_relations_referral" },
+          { "name": "prompt", "value": "=Draft a check-in and referral-ask message for past client {{$json.full_name}} (referral_score: {{$json.referral_score}}). Keep it warm, not salesy, and tie the referral ask to genuine follow-up." }
+        ] },
+        "options": { "timeout": 45000 }
+      },
+      "id": "run-agent", "name": "Run Client Experience Agent (AGT-010)",
+      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [-100, 220],
+      "onError": "continueRegularOutput",
+      "notes": "Same agent (AGT-010) as WF-1401 but a different pipeline stage and prompt -- past clients (closed) getting relationship/referral outreach vs. new leads getting nurture."
+    }
+  ],
+  "connections": {
+    "Weekly Monday 9am": { "main": [[{ "node": "Fetch Orgs With Real Estate Pack Active", "type": "main", "index": 0 }]] },
+    "Fetch Orgs With Real Estate Pack Active": { "main": [[{ "node": "Build Org ID Filter", "type": "main", "index": 0 }]] },
+    "Build Org ID Filter": { "main": [[{ "node": "Fetch Past Clients (closed)", "type": "main", "index": 0 }]] },
+    "Fetch Past Clients (closed)": { "main": [[{ "node": "One Past Client At A Time", "type": "main", "index": 0 }]] },
+    "One Past Client At A Time": { "main": [[{ "node": "Run Client Experience Agent (AGT-010)", "type": "main", "index": 0 }], []] },
+    "Run Client Experience Agent (AGT-010)": { "main": [[{ "node": "One Past Client At A Time", "type": "main", "index": 0 }]] }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "meta": { "templateId": "WF-1405" }
+}

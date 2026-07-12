@@ -140,9 +140,14 @@ export default async function DashboardLayout({ children }: { children: React.Re
     rlsError = true
   }
 
-  // Derive role from plan_tier_key first (what they paid for), fall back to users.role
+  // Admin always wins, regardless of plan_tier_key -- previously planRole was
+  // checked first, which meant any admin who *also* had a purchased plan
+  // (e.g. users.role='admin' but clients.plan_tier_key='creator_concierge')
+  // got silently demoted to their plan's role on every login. Confirmed live
+  // on desire1319@yahoo.com: users.role was already 'admin' but plan_tier_key
+  // 'creator_concierge' overrode it every time.
   const planRole = deriveRoleFromPlanTier(clientRecord?.plan_tier_key)
-  const role: UserRole = planRole ?? (userRole === 'admin' ? 'admin' : userRole)
+  const role: UserRole = userRole === 'admin' ? 'admin' : (planRole ?? userRole)
 
   // Plan guard: non-admin dashboard access requires at least one active plan.
   if (role !== 'admin') {

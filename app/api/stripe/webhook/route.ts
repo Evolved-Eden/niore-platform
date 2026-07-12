@@ -2,6 +2,7 @@ import Stripe from "stripe";
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { STRIPE_API_VERSION } from "@/lib/constants";
+import { sendEmail } from "@/lib/email";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: STRIPE_API_VERSION,
@@ -89,32 +90,70 @@ async function getOrCreateOrg(userId: string, userName: string) {
   return org
 }
 
-async function createIntelligenceProfile(orgId: string) {
-  const { data: existing } = await supabaseAdmin
-    .from('intelligence_profiles')
-    .select('id')
-    .eq('entity_id', orgId)
-    .eq('entity_type', 'organization')
-    .maybeSingle()
+// NOTE: this used to insert into `intelligence_profiles`, a table that
+// migration 00021_schema_consolidation.sql explicitly retired ("LEGACY --
+// unused. Intelligence data lives in client_twins / agents.") -- but the
+// live table was never actually created, so every call here was silently
+// failing (supabaseAdmin swallows the error since only `data` is read).
+// Removed. upsertClientTwin() + createZuriAgent() below are the real
+// Base Twin / Core Agent provisioning steps per the Eden Core System model.
 
-  if (existing) return existing
+// Activates (or upgrades) an OS package for an organization -- the
+// canonical record of "this org/human currently has X active," which
+// supports multiple concurrent OS's on one org (personal_os + family_os +
+// creator_os all at once) and doubles as the Blueprint Passive/Active/
+// Mastered state per system.
+async function activateOsPackage(params: {
+  organizationId: string
+  osPackageKey: string
+  tierLevel?: 'standard' | 'prime' | 'elite'
+  source?: string
+}) {
+  const { organizationId, osPackageKey, tierLevel = 'standard', source = 'checkout' } = params
+  if (!organizationId || !osPackageKey) return null
 
-  const { data: intel } = await supabaseAdmin
-    .from("intelligence_profiles")
-    .insert({
-      entity_type: "organization",
-      entity_id: orgId,
-      organization_id: orgId,
-      profile_kind: "business_intelligence",
-      identity_summary: "Business intelligence",
-      profile_type: "checkout_derived",
-      confidence_score: 0.5,
-      version: 1,
-    })
+  const { data } = await supabaseAdmin
+    .from('organization_os_activations')
+    .upsert(
+      {
+        organization_id: organizationId,
+        item_type: 'os_package',
+        item_key: osPackageKey,
+        tier_level: tierLevel,
+        state: 'active',
+        source,
+        activated_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: 'organization_id,item_type,item_key' }
+    )
     .select()
     .single()
 
-  return intel
+  return data
+}
+
+// Best-effort audit trail for provisioning events -- audit_logs is the
+// canonical consolidated log (replaces the old empty _deprecated_entity_audit_log stub).
+async function logProvisioningEvent(params: {
+  organizationId?: string | null
+  userId?: string | null
+  action: string
+  resourceType?: string
+  afterState?: Record<string, unknown>
+}) {
+  try {
+    await supabaseAdmin.from('audit_logs').insert({
+      organization_id: params.organizationId ?? null,
+      user_id: params.userId ?? null,
+      action: params.action,
+      resource_type: params.resourceType ?? 'organization',
+      after_state: params.afterState ?? {},
+    })
+  } catch (err) {
+    // Non-fatal -- never let audit logging break provisioning.
+    console.error('audit_logs insert failed:', err)
+  }
 }
 
 async function upsertClientTwin(userId: string, orgId: string | null) {
@@ -207,6 +246,64 @@ export async function POST(req: Request) {
         stripeCustomerId: typeof paymentIntent.customer === "string" ? paymentIntent.customer : null,
         stripeSubscriptionId: null,
       })
+    }
+
+    // ── Marketplace catalog item purchase (creator marketplace) ──
+    // Distinct metadata shape from the deposit flow above -- set by
+    // app/api/marketplace/checkout, not the tier-deposit checkout.
+    if (meta.purchase_type === "marketplace_catalog_item") {
+      const catalogItemId = meta.catalog_item_id || ""
+      const sellerOrgId = meta.seller_organization_id || ""
+
+      const { data: purchase } = await supabaseAdmin
+        .from("catalog_purchases")
+        .update({ status: "succeeded", updated_at: new Date().toISOString() })
+        .eq("stripe_payment_intent_id", paymentIntent.id)
+        .select("id, seller_net_amount, currency")
+        .single()
+
+      if (purchase && sellerOrgId) {
+        const { data: wallet } = await supabaseAdmin
+          .from("wallets")
+          .select("id, balance")
+          .eq("organization_id", sellerOrgId)
+          .maybeSingle()
+
+        let walletId = wallet?.id
+        if (!walletId) {
+          const { data: newWallet } = await supabaseAdmin
+            .from("wallets")
+            .insert({ organization_id: sellerOrgId, balance: 0, currency: purchase.currency || "USD" })
+            .select("id")
+            .single()
+          walletId = newWallet?.id
+        }
+
+        if (walletId) {
+          await supabaseAdmin.from("wallet_transactions").insert({
+            wallet_id: walletId,
+            transaction_type: "marketplace_sale",
+            amount: purchase.seller_net_amount,
+            metadata: { catalog_item_id: catalogItemId, stripe_payment_intent_id: paymentIntent.id },
+          })
+
+          await supabaseAdmin
+            .from("wallets")
+            .update({ balance: Number(wallet?.balance ?? 0) + Number(purchase.seller_net_amount ?? 0) })
+            .eq("id", walletId)
+        }
+      }
+    }
+  }
+
+  if (event.type === "payment_intent.payment_failed") {
+    const paymentIntent = event.data.object as Stripe.PaymentIntent
+    const meta = paymentIntent.metadata || {}
+    if (meta.purchase_type === "marketplace_catalog_item") {
+      await supabaseAdmin
+        .from("catalog_purchases")
+        .update({ status: "failed", updated_at: new Date().toISOString() })
+        .eq("stripe_payment_intent_id", paymentIntent.id)
     }
   }
 
@@ -302,12 +399,32 @@ export async function POST(req: Request) {
       }
     }
 
-    // ── 3. Provision org + intelligence + Zuri (idempotent) ──
+    // ── 3. Provision org + Base Twin + Zuri (idempotent) ──
     const org = await getOrCreateOrg(userId, userData?.full_name || email.split('@')[0])
     if (org) {
-      await createIntelligenceProfile(org.id)
       await upsertClientTwin(userId, org.id)
       await createZuriAgent(userId, org.id)
+
+      // Record the OS activation (supports multiple concurrent OS's per org/human,
+      // and is the Blueprint Passive/Active/Mastered state tracker).
+      if (tier) {
+        await activateOsPackage({ organizationId: org.id, osPackageKey: tier, source: 'checkout' })
+      }
+
+      // Addons purchased alongside the base tier (e.g. someone on personal_os
+      // also adding family_os + creator_os) each get their own activation row,
+      // so one org/human can hold several OS's concurrently.
+      for (const addonKey of addons) {
+        await activateOsPackage({ organizationId: org.id, osPackageKey: addonKey, source: 'checkout_addon' })
+      }
+
+      await logProvisioningEvent({
+        organizationId: org.id,
+        userId,
+        action: 'checkout_provisioned',
+        resourceType: 'organization',
+        afterState: { tier, path, addons },
+      })
     }
 
     // ── 4. Provision selected agents from checkout ──
@@ -398,10 +515,29 @@ export async function POST(req: Request) {
     // ── 6. Tag org with vertical ──
     const checkoutVertical = meta.vertical || ""
     if (checkoutVertical && org) {
+      const { data: orgRow } = await supabaseAdmin
+        .from("organizations")
+        .select("metadata")
+        .eq("id", org.id)
+        .maybeSingle()
+
       await supabaseAdmin
         .from("organizations")
-        .update({ metadata: { vertical: checkoutVertical } })
+        .update({ metadata: { ...((orgRow?.metadata as Record<string, unknown>) ?? {}), vertical: checkoutVertical } })
         .eq("id", org.id)
+    }
+
+    // ── 7. Send purchase confirmation email ──
+    if (tier && email) {
+      try {
+        await sendEmail({
+          to: email,
+          subject: `You're in — ${tier.replace(/_/g, ' ')} is now active`,
+          html: `<p>Hi${userData?.full_name ? ` ${userData.full_name}` : ''},</p><p>Your <strong>${tier.replace(/_/g, ' ')}</strong> system is now active${addons.length ? `, along with: ${addons.map((a) => a.replace(/_/g, ' ')).join(', ')}` : ''}.</p><p>Your dashboard is ready — log in to get started.</p>`,
+        })
+      } catch (err) {
+        console.error('Purchase confirmation email failed:', err)
+      }
     }
   }
 

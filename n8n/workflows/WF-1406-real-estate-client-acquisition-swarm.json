@@ -1,0 +1,92 @@
+{
+  "name": "WF-1406 — Real Estate: Client Acquisition Swarm Deployment",
+  "nodes": [
+    {
+      "parameters": { "rule": { "interval": [ { "field": "cronExpression", "expression": "0 */6 * * *" } ] } },
+      "id": "trigger-1", "name": "Every 6 Hours",
+      "type": "n8n-nodes-base.scheduleTrigger", "typeVersion": 1.2, "position": [-1300, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{$env.SUPABASE_URL}}/rest/v1/organization_os_activations?select=organization_id&item_type=eq.vertical_pack&item_key=eq.real_estate_land&state=eq.active",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth"
+      },
+      "id": "fetch-orgs", "name": "Fetch Orgs With Real Estate Pack Active",
+      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [-1300, 500],
+      "credentials": { "httpHeaderAuth": { "id": "PLACEHOLDER_SUPABASE_SERVICE_ROLE", "name": "Supabase Service Role" } },
+      "notes": "Not an agent-run workflow like the other 5 -- this deploys the pre-built real_estate_swarm (swarm_templates key) to the org owner's client record if it isn't already deployed. Runs the org loop directly (no client-level filter step needed)."
+    },
+    { "parameters": { "batchSize": 1, "options": {} }, "id": "split-1", "name": "One Org At A Time",
+      "type": "n8n-nodes-base.splitInBatches", "typeVersion": 3, "position": [-1060, 500] },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{$env.SUPABASE_URL}}/rest/v1/organizations?select=id,owner_id,name&id=eq.{{$json.organization_id}}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth"
+      },
+      "id": "fetch-org-owner", "name": "Fetch Org Owner (Client) ID",
+      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [-820, 420],
+      "credentials": { "httpHeaderAuth": { "id": "PLACEHOLDER_SUPABASE_SERVICE_ROLE", "name": "Supabase Service Role" } }
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{$env.SUPABASE_URL}}/rest/v1/client_deployed_swarms?select=id&client_id=eq.{{$json.owner_id}}&swarm_id=eq.real_estate_swarm",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth"
+      },
+      "id": "check-existing", "name": "Check If Already Deployed",
+      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [-580, 420],
+      "credentials": { "httpHeaderAuth": { "id": "PLACEHOLDER_SUPABASE_SERVICE_ROLE", "name": "Supabase Service Role" } }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "leftValue": "", "caseSensitive": true, "typeValidation": "loose" },
+          "conditions": [ { "leftValue": "={{$json.length}}", "rightValue": 0, "operator": { "type": "number", "operation": "equals" } } ],
+          "combinator": "and"
+        }
+      },
+      "id": "if-not-deployed", "name": "If Not Already Deployed",
+      "type": "n8n-nodes-base.if", "typeVersion": 2.2, "position": [-340, 420]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.SUPABASE_URL}}/rest/v1/client_deployed_swarms",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": { "parameters": [
+          { "name": "client_id", "value": "={{$('Fetch Org Owner (Client) ID').item.json.owner_id}}" },
+          { "name": "swarm_id", "value": "real_estate_swarm" },
+          { "name": "swarm_name", "value": "Real Estate Swarm" },
+          { "name": "vertical", "value": "real_estate" },
+          { "name": "deployment_status", "value": "active" },
+          { "name": "status", "value": "active" }
+        ] },
+        "options": { "timeout": 45000 }
+      },
+      "id": "deploy-swarm", "name": "Deploy Real Estate Swarm",
+      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [-100, 340],
+      "credentials": { "httpHeaderAuth": { "id": "PLACEHOLDER_SUPABASE_SERVICE_ROLE", "name": "Supabase Service Role" } },
+      "onError": "continueRegularOutput",
+      "notes": "swarm_id 'real_estate_swarm' is a real swarm_templates row bundling all 15 published real_estate agents (AGT-009..017, AGT-151/152/177, property_listing_optimizer, property_match, transaction_coordinator)."
+    }
+  ],
+  "connections": {
+    "Every 6 Hours": { "main": [[{ "node": "Fetch Orgs With Real Estate Pack Active", "type": "main", "index": 0 }]] },
+    "Fetch Orgs With Real Estate Pack Active": { "main": [[{ "node": "One Org At A Time", "type": "main", "index": 0 }]] },
+    "One Org At A Time": { "main": [[{ "node": "Fetch Org Owner (Client) ID", "type": "main", "index": 0 }], []] },
+    "Fetch Org Owner (Client) ID": { "main": [[{ "node": "Check If Already Deployed", "type": "main", "index": 0 }]] },
+    "Check If Already Deployed": { "main": [[{ "node": "If Not Already Deployed", "type": "main", "index": 0 }]] },
+    "If Not Already Deployed": { "main": [[{ "node": "Deploy Real Estate Swarm", "type": "main", "index": 0 }], []] },
+    "Deploy Real Estate Swarm": { "main": [[{ "node": "One Org At A Time", "type": "main", "index": 0 }]] }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "meta": { "templateId": "WF-1406" }
+}

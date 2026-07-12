@@ -114,8 +114,10 @@ export default async function DashboardSectionPage({ params }: { params: Promise
     .select('plan_tier_key')
     .eq('id', user.id)
     .maybeSingle()
+  // Admin always wins regardless of plan_tier_key (same fix as
+  // app/dashboard/layout.tsx and app/dashboard/page.tsx).
   const planRole = deriveRoleFromPlanTier(clientRecord?.plan_tier_key)
-  const currentRole = planRole ?? userRole
+  const currentRole = userRole === 'admin' ? 'admin' : (planRole ?? userRole)
 
   if (currentRole !== role) redirect(`/dashboard/${currentRole}`)
 

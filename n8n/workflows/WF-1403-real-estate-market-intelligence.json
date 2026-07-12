@@ -1,0 +1,65 @@
+{
+  "name": "WF-1403 — Real Estate: Market Intelligence Monitoring",
+  "nodes": [
+    {
+      "parameters": { "rule": { "interval": [ { "field": "cronExpression", "expression": "0 6 * * *" } ] } },
+      "id": "trigger-1", "name": "Daily 6am",
+      "type": "n8n-nodes-base.scheduleTrigger", "typeVersion": 1.2, "position": [-1300, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{$env.SUPABASE_URL}}/rest/v1/organization_os_activations?select=organization_id&item_type=eq.vertical_pack&item_key=eq.real_estate_land&state=eq.active",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth"
+      },
+      "id": "fetch-orgs", "name": "Fetch Orgs With Real Estate Pack Active",
+      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [-1060, 300],
+      "credentials": { "httpHeaderAuth": { "id": "PLACEHOLDER_SUPABASE_SERVICE_ROLE", "name": "Supabase Service Role" } },
+      "notes": "This one runs per-ORG (a market brief for the brokerage/agent's own book of business), not per-lead -- unlike the other 5 workflows in this pack."
+    },
+    { "parameters": { "batchSize": 1, "options": {} }, "id": "split-1", "name": "One Org At A Time",
+      "type": "n8n-nodes-base.splitInBatches", "typeVersion": 3, "position": [-820, 300] },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{$env.SUPABASE_URL}}/rest/v1/organizations?select=id,owner_id,name&id=eq.{{$json.organization_id}}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth"
+      },
+      "id": "fetch-org-owner", "name": "Fetch Org Owner (Client) ID",
+      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [-580, 220],
+      "credentials": { "httpHeaderAuth": { "id": "PLACEHOLDER_SUPABASE_SERVICE_ROLE", "name": "Supabase Service Role" } }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.NIORE_APP_URL}}/api/internal/verticals/run-agent",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [ { "name": "x-internal-secret", "value": "={{$env.INTERNAL_CRON_SECRET}}" } ] },
+        "sendBody": true,
+        "bodyParameters": { "parameters": [
+          { "name": "clientId", "value": "={{$json.owner_id}}" },
+          { "name": "agentId", "value": "AGT-013" },
+          { "name": "actionType", "value": "real_estate_market_intelligence" },
+          { "name": "prompt", "value": "=Produce today's market intelligence brief for {{$json.name}}: local pricing trends, inventory shifts, and notable opportunities or risks." }
+        ] },
+        "options": { "timeout": 45000 }
+      },
+      "id": "run-agent", "name": "Run Market Agent (AGT-013)",
+      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [-340, 220],
+      "onError": "continueRegularOutput",
+      "notes": "agent_id AGT-013 = 'Real Estate Market Agent', a real published VERTICAL agent."
+    }
+  ],
+  "connections": {
+    "Daily 6am": { "main": [[{ "node": "Fetch Orgs With Real Estate Pack Active", "type": "main", "index": 0 }]] },
+    "Fetch Orgs With Real Estate Pack Active": { "main": [[{ "node": "One Org At A Time", "type": "main", "index": 0 }]] },
+    "One Org At A Time": { "main": [[{ "node": "Fetch Org Owner (Client) ID", "type": "main", "index": 0 }], []] },
+    "Fetch Org Owner (Client) ID": { "main": [[{ "node": "Run Market Agent (AGT-013)", "type": "main", "index": 0 }]] },
+    "Run Market Agent (AGT-013)": { "main": [[{ "node": "One Org At A Time", "type": "main", "index": 0 }]] }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "meta": { "templateId": "WF-1403" }
+}

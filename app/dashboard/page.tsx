@@ -90,9 +90,11 @@ export default async function DashboardHub({ searchParams }: { searchParams?: Pr
   const userRole = (identity?.role as string) ?? 'client'
   const name = identity?.full_name ?? user.email?.split('@')[0] ?? 'User'
 
-  // Derive role from plan_tier_key first (what they paid for), fall back to users.role
+  // Admin always wins regardless of plan_tier_key (see app/dashboard/layout.tsx
+  // for the full explanation -- same bug fixed there, admins with a purchased
+  // plan were getting silently demoted to their plan's role).
   const planRole = deriveRoleFromPlanTier(clientRecord?.plan_tier_key)
-  const role: string = planRole ?? userRole
+  const role: string = userRole === 'admin' ? 'admin' : (planRole ?? userRole)
 
   // Handle checkout=success — redirect to role-specific dashboard
   const sp = await searchParams

@@ -1,0 +1,64 @@
+{
+  "name": "WF-108 — Agent Execution Retry Sweep",
+  "nodes": [
+    {
+      "parameters": { "rule": { "interval": [ { "field": "cronExpression", "expression": "*/15 * * * *" } ] } },
+      "id": "trigger-1", "name": "Every 15 Minutes",
+      "type": "n8n-nodes-base.scheduleTrigger", "typeVersion": 1.2, "position": [-1100, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{$env.SUPABASE_URL}}/rest/v1/client_essence_actions?select=*&status=eq.failed&retry_count=lt.1",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth"
+      },
+      "id": "fetch-failed", "name": "Fetch Failed Actions (not yet retried)",
+      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [-860, 300],
+      "credentials": { "httpHeaderAuth": { "id": "PLACEHOLDER_SUPABASE_SERVICE_ROLE", "name": "Supabase Service Role" } },
+      "notes": "Requires a retry_count int column on client_essence_actions (not in the schema yet -- add via migration before activating this workflow) so we never retry more than once per action."
+    },
+    { "parameters": { "batchSize": 1, "options": {} }, "id": "split-1", "name": "One Action At A Time",
+      "type": "n8n-nodes-base.splitInBatches", "typeVersion": 3, "position": [-620, 300] },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.NIORE_APP_URL}}/api/client/essence/execute",
+        "sendBody": true,
+        "bodyParameters": { "parameters": [
+          { "name": "essenceItemId", "value": "={{$json.essence_item_id}}" },
+          { "name": "actionType", "value": "={{$json.action_type}}" },
+          { "name": "prompt", "value": "={{$json.prompt}}" },
+          { "name": "agentId", "value": "={{$json.agent_id}}" }
+        ] },
+        "options": { "timeout": 45000 }
+      },
+      "id": "retry-execute", "name": "Retry Agent Execution",
+      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [-380, 220],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{$env.SUPABASE_URL}}/rest/v1/client_essence_actions?id=eq.{{$json.id}}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": { "parameters": [ { "name": "retry_count", "value": "1" } ] }
+      },
+      "id": "mark-retried", "name": "Mark Retried",
+      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [-140, 220],
+      "credentials": { "httpHeaderAuth": { "id": "PLACEHOLDER_SUPABASE_SERVICE_ROLE", "name": "Supabase Service Role" } }
+    }
+  ],
+  "connections": {
+    "Every 15 Minutes": { "main": [[{ "node": "Fetch Failed Actions (not yet retried)", "type": "main", "index": 0 }]] },
+    "Fetch Failed Actions (not yet retried)": { "main": [[{ "node": "One Action At A Time", "type": "main", "index": 0 }]] },
+    "One Action At A Time": { "main": [[{ "node": "Retry Agent Execution", "type": "main", "index": 0 }], []] },
+    "Retry Agent Execution": { "main": [[{ "node": "Mark Retried", "type": "main", "index": 0 }]] },
+    "Mark Retried": { "main": [[{ "node": "One Action At A Time", "type": "main", "index": 0 }]] }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "meta": { "templateId": "WF-108" }
+}

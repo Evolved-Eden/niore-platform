@@ -1,0 +1,76 @@
+{
+  "name": "WF-301 — Plan / Entitlement Consistency Check",
+  "nodes": [
+    {
+      "parameters": { "rule": { "interval": [ { "field": "cronExpression", "expression": "0 2 * * *" } ] } },
+      "id": "trigger-1", "name": "Daily 02:00 UTC",
+      "type": "n8n-nodes-base.scheduleTrigger", "typeVersion": 1.2, "position": [-1100, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{$env.SUPABASE_URL}}/rest/v1/membership_tiers?select=key",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth"
+      },
+      "id": "fetch-tiers", "name": "Fetch membership_tiers keys",
+      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [-880, 220],
+      "credentials": { "httpHeaderAuth": { "id": "PLACEHOLDER_SUPABASE_SERVICE_ROLE", "name": "Supabase Service Role" } }
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{$env.SUPABASE_URL}}/rest/v1/tier_entitlements?select=plan_key",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth"
+      },
+      "id": "fetch-entitlements", "name": "Fetch tier_entitlements plan_keys",
+      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [-880, 380],
+      "credentials": { "httpHeaderAuth": { "id": "PLACEHOLDER_SUPABASE_SERVICE_ROLE", "name": "Supabase Service Role" } }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combinationMode": "mergeByPosition"
+      },
+      "id": "merge-1", "name": "Merge",
+      "type": "n8n-nodes-base.merge", "typeVersion": 3, "position": [-640, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const tiers = new Set(($input.first().json.tiers || []).map(t => t.key));\nconst entitled = new Set(($input.first().json.entitlements || []).map(e => e.plan_key));\nconst missing = [...tiers].filter(k => !entitled.has(k));\nconst orphaned = [...entitled].filter(k => !tiers.has(k));\nreturn [{ json: { missing_entitlements: missing, orphaned_entitlements: orphaned, has_mismatch: missing.length > 0 || orphaned.length > 0 } }];"
+      },
+      "id": "diff-code", "name": "Diff Tiers vs Entitlements",
+      "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [-400, 300],
+      "notes": "Reshape the two HTTP Request outputs into { tiers: [...], entitlements: [...] } upstream (Set node, omitted here for brevity) before this Code node runs."
+    },
+    {
+      "parameters": { "conditions": { "boolean": [ { "value1": "={{$json.has_mismatch}}", "value2": true } ] } },
+      "id": "if-mismatch", "name": "If Mismatch Found",
+      "type": "n8n-nodes-base.if", "typeVersion": 2, "position": [-160, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.INTERNAL_OPS_DISCORD_WEBHOOK}}",
+        "sendBody": true,
+        "bodyParameters": { "parameters": [
+          { "name": "content", "value": "=⚠️ Plan/entitlement mismatch found.\\nMissing tier_entitlements for: {{$json.missing_entitlements.join(', ')}}\\nOrphaned tier_entitlements for: {{$json.orphaned_entitlements.join(', ')}}" }
+        ] }
+      },
+      "id": "alert-discord", "name": "Alert Ops Channel",
+      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [80, 220]
+    }
+  ],
+  "connections": {
+    "Daily 02:00 UTC": { "main": [[{ "node": "Fetch membership_tiers keys", "type": "main", "index": 0 }, { "node": "Fetch tier_entitlements plan_keys", "type": "main", "index": 0 }]] },
+    "Fetch membership_tiers keys": { "main": [[{ "node": "Merge", "type": "main", "index": 0 }]] },
+    "Fetch tier_entitlements plan_keys": { "main": [[{ "node": "Merge", "type": "main", "index": 1 }]] },
+    "Merge": { "main": [[{ "node": "Diff Tiers vs Entitlements", "type": "main", "index": 0 }]] },
+    "Diff Tiers vs Entitlements": { "main": [[{ "node": "If Mismatch Found", "type": "main", "index": 0 }]] },
+    "If Mismatch Found": { "main": [[{ "node": "Alert Ops Channel", "type": "main", "index": 0 }], []] }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "meta": { "templateId": "WF-301" }
+}

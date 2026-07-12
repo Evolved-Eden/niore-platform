@@ -1,5 +1,5 @@
 {
-  "name": "WF2 — Scheduler",
+  "name": "WF2 \u2014 Scheduler",
   "nodes": [
     {
       "id": "f1a2b3c4-d5e6-7890-abcd-ef1234567890",
@@ -35,10 +35,7 @@
         "query": "SELECT *\nFROM public.workflow_schedules\nWHERE active = true\n  AND next_run_at <= NOW()\nORDER BY next_run_at\nLIMIT 500;"
       },
       "credentials": {
-        "postgres": {
-          "id": "V3Efv1mtgcNnSJUZ",
-          "name": "Supabase Postgres"
-        }
+        "postgres": "Supabase Postgres"
       }
     },
     {
@@ -66,7 +63,7 @@
       ],
       "parameters": {
         "method": "POST",
-        "url": "https://jebixydqpvsegvrtfmgm.supabase.co/functions/v1/workflow-trigger",
+        "url": "={{ $env.SUPABASE_URL }}/functions/v1/workflow-trigger",
         "authentication": "genericCredentialType",
         "nodeCredentialType": "httpHeaderAuth",
         "sendHeaders": true,
@@ -105,10 +102,7 @@
         "query": "UPDATE public.workflow_schedules\nSET\n  last_run_at = NOW(),\n  next_run_at = public.calculate_next_run(cron_expression)\nWHERE id = '{{ $json.id }}'::uuid;"
       },
       "credentials": {
-        "postgres": {
-          "id": "V3Efv1mtgcNnSJUZ",
-          "name": "Supabase Postgres"
-        }
+        "postgres": "Supabase Postgres"
       }
     }
   ],
@@ -158,17 +152,17 @@
       ]
     }
   },
+  "pinData": {},
+  "versionId": "00000000-0000-0000-0000-000000000002",
   "settings": {
     "executionOrder": "v1",
     "errorWorkflow": "",
     "callerPolicy": "workflowsFromSameOwner",
     "timezone": "UTC"
   },
-  "staticData": {
-    "node:Every 1m": {
-      "recurrenceRules": []
-    }
-  },
-  "pinData": {},
-  "tags": []
+  "staticData": null,
+  "tags": [
+    "infrastructure",
+    "scheduler"
+  ]
 }

@@ -1,5 +1,5 @@
 {
-  "name": "WF3 — Dead Letter Handler",
+  "name": "WF3 \u2014 Dead Letter Handler",
   "nodes": [
     {
       "id": "e6f7a8b9-c0d1-2345-efab-456789012345",
@@ -139,7 +139,7 @@
       ],
       "parameters": {
         "operation": "executeQuery",
-        "query": "CREATE TABLE IF NOT EXISTS public.workflow_alerts (id UUID PRIMARY KEY DEFAULT gen_random_uuid(), source TEXT NOT NULL DEFAULT 'n8n', workflow_name TEXT NOT NULL, node_name TEXT NOT NULL DEFAULT 'unknown', level TEXT NOT NULL DEFAULT 'error', title TEXT NOT NULL, message TEXT NOT NULL, context JSONB DEFAULT '{}'::jsonb, created_at TIMESTAMPTZ NOT NULL DEFAULT NOW());\nINSERT INTO public.workflow_alerts (source, workflow_name, node_name, level, title, message, context)\nVALUES ('n8n', 'WF3 - Dead Letter Handler', 'Retryable?', 'warning', 'Dead Letter: Max Retries Exceeded', '{{ \"Dead letter for workflow \" + $json.workflow_id + \", error: \" + ($json.error_message || \"Unknown\") + \", retries: \" + $json.retry_count + \"/\" + $json.max_retries }}', '{{ JSON.stringify($json) }}'::jsonb);",
+        "query": "INSERT INTO public.workflow_alerts (source, workflow_name, node_name, level, title, message, context)\nVALUES ('n8n', 'WF3 - Dead Letter Handler', 'Retryable?', 'warning', 'Dead Letter: Max Retries Exceeded', '{{ \"Dead letter for workflow \" + $json.workflow_id + \", error: \" + ($json.error_message || \"Unknown\") + \", retries: \" + $json.retry_count + \"/\" + $json.max_retries }}', '{{ JSON.stringify($json) }}'::jsonb);",
         "options": {}
       },
       "credentials": {

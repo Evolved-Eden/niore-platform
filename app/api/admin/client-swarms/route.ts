@@ -90,11 +90,11 @@ export async function POST(req: NextRequest) {
 
       if (error) throw error
 
-      supabaseAdmin.from('clients').select('swarm_deployments').eq('id', client_id).single()
-        .then(({ data: clientRow }) => {
-          supabaseAdmin.from('clients').update({ swarm_deployments: (clientRow?.swarm_deployments ?? 0) + 1 }).eq('id', client_id).then(() => {}, () => {})
-        })
-        .then(() => {}, () => {})
+      // WF-205: keep clients.swarm_deployments accurate. Awaited (not
+      // fire-and-forget) so a failure here surfaces instead of silently
+      // drifting the counter out of sync.
+      const { data: clientRow } = await supabaseAdmin.from('clients').select('swarm_deployments').eq('id', client_id).single()
+      await supabaseAdmin.from('clients').update({ swarm_deployments: (clientRow?.swarm_deployments ?? 0) + 1 }).eq('id', client_id)
 
       return NextResponse.json({ success: true, swarm: data })
     }
@@ -124,11 +124,9 @@ export async function DELETE(req: NextRequest) {
     if (error) throw error
 
     if (deleted && deleted.length > 0) {
-      supabaseAdmin.from('clients').select('swarm_deployments').eq('id', client_id).single()
-        .then(({ data: c }) => {
-          supabaseAdmin.from('clients').update({ swarm_deployments: Math.max((c?.swarm_deployments ?? 1) - 1, 0) }).eq('id', client_id).then(() => {}, () => {})
-        })
-        .then(() => {}, () => {})
+      // WF-205, same reliability fix as above.
+      const { data: c } = await supabaseAdmin.from('clients').select('swarm_deployments').eq('id', client_id).single()
+      await supabaseAdmin.from('clients').update({ swarm_deployments: Math.max((c?.swarm_deployments ?? 1) - 1, 0) }).eq('id', client_id)
     }
 
     return NextResponse.json({ success: true })

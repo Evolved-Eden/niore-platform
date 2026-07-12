@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { query, queryOne } from '@/lib/db'
+import { supabaseAdmin } from '@/lib/supabase/admin'
 import { runAgentByAgentId } from '@/lib/agents'
 
 export const dynamic = 'force-dynamic'
@@ -26,18 +26,21 @@ export async function POST(req: NextRequest) {
     const isMockId = String(essenceItemId).startsWith('mock_')
 
     // 1. Create the action record
-    let actionId: string
+    const { data: actionRow, error: actionError } = await supabaseAdmin
+      .from('client_essence_actions')
+      .insert({
+        essence_item_id: essenceItemId,
+        client_id: user.id,
+        action_type: actionType,
+        prompt: prompt || null,
+        agent_id: agentId || null,
+        status: 'running',
+        started_at: new Date().toISOString(),
+      })
+      .select('id')
+      .single()
 
-    try {
-      const actionResult = await queryOne(
-        `INSERT INTO client_essence_actions (essence_item_id, client_id, action_type, prompt, agent_id, status, started_at)
-         VALUES ($1, $2, $3, $4, $5, 'running', NOW())
-         RETURNING id`,
-        [essenceItemId, user.id, actionType, prompt || null, agentId || null]
-      )
-
-      actionId = actionResult?.id ?? `mock_${Date.now()}`
-    } catch (actionError: any) {
+    if (actionError) {
       // Table doesn't exist — return mock success (resilient)
       if (
         actionError.code === '42P01' ||
@@ -53,6 +56,8 @@ export async function POST(req: NextRequest) {
       }
       throw actionError
     }
+
+    const actionId: string = actionRow?.id ?? `mock_${Date.now()}`
 
     // 2. Actually run the agent, if one was specified. Without an agentId
     // there's nothing to execute — leave the action as 'running' rather than
@@ -71,28 +76,33 @@ export async function POST(req: NextRequest) {
         finalStatus = 'failed'
       }
 
-      try {
-        await query(
-          `UPDATE client_essence_actions
-           SET status = $1, result_summary = $2, completed_at = NOW(), updated_at = NOW()
-           WHERE id = $3`,
-          [finalStatus, resultSummary, actionId]
-        )
-      } catch (updateActionError) {
+      const { error: updateActionError } = await supabaseAdmin
+        .from('client_essence_actions')
+        .update({
+          status: finalStatus,
+          result_summary: resultSummary,
+          completed_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', actionId)
+
+      if (updateActionError) {
         console.error('Failed to persist action result:', updateActionError)
       }
     }
 
     // 3. Update the essence intelligence item status (skip for mock IDs)
     if (!isMockId) {
-      try {
-        await query(
-          `UPDATE essence_intelligence
-           SET status = $1, linked_agent_id = COALESCE($2, linked_agent_id), updated_at = NOW()
-           WHERE id = $3`,
-          [finalStatus === 'completed' ? 'active' : finalStatus, agentId || null, essenceItemId]
-        )
-      } catch (updateError: any) {
+      const { error: updateError } = await supabaseAdmin
+        .from('essence_intelligence')
+        .update({
+          status: finalStatus === 'completed' ? 'active' : finalStatus,
+          ...(agentId ? { linked_agent_id: agentId } : {}),
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', essenceItemId)
+
+      if (updateError) {
         console.error('Failed to update essence item status:', updateError)
         // Non-fatal — action is already registered
       }
@@ -128,14 +138,14 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const rows = await query(
-      `SELECT id, essence_item_id, action_type, prompt, agent_id, status, result_summary, started_at, completed_at, created_at
-       FROM client_essence_actions
-       WHERE client_id = $1
-       ORDER BY created_at DESC
-       LIMIT 25`,
-      [user.id]
-    )
+    const { data: rows, error } = await supabaseAdmin
+      .from('client_essence_actions')
+      .select('id, essence_item_id, action_type, prompt, agent_id, status, result_summary, started_at, completed_at, created_at')
+      .eq('client_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(25)
+
+    if (error) throw error
 
     return NextResponse.json({ actions: rows ?? [] })
   } catch (error: any) {

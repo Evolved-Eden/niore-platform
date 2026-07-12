@@ -8,8 +8,15 @@ let pool: Pool | null = null
 
 function getPool(): Pool {
   if (!pool) {
-    // Support LOCAL_DATABASE_URL as a full connection string
-    const localUrl = process.env.LOCAL_DATABASE_URL
+    // Support LOCAL_DATABASE_URL as a full connection string, but only for
+    // actual local development. `VERCEL` is set on every Vercel deployment
+    // (production, preview, and `vercel dev`), so this guard stops a
+    // leftover/misconfigured LOCAL_DATABASE_URL env var from silently
+    // routing production traffic at a local Postgres instance that can
+    // never be reachable from a serverless function (this was causing
+    // real "connect ECONNREFUSED 127.0.0.1:5432" failures in prod on
+    // /api/client/essence/execute and /api/agents).
+    const localUrl = !process.env.VERCEL ? process.env.LOCAL_DATABASE_URL : undefined
     if (localUrl) {
       const u = new URL(localUrl)
       pool = new Pool({
@@ -28,6 +35,12 @@ function getPool(): Pool {
 
     const DB_HOST = process.env.DB_HOST || process.env.POSTGRES_HOST
     if (!DB_HOST) throw new Error('DB_HOST environment variable is required (auto-checks POSTGRES_HOST fallback)')
+    if (process.env.VERCEL && (DB_HOST === 'localhost' || DB_HOST === '127.0.0.1')) {
+      throw new Error(
+        `DB_HOST is set to "${DB_HOST}" in a Vercel deployment — this can never connect. ` +
+        'Check the DB_HOST/POSTGRES_HOST environment variable for this project/environment in Vercel.'
+      )
+    }
 
     const DB_PORT = process.env.DB_PORT || process.env.POSTGRES_PORT || '5432'
     const DB_USER = process.env.DB_USER || process.env.POSTGRES_USER || 'postgres'

@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
     const vertical = searchParams.get('vertical');
 
     let sbQuery = supabaseAdmin
-      .from('workflow_demos')
+      .from('workflows')
       .select('*', { count: 'exact' });
 
     if (category) sbQuery = sbQuery.eq('category', category);
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
       if (is_active !== undefined) updates.is_active = is_active;
 
       const { data, error } = await supabaseAdmin
-        .from('workflow_demos')
+        .from('workflows')
         .update(updates)
         .eq('id', id)
         .select()
@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: true, workflow: data });
     } else {
       const { data, error } = await supabaseAdmin
-        .from('workflow_demos')
+        .from('workflows')
         .insert({
           vertical: vertical || 'general',
           name,
@@ -94,7 +94,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     const { error } = await supabaseAdmin
-      .from('workflow_demos')
+      .from('workflows')
       .delete()
       .eq('id', id);
 
@@ -118,7 +118,7 @@ export async function PATCH(request: NextRequest) {
     if (is_active !== undefined) updates.is_active = is_active;
 
     const { data, error } = await supabaseAdmin
-      .from('workflow_demos')
+      .from('workflows')
       .update(updates)
       .eq('id', id)
       .select()

@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
     }
 
     const { data: workflow, error: fetchError } = await supabaseAdmin
-      .from('workflow_demos')
+      .from('workflows')
       .select('*')
       .eq('id', workflowId)
       .maybeSingle();
@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
     if (logError) throw logError;
 
     await supabaseAdmin
-      .from('workflow_demos')
+      .from('workflows')
       .update({ run_status: 'running', last_run_at: new Date().toISOString(), updated_at: new Date().toISOString() })
       .eq('id', workflowId);
 
@@ -111,7 +111,7 @@ export async function POST(request: NextRequest) {
             .update({ status: 'failed', error_message: errorText, completed_at: new Date().toISOString() })
             .eq('id', runLog.id);
           await supabaseAdmin
-            .from('workflow_demos')
+            .from('workflows')
             .update({ run_status: 'failed', updated_at: new Date().toISOString() })
             .eq('id', workflowId);
         }
@@ -122,7 +122,7 @@ export async function POST(request: NextRequest) {
           .update({ status: 'failed', error_message: fetchError.message, completed_at: new Date().toISOString() })
           .eq('id', runLog.id);
         await supabaseAdmin
-          .from('workflow_demos')
+          .from('workflows')
           .update({ run_status: 'failed', updated_at: new Date().toISOString() })
           .eq('id', workflowId);
       }
@@ -132,7 +132,7 @@ export async function POST(request: NextRequest) {
         .update({ status: 'completed', completed_at: new Date().toISOString() })
         .eq('id', runLog.id);
       await supabaseAdmin
-        .from('workflow_demos')
+        .from('workflows')
         .update({ run_status: 'completed', updated_at: new Date().toISOString() })
         .eq('id', workflowId);
     }

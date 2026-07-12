@@ -1,15 +1,25 @@
 {
-  "name": "WF-102 — Daily Essence Board Generation",
+  "name": "WF-102 \u2014 Daily Essence Board Generation",
   "nodes": [
     {
       "parameters": {
-        "rule": { "interval": [ { "field": "cronExpression", "expression": "0 4 * * *" } ] }
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 4 * * *"
+            }
+          ]
+        }
       },
       "id": "trigger-1",
       "name": "Daily 04:00 UTC",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
-      "position": [-1120, 300]
+      "position": [
+        -1120,
+        300
+      ]
     },
     {
       "parameters": {
@@ -23,17 +33,31 @@
       "name": "Fetch Active Clients",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [-880, 300],
-      "credentials": { "httpHeaderAuth": { "id": "PLACEHOLDER_SUPABASE_SERVICE_ROLE", "name": "Supabase Service Role" } },
+      "position": [
+        -880,
+        300
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "PLACEHOLDER_SUPABASE_SERVICE_ROLE",
+          "name": "Supabase Service Role"
+        }
+      },
       "notes": "Header auth credential must send: apikey=<SUPABASE_SERVICE_ROLE_KEY>, Authorization=Bearer <SUPABASE_SERVICE_ROLE_KEY>"
     },
     {
-      "parameters": { "batchSize": 1, "options": {} },
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      },
       "id": "split-batches",
       "name": "One Client At A Time",
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
-      "position": [-640, 300]
+      "position": [
+        -640,
+        300
+      ]
     },
     {
       "parameters": {
@@ -42,17 +66,37 @@
         "sendBody": true,
         "bodyParameters": {
           "parameters": [
-            { "name": "userId", "value": "={{$json.id}}" },
-            { "name": "range", "value": "daily" }
+            {
+              "name": "userId",
+              "value": "={{$json.id}}"
+            },
+            {
+              "name": "range",
+              "value": "daily"
+            }
           ]
         },
-        "options": { "timeout": 30000 }
+        "options": {
+          "timeout": 30000
+        },
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-internal-cron-secret",
+              "value": "={{$env.INTERNAL_CRON_SECRET}}"
+            }
+          ]
+        },
+        "sendHeaders": true
       },
       "id": "generate-essence",
       "name": "Generate Daily Essence",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [-400, 220],
+      "position": [
+        -400,
+        220
+      ],
       "onError": "continueRegularOutput",
       "notes": "SECURITY NOTE: as of this session, POST /api/zuri/essence has no auth check at all -- it trusts the userId in the body. Flagged separately for a proper internal-service-secret fix; do not expose this URL publicly beyond this internal cron caller until that's fixed."
     },
@@ -65,12 +109,30 @@
         "sendBody": true,
         "bodyParameters": {
           "parameters": [
-            { "name": "workflow_id", "value": "={{$env.WF_102_ROW_ID}}" },
-            { "name": "client_id", "value": "={{$json.id}}" },
-            { "name": "status", "value": "={{$json.error ? 'failed' : 'completed'}}" },
-            { "name": "triggered_by", "value": "schedule" },
-            { "name": "started_at", "value": "={{$now.toISO()}}" },
-            { "name": "completed_at", "value": "={{$now.toISO()}}" }
+            {
+              "name": "workflow_id",
+              "value": "={{$env.WF_102_ROW_ID}}"
+            },
+            {
+              "name": "client_id",
+              "value": "={{$json.id}}"
+            },
+            {
+              "name": "status",
+              "value": "={{$json.error ? 'failed' : 'completed'}}"
+            },
+            {
+              "name": "triggered_by",
+              "value": "schedule"
+            },
+            {
+              "name": "started_at",
+              "value": "={{$now.toISO()}}"
+            },
+            {
+              "name": "completed_at",
+              "value": "={{$now.toISO()}}"
+            }
           ]
         }
       },
@@ -78,18 +140,81 @@
       "name": "Log Per-Client Result",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [-160, 220],
-      "credentials": { "httpHeaderAuth": { "id": "PLACEHOLDER_SUPABASE_SERVICE_ROLE", "name": "Supabase Service Role" } }
+      "position": [
+        -160,
+        220
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "PLACEHOLDER_SUPABASE_SERVICE_ROLE",
+          "name": "Supabase Service Role"
+        }
+      }
     }
   ],
   "connections": {
-    "Daily 04:00 UTC": { "main": [[{ "node": "Fetch Active Clients", "type": "main", "index": 0 }]] },
-    "Fetch Active Clients": { "main": [[{ "node": "One Client At A Time", "type": "main", "index": 0 }]] },
-    "One Client At A Time": { "main": [[{ "node": "Generate Daily Essence", "type": "main", "index": 0 }], []] },
-    "Generate Daily Essence": { "main": [[{ "node": "Log Per-Client Result", "type": "main", "index": 0 }]] },
-    "Log Per-Client Result": { "main": [[{ "node": "One Client At A Time", "type": "main", "index": 0 }]] }
+    "Daily 04:00 UTC": {
+      "main": [
+        [
+          {
+            "node": "Fetch Active Clients",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Active Clients": {
+      "main": [
+        [
+          {
+            "node": "One Client At A Time",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "One Client At A Time": {
+      "main": [
+        [
+          {
+            "node": "Generate Daily Essence",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Generate Daily Essence": {
+      "main": [
+        [
+          {
+            "node": "Log Per-Client Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Per-Client Result": {
+      "main": [
+        [
+          {
+            "node": "One Client At A Time",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
   },
   "active": false,
-  "settings": { "executionOrder": "v1" },
-  "meta": { "templateId": "WF-102" }
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "templateId": "WF-102"
+  }
 }

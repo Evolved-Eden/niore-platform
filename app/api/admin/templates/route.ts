@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
 
     if (type === 'all' || type === 'workflow') {
       const { data, error } = await supabaseAdmin
-        .from('workflow_demos')
+        .from('workflows')
         .select('id, name, description, vertical, category, stages, is_active, tags, n8n_webhook_url')
         .order('name', { ascending: true });
       if (!error) workflows = (data || []).map((w: any) => ({

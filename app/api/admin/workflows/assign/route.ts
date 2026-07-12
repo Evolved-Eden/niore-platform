@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
     }
 
     const { data, error } = await supabaseAdmin
-      .from('workflow_demos')
+      .from('workflows')
       .update(updates)
       .eq('id', workflowId)
       .select()

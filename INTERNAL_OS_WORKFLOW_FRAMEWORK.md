@@ -100,3 +100,39 @@ docker compose logs -f n8n
 ```
 
 Also flagged separately: `scripts/ssh-connect.mjs` and `scripts/ssh-fix-n8n.mjs` have your VPS password committed in plaintext. Worth rotating and letting me scrub those scripts once you're set up with key-based auth.
+
+---
+
+## Update: renamed table, OS packages, real auth, first os_package workflows
+
+### Table rename
+`workflow_demos` → `workflows`. "Demo" was never a table-level concept — it's one value of `scope` (`client_demo`). The `internal_os` scope value is renamed to `core` to match your own term for it. All app code (`app/api/admin/workflows/*`, `app/api/admin/templates`) updated to match; `tsc`/`eslint`/tests all still pass clean.
+
+### OS package model
+Added `os_packages` (key, name, description, target_segment, `plan_tier_keys` linking to real `membership_tiers` rows) and two columns on `workflows`: `applicable_os text[]` and `standard_in_all_os boolean`. A workflow can belong to zero, one, or several OS packages, or be marked standard across all of them — this is the "many are resalable and reusable across OS, so they come standard" model you described.
+
+Grounded the OS list in what's **actually priced** in `membership_tiers` rather than inventing one — you already have 6 real OS products (`os_founder`, `os_creator`, `os_business`, `os_agency`, `os_family`, `os_wellness`), a base "Personal OS" tier group (`service_free/basic/premium`), an affiliate program (`affiliate_bronze/silver/gold/platinum`), and a top bespoke tier (`enterprise_concierge`/`eden_force`/`omnigrid` — the "lux concierge" you mentioned). I mapped all of these into `os_packages` rows.
+
+One thing I couldn't cleanly resolve and want your call on: `employee_starter/growth/pro/enterprise` and `department_starter/premium` and `client_enterprise/founder/teams` look like a **separate axis** — per-seat/per-org access levels rather than product bundles — that may overlap with or predate the `os_*` packages. I left them grouped under a placeholder `enterprise_org` package rather than guessing how they should really relate to the 6 real OS products. Worth a conversation whenever you're ready.
+
+**The exclusion rule you asked for** (Personal OS shouldn't get CRM/campaigns): implemented by simply *not* tagging business-specific workflows (invoice dunning, lead nurture, commissions) as `standard_in_all_os` or `applicable_os` including `personal_os`. Personal OS clients get exactly the 11 core workflows tagged standard (essence generation, intake, blueprint/domain fulfillment, entitlement sync, offboarding, notifications, retry sweep) and nothing else — no separate Personal OS-specific workflows needed beyond that, which is itself worth noting: Personal OS is the *floor*, not a package requiring its own custom automations.
+
+### Real auth on `/api/zuri/essence`
+Fixed. Every legitimate in-app caller already sends the requesting user's own ID, so this was a same-behavior fix: a logged-in session now must match the `userId` it's requesting (403 if not, 401 if no session). The scheduled workflows (WF-102/103/104) authenticate instead via a shared secret header (`x-internal-cron-secret`, checked against a new `INTERNAL_CRON_SECRET` env var — added to `.env.example`, needs a real value set in Vercel + your n8n instance). Also fixed a small adjacent bug while in there: the admin essence page sends `client_id`, not `userId` — the route now accepts either instead of silently no-op'ing on the admin caller.
+
+### First os_package workflows (documented, grounded in real agent/vertical data)
+
+Pulled the real agent catalog before writing these: 415 active agents, `role_type` split VERTICAL 287 / CORE 43 / BRIDGE 31 / CRISIS 30 / CROSS_SYSTEM 18 / UTILITY 8, spread across dozens of verticals (corporate 17, real_estate 15, commerce/sustainability/early_childhood/youth/relationships/arts/manufacturing 13 each, legal/luxury 12, finance/crisis/government/social_services 11, health/media/mental_health/tech 10, and more). Plus 38 platform-owned swarms, one per vertical, each with a `workflow_ids` column already primed for exactly this kind of linkage.
+
+12 workflows added (`scope = 'os_package'`, `lifecycle_status = 'documented'` — specs, not yet built as real n8n JSON):
+
+- **Founder OS**: Weekly KPI & Investor Update, Hiring Pipeline Automation (corporate-vertical agents)
+- **Creator OS**: Content Calendar Sync, Payout & Royalty Tracker (arts/media-vertical agents)
+- **Business OS**: Lead Nurture & Qualification (generalizes the pre-existing real-estate demo pattern), Invoice & AR/AP Automation (finance-vertical agents)
+- **Agency OS**: Multi-Client Swarm Dashboard Sync, White-Label Report Generator (CROSS_SYSTEM agents + `swarm_catalog.health_score`)
+- **Family OS**: Concierge Request Router, Legacy & Estate Planning Tracker (luxury-vertical + CRISIS-capable agents)
+- **Wellness OS**: Client Retention & Check-In, Treatment Intelligence Sync (health/mental_health-vertical agents — these two directly promote the pre-existing `health_wellness_longevity` demo rows, which already sketch this exact pattern)
+
+**My actual opinion on what's next, if you want it:** the highest-value next move isn't more breadth, it's depth on Wellness OS and Business OS specifically — both already have real demo scaffolding to build on (the `health_wellness_longevity` and `real_estate_land` `client_demo` rows), both map to agent pools with 20+ real vertical agents, and both are your two highest-priced non-bespoke OS tiers. I'd build those two all the way to real n8n JSON next, using them as the template for the rest, rather than spreading thin across all 6 OS at once.
+
+Total library now: **76 workflows** (34 core, 30 client_demo, 12 os_package). All schema changes committed as migrations `20260712100000` and `20260712110000`.

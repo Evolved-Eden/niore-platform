@@ -669,10 +669,42 @@ function generateLocal(
 }
 
 // ── POST handler ─────────────────────────────────────────────────────
+//
+// AUTH NOTE: this route previously had no auth check at all -- it trusted
+// whatever userId was in the body, so anyone who knew or guessed a user id
+// could trigger AI-cost-incurring generation and read that user's essence
+// content. Every legitimate in-app caller already passes the requesting
+// user's OWN id (confirmed across app/intake, app/dashboard/admin/essence,
+// app/dashboard/client/essence, app/dashboard/client/profile), so the fix
+// below doesn't change behavior for any of them: a logged-in session must
+// match the userId it's requesting. The one legitimate exception is the
+// internal scheduled workflows (WF-102/103/104, see n8n/workflows/) which
+// have no browser session and iterate over many clients -- those
+// authenticate instead with a shared secret header.
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    const { userId, userRole, context } = body
+    const { userRole, context } = body
+    // app/dashboard/admin/essence/page.tsx sends client_id instead of userId --
+    // accept both rather than silently no-op'ing on a mismatched field name.
+    const userId: string | undefined = body.userId || body.client_id
+
+    const internalSecret = req.headers.get('x-internal-cron-secret')
+    const isInternalServiceCall =
+      !!internalSecret && !!process.env.INTERNAL_CRON_SECRET && internalSecret === process.env.INTERNAL_CRON_SECRET
+
+    if (!isInternalServiceCall) {
+      const { createClient } = await import('@/lib/supabase/server')
+      const supabase = await createClient()
+      const { data: { user: sessionUser } } = await supabase.auth.getUser()
+      if (!sessionUser) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      }
+      if (userId && userId !== sessionUser.id) {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+      }
+    }
+
     const range: 'daily' | 'weekly' | 'monthly' =
       body?.range === 'weekly' || body?.range === 'monthly' ? body.range : 'daily'
     const provider = await getProvider()

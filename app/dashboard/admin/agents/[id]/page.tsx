@@ -20,6 +20,11 @@ export default function EditAgentPage({ params }: { params: Promise<{ id: string
   const [saving, setSaving] = useState(false);
   const [saveMsg, setSaveMsg] = useState<string | null>(null);
   const [isPublished, setIsPublished] = useState(false);
+  const [tagline, setTagline] = useState('');
+  const [description, setDescription] = useState('');
+  const [systemPrompt, setSystemPrompt] = useState('');
+  const [contentSaving, setContentSaving] = useState(false);
+  const [contentSaveMsg, setContentSaveMsg] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -28,6 +33,9 @@ export default function EditAgentPage({ params }: { params: Promise<{ id: string
       const json = await res.json();
       setAgent(json.agent || null);
       setIsPublished(json.agent?.is_published ?? false);
+      setTagline(json.agent?.tagline ?? '');
+      setDescription(json.agent?.description ?? '');
+      setSystemPrompt(json.agent?.system_prompt ?? '');
       if (json.mas_scores) {
         setScores({
           capability: json.mas_scores.capability ?? 50,
@@ -44,6 +52,29 @@ export default function EditAgentPage({ params }: { params: Promise<{ id: string
 
   const updateScore = (key: string, value: number) => {
     setScores(prev => ({ ...prev, [key]: value }));
+  };
+
+  const saveContent = async () => {
+    const { id } = await params;
+    setContentSaving(true);
+    setContentSaveMsg(null);
+    try {
+      const res = await fetch(`/api/admin/agents/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tagline, description, system_prompt: systemPrompt }),
+      });
+      const json = await res.json();
+      if (json.error) {
+        setContentSaveMsg(`Error: ${json.error}`);
+      } else {
+        setContentSaveMsg('Saved ✓');
+        setTimeout(() => setContentSaveMsg(null), 3000);
+      }
+    } catch {
+      setContentSaveMsg('Save failed');
+    }
+    setContentSaving(false);
   };
 
   const saveScores = async () => {
@@ -135,6 +166,53 @@ export default function EditAgentPage({ params }: { params: Promise<{ id: string
             <div>
               <label className="block text-sm font-medium text-white/70 mb-1">Evolution Status</label>
               <div className="w-full bg-white/5 border border-white/10 rounded-sm px-3 py-2 text-sm text-white/50">{agent.evolution_status || '—'}</div>
+            </div>
+          </div>
+
+          {/* Editable content: tagline / description / system prompt.
+              These were auto-generated from each agent's name/tagline/
+              vertical/role_type as a reviewable starting point -- edit
+              and save here. */}
+          <div className="pt-4 border-t border-white/[0.06] space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-white/70 mb-1">Tagline</label>
+              <input
+                value={tagline}
+                onChange={(e) => setTagline(e.target.value)}
+                className="w-full bg-white/5 border border-white/10 rounded-sm px-3 py-2 text-sm text-white/80 focus:outline-none focus:border-[#c8ff00]/40"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-white/70 mb-1">Description</label>
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                rows={2}
+                className="w-full bg-white/5 border border-white/10 rounded-sm px-3 py-2 text-sm text-white/80 resize-none focus:outline-none focus:border-[#c8ff00]/40"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-white/70 mb-1">System Prompt</label>
+              <textarea
+                value={systemPrompt}
+                onChange={(e) => setSystemPrompt(e.target.value)}
+                rows={8}
+                className="w-full bg-white/5 border border-white/10 rounded-sm px-3 py-2 text-xs text-white/80 font-mono resize-y focus:outline-none focus:border-[#c8ff00]/40"
+              />
+            </div>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={saveContent}
+                disabled={contentSaving}
+                className="px-5 py-2 bg-[#c8ff00] text-[#080810] text-sm font-bold rounded-sm hover:bg-white transition-all disabled:opacity-40"
+              >
+                {contentSaving ? 'Saving...' : 'Save Content'}
+              </button>
+              {contentSaveMsg && (
+                <span className={`text-sm font-medium ${contentSaveMsg.startsWith('Error') ? 'text-red-400' : 'text-green-400'}`}>
+                  {contentSaveMsg}
+                </span>
+              )}
             </div>
           </div>
         </div>

@@ -1,0 +1,85 @@
+{
+  "name": "WF-201 \u2014 Agent Catalog Health Check (clock)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 3 * * *"
+            }
+          ]
+        }
+      },
+      "id": "trigger-1",
+      "name": "Daily 03:00 UTC",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -640,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.SUPABASE_URL}}/functions/v1/workflow-trigger",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "workflow_id",
+              "value": "={{$env.WF_201_ROW_ID}}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{$env.SUPABASE_ANON_KEY}}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "fire-trigger",
+      "name": "Fire workflow-trigger",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -400,
+        300
+      ],
+      "notes": "This is only the clock. All the real logic (what actually runs) lives natively as workflow_nodes/workflow_edges rows for this workflow_id -- see the native workflow execution runtime section of INTERNAL_OS_WORKFLOW_FRAMEWORK.md. n8n's only job here is triggering on a schedule, since the native engine has no cron of its own."
+    }
+  ],
+  "connections": {
+    "Daily 03:00 UTC": {
+      "main": [
+        [
+          {
+            "node": "Fire workflow-trigger",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "templateId": "WF-201"
+  }
+}

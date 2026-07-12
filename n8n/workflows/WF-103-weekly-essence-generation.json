@@ -1,5 +1,5 @@
 {
-  "name": "WF-102 \u2014 Daily Essence Board Generation",
+  "name": "WF-103 \u2014 Weekly Essence Board Generation",
   "nodes": [
     {
       "parameters": {
@@ -7,13 +7,13 @@
           "interval": [
             {
               "field": "cronExpression",
-              "expression": "0 4 * * *"
+              "expression": "0 4 * * 1"
             }
           ]
         }
       },
       "id": "trigger-1",
-      "name": "Daily 04:00 UTC",
+      "name": "Weekly Monday 04:00 UTC",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
       "position": [
@@ -72,7 +72,7 @@
             },
             {
               "name": "range",
-              "value": "daily"
+              "value": "weekly"
             }
           ]
         },
@@ -90,7 +90,7 @@
         "sendHeaders": true
       },
       "id": "generate-essence",
-      "name": "Generate Daily Essence",
+      "name": "Generate Weekly Essence",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
@@ -98,7 +98,7 @@
         220
       ],
       "onError": "continueRegularOutput",
-      "notes": "/api/zuri/essence requires either a matching session or the x-internal-cron-secret header (fixed earlier this session) -- this call authenticates via that header."
+      "notes": "/api/zuri/essence requires either a matching session or the x-internal-cron-secret header (fixed earlier this session) -- this call authenticates via that header, same as WF-102."
     },
     {
       "parameters": {
@@ -111,7 +111,7 @@
           "parameters": [
             {
               "name": "workflow_id",
-              "value": "={{$env.WF_102_ROW_ID}}"
+              "value": "={{$env.WF_103_ROW_ID}}"
             },
             {
               "name": "client_id",
@@ -153,7 +153,7 @@
     }
   ],
   "connections": {
-    "Daily 04:00 UTC": {
+    "Weekly Monday 04:00 UTC": {
       "main": [
         [
           {
@@ -179,7 +179,7 @@
       "main": [
         [
           {
-            "node": "Generate Daily Essence",
+            "node": "Generate Weekly Essence",
             "type": "main",
             "index": 0
           }
@@ -187,7 +187,7 @@
         []
       ]
     },
-    "Generate Daily Essence": {
+    "Generate Weekly Essence": {
       "main": [
         [
           {
@@ -215,6 +215,6 @@
     "executionOrder": "v1"
   },
   "meta": {
-    "templateId": "WF-102"
+    "templateId": "WF-103"
   }
 }

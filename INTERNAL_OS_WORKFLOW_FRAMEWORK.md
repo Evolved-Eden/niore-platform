@@ -169,3 +169,22 @@ Confirmed: the 30 `client_demo` workflows aren't sales-only illustrations — th
 All 30 are still `lifecycle_status = 'documented'` (real `workflow_json` not yet built) — the assignment makes them sellable in the package sense; building the actual n8n JSON for each is separate follow-on work, same as the 12 `os_package` workflows from last pass.
 
 Migration: `supabase/migrations/20260712120000_employee_team_department_titles.sql`. Applied live.
+
+## Native workflow execution runtime -- finished this pass
+
+Correction to what I said two passes ago ("there's no job queue to poll or dispatch, so Phase 1 RIS Runtime doesn't apply"): that was wrong. A real one already existed, half-built, as three Supabase Edge Functions -- `workflow-trigger`, `workflow-worker`, `workflow-router` -- deployed directly against the DB by an earlier AI-agent pass (no migration history for the tables they use, consistent with what you said about some VPS/n8n scripts being agent-added and possibly unreliable). It's exactly the queue/dispatcher pattern from the original 63-workflow list.
+
+It didn't work. Found and fixed, in order:
+
+1. **`workflow_runs` had the wrong shape entirely** -- bigint `id`, a separate uuid `workflow_run_id` column, a stray `pending_count` text column, and none of the columns (`workflow_id`, `organization_id`, `client_id`, `business_id`, `started_at`, `idempotency_key`, `context`) the trigger function actually writes. Confirmed via grep that nothing in `app/` or `lib/` references any of these tables, so it was safe to drop and rebuild correctly rather than patch around it.
+2. **5 tables didn't exist at all**: `workflow_nodes`, `workflow_node_runs`, `workflow_edges`, `workflow_dead_letters`, `workflow_run_checkpoints`. Added a 6th, `workflow_merge_counters`, to back the merge/fan-in RPCs. All added with proper FKs so PostgREST's nested-select syntax (`workflow_node_runs.select('*, workflow_nodes(*), workflow_runs(*)')`) works.
+3. **`merge_ready`/`increment_merge_counter` RPCs didn't exist** -- added both.
+4. **`claim_workflow_job` was missing columns its own caller reads**: `workflow-worker` destructures `currentJob.attempt`/`currentJob.max_attempts` from the RPC result, but the deployed function never selected those columns, so retry counting silently always reset to attempt=1/max_attempts=3. Fixed.
+5. **`workflow-trigger` checked the wrong column**: `workflows.status`, which doesn't exist (only `lifecycle_status` does) -- meaning every trigger request would have 400'd with "workflow inactive" no matter what. Fixed to check `lifecycle_status === 'active'`. Redeployed (v8).
+6. **Found live while smoke-testing**: `claim_workflow_job` didn't scope its claim query by `queue_name`, so it could grab orphaned jobs from any other producer -- caught a 2-month-old dead row exactly this way. Added the `queue_name = 'workflow'` filter and cleaned up that stale row plus 2 old `workflow_trigger_failed` event rows from the same earlier failed attempt.
+
+**Verified end-to-end at the SQL layer** (the sandbox can't reach `*.supabase.co` directly -- same network allowlist restriction as the n8n VPS -- so this was done by replaying each edge function's exact DB operations against a temporary test workflow/node/run, then deleting all of it): trigger → queue → claim → execute → checkpoint → complete → router-close-out all worked, and the merge fan-in counter correctly required both branches before reporting ready.
+
+**What this means going forward**: Niore now has a real native execution path independent of n8n, not just "n8n or nothing." It has zero DAGs defined yet -- `workflow_nodes`/`workflow_edges` are empty for all 76 real workflows. Wiring an actual workflow (e.g. one of the 4 already-built n8n ones) into this native engine as its own `workflow_nodes`/`workflow_edges` graph, and deciding whether the two execution paths (native vs. n8n) are meant to coexist per-workflow or whether one should be the standard, is the natural next step -- your call, not guessed here.
+
+Migration: `supabase/migrations/20260712130000_finish_workflow_execution_runtime.sql`. Edge function source: `supabase/functions/workflow-trigger/index.ts` (redeployed as v8; `workflow-worker`/`workflow-router` needed no code changes, only the new tables/RPCs).

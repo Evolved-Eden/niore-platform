@@ -125,7 +125,9 @@ function getPlanetDistanceAU(bodyName: string, date: Date): number | null {
 
 function calcAscendant(date: Date, latitude: number, longitude: number): number {
   const A = require('astronomy-engine')
-  const jd = A.JulianDay(date)
+  // astronomy-engine has no JulianDay() export — MakeTime().ut is days since
+  // J2000.0 (JD 2451545.0), so add that epoch offset to get the true JD.
+  const jd = 2451545.0 + A.MakeTime(date).ut
 
   // Julian centuries from J2000.0
   const T = (jd - 2451545.0) / 36525
@@ -157,7 +159,7 @@ function calcAscendant(date: Date, latitude: number, longitude: number): number 
 
 function calcMidheaven(date: Date, longitude: number): number {
   const A = require('astronomy-engine')
-  const jd = A.JulianDay(date)
+  const jd = 2451545.0 + A.MakeTime(date).ut
   const T = (jd - 2451545.0) / 36525
 
   let gmst = 280.46061837 + 360.98564736629 * (jd - 2451545.0) +

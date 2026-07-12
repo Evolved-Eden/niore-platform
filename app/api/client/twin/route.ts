@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Use service client to bypass RLS recursion on organization_memberships
+    // Use service client to bypass RLS on client_twins
     const { data: twin, error } = await supabaseAdmin
       .from('client_twins')
       .select('id, metadata')

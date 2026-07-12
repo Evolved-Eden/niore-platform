@@ -147,7 +147,7 @@ export default async function ClientPlanPage() {
   const [clientRes, userRes, orgMembershipsRes] = await Promise.all([
     supabase.from('clients').select('*').eq('id', user.id).maybeSingle(),
     supabase.from('users').select('*').eq('id', user.id).maybeSingle(),
-    supabase.from('organization_memberships')
+    supabase.from('organization_members')
       .select('organization_id, role, status, organizations(name, subscription_plan)')
       .eq('user_id', user.id)
       .maybeSingle(),

@@ -238,14 +238,21 @@ export type Organization = {
   deleted_at?: string | null
 }
 
-export type OrganizationMembership = {
+export type OrganizationMember = {
   id: string
   user_id: string
   organization_id: string
   role: string
-  status: string
+  status?: string
+  is_active?: boolean
+  is_paid_member?: boolean
+  tier_key?: string | null
+  business_id?: string | null
+  client_id?: string | null
+  permissions?: Record<string, unknown> | null
   invited_by?: string | null
   invited_at?: string | null
+  accepted_at?: string | null
   joined_at?: string | null
   created_at?: string
   updated_at?: string
@@ -942,7 +949,7 @@ export type Database = {
       memberships: TableWithDefaults<Membership>
       notification_logs: TableWithDefaults<NotificationLog>
       omnigrid_intelligence_system: TableWithDefaults<OmnigridSystem>
-      organization_memberships: TableWithDefaults<OrganizationMembership>
+      organization_members: TableWithDefaults<OrganizationMember>
       organizations: TableWithDefaults<Organization>
       ris_templates: TableWithDefaults<RISTemplateRow>
       swarm_templates: TableWithDefaults<SwarmTemplateRow>

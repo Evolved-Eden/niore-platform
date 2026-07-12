@@ -102,13 +102,15 @@ export async function POST(req: NextRequest) {
     const orgId = org?.id
 
     if (orgId) {
-      // Add owner to org_memberships
-      await supabaseAdmin.from('organization_memberships').upsert({
+      // Add owner to organization_members (organization_memberships was
+      // merged into this table -- is_paid_member marks the org's paying owner)
+      await supabaseAdmin.from('organization_members').upsert({
         user_id: userId,
         organization_id: orgId,
         role: 'owner',
         status: 'active',
-      } as never, { onConflict: 'user_id,organization_id' } as never)
+        is_paid_member: true,
+      } as never, { onConflict: 'organization_id,user_id' } as never)
 
       // ── 5. Create entitlements ──
       const isUnlimited = isTestAccount || effectiveTier?.includes('enterprise') || effectiveTier?.includes('test')

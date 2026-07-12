@@ -1,12 +1,15 @@
 {
-  "name": "WF5 — Reply Recovery",
+  "name": "WF5 \u2014 Reply Recovery",
   "nodes": [
     {
       "id": "56789abc-def0-1234-5678-9abcdef01234",
       "name": "Webhook",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 1.2,
-      "position": [250, 300],
+      "position": [
+        250,
+        300
+      ],
       "parameters": {
         "path": "replay-workflow",
         "httpMethod": "POST",
@@ -20,7 +23,10 @@
       "name": "Load Checkpoint",
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2,
-      "position": [450, 300],
+      "position": [
+        450,
+        300
+      ],
       "parameters": {
         "operation": "executeQuery",
         "query": "SELECT *\nFROM public.workflow_run_checkpoints\nWHERE workflow_run_id = '{{ $json.workflow_run_id }}'::uuid\nORDER BY created_at DESC\nLIMIT 1;"
@@ -34,7 +40,10 @@
       "name": "Has Checkpoint?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
-      "position": [650, 300],
+      "position": [
+        650,
+        300
+      ],
       "parameters": {
         "conditions": {
           "options": {
@@ -62,7 +71,10 @@
       "name": "Replay Workflow",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [850, 150],
+      "position": [
+        850,
+        150
+      ],
       "parameters": {
         "method": "POST",
         "url": "={{ $env.SUPABASE_URL }}/functions/v1/workflow-trigger",
@@ -95,7 +107,10 @@
       "name": "Respond Success",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.1,
-      "position": [1050, 150],
+      "position": [
+        1050,
+        150
+      ],
       "parameters": {
         "respondWith": "json",
         "responseBody": "={{ {\n  \"success\": true,\n  \"message\": \"Workflow replayed successfully\",\n  \"workflow_run_id\": $json.workflow_run_id,\n  \"workflow_id\": $json.workflow_id\n} }}"
@@ -106,7 +121,10 @@
       "name": "Respond NotFound",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.1,
-      "position": [850, 500],
+      "position": [
+        850,
+        500
+      ],
       "parameters": {
         "respondWith": "json",
         "responseStatusCode": 404,
@@ -176,5 +194,8 @@
     "timezone": "UTC"
   },
   "staticData": null,
-  "tags": ["infrastructure", "recovery"]
+  "tags": [
+    "infrastructure",
+    "recovery"
+  ]
 }

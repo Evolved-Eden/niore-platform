@@ -1,11 +1,11 @@
 {
-  "name": "WF2 — Scheduler",
+  "name": "WF1 \u2014 Queue Poller",
   "nodes": [
     {
-      "id": "f1a2b3c4-d5e6-7890-abcd-ef1234567890",
-      "name": "Every 1m",
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "name": "Every 5s",
       "type": "n8n-nodes-base.scheduleTrigger",
-      "typeVersion": 1.1,
+      "typeVersion": 1,
       "position": [
         250,
         300
@@ -15,15 +15,15 @@
           "interval": [
             {
               "field": "seconds",
-              "secondsInterval": 1
+              "secondsInterval": 5
             }
           ]
         }
       }
     },
     {
-      "id": "a2b3c4d5-e6f7-8901-abcd-f12345678901",
-      "name": "Fetch Due Schedules",
+      "id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+      "name": "Count Pending",
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2,
       "position": [
@@ -32,38 +32,46 @@
       ],
       "parameters": {
         "operation": "executeQuery",
-        "query": "SELECT *\nFROM public.workflow_schedules\nWHERE active = true\n  AND next_run_at <= NOW()\nORDER BY next_run_at\nLIMIT 500;"
+        "query": "SELECT COUNT(*)::int AS pending_count\nFROM public.queue_jobs\nWHERE status = 'pending' AND queue_name = 'workflow';"
       },
       "credentials": {
         "postgres": "Supabase Postgres"
       }
     },
     {
-      "id": "b3c4d5e6-f7a8-9012-bcde-123456789012",
-      "name": "Split Batches",
-      "type": "n8n-nodes-base.splitInBatches",
-      "typeVersion": 3,
+      "id": "c3d4e5f6-a7b8-9012-cdef-123456789012",
+      "name": "Has Work?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
       "position": [
         650,
         300
       ],
       "parameters": {
-        "batchSize": 50,
-        "options": {}
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{ $json.pending_count }}",
+              "operation": "larger",
+              "value2": 0
+            }
+          ]
+        },
+        "combineOperation": "all"
       }
     },
     {
-      "id": "c4d5e6f7-a8b9-0123-cdef-234567890123",
-      "name": "Trigger Workflow",
+      "id": "d4e5f6a7-b8c9-0123-defa-234567890123",
+      "name": "Call Worker",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
         850,
-        300
+        200
       ],
       "parameters": {
         "method": "POST",
-        "url": "={{ $env.SUPABASE_URL }}/functions/v1/workflow-trigger",
+        "url": "={{ $env.SUPABASE_URL }}/functions/v1/workflow-worker",
         "authentication": "genericCredentialType",
         "nodeCredentialType": "httpHeaderAuth",
         "sendHeaders": true,
@@ -81,7 +89,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "{\n  \"workflow_id\": \"{{ $json.workflow_id }}\",\n  \"organization_id\": \"{{ $json.organization_id }}\",\n  \"client_id\": \"{{ $json.client_id }}\",\n  \"business_id\": \"{{ $json.business_id }}\",\n  \"input\": \"{{ $json.payload }}\",\n  \"idempotency_key\": \"schedule-{{ $json.id }}-{{ $now }}\"\n}",
+        "jsonBody": "{}",
         "options": {
           "timeout": 30000,
           "allowUnauthorizedCerts": false
@@ -89,17 +97,18 @@
       }
     },
     {
-      "id": "d5e6f7a8-b9c0-1234-defa-345678901234",
-      "name": "Update Schedule",
+      "id": "e5f6a7b8-c9d0-1234-efab-345678901234",
+      "name": "Log Alert",
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2,
       "position": [
-        1050,
-        300
+        850,
+        500
       ],
       "parameters": {
         "operation": "executeQuery",
-        "query": "UPDATE public.workflow_schedules\nSET\n  last_run_at = NOW(),\n  next_run_at = public.calculate_next_run(cron_expression)\nWHERE id = '{{ $json.id }}'::uuid;"
+        "query": "INSERT INTO public.workflow_alerts (source, workflow_name, node_name, level, title, message, context)\nVALUES ('n8n', 'WF1 - Queue Poller', 'Call Worker', 'error', 'HTTP Call Failed', 'HTTP call to workflow-worker function failed', '{{ JSON.stringify($json) }}'::jsonb);",
+        "options": {}
       },
       "credentials": {
         "postgres": "Supabase Postgres"
@@ -107,44 +116,45 @@
     }
   ],
   "connections": {
-    "Every 1m": {
+    "Every 5s": {
       "main": [
         [
           {
-            "node": "Fetch Due Schedules",
+            "node": "Count Pending",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Fetch Due Schedules": {
+    "Count Pending": {
       "main": [
         [
           {
-            "node": "Split Batches",
+            "node": "Has Work?",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Split Batches": {
+    "Has Work?": {
       "main": [
         [
           {
-            "node": "Trigger Workflow",
+            "node": "Call Worker",
             "type": "main",
             "index": 0
           }
-        ]
+        ],
+        []
       ]
     },
-    "Trigger Workflow": {
-      "main": [
+    "Call Worker": {
+      "error": [
         [
           {
-            "node": "Update Schedule",
+            "node": "Log Alert",
             "type": "main",
             "index": 0
           }
@@ -153,7 +163,7 @@
     }
   },
   "pinData": {},
-  "versionId": "00000000-0000-0000-0000-000000000002",
+  "versionId": "00000000-0000-0000-0000-000000000001",
   "settings": {
     "executionOrder": "v1",
     "errorWorkflow": "",
@@ -163,6 +173,6 @@
   "staticData": null,
   "tags": [
     "infrastructure",
-    "scheduler"
+    "queue"
   ]
 }

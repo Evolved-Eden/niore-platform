@@ -253,3 +253,27 @@ All of these are `lifecycle_status = 'built'` (or `'active'` where they run inli
 - **Discord/Telegram alerting** anywhere in any of the above -- zero `connector_accounts` rows exist. Every alert leg in every workflow (this pass and last) is a documented no-op until at least one is configured.
 
 After these, what's left is Lux/Concierge OS and the 42 client_demo/os_package workflows -- deferred per your instruction, and each of those needs the underlying feature built (transaction coordination, hotel concierge ops, legal case management, etc.) before wiring means anything.
+
+## n8n infra consolidation: the real missing pieces, found in a root `workflows/` folder
+
+You flagged this: there was a second, separate `workflows/` folder at the repo root (7 files, dated before this session) plus an `archive/workflow-dupes/` with partial duplicates of 5 of them. Investigated before touching anything -- these turned out to matter a lot:
+
+- **WF1 Queue Poller** -- polls every 5s and calls `workflow-worker` if `queue_jobs` has pending work. This is the piece I genuinely missed when "finishing" the native runtime two passes ago: `workflow-worker` only processes one job when invoked and never re-invokes itself, so without something polling, a workflow with more than one node would queue the second node and then just sit there forever. Fixed a real bug in the file (`workflow_jobs` -> `queue_jobs`, the correct table name) and moved it in.
+- **WF2 Scheduler** -- centralized: reads a `workflow_schedules` table and fires `workflow-trigger` for whatever's due, using an existing `calculate_next_run(cron_expression)` Postgres function that was already there but silently defaulted to "1 hour" for monthly crons (the exact pattern WF-503/603/701 use) -- fixed that gap in the function. This **replaces** the 5 separate per-workflow n8n clock JSONs from last two passes (WF-201/503/602/603/701) with one workflow. Those 5 files are deleted; `workflow_schedules` now has one row per workflow instead.
+- **WF3 Dead Letter Handler** -- consumes `workflow_dead_letters`, which the worker has been writing to since it was built but nothing ever read from. Added the `processed`/`processed_at` columns it needs.
+- **WF4 Metrics Aggregator** -- aggregates `workflow_runs` into a new `workflow_metrics` table. No schema gaps, just needed the target table.
+- **WF5 Reply Recovery** -- webhook-triggered recovery from `workflow_run_checkpoints` (also built, also never read from until now). No changes needed.
+
+All 5 moved into `n8n/workflows/` as `INFRA-01` through `INFRA-05` (they're cross-cutting runtime infrastructure, not individually-numbered business workflows, so they don't get their own `workflows` table row).
+
+**WF6 Client Registration** and **WF7 Post-Intake Processor** -- moved to `archive/workflow-dupes/` rather than kept or deleted outright, because I'm not fully certain either way:
+- WF6 provisions organizations/clients/client_twins via a `client-register` webhook -- this looks redundant with `app/api/auth/onSignup/route.ts` (already does user/client creation) and `provisionAccount`, but I didn't trace every branch of `provisionAccount` to be certain it covers 100% of what WF6 does.
+- WF7 creates an `intelligence_profiles` row on intake completion and sends a Discord welcome -- while checking this I found `createIntelligenceProfile()` in the Stripe webhook references a table called `intelligence_profiles` that **does not exist** in the database. That function is currently silently broken. Worth a real look -- flagging rather than fixing blind, since I don't yet know if that's a typo for an existing table or a genuinely missing one.
+
+Also removed the 5 stale duplicate files that were already sitting in `archive/workflow-dupes/` (WF1-5, uppercase names) -- fully superseded by the fixed `INFRA-01..05` versions now in `n8n/workflows/`.
+
+**Total in `n8n/workflows/` now: 11 files** -- 5 infra (INFRA-01..05) + 6 business workflows (WF-102/103/104/108/301/401).
+
+**New tables from this pass**: `workflow_schedules`, `workflow_alerts`, `workflow_metrics`. **Fixed**: `calculate_next_run()` now handles monthly-on-a-fixed-day crons. `workflow_dead_letters` got `processed`/`processed_at` columns.
+
+**Found, not yet fixed**: `intelligence_profiles` table referenced by the Stripe webhook's `createIntelligenceProfile()` does not exist -- that function is currently a silent no-op or error swallowed somewhere. Needs a real look.

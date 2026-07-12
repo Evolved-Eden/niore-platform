@@ -245,7 +245,7 @@ export default function AdminDeploymentsPage() {
                         ) : (
                           <span className="text-amber-400/80">
                             No entitlement tier configured for &quot;{c.client.plan_tier_key}&quot; — this plan key has no matching row
-                            in entitlement_tiers, so limits may not be enforced correctly.
+                            in tier_entitlements, so limits may not be enforced correctly.
                           </span>
                         )
                       ) : (

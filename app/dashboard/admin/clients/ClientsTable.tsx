@@ -3,16 +3,33 @@
 import { useState, useCallback } from 'react'
 import type { ClientRow } from './page'
 
+// Kept in sync with the real plan_key values in membership_tiers /
+// tier_entitlements (verified via a full outer join -- 28/28 match).
+// Two corrections made here: 'client_team' -> 'client_teams' and
+// 'affiliate_starter'/'affiliate_pro'/'affiliate_enterprise' ->
+// 'affiliate_bronze'/'affiliate_silver'/'affiliate_gold'/'affiliate_platinum'
+// (the old values had zero matching entitlement row, so assigning them
+// silently gave a client no enforced limits at all). Also added the five
+// enterprise_*/os_family/os_wellness tiers that exist in membership_tiers
+// but had no dropdown entry, so they were unreachable from this page.
+//
+// Still-open gap, not fixed here (needs a product decision, not a
+// mechanical rename): 'personal_free'/'personal_plus'/'personal_premium'
+// and 'trial'/'none' have no corresponding membership_tiers row at all --
+// either that product line was never built out, or these are meant as
+// placeholders. Assigning one of these still works but shows the
+// "no entitlement tier configured" warning on the Deployments page.
 const TIERS = [
   'trial',
-  'client_founder', 'client_team', 'client_enterprise',
+  'client_founder', 'client_teams', 'client_enterprise',
   'creator_studio', 'creator_premium', 'creator_concierge',
   'personal_free', 'personal_plus', 'personal_premium',
-  'affiliate_starter', 'affiliate_pro', 'affiliate_enterprise',
+  'affiliate_bronze', 'affiliate_silver', 'affiliate_gold', 'affiliate_platinum',
   'service_free', 'service_basic', 'service_premium',
   'employee_starter', 'employee_growth', 'employee_pro', 'employee_enterprise',
   'department_starter', 'department_premium',
-  'os_creator', 'os_founder', 'os_business', 'os_agency',
+  'os_creator', 'os_founder', 'os_business', 'os_agency', 'os_family', 'os_wellness',
+  'enterprise_concierge', 'enterprise_eden_force', 'enterprise_omnigrid',
   'none',
 ]
 

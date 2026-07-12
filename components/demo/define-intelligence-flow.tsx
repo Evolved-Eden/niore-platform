@@ -509,7 +509,7 @@ export default function DefineIntelligenceFlow({ initialPath }: { initialPath?: 
             What kind of intelligence<br /><span className="text-[#c8ff00]">do you need?</span>
           </h1>
           <p className="text-white/40 text-lg max-w-xl text-center mb-12 leading-relaxed">
-            Tell us about your world, and we'll design the system that fits how you work, create, and grow.
+            Tell us about your world, and we&apos;ll design the system that fits how you work, create, and grow.
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-3xl w-full mb-12">
             {(Object.entries(PATH_META) as [PathType, typeof PATH_META.client][]).map(([key, meta]) => (
@@ -670,8 +670,8 @@ export default function DefineIntelligenceFlow({ initialPath }: { initialPath?: 
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
             </div>
-            <h1 className="font-display text-3xl font-bold mb-2">Zuri's <span className="text-[#c8ff00]">Analysis</span></h1>
-            <p className="text-white/40 text-sm max-w-md mx-auto">Based on your answers, I've designed two intelligence paths for you.</p>
+            <h1 className="font-display text-3xl font-bold mb-2">Zuri&apos;s <span className="text-[#c8ff00]">Analysis</span></h1>
+            <p className="text-white/40 text-sm max-w-md mx-auto">Based on your answers, I&apos;ve designed two intelligence paths for you.</p>
           </div>
           <div className="rounded-sm p-6 mb-8 border animate-fade-in" style={{ backgroundColor: `${meta.color}08`, borderColor: `${meta.color}20` }}>
             <p className="text-sm text-white/70 leading-relaxed">{analysis.reasoning}</p>

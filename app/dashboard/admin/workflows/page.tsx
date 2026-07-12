@@ -696,7 +696,7 @@ export default function WorkflowDesigner() {
         ) : runLogsLoading ? (
           <p className="text-white/30 text-sm">Loading run history...</p>
         ) : runLogs.length === 0 ? (
-          <p className="text-white/30 text-sm">No runs yet. Click "Run Workflow" to trigger.</p>
+          <p className="text-white/30 text-sm">No runs yet. Click &quot;Run Workflow&quot; to trigger.</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">

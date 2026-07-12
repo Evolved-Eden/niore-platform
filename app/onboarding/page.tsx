@@ -156,7 +156,7 @@ function ZuriStep({ onNext, userName }: { onNext: () => void; userName: string }
           <div className="w-8 h-8 rounded-full bg-[#c8ff00]/20 border border-[#c8ff00]/40 flex items-center justify-center text-xs font-bold text-[#c8ff00]">Z</div>
           <h2 className="text-xl font-bold">Meet Zuri</h2>
         </div>
-        <p className="text-white/30 text-sm">Your intelligence is online. Let's calibrate your system.</p>
+        <p className="text-white/30 text-sm">Your intelligence is online. Let&apos;s calibrate your system.</p>
       </div>
 
       {/* Chat */}
@@ -373,7 +373,7 @@ function ScheduleStep({ onNext, userId, userName }: {
     <div className="max-w-xl mx-auto">
       <div className="mb-8">
         <h2 className="text-2xl font-bold mb-2">Schedule your consultation</h2>
-        <p className="text-white/40 text-sm">Book your onboarding call. We'll walk through your system setup together.</p>
+        <p className="text-white/40 text-sm">Book your onboarding call. We&apos;ll walk through your system setup together.</p>
       </div>
 
       {/* Date picker */}
@@ -455,7 +455,7 @@ function DoneStep({ userName, router }: { userName: string; router: ReturnType<t
       <div className="w-16 h-16 rounded-full bg-[#c8ff00]/10 border border-[#c8ff00]/30 flex items-center justify-center mx-auto mb-6">
         <span className="text-[#c8ff00] text-2xl">✓</span>
       </div>
-      <h2 className="text-3xl font-bold mb-3">You're in, {userName}.</h2>
+      <h2 className="text-3xl font-bold mb-3">You&apos;re in, {userName}.</h2>
       <p className="text-white/40 mb-8">
         Your intelligence is being configured. Zuri will be fully calibrated before your consultation.
       </p>

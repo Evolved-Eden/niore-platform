@@ -91,7 +91,7 @@ function sunLongitude(date: Date): number {
 
   // More accurate vernal equinox ~ March 20.5 (noon UTC)
   const daysSinceEquinox = dayOfYear - 80.5
-  let longitude = daysSinceEquinox * (360 / 365.25)
+  const longitude = daysSinceEquinox * (360 / 365.25)
 
   // Normalize to 0-360
   return ((longitude % 360) + 360) % 360

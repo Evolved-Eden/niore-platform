@@ -40,6 +40,7 @@ export default function Error({
           >
             Try again
           </button>
+          {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- hard reload is intentional in an error boundary */}
           <a
             href="/"
             className="rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-emerald-500"

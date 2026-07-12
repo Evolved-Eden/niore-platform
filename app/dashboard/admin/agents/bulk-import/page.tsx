@@ -58,6 +58,7 @@ export default function BulkImportPage() {
       <div className="glass rounded-sm p-4 border border-white/[0.06]">
         <h3 className="font-bold text-blue-400 mb-2">Download Template</h3>
         <p className="text-sm text-blue-300 mb-2">Download the CSV template with required columns:</p>
+        {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- file download from an API route, not page navigation */}
         <a
           href="/api/admin/agents/bulk-import"
           className="text-blue-400 underline"

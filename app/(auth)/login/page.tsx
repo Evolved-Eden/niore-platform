@@ -168,7 +168,7 @@ function LoginForm() {
           <div className="bg-[#080810] border border-white/[0.08] rounded-xl p-6 w-full max-w-sm">
             <h2 className="font-display text-lg font-bold mb-2">Reset Password</h2>
             <p className="text-xs text-white/40 mb-4">
-              Enter your email and we'll send you a reset link.
+              Enter your email and we&apos;ll send you a reset link.
             </p>
 
             {resetSent ? (

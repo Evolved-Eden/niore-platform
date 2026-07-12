@@ -172,7 +172,7 @@ export function calculateVedicAstrology(input: VedicInput): VedicAstrologyProfil
     // Convert all tropical positions to sidereal
     const siderealPlanets: Record<string, number> = {}
     for (const [name, p] of Object.entries(western.planets)) {
-      let slon = ((p.longitude - ayanamsa) % 360 + 360) % 360
+      const slon = ((p.longitude - ayanamsa) % 360 + 360) % 360
       siderealPlanets[name] = slon
     }
 

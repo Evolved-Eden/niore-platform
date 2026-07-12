@@ -756,7 +756,7 @@ function BlueprintAssessContent() {
             Welcome to Your <span className="text-[#c8ff00]">Blueprint</span>
           </h1>
           <p className="text-white/40 max-w-lg mx-auto leading-relaxed">
-            This is not a form. It's an intelligence mapping layer — discovering your identity,
+            This is not a form. It&apos;s an intelligence mapping layer — discovering your identity,
             patterns, constraints, and trajectory. Your answers activate the agents, swarms, and
             workflows that will serve your evolution.
           </p>
@@ -1308,7 +1308,7 @@ function BlueprintAssessContent() {
                 <div>
                   <h3 className="text-lg font-semibold mb-2">Save your Blueprint</h3>
                   <p className="text-white/50 text-sm leading-relaxed">
-                    You're exploring the Blueprint as a guest. Create an account to save your progress, deploy your system, and return to your recommendations anytime.
+                    You&apos;re exploring the Blueprint as a guest. Create an account to save your progress, deploy your system, and return to your recommendations anytime.
                   </p>
                   <div className="mt-4 flex flex-col sm:flex-row gap-3">
                     <button

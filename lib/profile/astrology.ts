@@ -138,7 +138,7 @@ function calcAscendant(date: Date, latitude: number, longitude: number): number 
   gmst = ((gmst % 360) + 360) % 360
 
   // Local Sidereal Time (add east longitude)
-  let lst = (gmst + longitude) % 360
+  const lst = (gmst + longitude) % 360
 
   // Obliquity of ecliptic
   const epsilon = 23.439291 - 0.0130042 * T - 0.00000016 * T * T + 0.000000504 * T * T * T

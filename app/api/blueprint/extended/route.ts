@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createClient, createServiceClient } from '@/lib/supabase/server'
 
 /**
  * EXTENDED BLUEPRINT — The Whole-Life Intelligence Scan
@@ -8,9 +9,41 @@ import { NextRequest, NextResponse } from 'next/server'
  *
  * Optional deep scan across 7 life domains (35 questions).
  * Produces a Life Intelligence Profile and 23-domain resonance map.
+ *
+ * PAYWALLED: requires client_twins.metadata.blueprint_expanded = true, set by
+ * the Stripe webhook after purchasing the Expanded Blueprint ($150). This was
+ * previously unenforced -- anyone could complete the full 35-question scan
+ * for free regardless of purchase.
  */
 export async function POST(req: NextRequest) {
   try {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
+    }
+
+    const svc = createServiceClient()
+    const { data: twin, error: twinErr } = await svc
+      .from('client_twins')
+      .select('metadata')
+      .eq('client_id', user.id)
+      .maybeSingle()
+    if (twinErr) console.error('Extended blueprint: failed to check purchase status:', twinErr)
+
+    const hasExpanded = Boolean((twin?.metadata as any)?.blueprint_expanded)
+    if (!hasExpanded) {
+      return NextResponse.json(
+        {
+          error: 'Expanded Blueprint required',
+          message: 'The Extended assessment is part of the Expanded Blueprint upgrade.',
+          purchase_url: '/dashboard/client/blueprint',
+          product_id: 'expanded_blueprint',
+        },
+        { status: 402 }
+      )
+    }
+
     const { answers = {}, step = 'mind_body', sectionScores = {}, tier = null } = await req.json()
 
     // ════════════════════════════════════════════════════════════

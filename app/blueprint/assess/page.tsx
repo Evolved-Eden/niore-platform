@@ -130,6 +130,7 @@ function BlueprintAssessContent() {
 
   // Purchased system / tier detection
   const [userTier, setUserTier] = useState<string | null>(null)
+  const [hasExpandedAccess, setHasExpandedAccess] = useState(false)
 
   // Save progress to localStorage whenever step or responses change
   useEffect(() => {
@@ -260,6 +261,16 @@ function BlueprintAssessContent() {
         if (!client?.plan_tier_key && meta.requested_plan_tier_key) {
           setUserTier(meta.requested_plan_tier_key)
         }
+
+        // Extended scan is paywalled behind the Expanded Blueprint purchase --
+        // check client_twins.metadata.blueprint_expanded (set by the Stripe
+        // webhook), not clients.metadata.
+        const { data: twin } = await supabase
+          .from('client_twins')
+          .select('metadata')
+          .eq('client_id', user.id)
+          .maybeSingle()
+        setHasExpandedAccess(Boolean((twin?.metadata as any)?.blueprint_expanded))
       }
 
       setCheckingAuth(false)
@@ -415,10 +426,14 @@ function BlueprintAssessContent() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ step: s, tier: userTier }),
     })
+    if (res.status === 402) {
+      router.push('/dashboard/client/blueprint?upgrade=expanded')
+      return
+    }
     const d = await res.json()
     if (d.error) { setError(d.error); return }
     if (d.section) setExtSection(d.section)
-  }, [userTier])
+  }, [userTier, router])
 
   useEffect(() => {
     if (step === 'extended') loadExtSection('mind_body')
@@ -439,8 +454,12 @@ function BlueprintAssessContent() {
         tier: userTier,
       }),
     })
-    const d = await res.json()
     setLoadingMessage('')
+    if (res.status === 402) {
+      router.push('/dashboard/client/blueprint?upgrade=expanded')
+      return
+    }
+    const d = await res.json()
     if (d.error) { setError(d.error); return }
 
     if (d.sectionScores) setExtScores(d.sectionScores)
@@ -871,9 +890,16 @@ function BlueprintAssessContent() {
 
         {/* Next steps */}
         <div className="flex flex-col sm:flex-row gap-4 pt-8 border-t border-white/10">
-          <button onClick={() => setStep('extended')}
+          <button
+            onClick={() => {
+              if (!hasExpandedAccess) {
+                router.push('/dashboard/client/blueprint?upgrade=expanded')
+                return
+              }
+              setStep('extended')
+            }}
             className="flex-1 px-6 py-3 bg-[#c8ff00] text-[#080810] rounded-xl font-bold hover:bg-white transition-all text-center">
-            Continue to Extended Scan
+            {hasExpandedAccess ? 'Continue to Extended Scan' : 'Unlock Extended Scan — $150'}
           </button>
           <button onClick={() => setStep('intake_role')}
             className="flex-1 px-6 py-3 rounded-xl border border-white/10 text-white/60 hover:text-white hover:border-white/20 transition-all text-center">

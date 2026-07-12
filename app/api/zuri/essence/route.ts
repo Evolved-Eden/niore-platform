@@ -491,14 +491,21 @@ export async function POST(req: NextRequest) {
     let lensNumer: any = undefined
 
     try {
-      const { query } = await import('@/lib/db')
+      const { supabaseAdmin } = await import('@/lib/supabase/admin')
       if (userId) {
-        // Multi-lens data from client_twins metadata
-        const twinRes = await query(
-          `SELECT metadata FROM client_twins WHERE client_id = $1 LIMIT 1`,
-          [userId]
-        )
-        const meta = twinRes.rows[0]?.metadata
+        // Multi-lens data from client_twins metadata. Uses the admin client
+        // (not the raw pg pool lib/db used to use here) so this doesn't
+        // depend on a second, separately-configured DB connection -- that
+        // was silently failing (bare catch, no logging) whenever DB_HOST
+        // wasn't set, which is why the essence board kept falling back to
+        // generic filler content even after a real intake was completed.
+        const { data: twinRow, error: twinErr } = await supabaseAdmin
+          .from('client_twins')
+          .select('metadata')
+          .eq('client_id', userId)
+          .maybeSingle()
+        if (twinErr) console.error('Essence: failed to fetch client_twins metadata:', twinErr)
+        const meta = twinRow?.metadata as any
 
         // Legacy blueprint data
         if (meta?.blueprint?.core?.scores) {
@@ -596,15 +603,21 @@ export async function POST(req: NextRequest) {
 
         // Pending essence intelligence tasks (up to 3)
         try {
-          const tasksRes = await query(
-            `SELECT content, type FROM essence_intelligence WHERE client_id = $1 AND status = 'pending' ORDER BY created_at DESC LIMIT 3`,
-            [userId]
-          )
-          pendingTasks = tasksRes.rows
-        } catch {}
+          const { data: tasksRows, error: tasksErr } = await supabaseAdmin
+            .from('essence_intelligence')
+            .select('content, type')
+            .eq('client_id', userId)
+            .eq('status', 'pending')
+            .order('created_at', { ascending: false })
+            .limit(3)
+          if (tasksErr) console.error('Essence: failed to fetch pending tasks:', tasksErr)
+          pendingTasks = tasksRows ?? undefined
+        } catch (e) {
+          console.error('Essence: pending tasks fetch threw:', e)
+        }
       }
-    } catch {
-      // Non-critical — fallback works without DB
+    } catch (e) {
+      console.error('Essence: client_twins/lens fetch failed, using fallback:', e)
     }
 
     // Fetch recent memories from ai_memories (use admin client to bypass RLS)

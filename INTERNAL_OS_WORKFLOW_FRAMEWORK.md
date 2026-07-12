@@ -136,3 +136,36 @@ Pulled the real agent catalog before writing these: 415 active agents, `role_typ
 **My actual opinion on what's next, if you want it:** the highest-value next move isn't more breadth, it's depth on Wellness OS and Business OS specifically — both already have real demo scaffolding to build on (the `health_wellness_longevity` and `real_estate_land` `client_demo` rows), both map to agent pools with 20+ real vertical agents, and both are your two highest-priced non-bespoke OS tiers. I'd build those two all the way to real n8n JSON next, using them as the template for the rest, rather than spreading thin across all 6 OS at once.
 
 Total library now: **76 workflows** (34 core, 30 client_demo, 12 os_package). All schema changes committed as migrations `20260712100000` and `20260712110000`.
+
+## Employees, teams, and departments — your vocabulary, made real
+
+Your framing: **agents = employees**, **swarms = teams**, **a team of swarms = a department**. That's not just naming — it's now a real structural hierarchy in the schema:
+
+```
+organization
+  |- department            (new `departments` table -- "a team of swarms")
+       |- swarm  ("team")  (`client_deployed_swarms.department_id` -> departments)
+            |- agent ("employee") (`client_deployed_agents.swarm_id` -> client_deployed_swarms)
+```
+
+This also resolves the one thing flagged last pass and left as your call: the `employee_*`/`department_*` membership tiers looked like a separate axis that might overlap with the 6 OS bundles. It doesn't overlap — those tiers gate exactly what this hierarchy now counts (how many employees/agents and departments an org can operate), grouped under the `enterprise_org` OS package.
+
+New API: `GET/POST/PATCH /api/client/departments` — create, list (with live team counts), rename, or archive a department. `POST /api/client/swarms/deploy` now accepts an optional `departmentId` to assign a team to a department; `POST /api/client/agents/deploy` now accepts an optional `swarmId` to assign an employee to a team.
+
+**Titles** — the "something to define the titles" you asked for is a shared `titles` catalog table (26 seeded rows), referenced by both `organization_members.title_key` (human members: Owner, CEO, COO, Operations Manager, etc.) and `client_deployed_agents.title_key` (employees/agents: Team Lead, Senior Agent, Specialist, Department Head, plus vertical-specific ones like Wellness Coordinator, Concierge Lead, Listing Agent, HR Manager). Both tables also got a `custom_title` free-text fallback for anything the catalog doesn't cover yet. No dedicated UI for assigning org-member titles exists yet (no route currently manages `organization_members` from the client side) — schema's ready, UI is a follow-up.
+
+## Demos are sellable, not just showcases
+
+Confirmed: the 30 `client_demo` workflows aren't sales-only illustrations — they can be sold as real product. Made that concrete by assigning `applicable_os` to every one of them (previously empty arrays), using the same field that already gates `os_package` workflows:
+
+| Vertical (6 workflows each) | Assigned to |
+|---|---|
+| `real_estate_land` | Business OS |
+| `luxury_hospitality` | Concierge / Lux OS |
+| `health_wellness_longevity` | Wellness OS |
+| `human_development_performance` | Business OS + Enterprise (Org/Employee seats) |
+| `law_governance_policy` | Business OS |
+
+All 30 are still `lifecycle_status = 'documented'` (real `workflow_json` not yet built) — the assignment makes them sellable in the package sense; building the actual n8n JSON for each is separate follow-on work, same as the 12 `os_package` workflows from last pass.
+
+Migration: `supabase/migrations/20260712120000_employee_team_department_titles.sql`. Applied live.

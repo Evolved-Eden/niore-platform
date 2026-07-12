@@ -39,7 +39,10 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { agentId, agentName, roleType, vertical, prompt, intelligenceDocs, profileImage } = body
+    const {
+      agentId, agentName, roleType, vertical, prompt, intelligenceDocs, profileImage,
+      swarmId, titleKey, customTitle,
+    } = body
 
     if (!agentId || !agentName) {
       return NextResponse.json(
@@ -51,7 +54,8 @@ export async function POST(request: NextRequest) {
     const id = crypto.randomUUID()
     const now = new Date().toISOString()
 
-    // Insert the deployed agent record
+    // Insert the deployed agent record.
+    // An "employee" (agent) can optionally belong to a "team" (swarm) and carry a title.
     const { error: insertError } = await supabaseAdmin.from('client_deployed_agents').insert({
       id,
       client_id: user.id,
@@ -62,6 +66,9 @@ export async function POST(request: NextRequest) {
       prompt: prompt || null,
       intelligence_docs: intelligenceDocs ? JSON.stringify(intelligenceDocs) : null,
       profile_image: profileImage || null,
+      swarm_id: swarmId || null,
+      title_key: titleKey || null,
+      custom_title: customTitle || null,
       status: 'active',
       created_at: now,
       updated_at: now,
@@ -112,7 +119,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { id, status, prompt } = body
+    const { id, status, prompt, swarmId, titleKey, customTitle } = body
 
     if (!id) {
       return NextResponse.json({ error: 'id is required' }, { status: 400 })
@@ -135,6 +142,9 @@ export async function PATCH(request: NextRequest) {
     const updateData: Record<string, unknown> = { updated_at: now }
     if (status) updateData.status = status
     if (prompt !== undefined) updateData.prompt = prompt
+    if (swarmId !== undefined) updateData.swarm_id = swarmId || null
+    if (titleKey !== undefined) updateData.title_key = titleKey || null
+    if (customTitle !== undefined) updateData.custom_title = customTitle || null
 
     const { error: updateError } = await supabaseAdmin
       .from('client_deployed_agents')

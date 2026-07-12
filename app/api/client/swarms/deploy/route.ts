@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { swarmId, swarmName, vertical, memberAgentIds, configuration } = body
+    const { swarmId, swarmName, vertical, memberAgentIds, configuration, departmentId } = body
 
     if (!swarmId || !swarmName) {
       return NextResponse.json(
@@ -51,7 +51,8 @@ export async function POST(request: NextRequest) {
     const id = crypto.randomUUID()
     const now = new Date().toISOString()
 
-    // Insert the deployed swarm record
+    // Insert the deployed swarm record.
+    // A "team" (swarm) can optionally belong to a "department" (a team of swarms).
     const { error: insertError } = await supabaseAdmin.from('client_deployed_swarms').insert({
       id,
       client_id: user.id,
@@ -60,6 +61,7 @@ export async function POST(request: NextRequest) {
       vertical: vertical || null,
       member_agent_ids: memberAgentIds ? JSON.stringify(memberAgentIds) : '[]',
       configuration: configuration ? JSON.stringify(configuration) : null,
+      department_id: departmentId || null,
       status: 'active',
       created_at: now,
       updated_at: now,
@@ -110,7 +112,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { id, status, configuration } = body
+    const { id, status, configuration, departmentId } = body
 
     if (!id) {
       return NextResponse.json({ error: 'id is required' }, { status: 400 })
@@ -135,6 +137,7 @@ export async function PATCH(request: NextRequest) {
     if (configuration !== undefined) {
       updateData.configuration = typeof configuration === 'string' ? configuration : JSON.stringify(configuration)
     }
+    if (departmentId !== undefined) updateData.department_id = departmentId || null
 
     const { error: updateError } = await supabaseAdmin
       .from('client_deployed_swarms')

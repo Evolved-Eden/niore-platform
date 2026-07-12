@@ -1096,7 +1096,12 @@ export default function ClientBlueprintPage() {
                           </button>
                         )}
                         {owned && (
-                          <span className="text-[10px] text-white/30 italic">Owned</span>
+                          <Link
+                            href={`/dashboard/client/blueprint/domain?key=${mod.id}`}
+                            className="px-3 py-1.5 text-[10px] font-bold rounded-sm border border-[#c8ff00]/40 text-[#c8ff00] hover:bg-[#c8ff00]/10 transition-all"
+                          >
+                            Answer Questions
+                          </Link>
                         )}
                       </div>
                     </div>

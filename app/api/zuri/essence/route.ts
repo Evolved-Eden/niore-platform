@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getOpenAIKey, getAnthropicKey, getEssenceProvider, getEssenceModel } from '@/lib/config'
+import { runAgentByAgentId } from '@/lib/agents'
 
 // ── Types ──────────────────────────────────────────────────────────
 type AIProvider = 'openai' | 'anthropic' | 'openrouter' | 'local' | 'disabled'
@@ -17,6 +18,16 @@ const FALLBACK = {
   ],
   dailyQuestion: "What's one decision you made today that your future self would thank you for?",
   provider: 'fallback' as const,
+  range: 'daily' as const,
+  topFive: [] as string[],
+  numerology: null,
+  color: null,
+  modality: null,
+  crystals: [] as { name: string; reason: string }[],
+  postingTime: null,
+  businessMove: null,
+  personality: 'Complete your Blueprint Assessment to unlock your personality read.',
+  blueprint: { tier: 'base' as const, agentsUsed: [] as string[], content: 'Complete your Blueprint Assessment to unlock this tile.' },
 }
 
 // ── Gate-based suggestion templates ───────────────────────────────
@@ -184,6 +195,191 @@ const GENERIC_QUESTIONS = [
   "Who do you need to become to achieve what you want?",
   "What's the gift in today's challenge?",
 ]
+
+
+// ── Factual lens-derived lookups (always computed, not AI-dependent) ──
+// These ground the new Essence categories in real astrological/numerological
+// facts rather than static templates, so they change day-to-day with the
+// person's actual numerology day/month/year number and stay correct for
+// stable natal traits (sun-sign modality, sun-sign color) that shouldn't
+// change day to day.
+const MODALITY_BY_SIGN: Record<string, 'cardinal' | 'fixed' | 'mutable'> = {
+  Aries: 'cardinal', Cancer: 'cardinal', Libra: 'cardinal', Capricorn: 'cardinal',
+  Taurus: 'fixed', Leo: 'fixed', Scorpio: 'fixed', Aquarius: 'fixed',
+  Gemini: 'mutable', Virgo: 'mutable', Sagittarius: 'mutable', Pisces: 'mutable',
+}
+
+const MODALITY_MEANING: Record<'cardinal' | 'fixed' | 'mutable', string> = {
+  cardinal: 'You initiate — you\'re built to start things, not just maintain them',
+  fixed: 'You sustain — you\'re built to see things through once you commit',
+  mutable: 'You adapt — you\'re built to flex and adjust faster than most',
+}
+
+const COLOR_BY_SIGN: Record<string, { name: string; hex: string }> = {
+  Aries: { name: 'Red', hex: '#E63946' },
+  Taurus: { name: 'Emerald Green', hex: '#2A9D8F' },
+  Gemini: { name: 'Yellow', hex: '#F4D35E' },
+  Cancer: { name: 'Silver', hex: '#C0C0C0' },
+  Leo: { name: 'Gold', hex: '#FFB703' },
+  Virgo: { name: 'Slate Grey', hex: '#5C6B73' },
+  Libra: { name: 'Rose Pink', hex: '#F4A6B7' },
+  Scorpio: { name: 'Maroon', hex: '#6A040F' },
+  Sagittarius: { name: 'Royal Purple', hex: '#7B2CBF' },
+  Capricorn: { name: 'Deep Brown', hex: '#4A3728' },
+  Aquarius: { name: 'Electric Blue', hex: '#0077B6' },
+  Pisces: { name: 'Sea Green', hex: '#40916C' },
+}
+
+const CRYSTAL_BY_NUMBER: Record<number, { name: string; reason: string }> = {
+  1: { name: 'Citrine', reason: 'supports new beginnings and personal leadership' },
+  2: { name: 'Moonstone', reason: 'supports intuition and balance in partnership' },
+  3: { name: 'Carnelian', reason: 'supports creative expression and confidence' },
+  4: { name: 'Hematite', reason: 'supports grounding and steady structure' },
+  5: { name: 'Turquoise', reason: 'supports adaptability and healthy change' },
+  6: { name: 'Rose Quartz', reason: 'supports love, care, and harmony' },
+  7: { name: 'Amethyst', reason: 'supports reflection and spiritual insight' },
+  8: { name: "Tiger's Eye", reason: 'supports personal power and abundance' },
+  9: { name: 'Clear Quartz', reason: 'supports clarity and completion' },
+}
+
+const POSTING_TIME_BY_NUMBER: Record<number, { window: string; reason: string }> = {
+  1: { window: '8-10 AM', reason: 'lead with something new — this energy favors first moves' },
+  2: { window: '12-1 PM', reason: 'conversational, community-building content lands best' },
+  3: { window: '2-4 PM', reason: 'creative and visual content performs best under this energy' },
+  4: { window: '7-9 AM', reason: 'practical, how-to content resonates with this grounded energy' },
+  5: { window: '6-8 PM', reason: 'bold, attention-grabbing content matches this restless energy' },
+  6: { window: '11 AM-1 PM', reason: 'relationship and community content lands under this energy' },
+  7: { window: '8-10 PM', reason: 'thoughtful, reflective content fits this introspective window' },
+  8: { window: '9-11 AM', reason: 'authority and results-driven content lands under this energy' },
+  9: { window: '3-5 PM', reason: 'wrap-up and highlight content fits this completion energy' },
+}
+
+const BUSINESS_MOVE_BY_HD_TYPE: Record<string, string> = {
+  Generator: "Respond, don't initiate — say yes to what excites you rather than pitching cold today.",
+  'Manifesting Generator': 'Move fast on what lights you up, but inform others before you pivot.',
+  Projector: 'Wait for recognition or invitation before pitching — make your expertise visible instead of chasing.',
+  Manifestor: 'Initiate boldly today, but inform key stakeholders before you act.',
+  Reflector: 'Sample the field before committing — check in with 1-2 trusted advisors before deciding.',
+}
+const BUSINESS_MOVE_DEFAULT = 'Focus on your single highest-leverage business action today rather than spreading across many.'
+
+const PERSONALITY_BLURBS: Record<string, string> = {
+  'The Pioneer': "You lead by going first — your gift is crossing frontiers before there's a map.",
+  'The Sage': 'You lead through wisdom — people come to you to make sense of things.',
+  'The Alchemist': 'You transform what you touch — raw material becomes something new in your hands.',
+  'The Strategist': 'You see the board three moves ahead — your gift is clarity under complexity.',
+  'The Connector': "You build bridges — your network is your superpower, and you know it.",
+  'The Architect': 'You build what lasts — structure and systems are where you do your best work.',
+  'The Visionary': "You see what doesn't exist yet — and you can't help but build toward it.",
+  'The Guardian': 'You protect what matters — your strength shows up most when others need it.',
+  'The Catalyst': 'You move things that are stuck — change follows you into a room.',
+  'The Weaver': 'You integrate — your gift is finding the thread that ties everything together.',
+  'The Seeker': "You're driven by the question, not the answer — curiosity is your engine.",
+  'The Harmonizer': 'You find the balance point — peace, for you, is an active skill, not passivity.',
+  'The Artisan': 'You refine — craft and mastery matter more to you than speed.',
+  'The Navigator': "You course-correct fast — you'd rather adjust than stay stuck on the wrong path.",
+  'The Amplifier': 'You make things louder in the best way — momentum builds around you.',
+  'The Cultivator': 'You grow things patiently — you play the long game better than most.',
+}
+
+/** Always-computed factual extras for the Essence Board — grounded in the
+ * person's real astrology/numerology/human-design data (not AI-dependent),
+ * so these stay correct and genuinely change day-to-day / week-to-week /
+ * month-to-month rather than looping a fixed template pool. */
+function computeLensExtras(
+  lensAstro: any,
+  lensNumer: any,
+  hdType: string | undefined,
+  archetype: string | undefined,
+  range: 'daily' | 'weekly' | 'monthly',
+  seedNum: number
+) {
+  const sunSign: string | undefined = lensAstro?.sunSign
+
+  const modalityType = sunSign ? MODALITY_BY_SIGN[sunSign] : undefined
+  const modality = modalityType
+    ? { type: modalityType, sign: sunSign, reason: MODALITY_MEANING[modalityType] }
+    : null
+
+  const color = sunSign && COLOR_BY_SIGN[sunSign]
+    ? { ...COLOR_BY_SIGN[sunSign], reason: `Your ${sunSign} Sun's signature color` }
+    : null
+
+  // Which numerology number applies depends on the time horizon being viewed
+  const numNumber: number | undefined =
+    range === 'monthly' ? lensNumer?.personalYear
+    : range === 'weekly' ? lensNumer?.personalMonth
+    : lensNumer?.personalDay
+  const numberLabel = range === 'monthly' ? 'Personal Year' : range === 'weekly' ? 'Personal Month' : 'Personal Day'
+  const numerology = numNumber
+    ? { number: numNumber, label: `${numberLabel} ${numNumber}`, range }
+    : null
+
+  const crystalNum = numNumber ? ((numNumber - 1) % 9) + 1 : (Math.abs(seedNum) % 9) + 1
+  const crystals = [CRYSTAL_BY_NUMBER[crystalNum] ?? CRYSTAL_BY_NUMBER[1]]
+
+  const postNum = numNumber ? ((numNumber - 1) % 9) + 1 : (Math.abs(seedNum) % 9) + 1
+  const postingTime = POSTING_TIME_BY_NUMBER[postNum] ?? POSTING_TIME_BY_NUMBER[1]
+
+  const businessMove = {
+    action: hdType ? (BUSINESS_MOVE_BY_HD_TYPE[hdType] ?? BUSINESS_MOVE_DEFAULT) : BUSINESS_MOVE_DEFAULT,
+    hdType: hdType ?? null,
+  }
+
+  const personality = archetype && PERSONALITY_BLURBS[archetype]
+    ? PERSONALITY_BLURBS[archetype]
+    : sunSign
+      ? `A ${sunSign} Sun${lensAstro?.moonSign ? ` with ${lensAstro.moonSign} Moon` : ''} — complete your Blueprint Assessment for a full personality read.`
+      : 'Complete your Blueprint Assessment to unlock your personality read.'
+
+  return { numerology, color, modality, crystals, postingTime, businessMove, personality }
+}
+
+/** Blueprint essence tile — literally calls the Blueprint agent(s) via the
+ * agent-execution system (lib/agents.ts), tier-gated: base tier gets the
+ * Blueprint Strategist (AGT-007) only; Enhanced/Expanded tiers get both
+ * the Strategist and the Soul Blueprint Agent (AGT-212), with Enhanced
+ * limited to a shorter combined read and Expanded getting the full output. */
+async function generateBlueprintTile(meta: any, range: 'daily' | 'weekly' | 'monthly') {
+  const enhanced = !!meta?.blueprint_enhanced
+  const expanded = !!meta?.blueprint_expanded
+  const tier: 'base' | 'enhanced' | 'expanded' = expanded ? 'expanded' : enhanced ? 'enhanced' : 'base'
+  const core = meta?.blueprint?.core
+
+  const horizon = range === 'monthly' ? 'this month' : range === 'weekly' ? 'this week' : 'today'
+  const inputPrompt = `Give the user one focused, specific, actionable blueprint insight for ${horizon}, grounded in their profile — not generic advice. Archetype: ${core?.archetype || 'unknown'}. Overall score: ${core?.overallScore ?? 'n/a'}. Section scores: ${core?.scores ? JSON.stringify(core.scores) : 'n/a'}. Keep it to 2-4 sentences.`
+
+  const agentIds = tier === 'base' ? ['AGT-007'] : ['AGT-007', 'AGT-212']
+  const outputs: { agentId: string; agentName: string; text: string }[] = []
+
+  for (const id of agentIds) {
+    try {
+      const { agent, output } = await runAgentByAgentId(id, inputPrompt)
+      const text = tier === 'enhanced' ? String(output).slice(0, 420) : String(output)
+      outputs.push({ agentId: id, agentName: agent.agent_name || id, text })
+    } catch (e) {
+      console.error(`Blueprint tile: agent ${id} failed:`, e)
+    }
+  }
+
+  if (outputs.length === 0) {
+    return {
+      tier,
+      agentsUsed: [] as string[],
+      content: core?.summary || core?.archetype
+        ? `Your saved blueprint summary: ${core?.summary || core?.archetype}`
+        : 'Complete your Blueprint Assessment to unlock this tile.',
+      upgradeMessage: tier === 'base' ? 'Upgrade to Enhanced or Expanded Blueprint for deeper, dual-agent insight.' : undefined,
+    }
+  }
+
+  return {
+    tier,
+    agentsUsed: outputs.map(o => o.agentName),
+    content: outputs.map(o => o.text).join('\n\n'),
+    upgradeMessage: tier === 'base' ? 'Upgrade to Enhanced or Expanded Blueprint for deeper, dual-agent insight.' : undefined,
+  }
+}
 
 const SYSTEM_PROMPT = `You are the Essence Board generator for Evolved Eden — a multi-lens human intelligence engine.
 
@@ -475,7 +671,10 @@ function generateLocal(
 // ── POST handler ─────────────────────────────────────────────────────
 export async function POST(req: NextRequest) {
   try {
-    const { userId, userRole, context } = await req.json()
+    const body = await req.json()
+    const { userId, userRole, context } = body
+    const range: 'daily' | 'weekly' | 'monthly' =
+      body?.range === 'weekly' || body?.range === 'monthly' ? body.range : 'daily'
     const provider = await getProvider()
 
     let result: { items: EssenceItem[]; dailyQuestion: string } | null = null
@@ -489,6 +688,8 @@ export async function POST(req: NextRequest) {
     let lensContext = ''
     let lensAstro: any = undefined
     let lensNumer: any = undefined
+    let hdType: string | undefined = undefined
+    let twinMeta: any = undefined
 
     try {
       const { supabaseAdmin } = await import('@/lib/supabase/admin')
@@ -506,6 +707,7 @@ export async function POST(req: NextRequest) {
           .maybeSingle()
         if (twinErr) console.error('Essence: failed to fetch client_twins metadata:', twinErr)
         const meta = twinRow?.metadata as any
+        twinMeta = meta
 
         // Legacy blueprint data
         if (meta?.blueprint?.core?.scores) {
@@ -591,6 +793,7 @@ export async function POST(req: NextRequest) {
         // ── Human Design ──
         if (lenses?.humanDesign?.data) {
           const hd = lenses.humanDesign.data
+          hdType = hd.foundation?.energyType
           const parts: string[] = ['[Human Design]']
           if (hd.archetype) parts.push(`Archetype ${hd.archetype}`)
           if (hd.foundation?.energyType) parts.push(`Type ${hd.foundation.energyType}`)
@@ -648,7 +851,13 @@ export async function POST(req: NextRequest) {
       ? `\nRecent memories:\n${recentMemories.join('\n')}`
       : ''
 
-    const prompt = `Generate a daily Essence Board for a ${userRole ?? 'user'} in the Evolved Eden intelligence ecosystem.
+    const horizonInstruction =
+      range === 'monthly' ? "Time horizon: THIS MONTH. Phrase every item and the daily question for a month-long arc (use 'this month' language), and reference the person's Personal Year/Month numerology and any longer transits rather than single-day timing."
+      : range === 'weekly' ? "Time horizon: THIS WEEK. Phrase every item and the daily question for a week-long arc (use 'this week' language), and reference the person's Personal Month numerology and the week's moon phase/transit movement rather than single-day timing."
+      : "Time horizon: TODAY."
+
+    const prompt = `Generate an Essence Board for a ${userRole ?? 'user'} in the Evolved Eden intelligence ecosystem.
+${horizonInstruction}
 ${context ? `\nUser context: ${context}` : ''}
 ${lensContext ? `\nProfile data:\n${lensContext}` : ''}
 ${userId ? `\nUser ID: ${userId}` : ''}${memoryBlock}`
@@ -683,7 +892,44 @@ ${userId ? `\nUser ID: ${userId}` : ''}${memoryBlock}`
       usedProvider = 'local-fallback'
     }
 
-    return NextResponse.json({ ...result, provider: usedProvider })
+    // ── Always-computed factual extras (numerology/color/modality/crystals/
+    // posting time/business move/personality) — grounded in real lens data,
+    // independent of which AI provider (if any) generated the core items.
+    const daySeed = new Date().toISOString().slice(0, 10)
+    const seedNum = daySeed.split('-').reduce((s, p) => s + parseInt(p), 0)
+    const extras = computeLensExtras(lensAstro, lensNumer, hdType, archetypeName, range, seedNum)
+    const topFive = (result.items || []).slice(0, 5).map(i => i.content)
+
+    // ── Blueprint tile — literally calls the Blueprint agent(s) via the
+    // agent-execution system, tier-gated by the person's purchased level.
+    let blueprintTile
+    try {
+      blueprintTile = await generateBlueprintTile(twinMeta, range)
+    } catch (e) {
+      console.error('Essence: blueprint tile generation failed:', e)
+      blueprintTile = { tier: 'base' as const, agentsUsed: [] as string[], content: 'Blueprint tile temporarily unavailable.' }
+    }
+
+    // ── Purchased Domain Modules -> permanent recurring essence categories.
+    // Per owner instruction, buying a domain module isn't a one-time report;
+    // once completed it shows up here permanently across all time horizons.
+    const domainProfiles = twinMeta?.domainProfiles || {}
+    const domainTiles = Object.values(domainProfiles).map((p: any) => ({
+      domain: p.domain,
+      label: p.label,
+      score: p.score,
+      insight: p.insights?.[Math.abs(seedNum) % Math.max(p.insights?.length ?? 1, 1)] ?? p.insights?.[0] ?? null,
+    }))
+
+    return NextResponse.json({
+      ...result,
+      provider: usedProvider,
+      range,
+      topFive,
+      ...extras,
+      blueprint: blueprintTile,
+      domainTiles,
+    })
   } catch {
     return NextResponse.json(FALLBACK)
   }

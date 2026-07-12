@@ -59,6 +59,21 @@ type BlueprintInfo = {
   exists: boolean
 }
 
+type EssenceRange = 'daily' | 'weekly' | 'monthly'
+
+type EssenceExtras = {
+  topFive: string[]
+  numerology: { number: number; label: string; range: EssenceRange } | null
+  color: { name: string; hex: string; reason: string } | null
+  modality: { type: 'cardinal' | 'fixed' | 'mutable'; sign?: string; reason: string } | null
+  crystals: { name: string; reason: string }[]
+  postingTime: { window: string; reason: string } | null
+  businessMove: { action: string; hdType: string | null } | null
+  personality: string
+  blueprintTile: { tier: 'base' | 'enhanced' | 'expanded'; agentsUsed: string[]; content: string; upgradeMessage?: string } | null
+  domainTiles: { domain: string; label: string; score: number; insight: string | null }[]
+}
+
 // ─────────────────────────────────────────────
 // Constants
 // ─────────────────────────────────────────────
@@ -113,6 +128,12 @@ function EssenceIntelligencePage() {
   const [loading, setLoading] = useState(true)
   const [dailyQuestion, setDailyQuestion] = useState('')
   const [error, setError] = useState<string | null>(null)
+  const [range, setRange] = useState<EssenceRange>('daily')
+  const [rangeLoading, setRangeLoading] = useState(false)
+  const [extras, setExtras] = useState<EssenceExtras>({
+    topFive: [], numerology: null, color: null, modality: null, crystals: [],
+    postingTime: null, businessMove: null, personality: '', blueprintTile: null, domainTiles: [],
+  })
 
   // Feed
   const [expandedFeed, setExpandedFeed] = useState(false)
@@ -130,6 +151,51 @@ function EssenceIntelligencePage() {
   const [recentActions, setRecentActions] = useState<any[]>([])
 
   // ── Load everything on mount ──
+
+  async function fetchEssenceBoard(userId: string, r: EssenceRange, context?: string) {
+    setRangeLoading(true)
+    try {
+      const essenceRes = await fetch('/api/zuri/essence', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, userRole: 'client', context: context ?? '', range: r }),
+      })
+      if (essenceRes.ok) {
+        const essenceData = await essenceRes.json()
+        if (essenceData.items?.length) {
+          setDailyItems(essenceData.items)
+        }
+        if (essenceData.dailyQuestion) {
+          setDailyQuestion(essenceData.dailyQuestion)
+        }
+        setExtras({
+          topFive: essenceData.topFive ?? [],
+          numerology: essenceData.numerology ?? null,
+          color: essenceData.color ?? null,
+          modality: essenceData.modality ?? null,
+          crystals: essenceData.crystals ?? [],
+          postingTime: essenceData.postingTime ?? null,
+          businessMove: essenceData.businessMove ?? null,
+          personality: essenceData.personality ?? '',
+          blueprintTile: essenceData.blueprint ?? null,
+          domainTiles: essenceData.domainTiles ?? [],
+        })
+      }
+    } catch (e) {
+      console.error('Essence board fetch failed:', e)
+    } finally {
+      setRangeLoading(false)
+    }
+  }
+
+  async function handleRangeChange(r: EssenceRange) {
+    if (r === range || !user?.id) {
+      setRange(r)
+      return
+    }
+    setRange(r)
+    await fetchEssenceBoard(user.id, r)
+  }
 
   useEffect(() => {
     async function load() {
@@ -186,21 +252,10 @@ function EssenceIntelligencePage() {
           }
         } catch {}
 
-        // 1. Fetch daily essence
-        const essenceRes = await fetch('/api/zuri/essence', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId: u.id, userRole: 'client', context: intakeContext }),
-        })
-        if (essenceRes.ok) {
-          const essenceData = await essenceRes.json()
-          if (essenceData.items?.length) {
-            setDailyItems(essenceData.items)
-          }
-          if (essenceData.dailyQuestion) {
-            setDailyQuestion(essenceData.dailyQuestion)
-          }
-        }
+        // 1. Fetch essence board (daily by default; tab switches re-fetch with a
+        // different range so weekly/monthly show genuinely different content,
+        // not just a history log of past daily items)
+        await fetchEssenceBoard(u.id, 'daily', intakeContext)
 
         // 2. Fetch stored intelligence
         const intelRes = await fetch('/api/client/essence/intelligence', {
@@ -476,14 +531,137 @@ function EssenceIntelligencePage() {
   return (
     <div className="max-w-6xl mx-auto animate-fade-in">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="font-display text-2xl font-bold tracking-tight mb-1">
-          Essence <span className="text-[#c8ff00]">Intelligence</span>
-        </h1>
-        <p className="text-white/30 text-sm">
-          Your intelligence system &mdash; suggestions, actions, and agent execution
-        </p>
+      <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 className="font-display text-2xl font-bold tracking-tight mb-1">
+            Essence <span className="text-[#c8ff00]">Intelligence</span>
+          </h1>
+          <p className="text-white/30 text-sm">
+            Your intelligence system &mdash; suggestions, actions, and agent execution
+          </p>
+        </div>
+
+        {/* Daily / Weekly / Monthly */}
+        <div className="flex items-center gap-1 bg-white/[0.04] rounded-sm p-1 border border-white/[0.06]">
+          {(['daily', 'weekly', 'monthly'] as EssenceRange[]).map((r) => (
+            <button
+              key={r}
+              onClick={() => handleRangeChange(r)}
+              disabled={rangeLoading}
+              className={`px-3 py-1.5 text-xs font-medium rounded-sm capitalize transition-colors disabled:opacity-50 ${
+                range === r ? 'bg-[#c8ff00] text-black' : 'text-white/50 hover:text-white/80'
+              }`}
+            >
+              {r}
+            </button>
+          ))}
+        </div>
       </div>
+
+      {/* ── Multi-lens Essence Tiles ── */}
+      <div className="mb-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+        {extras.numerology && (
+          <div className="glass rounded-sm border border-white/[0.06] p-3">
+            <div className="text-[10px] uppercase tracking-widest text-white/30 mb-1">Numerology</div>
+            <div className="text-lg font-bold text-[#c8ff00]">{extras.numerology.number}</div>
+            <div className="text-[11px] text-white/40">{extras.numerology.label}</div>
+          </div>
+        )}
+        {extras.color && (
+          <div className="glass rounded-sm border border-white/[0.06] p-3">
+            <div className="text-[10px] uppercase tracking-widest text-white/30 mb-1">Your Color</div>
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 rounded-full border border-white/20" style={{ backgroundColor: extras.color.hex }} />
+              <span className="text-sm font-semibold">{extras.color.name}</span>
+            </div>
+            <div className="text-[11px] text-white/40 mt-1">{extras.color.reason}</div>
+          </div>
+        )}
+        {extras.modality && (
+          <div className="glass rounded-sm border border-white/[0.06] p-3">
+            <div className="text-[10px] uppercase tracking-widest text-white/30 mb-1">Modality</div>
+            <div className="text-sm font-semibold capitalize">{extras.modality.type}{extras.modality.sign ? ` (${extras.modality.sign})` : ''}</div>
+            <div className="text-[11px] text-white/40 mt-1">{extras.modality.reason}</div>
+          </div>
+        )}
+        {extras.crystals.length > 0 && (
+          <div className="glass rounded-sm border border-white/[0.06] p-3">
+            <div className="text-[10px] uppercase tracking-widest text-white/30 mb-1">Crystal{extras.crystals.length > 1 ? 's' : ''}</div>
+            <div className="text-sm font-semibold">{extras.crystals.map((c) => c.name).join(', ')}</div>
+            <div className="text-[11px] text-white/40 mt-1">{extras.crystals[0]?.reason}</div>
+          </div>
+        )}
+        {extras.postingTime && (
+          <div className="glass rounded-sm border border-white/[0.06] p-3">
+            <div className="text-[10px] uppercase tracking-widest text-white/30 mb-1">Best Time to Post</div>
+            <div className="text-sm font-semibold">{extras.postingTime.window}</div>
+            <div className="text-[11px] text-white/40 mt-1">{extras.postingTime.reason}</div>
+          </div>
+        )}
+        {extras.businessMove && (
+          <div className="glass rounded-sm border border-white/[0.06] p-3">
+            <div className="text-[10px] uppercase tracking-widest text-white/30 mb-1">
+              Business Move{extras.businessMove.hdType ? ` \u2014 ${extras.businessMove.hdType}` : ''}
+            </div>
+            <div className="text-[11px] text-white/60">{extras.businessMove.action}</div>
+          </div>
+        )}
+        {extras.personality && (
+          <div className="glass rounded-sm border border-white/[0.06] p-3 col-span-2">
+            <div className="text-[10px] uppercase tracking-widest text-white/30 mb-1">Personality</div>
+            <div className="text-[11px] text-white/60">{extras.personality}</div>
+          </div>
+        )}
+        {extras.topFive.length > 0 && (
+          <div className="glass rounded-sm border border-white/[0.06] p-3 col-span-2 sm:col-span-3 lg:col-span-4">
+            <div className="text-[10px] uppercase tracking-widest text-white/30 mb-2">Your Top 5 Today</div>
+            <ol className="space-y-1 list-decimal list-inside">
+              {extras.topFive.map((t, i) => (
+                <li key={i} className="text-[11px] text-white/60">{t}</li>
+              ))}
+            </ol>
+          </div>
+        )}
+      </div>
+
+      {/* ── Purchased Domain Modules — permanent recurring categories ── */}
+      {extras.domainTiles.length > 0 && (
+        <div className="mb-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {extras.domainTiles.map((d) => (
+            <div key={d.domain} className="glass rounded-sm border border-white/[0.06] p-3">
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-[10px] uppercase tracking-widest text-white/30">{d.label} Module</span>
+                <span className="text-[10px] text-[#c8ff00] font-semibold">{d.score}/100</span>
+              </div>
+              {d.insight && <p className="text-[11px] text-white/60">{d.insight}</p>}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* ── Blueprint tile (calls the Blueprint agent(s), tier-gated) ── */}
+      {extras.blueprintTile && (
+        <div className="mb-6 glass rounded-sm border border-white/[0.06] p-4">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] uppercase tracking-widest text-[#c8ff00] font-medium">Blueprint</span>
+              <span className="text-[9px] px-2 py-0.5 rounded-full bg-white/10 text-white/50 uppercase">{extras.blueprintTile.tier}</span>
+            </div>
+            {extras.blueprintTile.agentsUsed.length > 0 && (
+              <span className="text-[10px] text-white/30">{extras.blueprintTile.agentsUsed.join(' + ')}</span>
+            )}
+          </div>
+          <p className="text-sm text-white/70 whitespace-pre-line">{extras.blueprintTile.content}</p>
+          {extras.blueprintTile.upgradeMessage && (
+            <Link
+              href="/dashboard/client/blueprint?upgrade=expanded"
+              className="inline-block mt-3 text-xs font-medium text-[#c8ff00] hover:underline"
+            >
+              {extras.blueprintTile.upgradeMessage} →
+            </Link>
+          )}
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* ══════════ Main — 2/3 ══════════ */}
@@ -613,7 +791,7 @@ function EssenceIntelligencePage() {
                       href="/dashboard/client/blueprint/assess"
                       className="px-5 py-2 bg-[#c8ff00] text-black text-xs font-bold rounded-sm hover:bg-white transition-all"
                     >
-                      Run Blueprint Assessment \u2192
+                      Run Blueprint Assessment →
                     </Link>
                   </div>
                   <p className="text-[10px] text-white/20 mt-3">
@@ -842,7 +1020,7 @@ function EssenceIntelligencePage() {
                     href="/dashboard/client/blueprint"
                     className="text-xs text-[#c8ff00] hover:opacity-80 transition-all"
                   >
-                    View Full Blueprint \u2192
+                    View Full Blueprint →
                   </Link>
                 </div>
               )}
@@ -996,7 +1174,7 @@ function EssenceIntelligencePage() {
                       onClick={() => setModalTab('deploy')}
                       className="flex-1 px-5 py-2.5 bg-[#c8ff00] text-black text-xs font-bold rounded-sm hover:bg-white transition-all"
                     >
-                      Deploy to Agent \u2192
+                      Deploy to Agent →
                     </button>
                     <button
                       onClick={() => setExecutingItem(null)}

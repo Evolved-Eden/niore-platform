@@ -1,0 +1,85 @@
+{
+  "name": "WF-603 \u2014 Data Retention Sweep (clock)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 6 1 * *"
+            }
+          ]
+        }
+      },
+      "id": "trigger-1",
+      "name": "Monthly 1st 06:00 UTC",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -640,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.SUPABASE_URL}}/functions/v1/workflow-trigger",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "workflow_id",
+              "value": "={{$env.WF_603_ROW_ID}}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{$env.SUPABASE_ANON_KEY}}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "fire-trigger",
+      "name": "Fire workflow-trigger",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -400,
+        300
+      ],
+      "notes": "This is only the clock. All real logic lives natively as workflow_nodes/workflow_edges for this workflow_id -- see INTERNAL_OS_WORKFLOW_FRAMEWORK.md."
+    }
+  ],
+  "connections": {
+    "Monthly 1st 06:00 UTC": {
+      "main": [
+        [
+          {
+            "node": "Fire workflow-trigger",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "templateId": "WF-603"
+  }
+}

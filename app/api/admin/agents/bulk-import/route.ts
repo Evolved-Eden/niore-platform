@@ -1,7 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/server';
 import { requireAdmin } from '@/lib/admin-auth';
+import { validateAgentForPublish } from '@/lib/agent-validation';
 
+// WF-202 (New Agent Intake Validator): bulk-imported agents can legitimately
+// be incomplete drafts, so this doesn't block the insert -- but it force
+// is_published to false on anything that wouldn't pass publish validation
+// (missing system_prompt/icon/category), so an incomplete agent can never
+// silently end up live. Real validation issues come back per-row so the
+// importer can fix them before publishing.
 export async function POST(request: NextRequest) {
   try {
     const auth = await requireAdmin();
@@ -13,8 +20,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No agents provided' }, { status: 400 });
     }
 
+    const validationResults = agents.map((agent) => validateAgentForPublish(agent as any));
+    const sanitizedAgents = agents.map((agent, i) => {
+      if (agent.is_published && !validationResults[i].valid) {
+        return { ...agent, is_published: false };
+      }
+      return agent;
+    });
+
     const supabase = await createAdminClient();
-    const { data, error } = await supabase.from('agents').insert(agents as never[]).select();
+    const { data, error } = await supabase.from('agents').insert(sanitizedAgents as never[]).select();
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 400 });
@@ -23,6 +38,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       imported: data?.length || 0,
       agents: data,
+      validation: validationResults.map((v, i) => ({ index: i, ...v })).filter((v) => !v.valid),
     });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

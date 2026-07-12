@@ -218,3 +218,38 @@ All 6 are now `lifecycle_status = 'built'` (real, callable automation exists) --
 - WF-402, WF-403, WF-405, WF-601 (Supabase/Vercel/GitHub Management-API sweeps) -- these need new internal routes that call those Management APIs server-side (same secret-safety reasoning as above applies), which is real integration work per API.
 - WF-602, WF-603, WF-701, WF-702 -- audit/cleanup sweeps with no existing query logic to call; buildable the same way as WF-201/503 once prioritized.
 - The 30 `client_demo` + 12 `os_package` workflows -- these describe vertical business processes (transaction coordination, hotel concierge, legal case management, etc.) that don't have corresponding features built in this platform yet. Wiring a DAG for them now would call nothing real. Feature-building comes first; wiring follows.
+
+## Everyday workflows pass: offboarding, governance, cleanup sweeps
+
+Per your instruction to finish the everyday/internal systems before lux/concierge. Same audit-first approach as last pass -- checked what's real before writing anything, and caught two more of my own near-misses before committing them.
+
+**WF-110 Client Offboarding & Cancellation** -- built for real, first time it's existed. `customer.subscription.deleted` handler added to `app/api/stripe/webhook/route.ts`: marks the client cancelled, downgrades to `service_free`, sends an exit email (offers a data export on request -- there's no automated export mechanism, so the email doesn't overclaim one), logs to `workflow_run_logs`. No Discord/Slack connector exists yet, so the internal retention-channel notify is a documented no-op until one's configured.
+
+**WF-302 Invoice Payment Failure Handler** -- built: `invoice.payment_failed` handler, dunning email that gets firmer at `attempt_count >= 3`. Deliberately doesn't restrict access itself -- that should follow Stripe's own subscription status transition, not a second independent decision here.
+
+**WF-109 Tier/Entitlement Change Sync** -- partial, and staying partial on purpose: `customer.subscription.updated` now syncs `clients.status` (past_due/unpaid/cancelled/pending_cancellation) for real. It does **not** remap the plan tier on a plan change, because that needs a real Stripe price ID -> `membership_tiers.key` mapping that doesn't exist anywhere in this codebase -- guessing one risks silently mis-tiering a paying customer. Send me your price catalog and I'll finish this.
+
+**WF-106/107 Blueprint/Domain Purchase Fulfillment** -- correction: I said these were only "partial overlap" last pass. Wrong -- I hadn't read far enough into the webhook handler. The actual `client_twins.metadata` unlock logic (blueprint_expanded/enhanced, purchased_domains) was already fully implemented before this session touched the file. The one real gap was no confirmation email, which I added. These are genuinely done now.
+
+**WF-202-205 (Agent & Swarm governance)** -- built:
+- WF-202 New Agent Intake Validator: `lib/agent-validation.ts` (shared), wired into bulk-import -- doesn't block incomplete imports (legitimate drafts), but force-unpublishes anything that fails validation.
+- WF-203 Agent Publish Pipeline: the admin agent PATCH route now re-validates before allowing `is_published: true`, rejects with the specific issues if invalid.
+- WF-204 System Prompt Change Audit Log: new `agent_audit_log` table, every `system_prompt`/`description` change diffed and logged.
+- WF-205 Swarm Deployment Sync: found already implemented in `app/api/admin/client-swarms/route.ts` -- not built from scratch. Fixed a real reliability bug: the `clients.swarm_deployments` counter update was fire-and-forget (unawaited), so a failure would silently desync it. Now awaited.
+
+**WF-602/603/701 (audit + cleanup sweeps)** -- built, flag-only (none of these delete anything automatically):
+- WF-602 Admin Action Audit Log Sweep: honestly partial -- only `agent_audit_log` exists as a real audit trail right now, so the digest only covers that. Client deletion and pricing/membership_tiers changes (also named in the original spec) have zero audit instrumentation anywhere; would need to be added to those routes first.
+- WF-603 Data Retention Sweep: flags `workflow_run_logs`/`client_essence_actions` rows past 180 days.
+- WF-701 Memory Cleanup/Archival: `ai_memories` has no explicit staleness score, so this uses the closest real signal (`importance = 'low'` + age > 90 days) rather than inventing a scoring mechanism that doesn't exist.
+
+All of these are `lifecycle_status = 'built'` (or `'active'` where they run inline in the Stripe webhook with no separate scheduling needed) with n8n clocks added for the 3 scheduled sweeps (WF-602 weekly, WF-603/701 monthly) -- same clock-only pattern as last pass.
+
+### Still blocked -- need something only you can provide
+
+- **WF-109 full tier remapping** -- your real Stripe price ID -> membership tier mapping.
+- **WF-303 Affiliate Commission Calculator, WF-304 Creator Payout Batch** -- no commission/payout logic exists anywhere. Needs real design: how are referrals tracked today (if at all), and Stripe Connect account setup for creator payouts. Not something to wire around -- needs to be designed first.
+- **WF-402 Supabase Advisor Sweep, WF-405 Backup Verification, WF-601 RLS Policy Audit** -- need a Supabase Management API personal access token (a credential only you can generate, in your Supabase account settings).
+- **WF-403 Dependency Audit Sweep** -- different mechanism (GitHub Actions on push to main), not a workflow_nodes DAG. Can build the CI file once you confirm you want it.
+- **Discord/Telegram alerting** anywhere in any of the above -- zero `connector_accounts` rows exist. Every alert leg in every workflow (this pass and last) is a documented no-op until at least one is configured.
+
+After these, what's left is Lux/Concierge OS and the 42 client_demo/os_package workflows -- deferred per your instruction, and each of those needs the underlying feature built (transaction coordination, hotel concierge ops, legal case management, etc.) before wiring means anything.

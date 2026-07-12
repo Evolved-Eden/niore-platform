@@ -272,6 +272,7 @@ export async function POST(req: Request) {
         .single()
 
       const twinMeta: Record<string, any> = (twin as any)?.metadata || {}
+      const newlyPurchasedDomains: string[] = []
 
       for (const pid of products) {
         if (pid === "expanded_blueprint") {
@@ -280,7 +281,10 @@ export async function POST(req: Request) {
           twinMeta.blueprint_enhanced = true
         } else if (pid.startsWith("domain_")) {
           const domains: string[] = twinMeta.purchased_domains || []
-          if (!domains.includes(pid)) domains.push(pid)
+          if (!domains.includes(pid)) {
+            domains.push(pid)
+            newlyPurchasedDomains.push(pid)
+          }
           twinMeta.purchased_domains = domains
         }
       }
@@ -299,6 +303,31 @@ export async function POST(req: Request) {
             version: 1,
             metadata: twinMeta,
           } as any)
+      }
+
+      // WF-106/107: the metadata unlock above already ran (and already did,
+      // before this pass) -- the one real gap was no confirmation email ever
+      // went out. Send one now for whichever products were purchased.
+      try {
+        const { sendEmail } = await import("@/lib/email")
+        const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
+        if (products.includes("expanded_blueprint") || products.includes("enhanced_blueprint")) {
+          await sendEmail({
+            to: email,
+            subject: "Your expanded Blueprint tier is unlocked",
+            html: `<p>Your Blueprint tier has been unlocked. <a href="${appUrl}/dashboard/client/blueprint">View your full Blueprint</a>.</p>`,
+          })
+        }
+        for (const pid of newlyPurchasedDomains) {
+          const domainKey = pid.replace(/^domain_/, "")
+          await sendEmail({
+            to: email,
+            subject: "Your Domain Module is ready",
+            html: `<p>Your ${domainKey.replace(/_/g, " ")} Domain Module is ready. <a href="${appUrl}/dashboard/client/blueprint/domain">Start your assessment</a>.</p>`,
+          })
+        }
+      } catch (emailError) {
+        console.error("WF-106/107 confirmation email failed:", emailError)
       }
     }
 
@@ -402,6 +431,145 @@ export async function POST(req: Request) {
         .from("organizations")
         .update({ metadata: { vertical: checkoutVertical } })
         .eq("id", org.id)
+    }
+  }
+
+  // ── WF-110: Client Offboarding & Cancellation ──
+  // Confirmed earlier this session there was no real offboarding flow at
+  // all (client settings just said "contact support"). This is the first
+  // real implementation: subscription cancelled -> mark the client
+  // cancelled, downgrade to the free tier, send an exit email (offering a
+  // data export on request -- there's no automated export mechanism yet,
+  // so this doesn't overclaim one), and log to workflow_run_logs for the
+  // internal retention review (no Discord/Slack connector is configured
+  // yet, so that notification leg is a no-op until one exists).
+  if (event.type === "customer.subscription.deleted") {
+    const subscription = event.data.object as Stripe.Subscription
+    const stripeCustomerId = typeof subscription.customer === "string" ? subscription.customer : subscription.customer?.id
+
+    const { data: membership } = await supabaseAdmin
+      .from("memberships")
+      .select("user_id")
+      .or(`stripe_subscription_id.eq.${subscription.id},stripe_customer_id.eq.${stripeCustomerId}`)
+      .maybeSingle()
+
+    const userId = membership?.user_id
+
+    if (userId) {
+      const { data: client } = await supabaseAdmin
+        .from("clients")
+        .select("email")
+        .eq("id", userId)
+        .maybeSingle()
+
+      await supabaseAdmin
+        .from("clients")
+        .update({ status: "cancelled", plan_tier_key: "service_free" })
+        .eq("id", userId)
+
+      await supabaseAdmin
+        .from("memberships")
+        .update({ status: "cancelled" })
+        .eq("user_id", userId)
+
+      if (client?.email) {
+        try {
+          const { sendEmail } = await import("@/lib/email")
+          await sendEmail({
+            to: client.email,
+            subject: "Your Niore subscription has ended",
+            html: `<p>Your subscription has been cancelled and your account moved to the free tier. If you'd like an export of your data, reply to this email and we'll prepare one.</p>`,
+          })
+        } catch (emailError) {
+          console.error("WF-110 exit email failed:", emailError)
+        }
+      }
+
+      await supabaseAdmin.from("workflow_run_logs").insert({
+        workflow_id: "750e60c3-7728-4f1c-95e7-d798b3f21267", // WF-110
+        client_id: userId,
+        status: "completed",
+        triggered_by: "stripe_webhook",
+        started_at: new Date().toISOString(),
+        completed_at: new Date().toISOString(),
+      })
+    } else {
+      console.error("WF-110: could not find a client for subscription", subscription.id)
+    }
+  }
+
+  // ── WF-302: Invoice Payment Failure Handler ──
+  // Dunning email, tone escalating with Stripe's own attempt_count -- no
+  // access changes on failure alone (access restriction, if wanted, should
+  // follow Stripe's own subscription.status transition to 'past_due'/
+  // 'unpaid', not be done independently here).
+  if (event.type === "invoice.payment_failed") {
+    const invoice = event.data.object as Stripe.Invoice
+    const stripeCustomerId = typeof invoice.customer === "string" ? invoice.customer : invoice.customer?.id
+    const attemptCount = invoice.attempt_count || 1
+
+    const { data: membership } = await supabaseAdmin
+      .from("memberships")
+      .select("user_id")
+      .eq("stripe_customer_id", stripeCustomerId || "")
+      .maybeSingle()
+
+    if (membership?.user_id) {
+      const { data: client } = await supabaseAdmin
+        .from("clients")
+        .select("email")
+        .eq("id", membership.user_id)
+        .maybeSingle()
+
+      if (client?.email) {
+        const firmer = attemptCount >= 3
+        try {
+          const { sendEmail } = await import("@/lib/email")
+          await sendEmail({
+            to: client.email,
+            subject: firmer ? "Action needed: your payment is still failing" : "We couldn't process your payment",
+            html: firmer
+              ? `<p>We've tried a few times now and your payment method still isn't working. Please update it soon to avoid losing access.</p>`
+              : `<p>We couldn't process your latest payment. No action needed yet -- we'll try again automatically, but you're welcome to update your payment method any time.</p>`,
+          })
+        } catch (emailError) {
+          console.error("WF-302 dunning email failed:", emailError)
+        }
+      }
+    } else {
+      console.error("WF-302: could not find a client for customer", stripeCustomerId)
+    }
+  }
+
+  // ── WF-109: Tier / Entitlement Change Sync (partial) ──
+  // Syncs clients.status from Stripe's own subscription.status/
+  // cancel_at_period_end so the account reflects reality (past_due,
+  // pending cancellation, reactivated). Deliberately does NOT attempt to
+  // remap plan_tier_key on a plan change -- that requires a real Stripe
+  // price ID -> membership tier key mapping that doesn't exist in this
+  // codebase, and guessing one would risk silently mis-tiering a paying
+  // customer. Build that mapping first, then extend this.
+  if (event.type === "customer.subscription.updated") {
+    const subscription = event.data.object as Stripe.Subscription
+    const stripeCustomerId = typeof subscription.customer === "string" ? subscription.customer : subscription.customer?.id
+
+    const { data: membership } = await supabaseAdmin
+      .from("memberships")
+      .select("user_id")
+      .or(`stripe_subscription_id.eq.${subscription.id},stripe_customer_id.eq.${stripeCustomerId}`)
+      .maybeSingle()
+
+    if (membership?.user_id) {
+      let status = "active"
+      if (subscription.cancel_at_period_end) status = "pending_cancellation"
+      else if (subscription.status === "past_due") status = "past_due"
+      else if (subscription.status === "unpaid") status = "unpaid"
+      else if (subscription.status === "canceled") status = "cancelled"
+
+      await supabaseAdmin
+        .from("clients")
+        .update({ status })
+        .eq("id", membership.user_id)
     }
   }
 

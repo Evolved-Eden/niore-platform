@@ -6,7 +6,7 @@ import type { UserRow } from './page'
 
 const TIERS = [
   'trial',
-  'client_founder', 'client_team', 'client_enterprise',
+  'client_founder', 'client_org', 'client_enterprise',
   'creator_studio', 'creator_premium', 'creator_concierge',
   'personal_free', 'personal_plus', 'personal_premium',
   'affiliate_starter', 'affiliate_pro', 'affiliate_enterprise',
@@ -78,7 +78,7 @@ export default function UsersTable({ initialUsers }: { initialUsers: UserRow[] }
           >
             Cleanup Test Users
           </button>
-          <Link href="/dashboard/admin/users/new" className="px-4 py-2 text-xs rounded-sm bg-[#c8ff00]/20 text-[#c8ff00] hover:bg-[#c8ff00]/30 transition-colors tracking-wider uppercase font-medium">
+          <Link href="/dashboard/admin/users/new" className="px-4 py-2 text-xs rounded-sm bg-[#C6A664]/20 text-[#C6A664] hover:bg-[#C6A664]/30 transition-colors tracking-wider uppercase font-medium">
             + Add User
           </Link>
           {actionMsg && (
@@ -91,7 +91,7 @@ export default function UsersTable({ initialUsers }: { initialUsers: UserRow[] }
             placeholder="Search by name or email..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="w-64 bg-white/[0.04] border border-white/[0.08] rounded-sm px-4 py-2 text-sm text-white/70 placeholder:text-white/20 focus:outline-none focus:border-[#c8ff00]/40 transition-colors"
+            className="w-64 bg-white/[0.04] border border-white/[0.08] rounded-sm px-4 py-2 text-sm text-white/70 placeholder:text-white/20 focus:outline-none focus:border-[#C6A664]/40 transition-colors"
           />
         </div>
       </div>
@@ -117,7 +117,7 @@ export default function UsersTable({ initialUsers }: { initialUsers: UserRow[] }
                 <tr key={u.id} className="hover:bg-white/[0.02] transition-colors">
                   <td className="px-6 py-4">
                     <button onClick={() => setDetailUser(u)} className="text-left">
-                      <div className="text-sm font-medium text-white/80 hover:text-[#c8ff00] transition-colors">{u.full_name || '—'}</div>
+                      <div className="text-sm font-medium text-white/80 hover:text-[#C6A664] transition-colors">{u.full_name || '—'}</div>
                       <div className="text-xs text-white/40">{u.email || '—'}</div>
                     </button>
                   </td>

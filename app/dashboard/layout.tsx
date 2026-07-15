@@ -11,13 +11,16 @@ const NAV: Record<UserRole, { label: string; href: string }[]> = {
   client: [
     { label: 'Overview',     href: '/dashboard/client' },
     { label: 'Profile',      href: '/dashboard/client/profile' },
+    { label: 'Organization', href: '/dashboard/client/organization' },
     { label: 'Intake',       href: '/intake' },
     { label: 'Blueprint',    href: '/dashboard/client/blueprint' },
     { label: 'Assessment',   href: '/dashboard/client/blueprint/assess' },
     { label: 'Essence Intel',href: '/dashboard/client/essence' },
     { label: 'My Agents',    href: '/dashboard/client/agents' },
-    { label: 'My Swarms',    href: '/dashboard/client/swarms' },
+    { label: 'My Teams',     href: '/dashboard/client/swarms' },
     { label: 'My Twin',      href: '/dashboard/client/twin' },
+    { label: 'Twin Registry',href: '/dashboard/client/registry' },
+    { label: 'Journal',      href: '/dashboard/client/journal' },
     { label: 'Vault',        href: '/dashboard/client/vault' },
     { label: 'Connectors',   href: '/dashboard/client/connectors' },
     { label: 'Concierge',    href: '/dashboard/client/consulting' },
@@ -89,11 +92,11 @@ const NAV: Record<UserRole, { label: string; href: string }[]> = {
 }
 
 const ROLE_COLOR: Record<UserRole, string> = {
-  client:    '#c8ff00',
-  creator:   '#00d4ff',
-  admin:     '#ff6b6b',
-  personal: '#fb923c',
-  affiliate: '#fb923c',
+  client:    '#C6A664',  // gold — primary
+  creator:   '#5E8B84',  // muted teal
+  admin:     '#7A2E32',  // deep wine
+  personal:  '#B5764A',  // muted terracotta
+  affiliate: '#C9974A',  // muted honey
 }
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -177,7 +180,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const nav = NAV[role]
 
   return (
-    <div className="flex min-h-screen bg-[#080810]">
+    <div className="flex min-h-screen bg-[#0A0A0B]">
       {/* Sidebar */}
       <aside className="w-56 flex-shrink-0 border-r border-white/[0.06] flex flex-col">
         {/* Logo */}

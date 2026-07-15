@@ -79,27 +79,27 @@ type EssenceExtras = {
 // ─────────────────────────────────────────────
 
 const TYPE_CONFIG: Record<string, { label: string; icon: string; color: string }> = {
-  focus:        { label: 'Focus Priority',  icon: '\uD83C\uDFAF', color: '#c8ff00' },
-  optimization: { label: 'Optimization',    icon: '\u26A1', color: '#00d4ff' },
-  timing:       { label: 'Timing',          icon: '\uD83D\uDD50', color: '#a78bfa' },
-  opportunity:  { label: 'Opportunity',     icon: '\uD83D\uDCA1', color: '#34d399' },
-  growth:       { label: 'Growth',          icon: '\uD83D\uDCC8', color: '#fb923c' },
-  brand:        { label: 'Brand',           icon: '\u2728', color: '#f472b6' },
-  habit:        { label: 'Habit',           icon: '\uD83D\uDD04', color: '#22d3ee' },
-  action:       { label: 'Action',          icon: '\u2713', color: '#e879f9' },
+  focus:        { label: 'Focus Priority',  icon: '\uD83C\uDFAF', color: '#C6A664' },
+  optimization: { label: 'Optimization',    icon: '\u26A1', color: '#5E8B84' },
+  timing:       { label: 'Timing',          icon: '\uD83D\uDD50', color: '#8B7AA8' },
+  opportunity:  { label: 'Opportunity',     icon: '\uD83D\uDCA1', color: '#5E8B84' },
+  growth:       { label: 'Growth',          icon: '\uD83D\uDCC8', color: '#B5764A' },
+  brand:        { label: 'Brand',           icon: '\u2728', color: '#C6A664' },
+  habit:        { label: 'Habit',           icon: '\uD83D\uDD04', color: '#8B7AA8' },
+  action:       { label: 'Action',          icon: '\u2713', color: '#C9974A' },
 }
 
 const PRIORITY_COLORS: Record<string, string> = {
-  high: '#ff6b6b',
-  medium: '#fb923c',
-  low: '#22d3ee',
+  high: '#7A2E32',
+  medium: '#B5764A',
+  low: '#8B7AA8',
 }
 
 const STATUS_BADGE: Record<string, { label: string; color: string }> = {
-  pending:     { label: 'Pending',    color: '#fb923c' },
-  active:      { label: 'Active',     color: '#c8ff00' },
-  running:     { label: 'Running',    color: '#00d4ff' },
-  completed:   { label: 'Completed',  color: '#34d399' },
+  pending:     { label: 'Pending',    color: '#B5764A' },
+  active:      { label: 'Active',     color: '#C6A664' },
+  running:     { label: 'Running',    color: '#5E8B84' },
+  completed:   { label: 'Completed',  color: '#5E8B84' },
   cancelled:   { label: 'Cancelled',  color: '#ffffff40' },
 }
 
@@ -488,7 +488,7 @@ function EssenceIntelligencePage() {
     return (
       <div
         className="w-1.5 h-1.5 rounded-full shrink-0 mt-1.5"
-        style={{ backgroundColor: PRIORITY_COLORS[priority] ?? '#22d3ee' }}
+        style={{ backgroundColor: PRIORITY_COLORS[priority] ?? '#8B7AA8' }}
       />
     )
   }
@@ -499,7 +499,7 @@ function EssenceIntelligencePage() {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-6 h-6 border-2 border-[#c8ff00] border-t-transparent rounded-full animate-spin" />
+          <div className="w-6 h-6 border-2 border-[#C6A664] border-t-transparent rounded-full animate-spin" />
           <p className="text-xs text-white/30">Loading intelligence system...</p>
         </div>
       </div>
@@ -517,7 +517,7 @@ function EssenceIntelligencePage() {
           <p className="text-sm text-white/50 mb-6 max-w-md mx-auto">{error}</p>
           <button
             onClick={() => window.location.reload()}
-            className="px-5 py-2 bg-[#c8ff00] text-black text-xs font-bold rounded-sm hover:bg-white transition-all"
+            className="px-5 py-2 bg-[#C6A664] text-black text-xs font-bold rounded-sm hover:bg-white transition-all"
           >
             Retry
           </button>
@@ -534,7 +534,7 @@ function EssenceIntelligencePage() {
       <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="font-display text-2xl font-bold tracking-tight mb-1">
-            Essence <span className="text-[#c8ff00]">Intelligence</span>
+            Essence <span className="text-[#C6A664]">Intelligence</span>
           </h1>
           <p className="text-white/30 text-sm">
             Your intelligence system &mdash; suggestions, actions, and agent execution
@@ -549,7 +549,7 @@ function EssenceIntelligencePage() {
               onClick={() => handleRangeChange(r)}
               disabled={rangeLoading}
               className={`px-3 py-1.5 text-xs font-medium rounded-sm capitalize transition-colors disabled:opacity-50 ${
-                range === r ? 'bg-[#c8ff00] text-black' : 'text-white/50 hover:text-white/80'
+                range === r ? 'bg-[#C6A664] text-black' : 'text-white/50 hover:text-white/80'
               }`}
             >
               {r}
@@ -563,7 +563,7 @@ function EssenceIntelligencePage() {
         {extras.numerology && (
           <div className="glass rounded-sm border border-white/[0.06] p-3">
             <div className="text-[10px] uppercase tracking-widest text-white/30 mb-1">Numerology</div>
-            <div className="text-lg font-bold text-[#c8ff00]">{extras.numerology.number}</div>
+            <div className="text-lg font-bold text-[#C6A664]">{extras.numerology.number}</div>
             <div className="text-[11px] text-white/40">{extras.numerology.label}</div>
           </div>
         )}
@@ -631,7 +631,7 @@ function EssenceIntelligencePage() {
             <div key={d.domain} className="glass rounded-sm border border-white/[0.06] p-3">
               <div className="flex items-center justify-between mb-1">
                 <span className="text-[10px] uppercase tracking-widest text-white/30">{d.label} Module</span>
-                <span className="text-[10px] text-[#c8ff00] font-semibold">{d.score}/100</span>
+                <span className="text-[10px] text-[#C6A664] font-semibold">{d.score}/100</span>
               </div>
               {d.insight && <p className="text-[11px] text-white/60">{d.insight}</p>}
             </div>
@@ -644,7 +644,7 @@ function EssenceIntelligencePage() {
         <div className="mb-6 glass rounded-sm border border-white/[0.06] p-4">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
-              <span className="text-[10px] uppercase tracking-widest text-[#c8ff00] font-medium">Blueprint</span>
+              <span className="text-[10px] uppercase tracking-widest text-[#C6A664] font-medium">Blueprint</span>
               <span className="text-[9px] px-2 py-0.5 rounded-full bg-white/10 text-white/50 uppercase">{extras.blueprintTile.tier}</span>
             </div>
             {extras.blueprintTile.agentsUsed.length > 0 && (
@@ -655,7 +655,7 @@ function EssenceIntelligencePage() {
           {extras.blueprintTile.upgradeMessage && (
             <Link
               href="/dashboard/client/blueprint?upgrade=expanded"
-              className="inline-block mt-3 text-xs font-medium text-[#c8ff00] hover:underline"
+              className="inline-block mt-3 text-xs font-medium text-[#C6A664] hover:underline"
             >
               {extras.blueprintTile.upgradeMessage} →
             </Link>
@@ -670,8 +670,8 @@ function EssenceIntelligencePage() {
           <div className="glass rounded-sm border border-white/[0.06] overflow-hidden">
             <div className="px-5 py-4 border-b border-white/[0.06] flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-[#c8ff00] animate-pulse-slow" />
-                <span className="text-xs text-[#c8ff00] tracking-widest uppercase font-medium">
+                <div className="w-2 h-2 rounded-full bg-[#C6A664] animate-pulse-slow" />
+                <span className="text-xs text-[#C6A664] tracking-widest uppercase font-medium">
                   Intelligence Feed
                 </span>
                 <span className="text-[10px] text-white/30">
@@ -736,7 +736,7 @@ function EssenceIntelligencePage() {
                                 </button>
                                 <button
                                   onClick={() => openExecuteModal(item, 'deploy')}
-                                  className="px-3 py-1.5 bg-[#c8ff00] text-black text-[10px] font-bold rounded-sm hover:bg-white transition-all"
+                                  className="px-3 py-1.5 bg-[#C6A664] text-black text-[10px] font-bold rounded-sm hover:bg-white transition-all"
                                 >
                                   Execute as Agent
                                 </button>
@@ -789,7 +789,7 @@ function EssenceIntelligencePage() {
                     </Link>
                     <Link
                       href="/dashboard/client/blueprint/assess"
-                      className="px-5 py-2 bg-[#c8ff00] text-black text-xs font-bold rounded-sm hover:bg-white transition-all"
+                      className="px-5 py-2 bg-[#C6A664] text-black text-xs font-bold rounded-sm hover:bg-white transition-all"
                     >
                       Run Blueprint Assessment →
                     </Link>
@@ -808,7 +808,7 @@ function EssenceIntelligencePage() {
                       <div className="text-xs text-white/30 tracking-widest uppercase mb-1">
                         Blueprint Score
                       </div>
-                      <div className="text-2xl font-bold text-[#c8ff00]">
+                      <div className="text-2xl font-bold text-[#C6A664]">
                         {blueprint.overallScore}
                       </div>
                     </div>
@@ -837,7 +837,7 @@ function EssenceIntelligencePage() {
                             </div>
                             <div className="h-1 bg-white/[0.06] rounded-full overflow-hidden">
                               <div
-                                className="h-full bg-[#c8ff00] rounded-full"
+                                className="h-full bg-[#C6A664] rounded-full"
                                 style={{ width: `${score}%` }}
                               />
                             </div>
@@ -857,7 +857,7 @@ function EssenceIntelligencePage() {
           {/* ── C. Active Essence Actions ── */}
           <div className="glass rounded-sm border border-white/[0.06] overflow-hidden">
             <div className="px-5 py-4 border-b border-white/[0.06] flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-[#00d4ff] animate-pulse-slow" />
+              <span className="w-2 h-2 rounded-full bg-[#5E8B84] animate-pulse-slow" />
               <span className="text-xs text-white/30 tracking-widest uppercase">
                 Active Essence Actions
               </span>
@@ -945,7 +945,7 @@ function EssenceIntelligencePage() {
                         className={
                           'text-[10px] px-1.5 py-0.5 rounded-sm ' +
                           (action.status === 'completed'
-                            ? 'bg-[#c8ff00]/10 text-[#c8ff00]'
+                            ? 'bg-[#C6A664]/10 text-[#C6A664]'
                             : action.status === 'failed'
                             ? 'bg-red-500/10 text-red-400'
                             : 'bg-white/10 text-white/40')
@@ -981,15 +981,15 @@ function EssenceIntelligencePage() {
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-white/50">Active Actions</span>
-                <span className="text-[#c8ff00] font-medium">{activeActions.length}</span>
+                <span className="text-[#C6A664] font-medium">{activeActions.length}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-white/50">Pending</span>
-                <span className="text-[#fb923c] font-medium">{pendingCount}</span>
+                <span className="text-[#B5764A] font-medium">{pendingCount}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-white/50">Completed</span>
-                <span className="text-[#34d399] font-medium">{completedCount}</span>
+                <span className="text-[#5E8B84] font-medium">{completedCount}</span>
               </div>
             </div>
           </div>
@@ -1018,7 +1018,7 @@ function EssenceIntelligencePage() {
                 <div className="pt-2 border-t border-white/[0.06]">
                   <Link
                     href="/dashboard/client/blueprint"
-                    className="text-xs text-[#c8ff00] hover:opacity-80 transition-all"
+                    className="text-xs text-[#C6A664] hover:opacity-80 transition-all"
                   >
                     View Full Blueprint →
                   </Link>
@@ -1038,7 +1038,7 @@ function EssenceIntelligencePage() {
               {!blueprint?.exists ? (
                 <Link
                   href="/dashboard/client/blueprint/assess"
-                  className="block w-full px-4 py-2 bg-[#c8ff00] text-black text-xs font-bold rounded-sm hover:bg-white transition-all text-center"
+                  className="block w-full px-4 py-2 bg-[#C6A664] text-black text-xs font-bold rounded-sm hover:bg-white transition-all text-center"
                 >
                   Run Assessment
                 </Link>
@@ -1094,7 +1094,7 @@ function EssenceIntelligencePage() {
           />
 
           {/* Modal */}
-          <div className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-sm border border-white/[0.08] bg-[#080810] shadow-2xl animate-fade-in">
+          <div className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-sm border border-white/[0.08] bg-[#0A0A0B] shadow-2xl animate-fade-in">
             {/* Close */}
             <button
               onClick={() => !deployLoading && setExecutingItem(null)}
@@ -1111,7 +1111,7 @@ function EssenceIntelligencePage() {
                   onClick={() => setModalTab('review')}
                   className={`flex-1 px-3 py-2 text-xs font-bold rounded-sm transition-all ${
                     modalTab === 'review'
-                      ? 'bg-[#c8ff00] text-black'
+                      ? 'bg-[#C6A664] text-black'
                       : 'text-white/40 hover:text-white/70'
                   }`}
                 >
@@ -1121,7 +1121,7 @@ function EssenceIntelligencePage() {
                   onClick={() => setModalTab('deploy')}
                   className={`flex-1 px-3 py-2 text-xs font-bold rounded-sm transition-all ${
                     modalTab === 'deploy'
-                      ? 'bg-[#c8ff00] text-black'
+                      ? 'bg-[#C6A664] text-black'
                       : 'text-white/40 hover:text-white/70'
                   }`}
                 >
@@ -1162,7 +1162,7 @@ function EssenceIntelligencePage() {
                   </div>
 
                   {/* Context / next steps */}
-                  <div className="p-4 rounded-sm bg-[#c8ff00]/[0.04] border border-[#c8ff00]/[0.1]">
+                  <div className="p-4 rounded-sm bg-[#C6A664]/[0.04] border border-[#C6A664]/[0.1]">
                     <p className="text-xs text-white/50 leading-relaxed">
                       This suggestion is based on your current intelligence profile. You can deploy it to an agent for execution, or dismiss it if it doesn&apos;t apply right now. Suggestions refresh daily as your context evolves.
                     </p>
@@ -1172,7 +1172,7 @@ function EssenceIntelligencePage() {
                   <div className="flex items-center gap-3 pt-2">
                     <button
                       onClick={() => setModalTab('deploy')}
-                      className="flex-1 px-5 py-2.5 bg-[#c8ff00] text-black text-xs font-bold rounded-sm hover:bg-white transition-all"
+                      className="flex-1 px-5 py-2.5 bg-[#C6A664] text-black text-xs font-bold rounded-sm hover:bg-white transition-all"
                     >
                       Deploy to Agent →
                     </button>
@@ -1206,8 +1206,8 @@ function EssenceIntelligencePage() {
 
                   {/* No blueprint warning */}
                   {!blueprint?.exists && (
-                    <div className="p-3 rounded-sm bg-[#fb923c]/[0.08] border border-[#fb923c]/[0.15]">
-                      <p className="text-[10px] text-[#fb923c] font-medium mb-1">
+                    <div className="p-3 rounded-sm bg-[#B5764A]/[0.08] border border-[#B5764A]/[0.15]">
+                      <p className="text-[10px] text-[#B5764A] font-medium mb-1">
                         No Blueprint Found
                       </p>
                       <p className="text-[11px] text-white/50">
@@ -1224,7 +1224,7 @@ function EssenceIntelligencePage() {
                     <select
                       value={selectedAgent}
                       onChange={(e) => setSelectedAgent(e.target.value)}
-                      className="w-full px-3 py-2.5 bg-white/[0.04] border border-white/[0.1] rounded-sm text-sm text-white/70 focus:outline-none focus:border-[#c8ff00]/40 transition-all appearance-none"
+                      className="w-full px-3 py-2.5 bg-white/[0.04] border border-white/[0.1] rounded-sm text-sm text-white/70 focus:outline-none focus:border-[#C6A664]/40 transition-all appearance-none"
                     >
                       <option value="" disabled>
                         {agents.length > 0 ? 'Select an agent...' : 'Loading agents...'}
@@ -1251,7 +1251,7 @@ function EssenceIntelligencePage() {
                       value={promptText}
                       onChange={(e) => setPromptText(e.target.value)}
                       rows={3}
-                      className="w-full px-3 py-2.5 bg-white/[0.04] border border-white/[0.1] rounded-sm text-sm text-white/70 focus:outline-none focus:border-[#c8ff00]/40 transition-all resize-none"
+                      className="w-full px-3 py-2.5 bg-white/[0.04] border border-white/[0.1] rounded-sm text-sm text-white/70 focus:outline-none focus:border-[#C6A664]/40 transition-all resize-none"
                       placeholder="Customize the prompt for the agent..."
                     />
                   </div>
@@ -1268,7 +1268,7 @@ function EssenceIntelligencePage() {
                     >
                       {intelFile ? (
                         <div className="flex items-center justify-center gap-2">
-                          <span className="text-xs text-[#c8ff00]">{intelFile.name}</span>
+                          <span className="text-xs text-[#C6A664]">{intelFile.name}</span>
                           <span className="text-[10px] text-white/30">
                             ({(intelFile.size / 1024).toFixed(1)} KB)
                           </span>
@@ -1296,7 +1296,7 @@ function EssenceIntelligencePage() {
                     <button
                       onClick={handleDeploy}
                       disabled={deployLoading || !selectedAgent}
-                      className="flex-1 px-5 py-2.5 bg-[#c8ff00] text-black text-xs font-bold rounded-sm hover:bg-white transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                      className="flex-1 px-5 py-2.5 bg-[#C6A664] text-black text-xs font-bold rounded-sm hover:bg-white transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                       {deployLoading ? (
                         <span className="flex items-center justify-center gap-2">

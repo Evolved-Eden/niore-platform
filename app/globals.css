@@ -3,22 +3,31 @@
 @tailwind utilities;
 
 :root {
-  --acid:     #c8ff00;
-  --cyan:     #00d4ff;
-  --violet:   #a78bfa;
-  --coral:    #ff6b6b;
-  --amber:    #fb923c;
+  /* Refined per-role accents (formerly neon) */
+  --gold:      #C6A664;  /* client — primary brand accent */
+  --creator:   #5E8B84;  /* creator — muted teal */
+  --admin:     #7A2E32;  /* admin — deep wine */
+  --personal:  #B5764A;  /* personal — muted terracotta */
+  --affiliate: #C9974A;  /* affiliate — muted honey */
+  --plum:      #8B7AA8;  /* secondary accent (timing, blueprint, etc.) */
 
-  --surface-0: #080810;
-  --surface-1: #0d0d1a;
-  --surface-2: #12121f;
-  --surface-3: #1a1a2e;
+  /* Legacy aliases so any code still referencing these keeps working */
+  --acid:     var(--gold);
+  --cyan:     var(--creator);
+  --violet:   var(--plum);
+  --coral:    var(--admin);
+  --amber:    var(--personal);
+
+  --surface-0: #0A0A0B;
+  --surface-1: #141414;
+  --surface-2: #1A1A1A;
+  --surface-3: #202020;
 
   --border:   rgba(255,255,255,0.08);
   --border-hover: rgba(255,255,255,0.15);
 
-  --font-sans: var(--font-inter);
-  --font-display: var(--font-space);
+  --font-sans: var(--font-body);
+  --font-display: var(--font-display-face);
 }
 
 * { box-sizing: border-box; }
@@ -52,8 +61,8 @@ body {
   border: 1px solid var(--border);
 }
 
-.glow-acid  { box-shadow: 0 0 24px rgba(200,255,0,0.15); }
-.glow-cyan  { box-shadow: 0 0 24px rgba(0,212,255,0.15); }
+.glow-acid  { box-shadow: 0 0 24px rgba(198,166,100,0.15); }
+.glow-cyan  { box-shadow: 0 0 24px rgba(94,139,132,0.15); }
 
 /* ── Native select dropdown fix ──
    Prevents browser-native <option> rendering as white-on-white in dark theme.
@@ -66,15 +75,15 @@ select {
 }
 
 select option {
-  background-color: #1a1a2e;
+  background-color: #1A1A1A;
   color: #e0e0e0;
 }
 
 /* Some browsers use the select's background for the dropdown panel, so
    reinforce with a forced dark selection highlight. */
 select option:checked {
-  background: #2a2a4e;
-  color: #c8ff00;
+  background: #2a241a;
+  color: #C6A664;
 }
 
 /* ============================================ */

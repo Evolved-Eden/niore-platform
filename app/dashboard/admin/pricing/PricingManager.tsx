@@ -84,8 +84,8 @@ export default function PricingManager({ initialTiers, initialEntitlements }: { 
             </span>
           )}
           <div className="flex rounded-sm overflow-hidden border border-white/[0.08]">
-            <button onClick={() => setTab('tiers')} className={`px-4 py-2 text-xs ${tab === 'tiers' ? 'bg-[#c8ff00]/20 text-[#c8ff00]' : 'text-white/40 hover:text-white/60'}`}>Tiers</button>
-            <button onClick={() => setTab('entitlements')} className={`px-4 py-2 text-xs ${tab === 'entitlements' ? 'bg-[#c8ff00]/20 text-[#c8ff00]' : 'text-white/40 hover:text-white/60'}`}>Entitlements</button>
+            <button onClick={() => setTab('tiers')} className={`px-4 py-2 text-xs ${tab === 'tiers' ? 'bg-[#C6A664]/20 text-[#C6A664]' : 'text-white/40 hover:text-white/60'}`}>Tiers</button>
+            <button onClick={() => setTab('entitlements')} className={`px-4 py-2 text-xs ${tab === 'entitlements' ? 'bg-[#C6A664]/20 text-[#C6A664]' : 'text-white/40 hover:text-white/60'}`}>Entitlements</button>
           </div>
         </div>
       </div>
@@ -93,7 +93,7 @@ export default function PricingManager({ initialTiers, initialEntitlements }: { 
       {/* Tiers tab */}
       {tab === 'tiers' && (
         <>
-          <button onClick={() => setEditTier({})} className="px-4 py-2 text-xs rounded-sm bg-[#c8ff00]/20 text-[#c8ff00] hover:bg-[#c8ff00]/30">+ New Tier</button>
+          <button onClick={() => setEditTier({})} className="px-4 py-2 text-xs rounded-sm bg-[#C6A664]/20 text-[#C6A664] hover:bg-[#C6A664]/30">+ New Tier</button>
           <div className="glass rounded-sm overflow-hidden border border-white/[0.06]">
             <table className="min-w-full">
               <thead>
@@ -160,12 +160,12 @@ export default function PricingManager({ initialTiers, initialEntitlements }: { 
                   <Field label="Max Memory (GB)" name="max_memory_gbs" value={editTier.max_memory_gbs ?? 0} type="number" />
                   <label className="flex items-center gap-2">
                     <span className="text-xs text-white/40">Is Org</span>
-                    <input type="checkbox" name="is_organization" defaultChecked={editTier.is_organization} className="accent-[#c8ff00]" />
+                    <input type="checkbox" name="is_organization" defaultChecked={editTier.is_organization} className="accent-[#C6A664]" />
                   </label>
                 </Grid>
                 <div className="flex justify-end gap-3 pt-2">
                   <button type="button" onClick={() => setEditTier(null)} className="px-4 py-2 text-sm text-white/50 hover:text-white/80">Cancel</button>
-                  <button type="submit" className="px-4 py-2 text-sm bg-[#c8ff00]/20 text-[#c8ff00] hover:bg-[#c8ff00]/30 rounded-sm">Save</button>
+                  <button type="submit" className="px-4 py-2 text-sm bg-[#C6A664]/20 text-[#C6A664] hover:bg-[#C6A664]/30 rounded-sm">Save</button>
                 </div>
               </form>
             </Modal>
@@ -176,7 +176,7 @@ export default function PricingManager({ initialTiers, initialEntitlements }: { 
       {/* Entitlements tab */}
       {tab === 'entitlements' && (
         <>
-          <button onClick={() => setEditEnt({ plan_key: tierKeys[0] || '' })} className="px-4 py-2 text-xs rounded-sm bg-[#c8ff00]/20 text-[#c8ff00] hover:bg-[#c8ff00]/30">+ New Entitlement</button>
+          <button onClick={() => setEditEnt({ plan_key: tierKeys[0] || '' })} className="px-4 py-2 text-xs rounded-sm bg-[#C6A664]/20 text-[#C6A664] hover:bg-[#C6A664]/30">+ New Entitlement</button>
           <div className="glass rounded-sm overflow-hidden border border-white/[0.06]">
             <table className="min-w-full">
               <thead>
@@ -238,14 +238,14 @@ export default function PricingManager({ initialTiers, initialEntitlements }: { 
                 <div className="grid grid-cols-2 gap-4">
                   {['legal', 'wealth', 'luxury_hospitality', 'creator_commerce'].map(addon => (
                     <label key={addon} className="flex items-center gap-2">
-                      <input type="checkbox" name={`can_use_${addon}_addon`} defaultChecked={(editEnt as any)[`can_use_${addon}_addon`]} className="accent-[#c8ff00]" />
+                      <input type="checkbox" name={`can_use_${addon}_addon`} defaultChecked={(editEnt as any)[`can_use_${addon}_addon`]} className="accent-[#C6A664]" />
                       <span className="text-xs text-white/40">{addon.replace('_', ' ')}</span>
                     </label>
                   ))}
                 </div>
                 <div className="flex justify-end gap-3 pt-2">
                   <button type="button" onClick={() => setEditEnt(null)} className="px-4 py-2 text-sm text-white/50 hover:text-white/80">Cancel</button>
-                  <button type="submit" className="px-4 py-2 text-sm bg-[#c8ff00]/20 text-[#c8ff00] hover:bg-[#c8ff00]/30 rounded-sm">Save</button>
+                  <button type="submit" className="px-4 py-2 text-sm bg-[#C6A664]/20 text-[#C6A664] hover:bg-[#C6A664]/30 rounded-sm">Save</button>
                 </div>
               </form>
             </Modal>
@@ -276,7 +276,7 @@ function Field({ label, name, value, type }: { label: string; name: string; valu
     <div>
       <label className="block text-xs text-white/40 mb-1">{label}</label>
       <input type={type || 'text'} name={name} defaultValue={value ?? ''}
-        className="w-full bg-white/[0.04] border border-white/[0.08] rounded-sm px-3 py-2 text-sm text-white/70 focus:outline-none focus:border-[#c8ff00]/40" />
+        className="w-full bg-white/[0.04] border border-white/[0.08] rounded-sm px-3 py-2 text-sm text-white/70 focus:outline-none focus:border-[#C6A664]/40" />
     </div>
   )
 }

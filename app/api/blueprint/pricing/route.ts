@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from 'next/server'
 const TIER_MAP: Record<string, Array<{ maxScore: number; key: string; name: string; price: number; period: string }>> = {
   client: [
     { maxScore: 40, key: 'client_founder', name: 'Founder', price: 397, period: '/month' },
-    { maxScore: 75, key: 'client_team', name: 'Teams', price: 1497, period: '/month' },
+    { maxScore: 75, key: 'client_org', name: 'Org', price: 1497, period: '/month' },
     { maxScore: 100, key: 'client_enterprise', name: 'Enterprise', price: 5000, period: '/month' },
   ],
   creator: [

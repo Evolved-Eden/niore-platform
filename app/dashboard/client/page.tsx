@@ -51,10 +51,10 @@ export default async function ClientDashboard() {
       : '—'
 
   const stats = [
-    { label: 'Intelligence Score', value: engagementScore, color: '#c8ff00', icon: '◈' },
-    { label: 'Twins Active',       value: twin ? '1' : '0',                color: '#00d4ff', icon: '⟐' },
-    { label: 'Blueprint Score',    value: blueprintScore,                   color: '#a78bfa', icon: '◆' },
-    { label: 'Lifetime Value',     value: client?.lifetime_value ? `$${client.lifetime_value}` : '—', color: '#fb923c', icon: '✦' },
+    { label: 'Intelligence Score', value: engagementScore, color: '#C6A664', icon: '◈' },
+    { label: 'Twins Active',       value: twin ? '1' : '0',                color: '#5E8B84', icon: '⟐' },
+    { label: 'Blueprint Score',    value: blueprintScore,                   color: '#8B7AA8', icon: '◆' },
+    { label: 'Lifetime Value',     value: client?.lifetime_value ? `$${client.lifetime_value}` : '—', color: '#B5764A', icon: '✦' },
   ]
 
   const quickActions = [
@@ -68,10 +68,21 @@ export default async function ClientDashboard() {
     <div className="max-w-6xl mx-auto animate-fade-in">
       {/* ── Welcome ── */}
       <div className="mb-8">
-        <h1 className="font-display text-3xl font-bold tracking-tight mb-1 bg-gradient-to-r from-[#c8ff00] via-white to-[#c8ff00] bg-clip-text text-transparent bg-[length:200%] animate-gradient">
+        <h1 className="font-display text-3xl font-bold tracking-tight mb-1 bg-gradient-to-r from-[#C6A664] via-white to-[#C6A664] bg-clip-text text-transparent bg-[length:200%] animate-gradient">
           Welcome back, {name}
         </h1>
         <p className="text-white/30 text-sm">Your intelligence ecosystem</p>
+      </div>
+
+      {/* ── Essence Board — center stage. This gives direction for the day
+          before anything else on the page competes for attention. ── */}
+      <div className="mb-8">
+        <div className="flex items-center gap-2 mb-3">
+          <span className="text-xs text-[#C6A664] tracking-widest uppercase font-medium">
+            Zuri's Direction For You
+          </span>
+        </div>
+        <EssenceBoard userId={user.id} userRole={identity?.role ?? 'client'} />
       </div>
 
       {/* ── Stats Bar — 4 KPIs ── */}
@@ -100,7 +111,7 @@ export default async function ClientDashboard() {
           <div className="glass rounded-sm overflow-hidden">
             <div className="px-6 py-4 border-b border-white/[0.06] flex items-center justify-between">
               <span className="text-xs text-white/30 tracking-widest uppercase flex items-center gap-2">
-                <span className="text-[#c8ff00]">⊙</span> Intelligence Activity Feed
+                <span className="text-[#C6A664]">⊙</span> Intelligence Activity Feed
               </span>
               <span className="text-[10px] text-white/20">Live</span>
             </div>
@@ -116,7 +127,7 @@ export default async function ClientDashboard() {
                 {!twin && (
                   <Link
                     href="/dashboard/client/blueprint/assess"
-                    className="px-5 py-2 bg-[#c8ff00] text-black text-xs font-bold rounded-sm hover:bg-white transition-all shrink-0 glow-acid"
+                    className="px-5 py-2 bg-[#C6A664] text-black text-xs font-bold rounded-sm hover:bg-white transition-all shrink-0 glow-acid"
                   >
                     Run Blueprint →
                   </Link>
@@ -129,7 +140,7 @@ export default async function ClientDashboard() {
           <div className="glass rounded-sm p-6">
             <div className="flex items-center justify-between mb-4">
               <div className="text-xs text-white/30 tracking-widest uppercase flex items-center gap-2">
-                <span className="text-[#c8ff00]">⊕</span> Deployed Agents
+                <span className="text-[#C6A664]">⊕</span> Deployed Agents
               </div>
               <Link
                 href="/dashboard/client/agents"
@@ -144,29 +155,17 @@ export default async function ClientDashboard() {
             </div>
             <Link
               href="/dashboard/client/blueprint"
-              className="inline-block mt-3 text-xs text-[#c8ff00] hover:text-white transition-colors"
+              className="inline-block mt-3 text-xs text-[#C6A664] hover:text-white transition-colors"
             >
               Deploy new agent →
             </Link>
-          </div>
-
-          {/* Essence Board Mini */}
-          <div className="glass rounded-sm overflow-hidden">
-            <div className="px-6 py-4 border-b border-white/[0.06]">
-              <span className="text-xs text-white/30 tracking-widest uppercase flex items-center gap-2">
-                <span>◈</span> Essence Board
-              </span>
-            </div>
-            <div className="p-6">
-              <EssenceBoard userId={user.id} userRole={identity?.role ?? 'client'} />
-            </div>
           </div>
 
           {/* Blueprint Progress */}
           <div className="glass rounded-sm p-6">
             <div className="flex items-center justify-between mb-4">
               <div className="text-xs text-white/30 tracking-widest uppercase flex items-center gap-2">
-                <span className="text-[#a78bfa]">◆</span> Blueprint Progress
+                <span className="text-[#8B7AA8]">◆</span> Blueprint Progress
               </div>
               <Link
                 href="/dashboard/client/blueprint"
@@ -186,7 +185,7 @@ export default async function ClientDashboard() {
                     className="h-full rounded-full transition-all duration-1000"
                     style={{
                       width: `${bpScore}%`,
-                      background: 'linear-gradient(90deg, #c8ff00, #00d4ff)',
+                      background: 'linear-gradient(90deg, #C6A664, #5E8B84)',
                     }}
                   />
                 </div>
@@ -201,7 +200,7 @@ export default async function ClientDashboard() {
             {!twin && (
               <Link
                 href="/dashboard/client/blueprint/assess"
-                className="inline-block mt-4 px-5 py-2 bg-[#c8ff00] text-black text-xs font-bold rounded-sm hover:bg-white transition-all glow-acid"
+                className="inline-block mt-4 px-5 py-2 bg-[#C6A664] text-black text-xs font-bold rounded-sm hover:bg-white transition-all glow-acid"
               >
                 Start Assessment →
               </Link>
@@ -214,7 +213,7 @@ export default async function ClientDashboard() {
           {/* Quick Actions */}
           <div className="glass rounded-sm p-5">
             <div className="text-xs text-white/30 tracking-widest uppercase mb-4 flex items-center gap-2">
-              <span className="text-[#c8ff00]">✦</span> Quick Actions
+              <span className="text-[#C6A664]">✦</span> Quick Actions
             </div>
             <div className="space-y-2">
               {quickActions.map((qa) => (
@@ -223,7 +222,7 @@ export default async function ClientDashboard() {
                   href={qa.href}
                   className="flex items-center gap-3 px-3 py-2.5 text-sm text-white/40 hover:text-white hover:bg-white/[0.04] rounded-sm transition-all duration-200 group"
                 >
-                  <span className="text-xs w-4 text-center group-hover:text-[#c8ff00] transition-colors">
+                  <span className="text-xs w-4 text-center group-hover:text-[#C6A664] transition-colors">
                     {qa.icon}
                   </span>
                   <div>
@@ -236,29 +235,29 @@ export default async function ClientDashboard() {
           </div>
 
           {/* Upcoming Consultation */}
-          <div className="glass rounded-sm p-5 border-l-2" style={{ borderLeftColor: '#fb923c' }}>
+          <div className="glass rounded-sm p-5 border-l-2" style={{ borderLeftColor: '#B5764A' }}>
             <div className="text-xs text-white/30 tracking-widest uppercase mb-3 flex items-center gap-2">
-              <span className="text-[#fb923c]">✦</span> Consultation
+              <span className="text-[#B5764A]">✦</span> Consultation
             </div>
             <p className="text-sm text-white/50">
               No consultations scheduled. Book a 30-min strategy session with your intelligence concierge.
             </p>
             <Link
               href="/dashboard/client/consulting"
-              className="inline-block mt-3 text-xs text-[#fb923c] hover:text-white transition-colors"
+              className="inline-block mt-3 text-xs text-[#B5764A] hover:text-white transition-colors"
             >
               Book session →
             </Link>
           </div>
 
           {/* Zuri Status */}
-          <div className="glass rounded-sm p-5 border-l-2" style={{ borderLeftColor: '#c8ff00' }}>
+          <div className="glass rounded-sm p-5 border-l-2" style={{ borderLeftColor: '#C6A664' }}>
             <div className="flex items-center justify-between mb-3">
               <div className="text-xs text-white/30 tracking-widest uppercase flex items-center gap-2">
-                <span className="text-[#c8ff00]">◈</span> Zuri
+                <span className="text-[#C6A664]">◈</span> Zuri Niorè
               </div>
               <span className="flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#c8ff00] animate-pulse-slow" />
+                <span className="w-1.5 h-1.5 rounded-full bg-[#C6A664] animate-pulse-slow" />
                 <span className="text-[10px] text-white/30">Online</span>
               </span>
             </div>
@@ -267,7 +266,7 @@ export default async function ClientDashboard() {
             </p>
             <Link
               href="/dashboard/client/zuri"
-              className="inline-block mt-3 text-xs text-[#c8ff00] hover:text-white transition-colors"
+              className="inline-block mt-3 text-xs text-[#C6A664] hover:text-white transition-colors"
             >
               Open Zuri →
             </Link>

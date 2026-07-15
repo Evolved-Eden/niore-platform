@@ -21,11 +21,11 @@ type EnvOnlyEntry = {
 }
 
 const CATEGORY_META: Record<string, { label: string; icon: string; color: string }> = {
-  ai:        { label: 'AI Configuration',      icon: '◈', color: '#c8ff00' },
-  n8n:       { label: 'n8n Automation',        icon: '↻', color: '#00d4ff' },
-  stripe:    { label: 'Stripe',                icon: '✦', color: '#fb923c' },
-  connector: { label: 'Connectors',             icon: '◆', color: '#a78bfa' },
-  general:   { label: 'General',               icon: '⊙', color: '#34d399' },
+  ai:        { label: 'AI Configuration',      icon: '◈', color: '#C6A664' },
+  n8n:       { label: 'n8n Automation',        icon: '↻', color: '#5E8B84' },
+  stripe:    { label: 'Stripe',                icon: '✦', color: '#B5764A' },
+  connector: { label: 'Connectors',             icon: '◆', color: '#8B7AA8' },
+  general:   { label: 'General',               icon: '⊙', color: '#5E8B84' },
 }
 
 const VALUE_TYPE_OPTIONS = ['string', 'number', 'boolean', 'json']
@@ -40,7 +40,7 @@ function PasswordField({ value, onChange }: { value: string; onChange: (v: strin
         type={show ? 'text' : 'password'}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full bg-white/5 border border-white/10 rounded-sm px-3 py-1.5 text-xs text-white/70 font-mono focus:outline-none focus:border-[#c8ff00]/40 transition-colors"
+        className="w-full bg-white/5 border border-white/10 rounded-sm px-3 py-1.5 text-xs text-white/70 font-mono focus:outline-none focus:border-[#C6A664]/40 transition-colors"
       />
       <button
         type="button"
@@ -225,7 +225,7 @@ export default function AdminSettingsPage() {
         </div>
         <button
           onClick={() => setShowAdd(true)}
-          className="px-4 py-2 bg-[#c8ff00] text-black text-xs font-bold rounded-sm hover:bg-white transition-all"
+          className="px-4 py-2 bg-[#C6A664] text-black text-xs font-bold rounded-sm hover:bg-white transition-all"
         >
           + Add Setting
         </button>
@@ -235,7 +235,7 @@ export default function AdminSettingsPage() {
       {message && (
         <div className={`px-4 py-3 rounded-sm text-sm ${
           message.type === 'ok'
-            ? 'bg-[#c8ff00]/10 border border-[#c8ff00]/20 text-[#c8ff00]'
+            ? 'bg-[#C6A664]/10 border border-[#C6A664]/20 text-[#C6A664]'
             : 'bg-red-500/10 border border-red-500/20 text-red-400'
         }`}>
           {message.text}
@@ -335,7 +335,7 @@ export default function AdminSettingsPage() {
                                 type="text"
                                 value={editingValues[entry.key] ?? entry.value}
                                 onChange={(e) => setEditingValues(prev => ({ ...prev, [entry.key]: e.target.value }))}
-                                className="w-full bg-white/5 border border-white/10 rounded-sm px-3 py-1.5 text-xs text-white/70 font-mono focus:outline-none focus:border-[#c8ff00]/40 transition-colors"
+                                className="w-full bg-white/5 border border-white/10 rounded-sm px-3 py-1.5 text-xs text-white/70 font-mono focus:outline-none focus:border-[#C6A664]/40 transition-colors"
                                 placeholder={entry.value || 'Enter value...'}
                               />
                             )}
@@ -343,7 +343,7 @@ export default function AdminSettingsPage() {
                           <button
                             onClick={() => handleSave(entry.key)}
                             disabled={saving[entry.key]}
-                            className="px-3 py-1.5 bg-[#c8ff00] text-black text-[10px] font-bold rounded-sm hover:bg-white transition-all shrink-0 disabled:opacity-40"
+                            className="px-3 py-1.5 bg-[#C6A664] text-black text-[10px] font-bold rounded-sm hover:bg-white transition-all shrink-0 disabled:opacity-40"
                           >
                             {saving[entry.key] ? '...' : 'Save'}
                           </button>
@@ -379,7 +379,7 @@ export default function AdminSettingsPage() {
           className="glass rounded-sm border border-white/[0.06] p-5 hover:border-white/15 transition-all group"
         >
           <div className="flex items-center gap-3 mb-2">
-            <span className="text-lg text-[#a78bfa]">◆</span>
+            <span className="text-lg text-[#8B7AA8]">◆</span>
             <h3 className="font-display font-semibold text-white text-sm">Connector Configs</h3>
           </div>
           <p className="text-xs text-white/40">
@@ -391,7 +391,7 @@ export default function AdminSettingsPage() {
           className="glass rounded-sm border border-white/[0.06] p-5 hover:border-white/15 transition-all group"
         >
           <div className="flex items-center gap-3 mb-2">
-            <span className="text-lg text-[#fb923c]">✦</span>
+            <span className="text-lg text-[#B5764A]">✦</span>
             <h3 className="font-display font-semibold text-white text-sm">Pricing & Plans</h3>
           </div>
           <p className="text-xs text-white/40">
@@ -473,7 +473,7 @@ export default function AdminSettingsPage() {
                 <button
                   onClick={handleAdd}
                   disabled={saving['__new'] || !newKey.trim()}
-                  className="flex-1 px-5 py-2.5 bg-[#c8ff00] text-black text-xs font-bold rounded-sm hover:bg-white transition-all disabled:opacity-40"
+                  className="flex-1 px-5 py-2.5 bg-[#C6A664] text-black text-xs font-bold rounded-sm hover:bg-white transition-all disabled:opacity-40"
                 >
                   {saving['__new'] ? 'Adding...' : 'Add Setting'}
                 </button>

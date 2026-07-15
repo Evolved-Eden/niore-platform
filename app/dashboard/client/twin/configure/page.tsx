@@ -84,7 +84,7 @@ export default function TwinConfigurePage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="w-6 h-6 border-2 border-[#c8ff00] border-t-transparent rounded-full animate-spin" />
+        <div className="w-6 h-6 border-2 border-[#C6A664] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -93,14 +93,14 @@ export default function TwinConfigurePage() {
     <div className="max-w-2xl mx-auto animate-fade-in">
       <div className="mb-8">
         <h1 className="font-display text-2xl font-bold tracking-tight mb-1">
-          Configure <span className="text-[#fb923c]">Twin</span>
+          Configure <span className="text-[#B5764A]">Twin</span>
         </h1>
         <p className="text-white/30 text-sm">Customize your AI twin&apos;s personality, behavior, and intelligence settings</p>
       </div>
 
       {message && (
         <div className={`mb-6 px-4 py-3 rounded-sm text-sm border ${
-          message.type === "success" ? "bg-[#c8ff00]/10 border-[#c8ff00]/30 text-[#c8ff00]" : "bg-red-900/20 border-red-800/30 text-red-400"
+          message.type === "success" ? "bg-[#C6A664]/10 border-[#C6A664]/30 text-[#C6A664]" : "bg-red-900/20 border-red-800/30 text-red-400"
         }`}>
           {message.text}
         </div>
@@ -115,7 +115,7 @@ export default function TwinConfigurePage() {
             value={config.name}
             onChange={(e) => setConfig({ ...config, name: e.target.value })}
             placeholder="My AI Twin"
-            className="w-full px-3 py-2.5 bg-white/[0.04] border border-white/10 rounded-sm text-sm text-white/70 focus:outline-none focus:border-[#fb923c]/40 transition-all"
+            className="w-full px-3 py-2.5 bg-white/[0.04] border border-white/10 rounded-sm text-sm text-white/70 focus:outline-none focus:border-[#B5764A]/40 transition-all"
           />
         </div>
 
@@ -127,7 +127,7 @@ export default function TwinConfigurePage() {
             onChange={(e) => setConfig({ ...config, personality_summary: e.target.value })}
             rows={4}
             placeholder="Describe your twin's personality, communication style, and core traits..."
-            className="w-full px-3 py-2.5 bg-white/[0.04] border border-white/10 rounded-sm text-sm text-white/70 focus:outline-none focus:border-[#fb923c]/40 transition-all resize-none"
+            className="w-full px-3 py-2.5 bg-white/[0.04] border border-white/10 rounded-sm text-sm text-white/70 focus:outline-none focus:border-[#B5764A]/40 transition-all resize-none"
           />
           <p className="text-[10px] text-white/20 mt-1">This defines how your twin communicates and makes decisions.</p>
         </div>
@@ -138,11 +138,11 @@ export default function TwinConfigurePage() {
           <select
             value={config.autonomy_level}
             onChange={(e) => setConfig({ ...config, autonomy_level: e.target.value })}
-            className="w-full px-3 py-2.5 bg-white/[0.04] border border-white/10 rounded-sm text-sm text-white/70 focus:outline-none focus:border-[#fb923c]/40 transition-all appearance-none"
+            className="w-full px-3 py-2.5 bg-white/[0.04] border border-white/10 rounded-sm text-sm text-white/70 focus:outline-none focus:border-[#B5764A]/40 transition-all appearance-none"
           >
-            <option value="guided" className="bg-[#080810]">Guided — Requires approval for actions</option>
-            <option value="semi_autonomous" className="bg-[#080810]">Semi-Autonomous — Acts within defined boundaries</option>
-            <option value="autonomous" className="bg-[#080810]">Autonomous — Full decision-making authority</option>
+            <option value="guided" className="bg-[#0A0A0B]">Guided — Requires approval for actions</option>
+            <option value="semi_autonomous" className="bg-[#0A0A0B]">Semi-Autonomous — Acts within defined boundaries</option>
+            <option value="autonomous" className="bg-[#0A0A0B]">Autonomous — Full decision-making authority</option>
           </select>
         </div>
 
@@ -157,7 +157,7 @@ export default function TwinConfigurePage() {
             max={100}
             value={config.confidence_threshold}
             onChange={(e) => setConfig({ ...config, confidence_threshold: parseInt(e.target.value) })}
-            className="w-full accent-[#fb923c]"
+            className="w-full accent-[#B5764A]"
           />
           <div className="flex justify-between text-[10px] text-white/20 mt-1">
             <span>Conservative</span>
@@ -172,7 +172,7 @@ export default function TwinConfigurePage() {
               type="checkbox"
               checked={config.memory_enabled}
               onChange={(e) => setConfig({ ...config, memory_enabled: e.target.checked })}
-              className="accent-[#fb923c]"
+              className="accent-[#B5764A]"
             />
             <div>
               <span className="text-sm text-white/70">Enable Memory</span>
@@ -186,7 +186,7 @@ export default function TwinConfigurePage() {
           <button
             onClick={handleSave}
             disabled={saving}
-            className="flex-1 px-5 py-2.5 bg-[#fb923c] text-black text-xs font-bold rounded-sm hover:bg-white transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+            className="flex-1 px-5 py-2.5 bg-[#B5764A] text-black text-xs font-bold rounded-sm hover:bg-white transition-all disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {saving ? (
               <span className="flex items-center justify-center gap-2">

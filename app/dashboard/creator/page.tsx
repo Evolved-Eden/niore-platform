@@ -1,4 +1,5 @@
 import { createAdminClient, createServiceClient } from '@/lib/supabase/server'
+import EssenceBoard from '@/components/EssenceBoard'
 
 // Blueprint data lives in client_twins.metadata.blueprint (set by intake/calculate)
 function extractBlueprint(clientTwin: any) {
@@ -31,17 +32,17 @@ export default async function CreatorDashboard() {
   const profile = extractBlueprint(twin)
 
   const stats = [
-    { label: 'Profile Version', value: profile?.version ?? 1,                color: '#00d4ff' },
-    { label: 'Confidence',      value: profile?.confidence_score ?? '—',     color: '#c8ff00' },
-    { label: 'Daily Essence',   value: profile?.daily_essence ? 'Active' : '—', color: '#a78bfa' },
-    { label: 'Status',          value: profile?.profile_kind ?? '—',         color: '#fb923c' },
+    { label: 'Profile Version', value: profile?.version ?? 1,                color: '#5E8B84' },
+    { label: 'Confidence',      value: profile?.confidence_score ?? '—',     color: '#C6A664' },
+    { label: 'Daily Essence',   value: profile?.daily_essence ? 'Active' : '—', color: '#8B7AA8' },
+    { label: 'Status',          value: profile?.profile_kind ?? '—',         color: '#B5764A' },
   ]
 
   const VERTICAL_COLOR: Record<string, string> = {
-    real_estate: '#fb923c',
-    healthcare:  '#00d4ff',
-    social:      '#a78bfa',
-    corporate:   '#c8ff00',
+    real_estate: '#B5764A',
+    healthcare:  '#5E8B84',
+    social:      '#8B7AA8',
+    corporate:   '#C6A664',
   }
 
   return (
@@ -49,6 +50,14 @@ export default async function CreatorDashboard() {
       <div className="mb-10">
         <h1 className="font-display text-3xl font-bold tracking-tight mb-1">Creator Studio</h1>
         <p className="text-white/30 text-sm">Build, deploy, and monetize your intelligence</p>
+      </div>
+
+      {/* Essence Board — center stage, same as every other dashboard */}
+      <div className="mb-8">
+        <div className="text-xs text-[#5E8B84] tracking-widest uppercase font-medium mb-3">
+          Zuri's Direction For You
+        </div>
+        <EssenceBoard userId={user.id} userRole="creator" />
       </div>
 
       {/* Stats */}
@@ -75,7 +84,7 @@ export default async function CreatorDashboard() {
                 {Object.entries(profile.personality_traits as Record<string, number>).map(([trait, score]) => (
                   <div key={trait} className="glass rounded-sm p-3">
                     <div className="text-[10px] text-white/30 uppercase tracking-widest mb-1">{trait}</div>
-                    <div className="text-lg text-[#c8ff00]">{(score * 100).toFixed(0)}%</div>
+                    <div className="text-lg text-[#C6A664]">{(score * 100).toFixed(0)}%</div>
                   </div>
                 ))}
               </div>
@@ -84,7 +93,7 @@ export default async function CreatorDashboard() {
         ) : (
           <div className="px-6 py-12 text-center text-white/20 text-sm">
             No intelligence profile yet.{' '}
-            <span className="text-[#00d4ff] cursor-pointer hover:underline">
+            <span className="text-[#5E8B84] cursor-pointer hover:underline">
               Complete your onboarding →
             </span>
           </div>

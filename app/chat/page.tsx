@@ -27,9 +27,9 @@ function ChatHomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#080810] text-white">
+    <div className="min-h-screen bg-[#0A0A0B] text-white">
       {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 border-b border-white/5 bg-[#080810]/95 backdrop-blur-xl">
+      <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 border-b border-white/5 bg-[#0A0A0B]/95 backdrop-blur-xl">
         <div className="flex items-center gap-3">
           <Image src="/logo.JPG" alt="Evolved Eden" width={100} height={22} className="object-contain" />
           <span className="text-xs text-white/40 ml-1">Knowledge Base</span>
@@ -37,7 +37,7 @@ function ChatHomePage() {
         <div className="flex items-center gap-4">
           <Link
             href="/chat/demo-frontdesk"
-            className="px-4 py-2 bg-[#c8ff00] text-black text-xs font-bold rounded-sm hover:bg-white transition-all"
+            className="px-4 py-2 bg-[#C6A664] text-black text-xs font-bold rounded-sm hover:bg-white transition-all"
           >
             Talk to Zuri
           </Link>
@@ -52,7 +52,7 @@ function ChatHomePage() {
           {/* Hero */}
           <div className="text-center mb-12">
             <h1 className="text-4xl font-display font-bold tracking-tight mb-3">
-              How can we <span className="text-[#c8ff00]">help</span>?
+              How can we <span className="text-[#C6A664]">help</span>?
             </h1>
             <p className="text-white/40 max-w-xl mx-auto">
               Browse our knowledge base or ask Zuri directly in the chat.
@@ -69,7 +69,7 @@ function ChatHomePage() {
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Search the knowledge base..."
-              className="w-full pl-12 pr-4 py-4 bg-white/[0.04] border border-white/10 rounded-sm text-white placeholder-white/20 focus:outline-none focus:border-[#c8ff00]/50 transition-all text-sm"
+              className="w-full pl-12 pr-4 py-4 bg-white/[0.04] border border-white/10 rounded-sm text-white placeholder-white/20 focus:outline-none focus:border-[#C6A664]/50 transition-all text-sm"
             />
           </div>
 
@@ -86,7 +86,7 @@ function ChatHomePage() {
                   <p className="text-xs text-white/20">Try different keywords or ask Zuri</p>
                   <Link
                     href="/chat/demo-frontdesk"
-                    className="inline-block mt-4 px-5 py-2 bg-[#c8ff00] text-black text-xs font-bold rounded-sm hover:bg-white transition-all"
+                    className="inline-block mt-4 px-5 py-2 bg-[#C6A664] text-black text-xs font-bold rounded-sm hover:bg-white transition-all"
                   >
                     Ask Zuri →
                   </Link>
@@ -108,7 +108,7 @@ function ChatHomePage() {
                 onClick={() => setActiveCategory(null)}
                 className={`px-4 py-2 rounded-full text-xs font-medium transition-all ${
                   activeCategory === null
-                    ? 'bg-[#c8ff00] text-black'
+                    ? 'bg-[#C6A664] text-black'
                     : 'border border-white/10 text-white/50 hover:border-white/20 hover:text-white'
                 }`}
               >
@@ -120,7 +120,7 @@ function ChatHomePage() {
                   onClick={() => setActiveCategory(cat.id)}
                   className={`px-4 py-2 rounded-full text-xs font-medium transition-all ${
                     activeCategory === cat.id
-                      ? 'bg-[#c8ff00] text-black'
+                      ? 'bg-[#C6A664] text-black'
                       : 'border border-white/10 text-white/50 hover:border-white/20 hover:text-white'
                   }`}
                 >
@@ -161,7 +161,7 @@ function ChatHomePage() {
             <p className="text-white/40 text-sm mb-4">Still have questions?</p>
             <Link
               href="/chat/demo-frontdesk"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-[#c8ff00] text-black font-bold rounded-sm hover:bg-white transition-all"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-[#C6A664] text-black font-bold rounded-sm hover:bg-white transition-all"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />

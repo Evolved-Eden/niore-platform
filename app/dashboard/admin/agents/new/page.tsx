@@ -136,7 +136,7 @@ export default function CreateAgentPage() {
         <div>
           <h1 className="font-display text-2xl font-bold tracking-tight text-white">New Agent</h1>
           <p className="text-white/40 text-sm mt-1">
-            Deploy an agent from the <span className="text-[#c8ff00]">registry</span> or create a custom one
+            Deploy an agent from the <span className="text-[#C6A664]">registry</span> or create a custom one
           </p>
         </div>
       </div>
@@ -375,7 +375,7 @@ export default function CreateAgentPage() {
           <button
             type="submit"
             disabled={loading || !formData.agent_id || !formData.agent_name || !formData.role_type}
-            className="px-6 py-2.5 bg-[#c8ff00] text-black font-bold text-sm rounded-sm hover:bg-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed inline-flex items-center gap-2"
+            className="px-6 py-2.5 bg-[#C6A664] text-black font-bold text-sm rounded-sm hover:bg-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed inline-flex items-center gap-2"
           >
             {loading ? (
               <><div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />Deploying...</>

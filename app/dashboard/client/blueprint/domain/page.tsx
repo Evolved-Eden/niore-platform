@@ -95,7 +95,7 @@ function DomainAssessmentInner() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
-        <div className="w-6 h-6 border-2 border-[#c8ff00] border-t-transparent rounded-full animate-spin" />
+        <div className="w-6 h-6 border-2 border-[#C6A664] border-t-transparent rounded-full animate-spin" />
       </div>
     )
   }
@@ -108,7 +108,7 @@ function DomainAssessmentInner() {
         <p className="text-sm text-white/50 mb-6">{error.message}</p>
         <Link
           href={error.purchaseUrl || '/dashboard/client/blueprint'}
-          className="inline-block px-5 py-2 bg-[#c8ff00] text-black text-xs font-bold rounded-sm hover:bg-white transition-all"
+          className="inline-block px-5 py-2 bg-[#C6A664] text-black text-xs font-bold rounded-sm hover:bg-white transition-all"
         >
           Go to Blueprint
         </Link>
@@ -135,7 +135,7 @@ function DomainAssessmentInner() {
         </p>
         <Link
           href="/dashboard/client/essence"
-          className="inline-block px-5 py-2 bg-[#c8ff00] text-black text-xs font-bold rounded-sm hover:bg-white transition-all"
+          className="inline-block px-5 py-2 bg-[#C6A664] text-black text-xs font-bold rounded-sm hover:bg-white transition-all"
         >
           View Essence Board
         </Link>
@@ -149,7 +149,7 @@ function DomainAssessmentInner() {
         ← Back to Blueprint
       </button>
       <h1 className="font-display text-xl font-bold mb-1">
-        {label} <span className="text-[#c8ff00]">Module</span>
+        {label} <span className="text-[#C6A664]">Module</span>
       </h1>
       <p className="text-white/30 text-sm mb-8">
         {existingProfile ? 'Update your answers below — this refreshes your permanent Essence Board category.' : '5 quick questions. Your answers become a permanent part of your Essence Board.'}
@@ -168,7 +168,7 @@ function DomainAssessmentInner() {
                     onClick={() => setAnswers((prev) => ({ ...prev, [q.key]: opt.value }))}
                     className={`text-left text-xs px-3 py-2 rounded-sm border transition-colors ${
                       answers[q.key] === opt.value
-                        ? 'border-[#c8ff00] bg-[#c8ff00]/10 text-[#c8ff00]'
+                        ? 'border-[#C6A664] bg-[#C6A664]/10 text-[#C6A664]'
                         : 'border-white/10 text-white/60 hover:border-white/30'
                     }`}
                   >
@@ -186,9 +186,9 @@ function DomainAssessmentInner() {
                   max={q.scaleMax ?? 10}
                   value={answers[q.key] ?? Math.round(((q.scaleMin ?? 1) + (q.scaleMax ?? 10)) / 2)}
                   onChange={(e) => setAnswers((prev) => ({ ...prev, [q.key]: Number(e.target.value) }))}
-                  className="flex-1 accent-[#c8ff00]"
+                  className="flex-1 accent-[#C6A664]"
                 />
-                <span className="text-sm font-semibold text-[#c8ff00] w-8 text-center">
+                <span className="text-sm font-semibold text-[#C6A664] w-8 text-center">
                   {answers[q.key] ?? Math.round(((q.scaleMin ?? 1) + (q.scaleMax ?? 10)) / 2)}
                 </span>
               </div>
@@ -199,7 +199,7 @@ function DomainAssessmentInner() {
                 value={answers[q.key] ?? ''}
                 onChange={(e) => setAnswers((prev) => ({ ...prev, [q.key]: e.target.value }))}
                 rows={3}
-                className="w-full bg-white/[0.03] border border-white/10 rounded-sm px-3 py-2 text-sm text-white/80 focus:outline-none focus:border-[#c8ff00]/50"
+                className="w-full bg-white/[0.03] border border-white/10 rounded-sm px-3 py-2 text-sm text-white/80 focus:outline-none focus:border-[#C6A664]/50"
                 placeholder="Your answer..."
               />
             )}
@@ -210,7 +210,7 @@ function DomainAssessmentInner() {
       <button
         onClick={handleSubmit}
         disabled={!allAnswered || submitting}
-        className="mt-8 w-full py-3 bg-[#c8ff00] text-black text-sm font-bold rounded-sm hover:bg-white transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+        className="mt-8 w-full py-3 bg-[#C6A664] text-black text-sm font-bold rounded-sm hover:bg-white transition-all disabled:opacity-40 disabled:cursor-not-allowed"
       >
         {submitting ? 'Saving...' : existingProfile ? 'Update Profile' : 'Complete Module'}
       </button>
@@ -220,7 +220,7 @@ function DomainAssessmentInner() {
 
 export default function DomainAssessmentPage() {
   return (
-    <Suspense fallback={<div className="flex items-center justify-center min-h-[50vh]"><div className="w-6 h-6 border-2 border-[#c8ff00] border-t-transparent rounded-full animate-spin" /></div>}>
+    <Suspense fallback={<div className="flex items-center justify-center min-h-[50vh]"><div className="w-6 h-6 border-2 border-[#C6A664] border-t-transparent rounded-full animate-spin" /></div>}>
       <DomainAssessmentInner />
     </Suspense>
   )

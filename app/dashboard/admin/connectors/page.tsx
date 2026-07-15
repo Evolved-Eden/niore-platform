@@ -91,7 +91,7 @@ function StatusBadge({ connected, testing }: { connected: boolean; testing?: boo
   return (
     <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
       connected
-        ? 'bg-[#c8ff00]/10 text-[#c8ff00] border border-[#c8ff00]/20'
+        ? 'bg-[#C6A664]/10 text-[#C6A664] border border-[#C6A664]/20'
         : 'bg-white/5 text-white/30 border border-white/10'
     }`}>
       {connected ? 'Connected' : 'Disconnected'}
@@ -361,7 +361,7 @@ export default function AdminConnectorsPage() {
       {actionMsg && (
         <div className={`px-4 py-3 rounded-sm text-sm ${
           actionMsg.type === 'ok'
-            ? 'bg-[#c8ff00]/10 border border-[#c8ff00]/20 text-[#c8ff00]'
+            ? 'bg-[#C6A664]/10 border border-[#C6A664]/20 text-[#C6A664]'
             : 'bg-red-500/10 border border-red-500/20 text-red-400'
         }`}>
           {actionMsg.text}
@@ -454,7 +454,7 @@ export default function AdminConnectorsPage() {
               {result && (
                 <div className={`mt-4 px-3 py-2 rounded-sm text-xs ${
                   result.success
-                    ? 'bg-[#c8ff00]/10 text-[#c8ff00] border border-[#c8ff00]/20'
+                    ? 'bg-[#C6A664]/10 text-[#C6A664] border border-[#C6A664]/20'
                     : 'bg-red-500/10 text-red-400 border border-red-500/20'
                 }`}>
                   {result.message}
@@ -466,7 +466,7 @@ export default function AdminConnectorsPage() {
                 <button
                   onClick={() => handleSave(platform)}
                   disabled={isSaving}
-                  className="flex-1 px-4 py-2.5 bg-[#c8ff00] text-black text-xs font-bold rounded-sm hover:bg-white transition-all disabled:opacity-40"
+                  className="flex-1 px-4 py-2.5 bg-[#C6A664] text-black text-xs font-bold rounded-sm hover:bg-white transition-all disabled:opacity-40"
                 >
                   {isSaving ? 'Saving...' : 'Save Configuration'}
                 </button>
@@ -539,14 +539,14 @@ export default function AdminConnectorsPage() {
                     </td>
                     <td className="px-4 py-4 text-center">
                       {client.discord_connected ? (
-                        <span className="text-[#c8ff00] text-sm" title={client.discord_platform_id ?? ''}>✓</span>
+                        <span className="text-[#C6A664] text-sm" title={client.discord_platform_id ?? ''}>✓</span>
                       ) : (
                         <span className="text-white/20 text-sm">✕</span>
                       )}
                     </td>
                     <td className="px-4 py-4 text-center">
                       {client.whatsapp_connected ? (
-                        <span className="text-[#c8ff00] text-sm" title={client.whatsapp_platform_id ?? ''}>✓</span>
+                        <span className="text-[#C6A664] text-sm" title={client.whatsapp_platform_id ?? ''}>✓</span>
                       ) : (
                         <span className="text-white/20 text-sm">✕</span>
                       )}

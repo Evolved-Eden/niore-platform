@@ -39,7 +39,7 @@ interface DeployedAgent {
 // VERTICALS replaced with dynamic useVerticals() hook below
 
 const STATUS_STYLES: Record<string, string> = {
-  active: 'bg-[#c8ff00]/10 text-[#c8ff00] border-[#c8ff00]/20',
+  active: 'bg-[#C6A664]/10 text-[#C6A664] border-[#C6A664]/20',
   paused: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
   pending: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
   error: 'bg-red-500/10 text-red-400 border-red-500/20',
@@ -129,7 +129,7 @@ export default function ClientSwarmsPage() {
   const handleDeploy = async () => {
     if (!deployModal) return
     if (!deployForm.swarmName.trim()) {
-      setDeployError('Swarm name is required')
+      setDeployError('Team name is required')
       return
     }
     setDeploying(true)
@@ -212,9 +212,9 @@ export default function ClientSwarmsPage() {
     <div className="max-w-7xl mx-auto space-y-6 animate-fade-in">
       {/* ── Hero ── */}
       <div>
-        <h1 className="font-display text-2xl font-bold tracking-tight text-white">Swarm Intelligence</h1>
+        <h1 className="font-display text-2xl font-bold tracking-tight text-white">Team Intelligence</h1>
         <p className="text-white/40 text-sm mt-1">
-          Deploy multi-agent swarms that collaborate across your ecosystem
+          Deploy multi-agent Teams that collaborate across your ecosystem
         </p>
       </div>
 
@@ -226,11 +226,11 @@ export default function ClientSwarmsPage() {
         </div>
         <div className="glass rounded-sm p-4 border border-white/[0.06]">
           <div className="text-[10px] text-white/30 tracking-widest uppercase mb-1">Active</div>
-          <div className="text-2xl font-light text-[#c8ff00]">{activeCount}</div>
+          <div className="text-2xl font-light text-[#C6A664]">{activeCount}</div>
         </div>
         <div className="glass rounded-sm p-4 border border-white/[0.06]">
-          <div className="text-[10px] text-white/30 tracking-widest uppercase mb-1">Available Swarms</div>
-          <div className="text-2xl font-light text-[#00d4ff]">{templates.length}</div>
+          <div className="text-[10px] text-white/30 tracking-widest uppercase mb-1">Available Teams</div>
+          <div className="text-2xl font-light text-[#5E8B84]">{templates.length}</div>
         </div>
       </div>
 
@@ -240,21 +240,21 @@ export default function ClientSwarmsPage() {
           onClick={() => setTab('available')}
           className={`rounded-full px-5 py-2 text-xs font-bold transition-all ${
             tab === 'available'
-              ? 'bg-[#c8ff00] text-black'
+              ? 'bg-[#C6A664] text-black'
               : 'text-white/40 border border-white/[0.06] hover:text-white'
           }`}
         >
-          Available Swarms
+          Available Teams
         </button>
         <button
           onClick={() => setTab('deployed')}
           className={`rounded-full px-5 py-2 text-xs font-bold transition-all ${
             tab === 'deployed'
-              ? 'bg-[#c8ff00] text-black'
+              ? 'bg-[#C6A664] text-black'
               : 'text-white/40 border border-white/[0.06] hover:text-white'
           }`}
         >
-          My Deployed Swarms
+          My Deployed Teams
           {totalDeployed > 0 && (
             <span className="ml-2 px-1.5 py-0.5 bg-white/10 text-white text-[10px] rounded-full">
               {totalDeployed}
@@ -264,7 +264,7 @@ export default function ClientSwarmsPage() {
       </div>
 
       {/* ══════════════════════════════════════════════════════
-         TAB 1: AVAILABLE SWARMS
+         TAB 1: AVAILABLE TEAMS
          ══════════════════════════════════════════════════════ */}
       {tab === 'available' && (
         <div className="space-y-4">
@@ -293,12 +293,12 @@ export default function ClientSwarmsPage() {
 
           {/* Grid */}
           {templatesLoading ? (
-            <div className="text-center py-16 text-white/30 text-sm">Loading swarm catalog...</div>
+            <div className="text-center py-16 text-white/30 text-sm">Loading Team catalog...</div>
           ) : filteredTemplates.length === 0 ? (
             <div className="text-center py-16 text-white/30 text-sm">
               {search || filterVertical !== 'all'
-                ? 'No swarms match your filters'
-                : 'No swarms available yet'
+                ? 'No Teams match your filters'
+                : 'No Teams available yet'
               }
             </div>
           ) : (
@@ -321,7 +321,7 @@ export default function ClientSwarmsPage() {
                       </div>
                       <button
                         onClick={() => openDeployModal(swarm)}
-                        className="px-3 py-1.5 bg-[#c8ff00] text-black text-[10px] font-bold rounded-sm hover:bg-white transition-all shrink-0"
+                        className="px-3 py-1.5 bg-[#C6A664] text-black text-[10px] font-bold rounded-sm hover:bg-white transition-all shrink-0"
                       >
                         Deploy
                       </button>
@@ -366,37 +366,37 @@ export default function ClientSwarmsPage() {
       )}
 
       {/* ══════════════════════════════════════════════════════
-         TAB 2: MY DEPLOYED SWARMS
+         TAB 2: MY DEPLOYED TEAMS
          ══════════════════════════════════════════════════════ */}
       {tab === 'deployed' && (
         <div className="space-y-4">
           {deployedLoading ? (
-            <div className="text-center py-16 text-white/30 text-sm">Loading deployed swarms...</div>
+            <div className="text-center py-16 text-white/30 text-sm">Loading deployed Teams...</div>
           ) : deployedSwarms.length === 0 ? (
             <div className="glass rounded-sm p-10 text-center border border-white/[0.06]">
               <div className="text-4xl mb-4 opacity-30">🧠</div>
-              <p className="text-white/50 text-sm">No swarms deployed yet.</p>
+              <p className="text-white/50 text-sm">No Teams deployed yet.</p>
               <p className="text-white/30 text-xs mt-1">
-                Browse available swarms to deploy your first multi-agent system.
+                Browse available Teams to deploy your first multi-agent system.
               </p>
               <button
                 onClick={() => setTab('available')}
-                className="mt-4 px-5 py-2 bg-[#c8ff00] text-black text-xs font-bold rounded-sm hover:bg-white transition-all"
+                className="mt-4 px-5 py-2 bg-[#C6A664] text-black text-xs font-bold rounded-sm hover:bg-white transition-all"
               >
-                Browse Swarms →
+                Browse Teams →
               </button>
 
               {/* Recommendation */}
               {templates.length > 0 && (
-                <div className="mt-6 p-4 bg-[#c8ff00]/5 border border-[#c8ff00]/10 rounded-sm inline-block">
-                  <p className="text-xs text-[#c8ff00]/70">
+                <div className="mt-6 p-4 bg-[#C6A664]/5 border border-[#C6A664]/10 rounded-sm inline-block">
+                  <p className="text-xs text-[#C6A664]/70">
                     💡 Based on your blueprint, we recommend deploying{' '}
                     <button
                       onClick={() => {
                         const rec = templates[0]
                         openDeployModal(rec)
                       }}
-                      className="underline hover:text-[#c8ff00]"
+                      className="underline hover:text-[#C6A664]"
                     >
                       {templates[0].swarm_name || templates[0].name || templates[0].key}
                     </button>
@@ -474,7 +474,7 @@ export default function ClientSwarmsPage() {
                         <button
                           onClick={() => updateSwarmStatus(swarm.id, 'active')}
                           disabled={actionLoading === swarm.id}
-                          className="px-2.5 py-1 text-[10px] bg-[#c8ff00]/10 text-[#c8ff00] border border-[#c8ff00]/20 rounded-sm hover:bg-[#c8ff00]/20 disabled:opacity-40"
+                          className="px-2.5 py-1 text-[10px] bg-[#C6A664]/10 text-[#C6A664] border border-[#C6A664]/20 rounded-sm hover:bg-[#C6A664]/20 disabled:opacity-40"
                         >
                           Resume
                         </button>
@@ -519,7 +519,7 @@ export default function ClientSwarmsPage() {
       )}
 
       {/* ══════════════════════════════════════════════════════
-         DEPLOY SWARM MODAL
+         DEPLOY TEAM MODAL
          ══════════════════════════════════════════════════════ */}
       {deployModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
@@ -527,10 +527,10 @@ export default function ClientSwarmsPage() {
             {/* Modal header */}
             <div className="flex items-start justify-between mb-6">
               <div>
-                <h2 className="font-display text-lg font-bold text-white">Deploy Swarm</h2>
+                <h2 className="font-display text-lg font-bold text-white">Deploy Team</h2>
                 <p className="text-xs text-white/40 mt-1">
                   Configure and deploy{' '}
-                  <span className="text-[#c8ff00]">
+                  <span className="text-[#C6A664]">
                     {deployModal.swarm_name || deployModal.name || deployModal.key}
                   </span>
                 </p>
@@ -547,13 +547,13 @@ export default function ClientSwarmsPage() {
               {/* Swarm Name */}
               <div>
                 <label className="block text-xs font-medium text-white/70 mb-1">
-                  Swarm Name <span className="text-red-400">*</span>
+                  Team Name <span className="text-red-400">*</span>
                 </label>
                 <input
                   type="text"
                   value={deployForm.swarmName}
                   onChange={(e) => setDeployForm({ ...deployForm, swarmName: e.target.value })}
-                  placeholder="My Custom Swarm"
+                  placeholder="My Custom Team"
                   className="w-full bg-white/5 border border-white/10 rounded-sm px-3 py-2 text-sm text-white/70 placeholder-white/30"
                 />
               </div>
@@ -586,7 +586,7 @@ export default function ClientSwarmsPage() {
                       No active agents deployed yet.{' '}
                       <button
                         onClick={() => setTab('available')}
-                        className="text-[#c8ff00] underline"
+                        className="text-[#C6A664] underline"
                       >
                         Deploy agents first
                       </button>
@@ -603,7 +603,7 @@ export default function ClientSwarmsPage() {
                           type="checkbox"
                           checked={deployForm.selectedAgents.includes(agent.id)}
                           onChange={() => toggleAgent(agent.id)}
-                          className="accent-[#c8ff00]"
+                          className="accent-[#C6A664]"
                         />
                         <span className="text-xs text-white/70">{agent.agent_name}</span>
                         <span className="text-[10px] text-white/30 font-mono ml-auto">{agent.agent_id}</span>
@@ -612,7 +612,7 @@ export default function ClientSwarmsPage() {
                   </div>
                 )}
                 {deployForm.selectedAgents.length > 0 && (
-                  <p className="text-[10px] text-[#c8ff00]/70 mt-1">
+                  <p className="text-[10px] text-[#C6A664]/70 mt-1">
                     {deployForm.selectedAgents.length} agent(s) selected
                   </p>
                 )}
@@ -644,11 +644,11 @@ export default function ClientSwarmsPage() {
                 <button
                   onClick={handleDeploy}
                   disabled={deploying || !deployForm.swarmName.trim()}
-                  className="flex-1 px-5 py-2.5 bg-[#c8ff00] text-black text-xs font-bold rounded-sm hover:bg-white transition-all disabled:opacity-40 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
+                  className="flex-1 px-5 py-2.5 bg-[#C6A664] text-black text-xs font-bold rounded-sm hover:bg-white transition-all disabled:opacity-40 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
                 >
                   {deploying ? (
                     <><div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />Deploying...</>
-                  ) : 'Deploy Swarm'}
+                  ) : 'Deploy Team'}
                 </button>
                 <button
                   onClick={() => setDeployModal(null)}

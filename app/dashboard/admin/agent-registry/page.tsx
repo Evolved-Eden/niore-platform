@@ -24,20 +24,20 @@ interface RegistryAgent {
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
-  concierge:  'border-l-[#00d4ff]',
-  sales:      'border-l-[#c8ff00]',
-  marketing:  'border-l-[#a78bfa]',
-  retention:  'border-l-[#ff6b6b]',
-  operations: 'border-l-[#fb923c]',
-  real_estate:'border-l-[#00d4ff]',
-  wealth:     'border-l-[#c8ff00]',
-  creator:    'border-l-[#a78bfa]',
-  commerce:   'border-l-[#ff6b6b]',
-  automation: 'border-l-[#fb923c]',
-  ai:         'border-l-[#00d4ff]',
-  wellness:   'border-l-[#c8ff00]',
-  analytics:  'border-l-[#a78bfa]',
-  compliance: 'border-l-[#ff6b6b]',
+  concierge:  'border-l-[#5E8B84]',
+  sales:      'border-l-[#C6A664]',
+  marketing:  'border-l-[#8B7AA8]',
+  retention:  'border-l-[#7A2E32]',
+  operations: 'border-l-[#B5764A]',
+  real_estate:'border-l-[#5E8B84]',
+  wealth:     'border-l-[#C6A664]',
+  creator:    'border-l-[#8B7AA8]',
+  commerce:   'border-l-[#7A2E32]',
+  automation: 'border-l-[#B5764A]',
+  ai:         'border-l-[#5E8B84]',
+  wellness:   'border-l-[#C6A664]',
+  analytics:  'border-l-[#8B7AA8]',
+  compliance: 'border-l-[#7A2E32]',
 };
 
 export default function AgentRegistryPage() {
@@ -82,7 +82,7 @@ export default function AgentRegistryPage() {
         </div>
         <Link
           href="/dashboard/admin/agents/new"
-          className="px-4 py-2 text-sm font-medium bg-[#c8ff00] text-black rounded-sm hover:bg-white transition-colors font-bold"
+          className="px-4 py-2 text-sm font-medium bg-[#C6A664] text-black rounded-sm hover:bg-white transition-colors font-bold"
         >
           + Deploy New
         </Link>
@@ -179,7 +179,7 @@ export default function AgentRegistryPage() {
               <button
                 onClick={() => handleDeploy(agent)}
                 disabled={deploying === agent.agent_id}
-                className="w-full py-2 text-xs font-bold bg-[#c8ff00]/10 text-[#c8ff00] border border-[#c8ff00]/20 rounded-sm hover:bg-[#c8ff00]/20 transition-colors disabled:opacity-50"
+                className="w-full py-2 text-xs font-bold bg-[#C6A664]/10 text-[#C6A664] border border-[#C6A664]/20 rounded-sm hover:bg-[#C6A664]/20 transition-colors disabled:opacity-50"
               >
                 {deploying === agent.agent_id ? 'Redirecting...' : 'Deploy to My Organization'}
               </button>

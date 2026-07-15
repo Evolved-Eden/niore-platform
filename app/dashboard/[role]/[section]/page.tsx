@@ -142,7 +142,7 @@ export default async function DashboardSectionPage({ params }: { params: Promise
           </Link>
           <Link
             href="/dashboard"
-            className="block rounded-sm border border-white/[0.08] bg-[#c8ff00]/10 px-5 py-4 text-sm text-[#c8ff00] hover:border-[#c8ff00]/20 hover:bg-[#c8ff00]/15 transition"
+            className="block rounded-sm border border-white/[0.08] bg-[#C6A664]/10 px-5 py-4 text-sm text-[#C6A664] hover:border-[#C6A664]/20 hover:bg-[#C6A664]/15 transition"
           >
             Return to Dashboard Hub
           </Link>

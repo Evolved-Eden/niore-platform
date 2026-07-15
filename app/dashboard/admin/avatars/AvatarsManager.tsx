@@ -55,7 +55,7 @@ export default function AvatarsManager({ initialAvatars }: { initialAvatars: any
               {msg.text}
             </span>
           )}
-          <button onClick={() => setEdit({})} className="px-4 py-2 text-xs rounded-sm bg-[#c8ff00]/20 text-[#c8ff00] hover:bg-[#c8ff00]/30">+ New Avatar</button>
+          <button onClick={() => setEdit({})} className="px-4 py-2 text-xs rounded-sm bg-[#C6A664]/20 text-[#C6A664] hover:bg-[#C6A664]/30">+ New Avatar</button>
         </div>
       </div>
 
@@ -131,12 +131,12 @@ export default function AvatarsManager({ initialAvatars }: { initialAvatars: any
                 </div>
               </div>
               <label className="flex items-center gap-2">
-                <input type="checkbox" name="is_active" defaultChecked={edit.is_active !== false} className="accent-[#c8ff00]" />
+                <input type="checkbox" name="is_active" defaultChecked={edit.is_active !== false} className="accent-[#C6A664]" />
                 <span className="text-xs text-white/40">Active</span>
               </label>
               <div className="flex justify-end gap-3 pt-2">
                 <button type="button" onClick={() => setEdit(null)} className="px-4 py-2 text-sm text-white/50 hover:text-white/80">Cancel</button>
-                <button type="submit" className="px-4 py-2 text-sm bg-[#c8ff00]/20 text-[#c8ff00] hover:bg-[#c8ff00]/30 rounded-sm">Save</button>
+                <button type="submit" className="px-4 py-2 text-sm bg-[#C6A664]/20 text-[#C6A664] hover:bg-[#C6A664]/30 rounded-sm">Save</button>
               </div>
             </form>
           </div>

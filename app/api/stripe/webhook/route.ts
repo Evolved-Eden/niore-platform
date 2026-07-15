@@ -428,6 +428,52 @@ export async function POST(req: Request) {
       }
     }
 
+    // ── Twin transfer: departing org member paid to keep their Twin's
+    // current capability level. Only NOW (payment confirmed) does the twin
+    // actually detach from the org — org_entitlements become permanently
+    // theirs, relabeled as personal. Org-scoped work was never touched;
+    // it stayed with the org the moment they were removed.
+    if (meta.twin_transfer === "true" && meta.user_id) {
+      const { data: transferringTwin } = await supabaseAdmin
+        .from("client_twins")
+        .select("id, metadata")
+        .eq("client_id", meta.user_id)
+        .eq("organization_id", meta.previous_org_id || "")
+        .maybeSingle()
+
+      if (transferringTwin) {
+        const twinMeta = { ...(transferringTwin.metadata || {}) } as Record<string, any>
+        const orgEntitlements = twinMeta.org_entitlements
+        delete twinMeta.org_entitlements
+        if (orgEntitlements) twinMeta.personal_entitlements = orgEntitlements
+        twinMeta.transferred_from_org = meta.previous_org_id
+        twinMeta.transferred_at = new Date().toISOString()
+
+        await supabaseAdmin
+          .from("client_twins")
+          .update({ organization_id: null, metadata: twinMeta })
+          .eq("id", transferringTwin.id)
+      }
+
+      try {
+        const { data: transferredUser } = await supabaseAdmin
+          .from("users")
+          .select("email, full_name")
+          .eq("id", meta.user_id)
+          .maybeSingle()
+        if (transferredUser?.email) {
+          const { sendEmail } = await import("@/lib/email")
+          await sendEmail({
+            to: transferredUser.email,
+            subject: "Your Twin is now yours, personally",
+            html: `<p>Hi${transferredUser.full_name ? ` ${transferredUser.full_name}` : ""},</p><p>Your Twin has transferred to your personal account and keeps everything it had. It's no longer tied to your former organization.</p>`,
+          })
+        }
+      } catch (emailError) {
+        console.error("Twin transfer confirmation email failed:", emailError)
+      }
+    }
+
     // ── 3. Provision org + Base Twin + Zuri (idempotent) ──
     const org = await getOrCreateOrg(userId, userData?.full_name || email.split('@')[0])
     if (org) {
@@ -445,6 +491,21 @@ export async function POST(req: Request) {
       // so one org/human can hold several OS's concurrently.
       for (const addonKey of addons) {
         await activateOsPackage({ organizationId: org.id, osPackageKey: addonKey, source: 'checkout_addon' })
+      }
+
+      // additional_intelligence: was priced (see ADDON_AMOUNTS) but never
+      // actually fulfilled anything. This is that fulfillment -- creates a
+      // second, independent Twin (organization_id always null) the person
+      // builds and can list in the Twin Registry entirely on their own,
+      // without touching their org-governed Twin at all.
+      if (addons.includes('additional_intelligence')) {
+        await supabaseAdmin.from('client_twins').insert({
+          client_id: userId,
+          organization_id: null,
+          is_independent: true,
+          twin_status: 'active',
+          version: 1,
+        } as any)
       }
 
       await logProvisioningEvent({

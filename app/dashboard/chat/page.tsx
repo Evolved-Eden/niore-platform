@@ -31,10 +31,10 @@ const ENTITY_ICONS: Record<string, string> = {
   twin: "◆",
 };
 const ENTITY_COLORS: Record<string, string> = {
-  zuri: "#c8ff00",
-  agent: "#00d4ff",
-  swarm: "#a78bfa",
-  twin: "#fb923c",
+  zuri: "#C6A664",
+  agent: "#5E8B84",
+  swarm: "#8B7AA8",
+  twin: "#B5764A",
 };
 
 export default function AdminChatPage() {
@@ -207,7 +207,7 @@ export default function AdminChatPage() {
             }}
             className={`flex items-center gap-1.5 px-3 py-2 text-xs font-medium rounded-t-sm transition-all ${
               chatMode === mode
-                ? "text-white bg-white/[0.04] border-b-2 border-[#c8ff00]"
+                ? "text-white bg-white/[0.04] border-b-2 border-[#C6A664]"
                 : "text-white/30 hover:text-white/60"
             }`}
           >
@@ -226,21 +226,21 @@ export default function AdminChatPage() {
           value={selectedKey}
           onChange={(e) => switchEntity(e.target.value)}
           disabled={loadingEntities}
-          className="flex-1 max-w-xs px-3 py-2 bg-white/[0.04] border border-white/10 rounded-sm text-sm text-white/70 focus:outline-none focus:border-[#c8ff00]/40 transition-all appearance-none disabled:opacity-40"
+          className="flex-1 max-w-xs px-3 py-2 bg-white/[0.04] border border-white/10 rounded-sm text-sm text-white/70 focus:outline-none focus:border-[#C6A664]/40 transition-all appearance-none disabled:opacity-40"
         >
           {modeEntities.map((entity) => (
-            <option key={entity.key} value={entity.key} className="bg-[#080810]">
+            <option key={entity.key} value={entity.key} className="bg-[#0A0A0B]">
               {entity.name}{entity.tagline ? ` — ${entity.tagline}` : ""}
             </option>
           ))}
           {modeEntities.length === 0 && (
-            <option value="" disabled className="bg-[#080810]">
+            <option value="" disabled className="bg-[#0A0A0B]">
               No {chatMode === "agent" ? "agents" : chatMode === "swarm" ? "swarms" : "entities"} available
             </option>
           )}
         </select>
         {loadingEntities && (
-          <div className="w-3 h-3 border-2 border-[#c8ff00] border-t-transparent rounded-full animate-spin" />
+          <div className="w-3 h-3 border-2 border-[#C6A664] border-t-transparent rounded-full animate-spin" />
         )}
       </div>
 
@@ -275,10 +275,10 @@ export default function AdminChatPage() {
       {/* Quick Stats */}
       <div className="grid grid-cols-4 gap-3 px-6 pb-4">
         {[
-          { label: "Agents", value: entities.filter((e) => e.type === "agent").length || "—", color: "#00d4ff" },
-          { label: "Swarms", value: entities.filter((e) => e.type === "swarm").length || "—", color: "#a78bfa" },
-          { label: "Mode", value: chatMode === "zuri" ? "Zuri" : chatMode === "agent" ? "Agent" : chatMode === "swarm" ? "Swarm" : "Twin", color: "#c8ff00" },
-          { label: "Status", value: "Online", color: "#34d399" },
+          { label: "Agents", value: entities.filter((e) => e.type === "agent").length || "—", color: "#5E8B84" },
+          { label: "Swarms", value: entities.filter((e) => e.type === "swarm").length || "—", color: "#8B7AA8" },
+          { label: "Mode", value: chatMode === "zuri" ? "Zuri" : chatMode === "agent" ? "Agent" : chatMode === "swarm" ? "Swarm" : "Twin", color: "#C6A664" },
+          { label: "Status", value: "Online", color: "#5E8B84" },
         ].map((stat) => (
           <div key={stat.label} className="glass rounded-sm p-3 border border-white/[0.06]">
             <div className="text-lg font-bold" style={{ color: stat.color }}>{stat.value}</div>
@@ -295,7 +295,7 @@ export default function AdminChatPage() {
               <div
                 className={`max-w-[80%] rounded-sm px-4 py-3 text-sm leading-relaxed whitespace-pre-line ${
                   msg.role === "user"
-                    ? "bg-[#c8ff00] text-black"
+                    ? "bg-[#C6A664] text-black"
                     : "bg-white/[0.04] text-white/80 border border-white/[0.06]"
                 }`}
               >
@@ -346,7 +346,7 @@ export default function AdminChatPage() {
             <button
               type="submit"
               disabled={!input.trim() || isLoading}
-              className="px-5 py-3 bg-[#c8ff00] text-black text-sm font-bold rounded-sm hover:bg-white transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+              className="px-5 py-3 bg-[#C6A664] text-black text-sm font-bold rounded-sm hover:bg-white transition-all disabled:opacity-40 disabled:cursor-not-allowed"
             >
               Send
             </button>

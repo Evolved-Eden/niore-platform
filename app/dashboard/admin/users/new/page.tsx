@@ -12,7 +12,7 @@ const USER_ROLES = [
 
 const PLAN_TIERS = [
   { key: 'client_founder', label: 'Founder' },
-  { key: 'client_teams', label: 'Teams' },
+  { key: 'client_org', label: 'Org' },
   { key: 'client_enterprise', label: 'Enterprise' },
   { key: 'creator_studio', label: 'Studio' },
   { key: 'creator_premium', label: 'Premium' },
@@ -84,10 +84,10 @@ export default function NewUserPage() {
 
       {/* Mode toggle */}
       <div className="flex gap-2">
-        <button onClick={() => setMode('basic')} className={`px-4 py-2 text-xs font-medium rounded-sm transition-colors ${mode === 'basic' ? 'bg-[#c8ff00] text-black' : 'bg-white/5 border border-white/10 text-white/60'}`}>
+        <button onClick={() => setMode('basic')} className={`px-4 py-2 text-xs font-medium rounded-sm transition-colors ${mode === 'basic' ? 'bg-[#C6A664] text-black' : 'bg-white/5 border border-white/10 text-white/60'}`}>
           Basic Setup
         </button>
-        <button onClick={() => setMode('full')} className={`px-4 py-2 text-xs font-medium rounded-sm transition-colors ${mode === 'full' ? 'bg-[#c8ff00] text-black' : 'bg-white/5 border border-white/10 text-white/60'}`}>
+        <button onClick={() => setMode('full')} className={`px-4 py-2 text-xs font-medium rounded-sm transition-colors ${mode === 'full' ? 'bg-[#C6A664] text-black' : 'bg-white/5 border border-white/10 text-white/60'}`}>
           Full Setup (Org + Entitlements)
         </button>
       </div>
@@ -170,7 +170,7 @@ export default function NewUserPage() {
 
         {/* Submit */}
         <div className="flex gap-3 pt-4">
-          <button type="submit" disabled={loading} className="px-4 py-2 text-sm font-medium bg-[#c8ff00] text-black rounded-sm hover:bg-white transition-colors font-bold flex-1">
+          <button type="submit" disabled={loading} className="px-4 py-2 text-sm font-medium bg-[#C6A664] text-black rounded-sm hover:bg-white transition-colors font-bold flex-1">
             {loading ? 'Creating...' : result ? 'Create Another' : 'Create User'}
           </button>
           <button type="button" onClick={() => router.push('/dashboard/admin/users')} className="px-4 py-2 text-sm font-medium bg-white/5 border border-white/10 text-white/60 rounded-sm hover:text-white transition-colors">

@@ -35,8 +35,8 @@ function PricingContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#080810] text-white flex items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#c8ff00] border-t-transparent" />
+      <div className="min-h-screen bg-[#0A0A0B] text-white flex items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#C6A664] border-t-transparent" />
       </div>
     )
   }
@@ -50,8 +50,8 @@ function PricingContent() {
 
 function StandardPricing({ path, setPath, pathname }: { path: PathType; setPath: (p: PathType) => void; pathname: string }) {
   return (
-    <div className="min-h-screen bg-[#080810] text-white">
-      <header className="sticky top-0 z-50 border-b border-white/5 bg-[#080810]/95 backdrop-blur-xl">
+    <div className="min-h-screen bg-[#0A0A0B] text-white">
+      <header className="sticky top-0 z-50 border-b border-white/5 bg-[#0A0A0B]/95 backdrop-blur-xl">
         <div className="max-w-6xl mx-auto px-6 py-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div>
             <p className="text-xs text-white/40 uppercase tracking-[0.3em] mb-2">Universal Pricing</p>
@@ -107,7 +107,7 @@ function StandardPricing({ path, setPath, pathname }: { path: PathType; setPath:
                     <button
                       key={option}
                       onClick={() => setPath(option)}
-                      className={`rounded-full px-4 py-3 text-sm transition-all ${path === option ? 'bg-[#c8ff00] text-black' : 'border border-white/10 bg-white/[0.03] text-white/60 hover:border-white/20 hover:text-white'}`}
+                      className={`rounded-full px-4 py-3 text-sm transition-all ${path === option ? 'bg-[#C6A664] text-black' : 'border border-white/10 bg-white/[0.03] text-white/60 hover:border-white/20 hover:text-white'}`}
                     >
                       {option}
                     </button>
@@ -144,7 +144,7 @@ function StandardPricing({ path, setPath, pathname }: { path: PathType; setPath:
           </div>
 
           <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-6">
-            <PlanBuilder path={path} verticalColor="#c8ff00" />
+            <PlanBuilder path={path} verticalColor="#C6A664" />
           </div>
 
           <div className="mt-8 rounded-3xl border border-white/10 bg-white/[0.02] p-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -157,7 +157,7 @@ function StandardPricing({ path, setPath, pathname }: { path: PathType; setPath:
             </div>
             <Link
               href={`/intake?path=${path}`}
-              className="inline-flex items-center justify-center rounded-full bg-[#c8ff00] px-6 py-3 text-sm font-bold text-black hover:bg-white transition-all"
+              className="inline-flex items-center justify-center rounded-full bg-[#C6A664] px-6 py-3 text-sm font-bold text-black hover:bg-white transition-all"
             >
               Start Your Intelligence Intake →
             </Link>
@@ -236,8 +236,8 @@ function UpgradeContent({ path, setPath, user }: { path: PathType; setPath: (p: 
   const upgradeTiers = tiers.filter(t => t.key !== currentPlanKey)
 
   return (
-    <div className="min-h-screen bg-[#080810] text-white">
-      <header className="sticky top-0 z-50 border-b border-white/5 bg-[#080810]/95 backdrop-blur-xl">
+    <div className="min-h-screen bg-[#0A0A0B] text-white">
+      <header className="sticky top-0 z-50 border-b border-white/5 bg-[#0A0A0B]/95 backdrop-blur-xl">
         <div className="max-w-6xl mx-auto px-6 py-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div>
             <p className="text-xs text-white/40 uppercase tracking-[0.3em] mb-2">Upgrade Your Plan</p>
@@ -275,15 +275,15 @@ function UpgradeContent({ path, setPath, user }: { path: PathType; setPath: (p: 
         {/* Current plan card */}
         {loading ? (
           <div className="flex items-center justify-center py-16">
-            <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#c8ff00] border-t-transparent" />
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#C6A664] border-t-transparent" />
           </div>
         ) : (
           <>
             {currentTier && (
-              <section className="rounded-3xl border border-[#c8ff00]/30 bg-[#c8ff00]/5 p-8">
+              <section className="rounded-3xl border border-[#C6A664]/30 bg-[#C6A664]/5 p-8">
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-6">
                   <div>
-                    <span className="inline-block rounded-full bg-[#c8ff00]/20 text-[#c8ff00] text-xs font-bold px-3 py-1 mb-3">
+                    <span className="inline-block rounded-full bg-[#C6A664]/20 text-[#C6A664] text-xs font-bold px-3 py-1 mb-3">
                       Current Plan
                     </span>
                     <h2 className="text-3xl font-semibold">{currentTier.name}</h2>
@@ -319,7 +319,7 @@ function UpgradeContent({ path, setPath, user }: { path: PathType; setPath: (p: 
                   return (
                     <div
                       key={t.key}
-                      className={`rounded-3xl border p-6 flex flex-col transition-all ${isCurrent ? 'border-[#c8ff00]/30 bg-[#c8ff00]/5' : 'border-white/10 bg-white/[0.02] hover:border-white/20'}`}
+                      className={`rounded-3xl border p-6 flex flex-col transition-all ${isCurrent ? 'border-[#C6A664]/30 bg-[#C6A664]/5' : 'border-white/10 bg-white/[0.02] hover:border-white/20'}`}
                     >
                       <div className="mb-4">
                         <p className="text-xs uppercase tracking-[0.3em] text-white/30 mb-1">{t.category}</p>
@@ -336,7 +336,7 @@ function UpgradeContent({ path, setPath, user }: { path: PathType; setPath: (p: 
                       <button
                         onClick={() => handleUpgrade(t.key)}
                         disabled={upgrading === t.key || isCurrent}
-                        className="w-full rounded-full bg-[#c8ff00] px-4 py-3 text-sm font-bold text-black hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                        className="w-full rounded-full bg-[#C6A664] px-4 py-3 text-sm font-bold text-black hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-all"
                       >
                         {upgrading === t.key ? 'Processing...' : isCurrent ? 'Current Plan' : 'Choose Plan'}
                       </button>
@@ -358,7 +358,7 @@ function UpgradeContent({ path, setPath, user }: { path: PathType; setPath: (p: 
                 </div>
                 <Link
                   href={`/intake?path=${path}`}
-                  className="inline-flex items-center justify-center rounded-full bg-[#c8ff00] px-6 py-3 text-sm font-bold text-black hover:bg-white transition-all shrink-0"
+                  className="inline-flex items-center justify-center rounded-full bg-[#C6A664] px-6 py-3 text-sm font-bold text-black hover:bg-white transition-all shrink-0"
                 >
                   Take the Intake →
                 </Link>
@@ -409,13 +409,13 @@ function renderFeatures(tier: any, ent: any) {
     }
     if (f.support) features.push(`Support: ${f.support}`)
   }
-  return features.map(f => <div key={f} className="flex items-center gap-2"><span className="text-[#c8ff00]">✓</span>{f}</div>)
+  return features.map(f => <div key={f} className="flex items-center gap-2"><span className="text-[#C6A664]">✓</span>{f}</div>)
 }
 
 function PricingFallback() {
   return (
-    <div className="min-h-screen bg-[#080810] text-white flex items-center justify-center">
-      <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#c8ff00] border-t-transparent" />
+    <div className="min-h-screen bg-[#0A0A0B] text-white flex items-center justify-center">
+      <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#C6A664] border-t-transparent" />
     </div>
   )
 }

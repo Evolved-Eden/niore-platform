@@ -119,7 +119,7 @@ export default function TemplateManager({ params }: { params: Promise<{ type: st
         </div>
 
         <div className="flex gap-3 pt-4">
-          <button onClick={handleSave} disabled={saving} className="px-4 py-2 text-sm font-medium bg-[#c8ff00] text-black rounded-sm hover:bg-white transition-colors font-bold flex-1">
+          <button onClick={handleSave} disabled={saving} className="px-4 py-2 text-sm font-medium bg-[#C6A664] text-black rounded-sm hover:bg-white transition-colors font-bold flex-1">
             {saving ? 'Saving...' : 'Save Template'}
           </button>
           <button onClick={() => router.back()} className="px-4 py-2 text-sm font-medium bg-white/5 border border-white/10 text-white/60 rounded-sm hover:text-white transition-colors">Cancel</button>

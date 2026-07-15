@@ -12,7 +12,7 @@ const navLinks = [
 
 export default function Navbar() {
   return (
-    <nav className="fixed left-0 right-0 top-0 z-50 border-b border-white/5 bg-[#080810]/88 backdrop-blur-xl">
+    <nav className="fixed left-0 right-0 top-0 z-50 border-b border-white/5 bg-[#0A0A0B]/88 backdrop-blur-xl">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 md:px-8">
         <Link href="/" className="flex items-center gap-2">
           <Image src="/logo.JPG" alt="Evolved Eden" width={120} height={28} className="object-contain" />
@@ -42,7 +42,7 @@ export default function Navbar() {
           </Link>
           <Link
             href="/pricing"
-            className="rounded-sm bg-[#c8ff00] px-4 py-2 text-xs font-bold text-black transition-colors hover:bg-white"
+            className="rounded-sm bg-[#C6A664] px-4 py-2 text-xs font-bold text-black transition-colors hover:bg-white"
           >
             Get Started
           </Link>

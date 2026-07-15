@@ -75,7 +75,7 @@ export default async function ClientSettingsPage() {
         </div>
         <Link
           href="/intake"
-          className="inline-block mt-4 text-xs text-[#c8ff00]/60 hover:text-[#c8ff00] transition-colors"
+          className="inline-block mt-4 text-xs text-[#C6A664]/60 hover:text-[#C6A664] transition-colors"
         >
           Update intake →
         </Link>
@@ -109,7 +109,7 @@ export default async function ClientSettingsPage() {
         </div>
         <Link
           href="/dashboard/client/profile"
-          className="inline-block mt-4 text-xs text-[#c8ff00]/60 hover:text-[#c8ff00] transition-colors"
+          className="inline-block mt-4 text-xs text-[#C6A664]/60 hover:text-[#C6A664] transition-colors"
         >
           View profile & plan details →
         </Link>

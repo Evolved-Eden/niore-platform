@@ -80,7 +80,7 @@ export default async function AdminOverview() {
             {populatedTables.length} active tables · {totalRowEstimate.toLocaleString()} total rows · {agentCount} agents · {userCount} users · {orgCount} orgs
           </p>
         </div>
-        <span className="text-xs px-3 py-1.5 rounded-full border border-[#ff6b6b]/30 text-[#ff6b6b] bg-[#ff6b6b]/10 tracking-widest uppercase">
+        <span className="text-xs px-3 py-1.5 rounded-full border border-[#7A2E32]/30 text-[#7A2E32] bg-[#7A2E32]/10 tracking-widest uppercase">
           Elevated Access
         </span>
       </div>
@@ -88,35 +88,35 @@ export default async function AdminOverview() {
       {/* Personal Hub */}
       <div className="glass rounded-sm p-5 border border-white/[0.06]">
         <div className="flex items-center gap-2 mb-4">
-          <div className="w-2 h-2 rounded-full bg-[#ff6b6b]" />
+          <div className="w-2 h-2 rounded-full bg-[#7A2E32]" />
           <h2 className="text-xs text-white/30 tracking-widest uppercase">Personal Hub</h2>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
-          <HubLink href="/dashboard/admin/blueprint" label="My Blueprint" icon="◆" color="#ff6b6b" />
-          <HubLink href="/dashboard/admin/essence" label="Essence Intel" icon="⊙" color="#a78bfa" />
-          <HubLink href="/dashboard/admin/twin" label="My Twin" icon="⟐" color="#22d3ee" />
-          <HubLink href="/dashboard/chat" label="Chat / Prompt" icon="☆" color="#fb923c" />
-          <HubLink href="/dashboard/admin/my-agents" label="My Agents" icon="⊕" color="#34d399" />
-          <HubLink href="/dashboard/admin/my-swarms" label="My Swarms" icon="⊗" color="#00d4ff" />
+          <HubLink href="/dashboard/admin/blueprint" label="My Blueprint" icon="◆" color="#7A2E32" />
+          <HubLink href="/dashboard/admin/essence" label="Essence Intel" icon="⊙" color="#8B7AA8" />
+          <HubLink href="/dashboard/admin/twin" label="My Twin" icon="⟐" color="#8B7AA8" />
+          <HubLink href="/dashboard/chat" label="Chat / Prompt" icon="☆" color="#B5764A" />
+          <HubLink href="/dashboard/admin/my-agents" label="My Agents" icon="⊕" color="#5E8B84" />
+          <HubLink href="/dashboard/admin/my-swarms" label="My Swarms" icon="⊗" color="#5E8B84" />
         </div>
       </div>
 
       {/* Core Stats — sourced from agent_catalog + swarm_catalog views */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-        <StatCard label="Agents" value={agentCount} color="#c8ff00" icon="🤖" />
-        <StatCard label="Swarms" value={swarmCount ?? 0} color="#00d4ff" icon="🐝" />
-        <StatCard label="Generators" value={generatorCount} color="#a78bfa" icon="⚙️" />
-        <StatCard label="Templates" value={blueprintCount + essenceCount + workflowCount} color="#fb923c" icon="📋" detail={`${blueprintCount}B · ${essenceCount}E · ${workflowCount}W`} />
-        <StatCard label="Users" value={userCount} color="#ff6b6b" icon="👥" />
-        <StatCard label="Clients" value={clientCount} color="#34d399" icon="📋" />
+        <StatCard label="Agents" value={agentCount} color="#C6A664" icon="🤖" />
+        <StatCard label="Swarms" value={swarmCount ?? 0} color="#5E8B84" icon="🐝" />
+        <StatCard label="Generators" value={generatorCount} color="#8B7AA8" icon="⚙️" />
+        <StatCard label="Templates" value={blueprintCount + essenceCount + workflowCount} color="#B5764A" icon="📋" detail={`${blueprintCount}B · ${essenceCount}E · ${workflowCount}W`} />
+        <StatCard label="Users" value={userCount} color="#7A2E32" icon="👥" />
+        <StatCard label="Clients" value={clientCount} color="#5E8B84" icon="📋" />
       </div>
 
       {/* Extended Stats Row 2 */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <MiniStat label="Archetypes" value={archetypeCount} color="#f472b6" />
-        <MiniStat label="Avatars" value={avatarCount} color="#22d3ee" />
-        <MiniStat label="Tiers" value={tierCount} color="#e879f9" />
-        <MiniStat label="System Agents" value={systemAgentCount} color="#fbbf24" />
+        <MiniStat label="Archetypes" value={archetypeCount} color="#C6A664" />
+        <MiniStat label="Avatars" value={avatarCount} color="#8B7AA8" />
+        <MiniStat label="Tiers" value={tierCount} color="#C9974A" />
+        <MiniStat label="System Agents" value={systemAgentCount} color="#C6A664" />
       </div>
 
       {/* Role Distribution + Quick Actions */}
@@ -157,13 +157,13 @@ export default async function AdminOverview() {
           <div className="glass rounded-sm p-6">
             <h2 className="text-xs text-white/30 tracking-widest uppercase mb-4">Quick Actions</h2>
             <div className="space-y-2">
-              <AddButton href="/dashboard/admin/agents/new" label="New Agent" color="#c8ff00" />
-              <AddButton href="/dashboard/admin/swarms/new" label="New Swarm" color="#00d4ff" />
-              <AddButton href="/dashboard/admin/zuri" label="Configure Zuri" color="#a78bfa" />
-              <AddButton href="/dashboard/admin/generators/new" label="New Generator" color="#a78bfa" />
-              <AddButton href="/dashboard/admin/users" label="Manage Users" color="#ff6b6b" />
-              <AddButton href="/dashboard/admin/workflows" label="Design Workflow" color="#fb923c" />
-              <AddButton href="/dashboard/admin/templates" label="Templates" color="#34d399" />
+              <AddButton href="/dashboard/admin/agents/new" label="New Agent" color="#C6A664" />
+              <AddButton href="/dashboard/admin/swarms/new" label="New Swarm" color="#5E8B84" />
+              <AddButton href="/dashboard/admin/zuri" label="Configure Zuri" color="#8B7AA8" />
+              <AddButton href="/dashboard/admin/generators/new" label="New Generator" color="#8B7AA8" />
+              <AddButton href="/dashboard/admin/users" label="Manage Users" color="#7A2E32" />
+              <AddButton href="/dashboard/admin/workflows" label="Design Workflow" color="#B5764A" />
+              <AddButton href="/dashboard/admin/templates" label="Templates" color="#5E8B84" />
             </div>
           </div>
         </div>
@@ -194,7 +194,7 @@ export default async function AdminOverview() {
                   <span
                     className="tabular-nums shrink-0"
                     style={{
-                      color: intensity > 0.5 ? '#c8ff00' : intensity > 0.1 ? '#60a5fa' : '#94a3b8'
+                      color: intensity > 0.5 ? '#C6A664' : intensity > 0.1 ? '#60a5fa' : '#94a3b8'
                     }}
                   >
                     {rows.toLocaleString()}
@@ -209,21 +209,21 @@ export default async function AdminOverview() {
       {/* System Health */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="glass rounded-sm p-4 border border-white/[0.06] flex items-center gap-3">
-          <div className="w-2 h-2 rounded-full bg-[#34d399] animate-pulse-slow" />
+          <div className="w-2 h-2 rounded-full bg-[#5E8B84] animate-pulse-slow" />
           <div>
             <div className="text-xs text-white/30">Database</div>
             <div className="text-sm text-white/70">Connected · {populatedTables.length} active tables</div>
           </div>
         </div>
         <div className="glass rounded-sm p-4 border border-white/[0.06] flex items-center gap-3">
-          <div className="w-2 h-2 rounded-full bg-[#c8ff00] animate-pulse-slow" />
+          <div className="w-2 h-2 rounded-full bg-[#C6A664] animate-pulse-slow" />
           <div>
             <div className="text-xs text-white/30">Agents</div>
             <div className="text-sm text-white/70">{agentCount} catalogued · {systemAgentCount} system · {Object.keys(roleDistribution).length} role types</div>
           </div>
         </div>
         <div className="glass rounded-sm p-4 border border-white/[0.06] flex items-center gap-3">
-          <div className="w-2 h-2 rounded-full bg-[#00d4ff] animate-pulse-slow" />
+          <div className="w-2 h-2 rounded-full bg-[#5E8B84] animate-pulse-slow" />
           <div>
             <div className="text-xs text-white/30">Templates</div>
             <div className="text-sm text-white/70">{blueprintCount + essenceCount + workflowCount} active · {swarmCount ?? 0} swarms</div>

@@ -25,7 +25,7 @@ interface DeployedSwarm {
 }
 
 const STATUS_STYLES: Record<string, string> = {
-  active: 'bg-[#ff6b6b]/10 text-[#ff6b6b] border-[#ff6b6b]/20',
+  active: 'bg-[#7A2E32]/10 text-[#7A2E32] border-[#7A2E32]/20',
   paused: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
   pending: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
   error: 'bg-red-500/10 text-red-400 border-red-500/20',
@@ -115,7 +115,7 @@ export default function AdminMySwarmsPage() {
       {/* Header */}
       <div className="mb-8">
         <h1 className="font-display text-2xl font-bold tracking-tight mb-1">
-          My <span className="text-[#ff6b6b]">Swarms</span>
+          My <span className="text-[#7A2E32]">Swarms</span>
         </h1>
         <p className="text-white/30 text-sm">Deploy and manage agent swarms for personal use</p>
       </div>
@@ -124,13 +124,13 @@ export default function AdminMySwarmsPage() {
       <div className="flex gap-1 mb-6 border-b border-white/[0.06]">
         <button
           onClick={() => setTab('deployed')}
-          className={`px-4 py-2.5 text-sm border-b-2 transition-colors ${tab === 'deployed' ? 'border-[#ff6b6b] text-white' : 'border-transparent text-white/30 hover:text-white/50'}`}
+          className={`px-4 py-2.5 text-sm border-b-2 transition-colors ${tab === 'deployed' ? 'border-[#7A2E32] text-white' : 'border-transparent text-white/30 hover:text-white/50'}`}
         >
           My Deployed ({deployed.length})
         </button>
         <button
           onClick={() => setTab('available')}
-          className={`px-4 py-2.5 text-sm border-b-2 transition-colors ${tab === 'available' ? 'border-[#ff6b6b] text-white' : 'border-transparent text-white/30 hover:text-white/50'}`}
+          className={`px-4 py-2.5 text-sm border-b-2 transition-colors ${tab === 'available' ? 'border-[#7A2E32] text-white' : 'border-transparent text-white/30 hover:text-white/50'}`}
         >
           Available ({templates.length})
         </button>
@@ -153,7 +153,7 @@ export default function AdminMySwarmsPage() {
           {deployed.map(swarm => (
             <div key={swarm.id} className="glass rounded-sm p-4 border border-white/[0.06] flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-[#ff6b6b]/10 flex items-center justify-center text-sm text-[#ff6b6b]">
+                <div className="w-10 h-10 rounded-full bg-[#7A2E32]/10 flex items-center justify-center text-sm text-[#7A2E32]">
                   {swarm.swarm_name.charAt(0)}
                 </div>
                 <div>
@@ -199,7 +199,7 @@ export default function AdminMySwarmsPage() {
                   <button
                     onClick={() => deploySwarm(template)}
                     disabled={deploying === key}
-                    className="shrink-0 px-3 py-1.5 rounded-sm text-xs bg-[#ff6b6b]/10 border border-[#ff6b6b]/20 text-[#ff6b6b] hover:bg-[#ff6b6b]/20 transition-colors disabled:opacity-40"
+                    className="shrink-0 px-3 py-1.5 rounded-sm text-xs bg-[#7A2E32]/10 border border-[#7A2E32]/20 text-[#7A2E32] hover:bg-[#7A2E32]/20 transition-colors disabled:opacity-40"
                   >
                     {deploying === key ? '...' : 'Deploy'}
                   </button>

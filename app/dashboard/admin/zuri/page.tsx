@@ -158,7 +158,7 @@ export default function ZuriAdminPage() {
           <button
             onClick={handleSave}
             disabled={saving}
-            className="px-5 py-2 bg-[#c8ff00] text-black text-sm font-bold rounded-sm hover:bg-white transition-all disabled:opacity-40"
+            className="px-5 py-2 bg-[#C6A664] text-black text-sm font-bold rounded-sm hover:bg-white transition-all disabled:opacity-40"
           >
             {saving ? 'Saving...' : saved ? '✓ Saved' : 'Save Configuration'}
           </button>
@@ -238,7 +238,7 @@ export default function ZuriAdminPage() {
           </div>
           <div className="bg-white/[0.02] rounded-sm p-3 border border-dashed border-white/10">
             <p className="text-xs text-white/30">
-              <span className="text-[#c8ff00]">💡</span> File upload coming soon — for now, paste your business context above.
+              <span className="text-[#C6A664]">💡</span> File upload coming soon — for now, paste your business context above.
               This will be embedded in Zuri&apos;s system prompt for personalized responses.
             </p>
           </div>
@@ -334,10 +334,10 @@ export default function ZuriAdminPage() {
       <div className="glass rounded-sm p-6 border border-white/[0.06]">
         <h2 className="text-xs text-white/30 tracking-widest uppercase mb-4">Agent Status</h2>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <StatusItem label="Health" value={agent.health_status || 'UNKNOWN'} color={agent.health_status === 'ACTIVE' ? '#34d399' : '#ff6b6b'} />
-          <StatusItem label="Config State" value={agent.config_state || '—'} color="#c8ff00" />
-          <StatusItem label="Operational State" value={agent.operational_state || '—'} color="#00d4ff" />
-          <StatusItem label="MAS Score" value={agent.mas_score != null ? String(agent.mas_score) : '—'} color="#a78bfa" />
+          <StatusItem label="Health" value={agent.health_status || 'UNKNOWN'} color={agent.health_status === 'ACTIVE' ? '#5E8B84' : '#7A2E32'} />
+          <StatusItem label="Config State" value={agent.config_state || '—'} color="#C6A664" />
+          <StatusItem label="Operational State" value={agent.operational_state || '—'} color="#5E8B84" />
+          <StatusItem label="MAS Score" value={agent.mas_score != null ? String(agent.mas_score) : '—'} color="#8B7AA8" />
         </div>
         <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs text-white/30">
           <div>Role: <span className="text-white/50">{agent.role_type || '—'}</span></div>
@@ -352,7 +352,7 @@ export default function ZuriAdminPage() {
         <button
           onClick={handleSave}
           disabled={saving}
-          className="px-6 py-3 bg-[#c8ff00] text-black text-sm font-bold rounded-sm hover:bg-white transition-all disabled:opacity-40 glow-acid"
+          className="px-6 py-3 bg-[#C6A664] text-black text-sm font-bold rounded-sm hover:bg-white transition-all disabled:opacity-40 glow-acid"
         >
           {saving ? 'Saving Configuration...' : saved ? '✓ Configuration Saved!' : 'Save All Configuration'}
         </button>

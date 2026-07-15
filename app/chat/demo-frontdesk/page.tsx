@@ -16,35 +16,35 @@ const VERTICAL_DEMOS = [
     title: "Luxury Med Spa",
     emoji: "✦",
     desc: "Client management, bookings, retention, marketing intelligence",
-    color: "#f472b6",
+    color: "#C6A664",
   },
   {
     id: "hotel",
     title: "Luxury Hotel",
     emoji: "◆",
     desc: "Guest experience, concierge AI, operations, revenue optimization",
-    color: "#00d4ff",
+    color: "#5E8B84",
   },
   {
     id: "real_estate",
     title: "Luxury Real Estate",
     emoji: "◇",
     desc: "Lead nurturing, property matching, market intelligence",
-    color: "#a78bfa",
+    color: "#8B7AA8",
   },
   {
     id: "hr",
     title: "Corporate HR",
     emoji: "▤",
     desc: "Talent management, onboarding, employee intelligence",
-    color: "#fb923c",
+    color: "#B5764A",
   },
   {
     id: "legal",
     title: "Legal Practice",
     emoji: "⊙",
     desc: "Case management, client intake, document intelligence",
-    color: "#34d399",
+    color: "#5E8B84",
   },
 ];
 
@@ -240,35 +240,35 @@ function DemoContent() {
 
   if (!greetingReady) {
     return (
-      <div className="flex items-center justify-center min-h-dvh bg-[#080810]">
-        <div className="w-6 h-6 border-2 border-[#c8ff00] border-t-transparent rounded-full animate-spin" />
+      <div className="flex items-center justify-center min-h-dvh bg-[#0A0A0B]">
+        <div className="w-6 h-6 border-2 border-[#C6A664] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col min-h-dvh bg-[#080810]">
+    <div className="flex flex-col min-h-dvh bg-[#0A0A0B]">
       {/* Header */}
       <header className="flex items-center justify-between px-6 py-4 border-b border-white/5">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-[#c8ff00]/20 flex items-center justify-center">
-            <svg className="w-4 h-4 text-[#c8ff00]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <div className="w-8 h-8 rounded-full bg-[#C6A664]/20 flex items-center justify-center">
+            <svg className="w-4 h-4 text-[#C6A664]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
           </div>
           <span className="font-display text-sm font-semibold tracking-wide">
-            EVOLVED <span className="text-[#c8ff00]">EDEN</span>
+            EVOLVED <span className="text-[#C6A664]">EDEN</span>
           </span>
         </div>
         <div className="flex items-center gap-4">
           <button
             onClick={() => setShowFaqSidebar(!showFaqSidebar)}
-            className={`text-xs transition-colors ${showFaqSidebar ? 'text-[#c8ff00]' : 'text-white/40 hover:text-white/70'}`}
+            className={`text-xs transition-colors ${showFaqSidebar ? 'text-[#C6A664]' : 'text-white/40 hover:text-white/70'}`}
           >
             FAQ
           </button>
           {hasIntake && (
-            <span className="text-xs text-[#c8ff00]/50 hidden sm:block">{archetypeParam} Profile</span>
+            <span className="text-xs text-[#C6A664]/50 hidden sm:block">{archetypeParam} Profile</span>
           )}
           <span className="text-xs text-white/40 hidden sm:block">Demo</span>
           <button onClick={handleReset} className="text-xs text-white/40 hover:text-white/70 transition-colors">
@@ -279,10 +279,10 @@ function DemoContent() {
 
       {/* Intake banner */}
       {hasIntake && (
-        <div className="px-6 py-2 bg-[#c8ff00]/[0.03] border-b border-[#c8ff00]/10 flex items-center gap-3 text-xs text-white/40">
-          <span className="text-[#c8ff00]">●</span>
+        <div className="px-6 py-2 bg-[#C6A664]/[0.03] border-b border-[#C6A664]/10 flex items-center gap-3 text-xs text-white/40">
+          <span className="text-[#C6A664]">●</span>
           <span className="truncate">{name} &middot; {archetypeParam} &middot; {energyType}</span>
-          <Link href="/intake" className="ml-auto text-[#c8ff00]/60 hover:text-[#c8ff00]">Edit</Link>
+          <Link href="/intake" className="ml-auto text-[#C6A664]/60 hover:text-[#C6A664]">Edit</Link>
         </div>
       )}
 
@@ -293,7 +293,7 @@ function DemoContent() {
             <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
               <div className={`max-w-[80%] rounded-sm px-4 py-3 text-sm leading-relaxed whitespace-pre-line ${
                 msg.role === "user"
-                  ? "bg-[#c8ff00] text-black"
+                  ? "bg-[#C6A664] text-black"
                   : "bg-white/[0.04] text-white/80 border border-white/[0.06]"
               }`}>
                 {msg.content || (
@@ -364,7 +364,7 @@ function DemoContent() {
           <div className="max-w-2xl mx-auto">
             <Link
               href="/pricing"
-              className="block w-full py-3.5 bg-[#c8ff00] text-black text-sm font-bold text-center rounded-sm hover:bg-white transition-all glow-acid"
+              className="block w-full py-3.5 bg-[#C6A664] text-black text-sm font-bold text-center rounded-sm hover:bg-white transition-all glow-acid"
             >
               View Plans & Pricing →
             </Link>
@@ -396,7 +396,7 @@ function DemoContent() {
                 value={faqSearch}
                 onChange={e => setFaqSearch(e.target.value)}
                 placeholder="Search FAQ..."
-                className="w-full px-4 py-3 bg-white/[0.04] border border-white/10 rounded-sm text-white text-sm placeholder-white/20 focus:outline-none focus:border-[#c8ff00]/50 transition-all mb-6"
+                className="w-full px-4 py-3 bg-white/[0.04] border border-white/10 rounded-sm text-white text-sm placeholder-white/20 focus:outline-none focus:border-[#C6A664]/50 transition-all mb-6"
               />
 
               {/* FAQ accordion */}
@@ -436,7 +436,7 @@ function DemoContent() {
               <div className="mt-8 pt-6 border-t border-white/10 text-center">
                 <Link
                   href="/chat"
-                  className="text-xs text-[#c8ff00]/60 hover:text-[#c8ff00] transition-colors"
+                  className="text-xs text-[#C6A664]/60 hover:text-[#C6A664] transition-colors"
                   onClick={() => setShowFaqSidebar(false)}
                 >
                   View Full Knowledge Base →
@@ -463,7 +463,7 @@ function DemoContent() {
             <button
               type="submit"
               disabled={!input.trim() || isLoading}
-              className="px-5 py-3 bg-[#c8ff00] text-black text-sm font-bold rounded-sm hover:bg-white transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+              className="px-5 py-3 bg-[#C6A664] text-black text-sm font-bold rounded-sm hover:bg-white transition-all disabled:opacity-40 disabled:cursor-not-allowed"
             >
               Send
             </button>
@@ -478,8 +478,8 @@ export default function DemoFrontDesk() {
   return (
     <Suspense
       fallback={
-        <div className="flex items-center justify-center min-h-dvh bg-[#080810]">
-          <div className="w-6 h-6 border-2 border-[#c8ff00] border-t-transparent rounded-full animate-spin" />
+        <div className="flex items-center justify-center min-h-dvh bg-[#0A0A0B]">
+          <div className="w-6 h-6 border-2 border-[#C6A664] border-t-transparent rounded-full animate-spin" />
         </div>
       }
     >

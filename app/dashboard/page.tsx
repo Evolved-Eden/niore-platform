@@ -5,10 +5,10 @@ import EssenceBoard from '@/components/EssenceBoard'
 import { deriveRoleFromPlanTier } from '@/types'
 
 const ROLE_COLOR: Record<string, string> = {
-  admin: '#ff6b6b',
-  creator: '#00d4ff',
-  client: '#c8ff00',
-  personal: '#fb923c',
+  admin: '#7A2E32',
+  creator: '#5E8B84',
+  client: '#C6A664',
+  personal: '#B5764A',
 }
 
 interface QuickAction {
@@ -53,12 +53,12 @@ const SYSTEM_STATUSES = [
 ]
 
 const KPI_ITEMS = [
-  { label: 'Blueprint Score', value: '92%', icon: '◆', color: '#c8ff00' },
-  { label: 'Twin Status', value: 'Active', icon: '⟐', color: '#00d4ff' },
-  { label: 'Essence Items', value: '14', icon: '⊙', color: '#a78bfa' },
-  { label: 'Agents Deployed', value: '3', icon: '⊕', color: '#c8ff00' },
-  { label: 'Swarms Active', value: '1', icon: '⊗', color: '#00d4ff' },
-  { label: 'Consultation', value: 'Scheduled', icon: '✦', color: '#fb923c' },
+  { label: 'Blueprint Score', value: '92%', icon: '◆', color: '#C6A664' },
+  { label: 'Twin Status', value: 'Active', icon: '⟐', color: '#5E8B84' },
+  { label: 'Essence Items', value: '14', icon: '⊙', color: '#8B7AA8' },
+  { label: 'Agents Deployed', value: '3', icon: '⊕', color: '#C6A664' },
+  { label: 'Swarms Active', value: '1', icon: '⊗', color: '#5E8B84' },
+  { label: 'Consultation', value: 'Scheduled', icon: '✦', color: '#B5764A' },
 ]
 
 const QUICK_STATS = [
@@ -103,7 +103,7 @@ export default async function DashboardHub({ searchParams }: { searchParams?: Pr
   if (checkout === 'success') {
     redirect(`/dashboard/${role}`)
   }
-  const color = ROLE_COLOR[role] ?? '#c8ff00'
+  const color = ROLE_COLOR[role] ?? '#C6A664'
   const actions = QUICK_ACTIONS[role] ?? QUICK_ACTIONS.client
   const kpis = KPI_ITEMS
 
@@ -112,7 +112,7 @@ export default async function DashboardHub({ searchParams }: { searchParams?: Pr
       {/* ── Hero Section ── */}
       <div className="mb-6">
         <h1
-          className="font-display text-3xl font-bold tracking-tight mb-1 bg-gradient-to-r from-[#c8ff00] via-white to-[#c8ff00] bg-clip-text text-transparent bg-[length:200%] animate-gradient"
+          className="font-display text-3xl font-bold tracking-tight mb-1 bg-gradient-to-r from-[#C6A664] via-white to-[#C6A664] bg-clip-text text-transparent bg-[length:200%] animate-gradient"
         >
           Welcome back, {name}
         </h1>
@@ -125,7 +125,7 @@ export default async function DashboardHub({ searchParams }: { searchParams?: Pr
           <div key={s.key} className="flex items-center gap-2">
             <span
               className={`w-2 h-2 rounded-full ${s.online ? 'animate-pulse' : ''}`}
-              style={{ background: s.online ? '#c8ff00' : '#555' }}
+              style={{ background: s.online ? '#C6A664' : '#555' }}
             />
             <span className="text-xs text-white/40 tracking-wider">{s.label}</span>
           </div>
@@ -158,7 +158,7 @@ export default async function DashboardHub({ searchParams }: { searchParams?: Pr
             <span>◈</span> Intelligence Command Center
           </span>
           <span className="flex items-center gap-2 text-xs text-white/20">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#c8ff00] animate-pulse-slow" />
+            <span className="w-1.5 h-1.5 rounded-full bg-[#C6A664] animate-pulse-slow" />
             Live
           </span>
         </div>
@@ -176,8 +176,8 @@ export default async function DashboardHub({ searchParams }: { searchParams?: Pr
       </div>
 
       {/* ── Role-Specific CTA ── */}
-      <div className="relative rounded-sm p-[2px] bg-gradient-to-r from-[#c8ff00] via-white/20 to-[#c8ff00] group/cta">
-        <div className="bg-[#080810] rounded-[3px] p-6 h-full">
+      <div className="relative rounded-sm p-[2px] bg-gradient-to-r from-[#C6A664] via-white/20 to-[#C6A664] group/cta">
+        <div className="bg-[#0A0A0B] rounded-[3px] p-6 h-full">
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div>
               <h2 className="font-display text-lg font-semibold mb-1 text-white">
@@ -191,7 +191,7 @@ export default async function DashboardHub({ searchParams }: { searchParams?: Pr
             </div>
             <Link
               href={role === 'client' ? '/dashboard/client/blueprint/assess' : `/dashboard/${role}`}
-              className="px-6 py-3 bg-[#c8ff00] text-black text-sm font-bold rounded-sm hover:bg-white transition-all shrink-0 glow-acid group-hover/cta:shadow-[0_0_32px_rgba(200,255,0,0.3)]"
+              className="px-6 py-3 bg-[#C6A664] text-black text-sm font-bold rounded-sm hover:bg-white transition-all shrink-0 glow-acid group-hover/cta:shadow-[0_0_32px_rgba(200,255,0,0.3)]"
             >
               {role === 'client' ? 'Start Blueprint →' : 'Go to Dashboard →'}
             </Link>

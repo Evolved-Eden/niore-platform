@@ -27,15 +27,15 @@ type BlueprintData = {
 // ── Lens display config ─────────────────────────────
 
 const LENS_DISPLAY: Record<string, { icon: string; label: string; color: string }> = {
-  astrology:          { icon: '☉', label: 'Western Astrology', color: '#c8ff00' },
-  vedicAstrology:    { icon: '☽', label: 'Vedic Astrology', color: '#a78bfa' },
-  numerology:        { icon: '7', label: 'Numerology', color: '#34d399' },
-  chineseZodiac:     { icon: '🐉', label: 'Chinese Zodiac', color: '#fb923c' },
-  humanDesign:       { icon: '◈', label: 'Human Design', color: '#22d3ee' },
-  biorhythms:        { icon: '〰', label: 'Biorhythms', color: '#f472b6' },
-  elementalArchetype:{ icon: '🔥', label: 'Elemental Type', color: '#e879f9' },
-  lifeTheme:         { icon: '✦', label: 'Life Theme', color: '#00d4ff' },
-  soulProfile:       { icon: '∞', label: 'Soul Profile', color: '#ff6b6b' },
+  astrology:          { icon: '☉', label: 'Western Astrology', color: '#C6A664' },
+  vedicAstrology:    { icon: '☽', label: 'Vedic Astrology', color: '#8B7AA8' },
+  numerology:        { icon: '7', label: 'Numerology', color: '#5E8B84' },
+  chineseZodiac:     { icon: '🐉', label: 'Chinese Zodiac', color: '#B5764A' },
+  humanDesign:       { icon: '◈', label: 'Human Design', color: '#8B7AA8' },
+  biorhythms:        { icon: '〰', label: 'Biorhythms', color: '#C6A664' },
+  elementalArchetype:{ icon: '🔥', label: 'Elemental Type', color: '#C9974A' },
+  lifeTheme:         { icon: '✦', label: 'Life Theme', color: '#5E8B84' },
+  soulProfile:       { icon: '∞', label: 'Soul Profile', color: '#7A2E32' },
 }
 
 const EMPTY_LENS = {
@@ -61,7 +61,7 @@ function AstrologyDetail({ data }: { data: any }) {
               <span className="text-[10px] font-bold text-white/50 w-14">{p}</span>
               <span className="text-[11px] text-white/80">{pl.sign} {Math.floor(pl.degrees)}°</span>
               <span className="text-[9px] text-white/30">H{pl.house || '?'}</span>
-              {pl.isRetrograde && <span className="text-[9px] text-[#fb923c]">R</span>}
+              {pl.isRetrograde && <span className="text-[9px] text-[#B5764A]">R</span>}
             </div>
           )
         })}
@@ -104,9 +104,9 @@ function VedicDetail({ data }: { data: any }) {
         })}
       </div>
       {data.moonNakshatra && (
-        <div className="p-2 rounded-sm bg-[#a78bfa]/[0.08] border border-[#a78bfa]/[0.12]">
+        <div className="p-2 rounded-sm bg-[#8B7AA8]/[0.08] border border-[#8B7AA8]/[0.12]">
           <span className="text-[10px] text-white/50">Moon Nakshatra: </span>
-          <span className="text-[11px] text-[#a78bfa] font-medium">{data.moonNakshatra} (Pada {data.moonPada})</span>
+          <span className="text-[11px] text-[#8B7AA8] font-medium">{data.moonNakshatra} (Pada {data.moonPada})</span>
         </div>
       )}
       <div className="flex gap-2 text-[10px] text-white/40">
@@ -137,7 +137,7 @@ function NumerologyDetail({ data }: { data: any }) {
         {items.filter(i => i.value != null).map(i => (
           <div key={i.label} className="p-2 rounded-sm bg-white/[0.03] border border-white/[0.06]">
             <div className="text-[9px] text-white/30 uppercase tracking-wider">{i.label}</div>
-            <div className="text-sm font-bold text-[#34d399]">{String(i.value)}</div>
+            <div className="text-sm font-bold text-[#5E8B84]">{String(i.value)}</div>
           </div>
         ))}
       </div>
@@ -159,7 +159,7 @@ function ChineseZodiacDetail({ data }: { data: any }) {
   if (!data) return null
   return (
     <div className="space-y-3">
-      <div className="flex items-center gap-3 p-3 rounded-sm bg-[#fb923c]/[0.06] border border-[#fb923c]/[0.1]">
+      <div className="flex items-center gap-3 p-3 rounded-sm bg-[#B5764A]/[0.06] border border-[#B5764A]/[0.1]">
         <span className="text-2xl">{data.animal === 'Rat' ? '🐀' : data.animal === 'Ox' ? '🐂' : data.animal === 'Tiger' ? '🐅' : data.animal === 'Rabbit' ? '🐇' : data.animal === 'Dragon' ? '🐉' : data.animal === 'Snake' ? '🐍' : data.animal === 'Horse' ? '🐎' : data.animal === 'Goat' ? '🐐' : data.animal === 'Monkey' ? '🐒' : data.animal === 'Rooster' ? '🐓' : data.animal === 'Dog' ? '🐕' : '🐖'}</span>
         <div>
           <div className="text-sm font-bold text-white">{data.animal}</div>
@@ -172,7 +172,7 @@ function ChineseZodiacDetail({ data }: { data: any }) {
           <div className="text-[10px] text-white/30 uppercase tracking-wider mb-1">Strengths</div>
           <div className="flex flex-wrap gap-1">
             {data.strengths.map((s: string, i: number) => (
-              <span key={i} className="px-2 py-0.5 rounded-full bg-[#34d399]/[0.1] text-[9px] text-[#34d399] border border-[#34d399]/[0.2]">{s}</span>
+              <span key={i} className="px-2 py-0.5 rounded-full bg-[#5E8B84]/[0.1] text-[9px] text-[#5E8B84] border border-[#5E8B84]/[0.2]">{s}</span>
             ))}
           </div>
         </div>
@@ -214,7 +214,7 @@ function HumanDesignDetail({ data }: { data: any }) {
             <div key={k} className="flex items-center gap-2">
               <span className="text-[10px] text-white/40 w-20 capitalize">{k.replace(/_/g, ' ')}</span>
               <div className="flex-1 h-1.5 bg-white/[0.06] rounded-full overflow-hidden">
-                <div className="h-full bg-[#22d3ee] rounded-full" style={{ width: `${v}%` }} />
+                <div className="h-full bg-[#8B7AA8] rounded-full" style={{ width: `${v}%` }} />
               </div>
               <span className="text-[9px] text-white/30">{v as number}%</span>
             </div>
@@ -228,10 +228,10 @@ function HumanDesignDetail({ data }: { data: any }) {
 function BiorhythmDetail({ data }: { data: any }) {
   if (!data) return null
   const cycles = [
-    { name: 'Physical', score: data.today?.physicalScore, period: '23d', color: '#f472b6' },
-    { name: 'Emotional', score: data.today?.emotionalScore, period: '28d', color: '#a78bfa' },
-    { name: 'Intellectual', score: data.today?.intellectualScore, period: '33d', color: '#22d3ee' },
-    { name: 'Spiritual', score: data.today?.spiritualScore, period: '53d', color: '#c8ff00' },
+    { name: 'Physical', score: data.today?.physicalScore, period: '23d', color: '#C6A664' },
+    { name: 'Emotional', score: data.today?.emotionalScore, period: '28d', color: '#8B7AA8' },
+    { name: 'Intellectual', score: data.today?.intellectualScore, period: '33d', color: '#8B7AA8' },
+    { name: 'Spiritual', score: data.today?.spiritualScore, period: '53d', color: '#C6A664' },
   ]
   return (
     <div className="space-y-3">
@@ -247,7 +247,7 @@ function BiorhythmDetail({ data }: { data: any }) {
             <div className="h-2 bg-white/[0.06] rounded-full overflow-hidden relative">
               <div className="h-full rounded-full transition-all" style={{
                 width: `${barWidth}%`,
-                background: isPositive ? c.color : '#ff6b6b',
+                background: isPositive ? c.color : '#7A2E32',
                 marginLeft: isPositive ? '50%' : `${50 - barWidth}%`,
               }} />
             </div>
@@ -264,10 +264,10 @@ function BiorhythmDetail({ data }: { data: any }) {
 function ElementalDetail({ data }: { data: any }) {
   if (!data) return null
   const elements = [
-    { name: 'Fire', pct: data.elementBalance?.fire || 0, color: '#fb923c' },
-    { name: 'Earth', pct: data.elementBalance?.earth || 0, color: '#34d399' },
-    { name: 'Air', pct: data.elementBalance?.air || 0, color: '#22d3ee' },
-    { name: 'Water', pct: data.elementBalance?.water || 0, color: '#a78bfa' },
+    { name: 'Fire', pct: data.elementBalance?.fire || 0, color: '#B5764A' },
+    { name: 'Earth', pct: data.elementBalance?.earth || 0, color: '#5E8B84' },
+    { name: 'Air', pct: data.elementBalance?.air || 0, color: '#8B7AA8' },
+    { name: 'Water', pct: data.elementBalance?.water || 0, color: '#8B7AA8' },
   ]
   return (
     <div className="space-y-3">
@@ -302,7 +302,7 @@ function LifeThemeDetail({ data }: { data: any }) {
   if (!data) return null
   return (
     <div className="space-y-3">
-      <div className="p-3 rounded-sm bg-[#00d4ff]/[0.06] border border-[#00d4ff]/[0.1]">
+      <div className="p-3 rounded-sm bg-[#5E8B84]/[0.06] border border-[#5E8B84]/[0.1]">
         <div className="text-[10px] text-white/30 uppercase tracking-wider mb-1">Soul Purpose</div>
         <p className="text-sm text-white/80 font-medium">{data.soulPurpose || 'Discovering...'}</p>
       </div>
@@ -334,7 +334,7 @@ function LifeThemeDetail({ data }: { data: any }) {
           <div className="space-y-1">
             {data.growthPath.slice(0, 4).map((g: string, i: number) => (
               <div key={i} className="flex items-start gap-2 text-[10px] text-white/50">
-                <span className="text-[#00d4ff] mt-0.5">→</span>
+                <span className="text-[#5E8B84] mt-0.5">→</span>
                 <span>{g}</span>
               </div>
             ))}
@@ -352,7 +352,7 @@ function SoulProfileDetail({ data }: { data: any }) {
   if (!data) return null
   return (
     <div className="space-y-3">
-      <div className="flex gap-3 p-3 rounded-sm bg-[#ff6b6b]/[0.06] border border-[#ff6b6b]/[0.1]">
+      <div className="flex gap-3 p-3 rounded-sm bg-[#7A2E32]/[0.06] border border-[#7A2E32]/[0.1]">
         <div>
           <div className="text-[9px] text-white/30 uppercase tracking-wider">Soul Age</div>
           <div className="text-sm font-bold text-white">{data.soulAge || '?'}</div>
@@ -367,7 +367,7 @@ function SoulProfileDetail({ data }: { data: any }) {
           <div className="text-[10px] text-white/30 uppercase tracking-wider mb-1">Karmic Patterns</div>
           {data.karmicPatterns.map((p: string, i: number) => (
             <div key={i} className="text-[10px] text-white/50 flex items-start gap-1.5 mb-0.5">
-              <span className="text-[#ff6b6b]">•</span> {p}
+              <span className="text-[#7A2E32]">•</span> {p}
             </div>
           ))}
         </div>
@@ -377,7 +377,7 @@ function SoulProfileDetail({ data }: { data: any }) {
           <div className="text-[10px] text-white/30 uppercase tracking-wider mb-1">Soul Contracts</div>
           {data.soulContracts.map((c: string, i: number) => (
             <div key={i} className="text-[10px] text-white/50 flex items-start gap-1.5 mb-0.5">
-              <span className="text-[#c8ff00]">◇</span> {c}
+              <span className="text-[#C6A664]">◇</span> {c}
             </div>
           ))}
         </div>
@@ -698,7 +698,7 @@ export default function ClientBlueprintPage() {
 
   if (loading) return (
     <div className="flex items-center justify-center min-h-[60vh]">
-      <div className="w-6 h-6 border-2 border-[#c8ff00] border-t-transparent rounded-full animate-spin" />
+      <div className="w-6 h-6 border-2 border-[#C6A664] border-t-transparent rounded-full animate-spin" />
     </div>
   )
 
@@ -708,7 +708,7 @@ export default function ClientBlueprintPage() {
       <div className="flex items-start justify-between mb-8">
         <div>
           <h1 className="font-display text-2xl font-bold tracking-tight mb-1">
-            My <span className="text-[#c8ff00]">Blueprint</span>
+            My <span className="text-[#C6A664]">Blueprint</span>
           </h1>
           <p className="text-white/30 text-sm">Your complete intelligence assessment and expansion modules</p>
         </div>
@@ -741,7 +741,7 @@ export default function ClientBlueprintPage() {
                   <div className="text-[10px] text-white/30 tracking-widest uppercase mb-2">From Your Intake</div>
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-white/50">Archetype</span>
-                    <span className="text-[#c8ff00] font-medium">{intake.archetype}</span>
+                    <span className="text-[#C6A664] font-medium">{intake.archetype}</span>
                   </div>
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-white/50">Core Architecture</span>
@@ -749,7 +749,7 @@ export default function ClientBlueprintPage() {
                   </div>
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-white/50">Energy Type</span>
-                    <span className="text-[#a78bfa] font-medium">{intake.energyType}</span>
+                    <span className="text-[#8B7AA8] font-medium">{intake.energyType}</span>
                   </div>
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-white/50">Natural Gift</span>
@@ -758,7 +758,7 @@ export default function ClientBlueprintPage() {
                   {intake.growthEdge && (
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-white/50">Growth Edge</span>
-                      <span className="text-[#00d4ff] font-medium">{intake.growthEdge}</span>
+                      <span className="text-[#5E8B84] font-medium">{intake.growthEdge}</span>
                     </div>
                   )}
                 </div>
@@ -788,7 +788,7 @@ export default function ClientBlueprintPage() {
                       await fetch('/api/profile/calculate', { method: 'POST' })
                       window.location.reload()
                     }}
-                    className="mt-3 text-[10px] font-bold px-3 py-1.5 rounded-sm border border-[#c8ff00]/40 text-[#c8ff00] hover:bg-[#c8ff00]/10 transition-all"
+                    className="mt-3 text-[10px] font-bold px-3 py-1.5 rounded-sm border border-[#C6A664]/40 text-[#C6A664] hover:bg-[#C6A664]/10 transition-all"
                   >
                     Calculate All Lenses
                   </button>
@@ -797,7 +797,7 @@ export default function ClientBlueprintPage() {
 
               <Link
                 href="/dashboard/client/blueprint/assess"
-                className="inline-block px-6 py-3 bg-[#c8ff00] text-black text-sm font-bold rounded-sm hover:bg-white transition-all"
+                className="inline-block px-6 py-3 bg-[#C6A664] text-black text-sm font-bold rounded-sm hover:bg-white transition-all"
               >
                 {intake.hasIntake ? 'Complete Full Blueprint Assessment →' : 'Start Blueprint Assessment →'}
               </Link>
@@ -809,7 +809,7 @@ export default function ClientBlueprintPage() {
                 <div className="flex items-start justify-between mb-6">
                   <div>
                     <div className="text-xs text-white/30 tracking-widest uppercase">Blueprint Score</div>
-                    <div className="text-4xl font-bold text-[#c8ff00] mt-1">{blueprint.overallScore}</div>
+                    <div className="text-4xl font-bold text-[#C6A664] mt-1">{blueprint.overallScore}</div>
                   </div>
                   <div className="text-right flex flex-col items-end gap-2">
                     <div>
@@ -818,7 +818,7 @@ export default function ClientBlueprintPage() {
                     </div>
                     <Link
                       href="/dashboard/client/blueprint/assess"
-                      className="text-[10px] font-bold px-3 py-1.5 rounded-sm border border-[#c8ff00]/40 text-[#c8ff00] hover:bg-[#c8ff00]/10 transition-all"
+                      className="text-[10px] font-bold px-3 py-1.5 rounded-sm border border-[#C6A664]/40 text-[#C6A664] hover:bg-[#C6A664]/10 transition-all"
                     >
                       Edit Blueprint →
                     </Link>
@@ -836,7 +836,7 @@ export default function ClientBlueprintPage() {
                           <span className="text-white/40">{score}/100</span>
                         </div>
                         <div className="h-1.5 bg-white/[0.06] rounded-full overflow-hidden">
-                          <div className="h-full bg-[#c8ff00] rounded-full" style={{ width: `${score}%` }} />
+                          <div className="h-full bg-[#C6A664] rounded-full" style={{ width: `${score}%` }} />
                         </div>
                       </div>
                     ))}
@@ -864,7 +864,7 @@ export default function ClientBlueprintPage() {
                         window.location.reload()
                       } catch {}
                     }}
-                    className="text-[10px] font-bold px-3 py-1.5 rounded-sm border border-[#c8ff00]/40 text-[#c8ff00] hover:bg-[#c8ff00]/10 transition-all"
+                    className="text-[10px] font-bold px-3 py-1.5 rounded-sm border border-[#C6A664]/40 text-[#C6A664] hover:bg-[#C6A664]/10 transition-all"
                   >
                     Recalculate All Lenses
                   </button>
@@ -935,7 +935,7 @@ export default function ClientBlueprintPage() {
                 {/* Status bar */}
                 {lenses && (
                   <div className="mt-4 flex items-center gap-2 text-[10px] text-white/30">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#c8ff00]" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#C6A664]" />
                     {Object.keys(LENS_DISPLAY).filter(k => (lenses as any)?.[k]?.status === 'calculated').length} / {Object.keys(LENS_DISPLAY).length} lenses active
                     <span className="ml-auto">
                       {lenses.astrology?.calculatedAt
@@ -961,15 +961,15 @@ export default function ClientBlueprintPage() {
               )}
 
               {/* Twin Status */}
-              <div className={`glass rounded-sm p-5 border ${twinExists ? 'border-[#c8ff00]/20' : 'border-white/[0.06]'}`}>
+              <div className={`glass rounded-sm p-5 border ${twinExists ? 'border-[#C6A664]/20' : 'border-white/[0.06]'}`}>
                 <div className="flex items-center gap-3">
-                  <div className={`w-3 h-3 rounded-full ${twinExists ? 'bg-[#c8ff00] animate-pulse-slow' : 'bg-white/20'}`} />
+                  <div className={`w-3 h-3 rounded-full ${twinExists ? 'bg-[#C6A664] animate-pulse-slow' : 'bg-white/20'}`} />
                   <div>
                     <p className="text-sm text-white/70">
                       {twinExists ? 'Your AI Twin is active and linked to this blueprint.' : 'No AI Twin deployed yet.'}
                     </p>
                     {!twinExists && (
-                      <Link href="/dashboard/client/twin" className="text-xs text-[#c8ff00] hover:underline mt-1 inline-block">
+                      <Link href="/dashboard/client/twin" className="text-xs text-[#C6A664] hover:underline mt-1 inline-block">
                         Configure Twin from Blueprint →
                       </Link>
                     )}
@@ -980,13 +980,13 @@ export default function ClientBlueprintPage() {
           )}
 
           {/* ── Expanded Blueprint Upgrade ── */}
-          <div className={`glass rounded-sm p-6 border ${purchasedExpanded ? 'border-[#c8ff00]/30' : 'border-white/[0.06] hover:border-white/15'}`}>
+          <div className={`glass rounded-sm p-6 border ${purchasedExpanded ? 'border-[#C6A664]/30' : 'border-white/[0.06] hover:border-white/15'}`}>
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
                   <h3 className="text-lg font-semibold">Expanded Blueprint</h3>
                   {purchasedExpanded && (
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#c8ff00]/20 text-[#c8ff00] uppercase tracking-wider">Purchased</span>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#C6A664]/20 text-[#C6A664] uppercase tracking-wider">Purchased</span>
                   )}
                 </div>
                 <p className="text-sm text-white/50 mb-3">
@@ -1001,7 +1001,7 @@ export default function ClientBlueprintPage() {
                 </div>
               </div>
               <div className="text-right shrink-0">
-                <div className="text-2xl font-bold text-[#c8ff00]">${EXPANDED_PRICE}</div>
+                <div className="text-2xl font-bold text-[#C6A664]">${EXPANDED_PRICE}</div>
                 <div className="text-[10px] text-white/30">one-time</div>
               </div>
             </div>
@@ -1009,7 +1009,7 @@ export default function ClientBlueprintPage() {
               <button
                 onClick={() => handlePurchase('expanded_blueprint')}
                 disabled={checkoutLoading === 'expanded_blueprint'}
-                className="w-full mt-4 px-5 py-2.5 bg-[#c8ff00] text-black text-xs font-bold rounded-sm hover:bg-white transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                className="w-full mt-4 px-5 py-2.5 bg-[#C6A664] text-black text-xs font-bold rounded-sm hover:bg-white transition-all disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 {checkoutLoading === 'expanded_blueprint' ? 'Processing...' : 'Purchase Expanded Blueprint'}
               </button>
@@ -1017,13 +1017,13 @@ export default function ClientBlueprintPage() {
           </div>
 
           {/* ── Enhanced Blueprint $35 ── */}
-          <div className={`glass rounded-sm p-6 border ${purchasedEnhanced ? 'border-[#00d4ff]/30' : 'border-white/[0.06] hover:border-white/15'}`}>
+          <div className={`glass rounded-sm p-6 border ${purchasedEnhanced ? 'border-[#5E8B84]/30' : 'border-white/[0.06] hover:border-white/15'}`}>
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
                   <h3 className="text-lg font-semibold">Enhanced Blueprint</h3>
                   {purchasedEnhanced && (
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#00d4ff]/20 text-[#00d4ff] uppercase tracking-wider">Purchased</span>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#5E8B84]/20 text-[#5E8B84] uppercase tracking-wider">Purchased</span>
                   )}
                 </div>
                 <p className="text-sm text-white/50 mb-3">
@@ -1038,7 +1038,7 @@ export default function ClientBlueprintPage() {
                 </div>
               </div>
               <div className="text-right shrink-0">
-                <div className="text-2xl font-bold text-[#00d4ff]">$35</div>
+                <div className="text-2xl font-bold text-[#5E8B84]">$35</div>
                 <div className="text-[10px] text-white/30">one-time</div>
               </div>
             </div>
@@ -1046,14 +1046,14 @@ export default function ClientBlueprintPage() {
               <button
                 onClick={() => handlePurchase('enhanced_blueprint')}
                 disabled={checkoutLoading === 'enhanced_blueprint'}
-                className="w-full mt-4 px-5 py-2.5 bg-[#00d4ff] text-black text-xs font-bold rounded-sm hover:bg-white transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                className="w-full mt-4 px-5 py-2.5 bg-[#5E8B84] text-black text-xs font-bold rounded-sm hover:bg-white transition-all disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 {checkoutLoading === 'enhanced_blueprint' ? 'Processing...' : 'Purchase Enhanced Blueprint — $35'}
               </button>
             )}
             {purchasedEnhanced && !purchasedExpanded && (
-              <p className="mt-3 text-xs text-[#00d4ff]/60 text-center">
-                Add the Expanded Blueprint for full whole-life intelligence scan → <Link href="/dashboard/client/blueprint/assess" className="underline hover:text-[#00d4ff]">Go to Assessment</Link>
+              <p className="mt-3 text-xs text-[#5E8B84]/60 text-center">
+                Add the Expanded Blueprint for full whole-life intelligence scan → <Link href="/dashboard/client/blueprint/assess" className="underline hover:text-[#5E8B84]">Go to Assessment</Link>
               </p>
             )}
           </div>
@@ -1066,7 +1066,7 @@ export default function ClientBlueprintPage() {
                 <p className="text-sm text-white/50">Add specific life-domain intelligence assessments to your blueprint. Each module unlocks 5 questions in that domain.</p>
               </div>
               <div className="text-right">
-                <div className="text-lg font-bold text-[#c8ff00]">${DOMAIN_PRICE}</div>
+                <div className="text-lg font-bold text-[#C6A664]">${DOMAIN_PRICE}</div>
                 <div className="text-[10px] text-white/30">each</div>
               </div>
             </div>
@@ -1075,13 +1075,13 @@ export default function ClientBlueprintPage() {
               {DOMAIN_MODULES.map((mod) => {
                 const owned = purchasedDomains.has(mod.id)
                 return (
-                  <div key={mod.id} className={`rounded-sm border p-4 transition-all ${owned ? 'border-[#c8ff00]/30 bg-[#c8ff00]/05' : 'border-white/[0.06] bg-white/[0.02] hover:border-white/15'}`}>
+                  <div key={mod.id} className={`rounded-sm border p-4 transition-all ${owned ? 'border-[#C6A664]/30 bg-[#C6A664]/05' : 'border-white/[0.06] bg-white/[0.02] hover:border-white/15'}`}>
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                           <span className="text-lg">{mod.icon}</span>
                           <h4 className="text-sm font-medium text-white/80">{mod.name}</h4>
-                          {owned && <span className="text-[9px] text-[#c8ff00] font-bold">✓</span>}
+                          {owned && <span className="text-[9px] text-[#C6A664] font-bold">✓</span>}
                         </div>
                         <p className="text-xs text-white/40 mt-1">{mod.desc}</p>
                       </div>
@@ -1090,7 +1090,7 @@ export default function ClientBlueprintPage() {
                           <button
                             onClick={() => handlePurchase(mod.id)}
                             disabled={checkoutLoading === mod.id}
-                            className="px-3 py-1.5 text-[10px] font-bold rounded-sm border border-[#c8ff00]/40 text-[#c8ff00] hover:bg-[#c8ff00]/10 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                            className="px-3 py-1.5 text-[10px] font-bold rounded-sm border border-[#C6A664]/40 text-[#C6A664] hover:bg-[#C6A664]/10 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                           >
                             {checkoutLoading === mod.id ? '...' : `$${DOMAIN_PRICE}`}
                           </button>
@@ -1098,7 +1098,7 @@ export default function ClientBlueprintPage() {
                         {owned && (
                           <Link
                             href={`/dashboard/client/blueprint/domain?key=${mod.id}`}
-                            className="px-3 py-1.5 text-[10px] font-bold rounded-sm border border-[#c8ff00]/40 text-[#c8ff00] hover:bg-[#c8ff00]/10 transition-all"
+                            className="px-3 py-1.5 text-[10px] font-bold rounded-sm border border-[#C6A664]/40 text-[#C6A664] hover:bg-[#C6A664]/10 transition-all"
                           >
                             Answer Questions
                           </Link>
@@ -1143,7 +1143,7 @@ export default function ClientBlueprintPage() {
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-white/50">Expanded</span>
-                <span className={purchasedExpanded ? 'text-[#c8ff00]' : 'text-white/40'}>{purchasedExpanded ? 'Active' : 'Locked'}</span>
+                <span className={purchasedExpanded ? 'text-[#C6A664]' : 'text-white/40'}>{purchasedExpanded ? 'Active' : 'Locked'}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-white/50">Modules</span>

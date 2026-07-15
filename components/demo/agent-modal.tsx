@@ -75,7 +75,7 @@ export default function AgentModal({ agentId, verticalColor, onClose }: AgentMod
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
       
       {/* Modal */}
-      <div className="relative w-full max-w-2xl max-h-[85vh] overflow-y-auto rounded-sm border border-white/[0.08] bg-[#080810] shadow-2xl animate-fade-in">
+      <div className="relative w-full max-w-2xl max-h-[85vh] overflow-y-auto rounded-sm border border-white/[0.08] bg-[#0A0A0B] shadow-2xl animate-fade-in">
         {/* Close button */}
         <button
           onClick={onClose}
@@ -86,7 +86,7 @@ export default function AgentModal({ agentId, verticalColor, onClose }: AgentMod
 
         {loading && (
           <div className="flex items-center justify-center py-20">
-            <div className="w-6 h-6 border-2 border-[#c8ff00] border-t-transparent rounded-full animate-spin" />
+            <div className="w-6 h-6 border-2 border-[#C6A664] border-t-transparent rounded-full animate-spin" />
           </div>
         )}
 
@@ -179,7 +179,7 @@ export default function AgentModal({ agentId, verticalColor, onClose }: AgentMod
                 <div className="space-y-1.5">
                   {agent.workflow_ids.map((wf) => (
                     <div key={wf} className="flex items-center gap-2 text-xs">
-                      <span className="text-[#c8ff00]">⚡</span>
+                      <span className="text-[#C6A664]">⚡</span>
                       <span className="text-white/60">{WORKFLOW_LABELS[wf] || wf}</span>
                     </div>
                   ))}

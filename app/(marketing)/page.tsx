@@ -7,19 +7,19 @@ const services = [
     title: 'Front Desk Agents',
     eyebrow: 'Intake and scheduling',
     copy: 'Qualify leads, answer common questions, route requests, and hand off clean context to your team.',
-    accent: 'border-[#00d4ff]/35 text-cyan',
+    accent: 'border-[#5E8B84]/35 text-cyan',
   },
   {
     title: 'Business Twins',
     eyebrow: 'Operations memory',
     copy: 'Turn your services, policies, offers, and workflows into a deployable intelligence layer.',
-    accent: 'border-[#c8ff00]/35 text-acid',
+    accent: 'border-[#C6A664]/35 text-acid',
   },
   {
     title: 'Creator Systems',
     eyebrow: 'Content and monetization',
     copy: 'Package expertise into assistants, campaigns, premium experiences, and affiliate-ready funnels.',
-    accent: 'border-[#a78bfa]/35 text-violet',
+    accent: 'border-[#8B7AA8]/35 text-violet',
   },
 ]
 
@@ -83,18 +83,18 @@ export default async function HomePage() {
   }
 
   return (
-    <div className="overflow-hidden bg-[#080810] text-white">
+    <div className="overflow-hidden bg-[#0A0A0B] text-white">
       <section className="relative flex min-h-[92vh] items-center px-5 pb-16 pt-28 md:px-8">
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_25%_20%,rgba(200,255,0,0.12),transparent_28%),radial-gradient(circle_at_78%_34%,rgba(0,212,255,0.1),transparent_26%)]" />
         <div className="mx-auto grid w-full max-w-7xl gap-12 lg:grid-cols-[1.04fr_0.96fr] lg:items-center">
           <div>
             <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-white/10 px-3 py-1.5 text-xs uppercase tracking-[0.24em] text-white/45">
-              <span className="h-1.5 w-1.5 rounded-full bg-[#c8ff00] animate-pulse-slow" />
+              <span className="h-1.5 w-1.5 rounded-full bg-[#C6A664] animate-pulse-slow" />
               Registered Intelligence Systems
             </div>
 
             <h1 className="max-w-5xl font-display text-5xl font-bold leading-[0.95] tracking-tight md:text-7xl xl:text-8xl">
-              Audacity in every <span className="text-[#c8ff00]">algorithm</span>.
+              Audacity in every <span className="text-[#C6A664]">algorithm</span>.
             </h1>
 
             <p className="mt-7 max-w-2xl text-lg leading-8 text-white/48">
@@ -105,7 +105,7 @@ export default async function HomePage() {
             <div className="mt-10 flex flex-col gap-3 sm:flex-row">
               <Link
                 href="/define-intelligence"
-                className="inline-flex items-center justify-center rounded-sm bg-[#c8ff00] px-7 py-3.5 text-sm font-bold text-black transition-colors hover:bg-white glow-acid"
+                className="inline-flex items-center justify-center rounded-sm bg-[#C6A664] px-7 py-3.5 text-sm font-bold text-black transition-colors hover:bg-white glow-acid"
               >
                 Define Your Intelligence
               </Link>
@@ -119,13 +119,13 @@ export default async function HomePage() {
           </div>
 
           <div className="rounded-lg border border-white/10 bg-white/[0.035] p-4 shadow-2xl shadow-black/30">
-            <div className="rounded-md border border-white/10 bg-[#0d0d1a] p-5">
+            <div className="rounded-md border border-white/10 bg-[#141414] p-5">
               <div className="flex items-center justify-between border-b border-white/10 pb-4">
                 <div>
                   <p className="text-xs uppercase tracking-[0.28em] text-white/35">Live OS</p>
                   <h2 className="mt-2 text-2xl font-semibold">Blueprint command center</h2>
                 </div>
-                <span className="rounded-full border border-[#c8ff00]/30 px-3 py-1 text-xs text-acid">Active</span>
+                <span className="rounded-full border border-[#C6A664]/30 px-3 py-1 text-xs text-acid">Active</span>
               </div>
 
               <div className="mt-5 grid gap-3">
@@ -140,7 +140,7 @@ export default async function HomePage() {
                         <h3 className="font-semibold">{label}</h3>
                         <p className="mt-1 text-sm leading-6 text-white/40">{copy}</p>
                       </div>
-                      <span className="text-sm font-semibold text-[#c8ff00]">{value}</span>
+                      <span className="text-sm font-semibold text-[#C6A664]">{value}</span>
                     </div>
                   </div>
                 ))}
@@ -172,7 +172,7 @@ export default async function HomePage() {
                 Build the intelligence layer your business keeps trying to become.
               </h2>
             </div>
-            <Link href="/intake" className="text-sm font-semibold text-[#c8ff00] hover:text-white">
+            <Link href="/intake" className="text-sm font-semibold text-[#C6A664] hover:text-white">
               Start blueprint assessment
             </Link>
           </div>
@@ -203,12 +203,12 @@ export default async function HomePage() {
               <Link
                 key={path.role}
                 href={path.href}
-                className="group rounded-lg border border-white/10 bg-white/[0.025] p-6 transition-colors hover:border-[#c8ff00]/50"
+                className="group rounded-lg border border-white/10 bg-white/[0.025] p-6 transition-colors hover:border-[#C6A664]/50"
               >
-                <p className="text-xs uppercase tracking-[0.28em] text-[#c8ff00]/70">{path.metric}</p>
+                <p className="text-xs uppercase tracking-[0.28em] text-[#C6A664]/70">{path.metric}</p>
                 <h3 className="mt-5 text-3xl font-semibold">{path.role}</h3>
                 <p className="mt-4 min-h-20 text-sm leading-7 text-white/45">{path.copy}</p>
-                <span className="mt-6 inline-flex text-sm font-semibold text-white/60 transition-colors group-hover:text-[#c8ff00]">
+                <span className="mt-6 inline-flex text-sm font-semibold text-white/60 transition-colors group-hover:text-[#C6A664]">
                   Open path
                 </span>
               </Link>
@@ -259,7 +259,7 @@ export default async function HomePage() {
               <a
                 href={process.env.NEXT_PUBLIC_EXCHANGE_URL || '/exchange'}
                 target="_blank" rel="noopener"
-                className="inline-flex items-center justify-center rounded-sm bg-[#c8ff00] px-6 py-3 text-sm font-bold text-black transition-colors hover:bg-white"
+                className="inline-flex items-center justify-center rounded-sm bg-[#C6A664] px-6 py-3 text-sm font-bold text-black transition-colors hover:bg-white"
               >
                 Visit the Exchange
               </a>
@@ -276,7 +276,7 @@ export default async function HomePage() {
             <div className="mt-5 space-y-3">
               {exchangeItems.map((item) => (
                 <div key={item} className="flex gap-3 rounded-md border border-white/10 bg-black/20 p-4">
-                  <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-[#c8ff00]" />
+                  <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-[#C6A664]" />
                   <p className="text-sm leading-6 text-white/55">{item}</p>
                 </div>
               ))}

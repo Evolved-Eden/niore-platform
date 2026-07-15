@@ -85,21 +85,21 @@ export default function BlueprintResultPage() {
   }
 
   if (checkingAuth || !result) return (
-    <main className="min-h-screen bg-[#080810] text-white flex items-center justify-center">
-      <div className="w-8 h-8 border-2 border-[#c8ff00] border-t-transparent rounded-full animate-spin" />
+    <main className="min-h-screen bg-[#0A0A0B] text-white flex items-center justify-center">
+      <div className="w-8 h-8 border-2 border-[#C6A664] border-t-transparent rounded-full animate-spin" />
     </main>
   )
 
   const domainColors: Record<string, string> = {
-    maturity: '#c8ff00',
+    maturity: '#C6A664',
     scale: '#60a5fa',
-    revenue_quality: '#34d399',
-    client_experience: '#f472b6',
-    tech_adoption: '#a78bfa',
+    revenue_quality: '#5E8B84',
+    client_experience: '#C6A664',
+    tech_adoption: '#8B7AA8',
     marketing_sophistication: '#fbbf24',
-    sophistication: '#e879f9',
-    ai_readiness: '#22d3ee',
-    operational_health: '#fb923c',
+    sophistication: '#C9974A',
+    ai_readiness: '#8B7AA8',
+    operational_health: '#B5764A',
     growth_velocity: '#f87171',
     service_level: '#38bdf8',
     revenue_sophistication: '#4ade80',
@@ -114,7 +114,7 @@ export default function BlueprintResultPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#080810] text-white">
+    <main className="min-h-screen bg-[#0A0A0B] text-white">
       <div className="max-w-3xl mx-auto px-6 py-16">
         {deployed ? (
           <div className="text-center py-20">
@@ -125,7 +125,7 @@ export default function BlueprintResultPage() {
             </p>
               <button
                 onClick={() => router.push('/dashboard')}
-                className="px-6 py-3 bg-[#c8ff00] text-[#080810] rounded-xl font-medium hover:bg-[#b8ee00] transition-all"
+                className="px-6 py-3 bg-[#C6A664] text-[#0A0A0B] rounded-xl font-medium hover:bg-[#b8ee00] transition-all"
               >
                 Go to Dashboard
               </button>
@@ -134,7 +134,7 @@ export default function BlueprintResultPage() {
           <>
             {/* Header */}
             <div className="mb-12">
-              <div className="text-xs text-[#c8ff00] uppercase tracking-widest mb-3">
+              <div className="text-xs text-[#C6A664] uppercase tracking-widest mb-3">
                 {result.vertical_key.replace(/_/g, ' ')} Blueprint
               </div>
               <h1 className="text-3xl font-display font-bold mb-3">{result.template_name}</h1>
@@ -158,7 +158,7 @@ export default function BlueprintResultPage() {
                         className="h-full rounded-full transition-all duration-1000"
                         style={{
                           width: `${score}%`,
-                          backgroundColor: domainColors[key] ?? '#c8ff00',
+                          backgroundColor: domainColors[key] ?? '#C6A664',
                         }}
                       />
                     </div>
@@ -228,11 +228,11 @@ export default function BlueprintResultPage() {
               <button
                 onClick={handleDeploy}
                 disabled={deploying}
-                className="px-8 py-3 bg-[#c8ff00] text-[#080810] rounded-xl font-medium hover:bg-[#b8ee00] transition-all disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2"
+                className="px-8 py-3 bg-[#C6A664] text-[#0A0A0B] rounded-xl font-medium hover:bg-[#b8ee00] transition-all disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2"
               >
                 {deploying ? (
                   <>
-                    <div className="w-4 h-4 border-2 border-[#080810] border-t-transparent rounded-full animate-spin" />
+                    <div className="w-4 h-4 border-2 border-[#0A0A0B] border-t-transparent rounded-full animate-spin" />
                     Deploying...
                   </>
                 ) : (

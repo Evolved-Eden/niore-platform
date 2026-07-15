@@ -16,9 +16,9 @@ import { requireAdmin } from '@/lib/admin-auth'
  * points at the correct table.
  *
  * Separately: the plan_tier_key values assignable in the admin Clients
- * dropdown (client_team, affiliate_starter/pro/enterprise, personal_free/
+ * dropdown (client_org, affiliate_starter/pro/enterprise, personal_free/
  * plus/premium) still don't all match membership_tiers/tier_entitlements'
- * real keys (client_teams, affiliate_bronze/silver/gold/platinum, no
+ * real keys (client_org, affiliate_bronze/silver/gold/platinum, no
  * personal_* rows exist at all). That part is a real, still-open naming
  * gap -- see the fixed subset in app/dashboard/admin/clients/
  * ClientsTable.tsx and the remaining personal_ / trial / none gap flagged

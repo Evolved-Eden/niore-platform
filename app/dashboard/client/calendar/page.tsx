@@ -59,7 +59,7 @@ export default function CalendarPage() {
               <div
                 key={d}
                 className={`text-center py-2 text-sm rounded-sm cursor-pointer transition-colors
-                  ${isToday ? 'bg-[#c8ff00] text-black font-bold' : 'text-white/60 hover:bg-white/[0.05]'}`}
+                  ${isToday ? 'bg-[#C6A664] text-black font-bold' : 'text-white/60 hover:bg-white/[0.05]'}`}
               >
                 {d}
               </div>

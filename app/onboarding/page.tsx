@@ -79,7 +79,7 @@ function PaymentStep({ clientSecret, amount, label, onSuccess }: {
       {/* Amount summary */}
       <div className="glass rounded-sm p-5 mb-6 flex items-center justify-between">
         <div className="text-sm text-white/60">{label}</div>
-        <div className="text-xl font-bold text-[#c8ff00]">
+        <div className="text-xl font-bold text-[#C6A664]">
           ${(amount / 100).toLocaleString()}
         </div>
       </div>
@@ -92,7 +92,7 @@ function PaymentStep({ clientSecret, amount, label, onSuccess }: {
         <button
           type="submit"
           disabled={loading || !stripe}
-          className="w-full py-4 bg-[#c8ff00] text-black font-bold text-sm rounded-sm hover:bg-white transition-colors disabled:opacity-50"
+          className="w-full py-4 bg-[#C6A664] text-black font-bold text-sm rounded-sm hover:bg-white transition-colors disabled:opacity-50"
         >
           {loading ? 'Processing...' : `Pay $${(amount / 100).toLocaleString()} & Begin Onboarding`}
         </button>
@@ -153,7 +153,7 @@ function ZuriStep({ onNext, userName }: { onNext: () => void; userName: string }
     <div className="max-w-xl mx-auto">
       <div className="mb-6">
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-8 h-8 rounded-full bg-[#c8ff00]/20 border border-[#c8ff00]/40 flex items-center justify-center text-xs font-bold text-[#c8ff00]">Z</div>
+          <div className="w-8 h-8 rounded-full bg-[#C6A664]/20 border border-[#C6A664]/40 flex items-center justify-center text-xs font-bold text-[#C6A664]">Z</div>
           <h2 className="text-xl font-bold">Meet Zuri</h2>
         </div>
         <p className="text-white/30 text-sm">Your intelligence is online. Let&apos;s calibrate your system.</p>
@@ -164,12 +164,12 @@ function ZuriStep({ onNext, userName }: { onNext: () => void; userName: string }
         {messages.map((m, i) => (
           <div key={i} className={`flex gap-3 ${m.from === 'user' ? 'flex-row-reverse' : ''}`}>
             {m.from === 'zuri' && (
-              <div className="w-6 h-6 rounded-full bg-[#c8ff00]/20 flex items-center justify-center text-[10px] font-bold text-[#c8ff00] flex-shrink-0 mt-0.5">Z</div>
+              <div className="w-6 h-6 rounded-full bg-[#C6A664]/20 flex items-center justify-center text-[10px] font-bold text-[#C6A664] flex-shrink-0 mt-0.5">Z</div>
             )}
             <div className={`text-sm rounded-sm px-4 py-3 max-w-[85%] ${
               m.from === 'zuri'
                 ? 'bg-white/[0.04] text-white/80 border border-white/[0.06]'
-                : 'bg-[#c8ff00]/10 text-[#c8ff00] border border-[#c8ff00]/20 ml-auto'
+                : 'bg-[#C6A664]/10 text-[#C6A664] border border-[#C6A664]/20 ml-auto'
             }`}>
               {m.text}
             </div>
@@ -177,7 +177,7 @@ function ZuriStep({ onNext, userName }: { onNext: () => void; userName: string }
         ))}
         {loading && (
           <div className="flex gap-3">
-            <div className="w-6 h-6 rounded-full bg-[#c8ff00]/20 flex items-center justify-center text-[10px] font-bold text-[#c8ff00] flex-shrink-0">Z</div>
+            <div className="w-6 h-6 rounded-full bg-[#C6A664]/20 flex items-center justify-center text-[10px] font-bold text-[#C6A664] flex-shrink-0">Z</div>
             <div className="glass rounded-sm px-4 py-3 text-white/30 text-sm">Thinking...</div>
           </div>
         )}
@@ -191,12 +191,12 @@ function ZuriStep({ onNext, userName }: { onNext: () => void; userName: string }
             onChange={e => setInput(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && sendMessage()}
             placeholder="Tell Zuri about your business..."
-            className="flex-1 bg-white/[0.04] border border-white/10 rounded-sm px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-[#c8ff00]/40 transition-colors"
+            className="flex-1 bg-white/[0.04] border border-white/10 rounded-sm px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-[#C6A664]/40 transition-colors"
           />
           <button
             onClick={sendMessage}
             disabled={loading}
-            className="px-5 py-3 bg-[#c8ff00] text-black text-sm font-bold rounded-sm hover:bg-white transition-colors disabled:opacity-40"
+            className="px-5 py-3 bg-[#C6A664] text-black text-sm font-bold rounded-sm hover:bg-white transition-colors disabled:opacity-40"
           >
             Send
           </button>
@@ -204,7 +204,7 @@ function ZuriStep({ onNext, userName }: { onNext: () => void; userName: string }
       ) : (
         <button
           onClick={onNext}
-          className="w-full py-3.5 bg-[#c8ff00] text-black font-bold text-sm rounded-sm hover:bg-white transition-colors"
+          className="w-full py-3.5 bg-[#C6A664] text-black font-bold text-sm rounded-sm hover:bg-white transition-colors"
         >
           Continue to Document Upload →
         </button>
@@ -274,7 +274,7 @@ function UploadStep({ onNext, userId }: { onNext: () => void; userId: string }) 
       </div>
 
       {/* Drop zone */}
-      <label className="block border-2 border-dashed border-white/10 rounded-sm p-10 text-center cursor-pointer hover:border-[#c8ff00]/30 transition-colors mb-4">
+      <label className="block border-2 border-dashed border-white/10 rounded-sm p-10 text-center cursor-pointer hover:border-[#C6A664]/30 transition-colors mb-4">
         <div className="text-white/20 text-sm mb-2">
           {files.length > 0
             ? `${files.length} file${files.length > 1 ? 's' : ''} selected`
@@ -294,7 +294,7 @@ function UploadStep({ onNext, userId }: { onNext: () => void; userId: string }) 
         <div className="space-y-1 mb-4">
           {files.map(f => (
             <div key={f.name} className="flex items-center gap-2 text-xs text-white/40 px-2">
-              <span className="text-[#c8ff00]">—</span> {f.name}
+              <span className="text-[#C6A664]">—</span> {f.name}
             </div>
           ))}
         </div>
@@ -310,7 +310,7 @@ function UploadStep({ onNext, userId }: { onNext: () => void; userId: string }) 
         <button
           onClick={handleUpload}
           disabled={uploading}
-          className="flex-1 py-3 bg-[#c8ff00] text-black font-bold text-sm rounded-sm hover:bg-white transition-colors disabled:opacity-50"
+          className="flex-1 py-3 bg-[#C6A664] text-black font-bold text-sm rounded-sm hover:bg-white transition-colors disabled:opacity-50"
         >
           {uploading ? 'Uploading...' : files.length > 0 ? 'Upload & Continue →' : 'Continue →'}
         </button>
@@ -386,7 +386,7 @@ function ScheduleStep({ onNext, userId, userName }: {
               onClick={() => { setSelectedDate(d); setSelectedTime(null) }}
               className={`p-3 rounded-sm border text-xs text-center transition-all ${
                 selectedDate === d
-                  ? 'border-[#c8ff00] bg-[#c8ff00]/10 text-[#c8ff00]'
+                  ? 'border-[#C6A664] bg-[#C6A664]/10 text-[#C6A664]'
                   : 'border-white/[0.08] text-white/40 hover:border-white/20 hover:text-white'
               }`}
             >
@@ -407,7 +407,7 @@ function ScheduleStep({ onNext, userId, userName }: {
                 onClick={() => setSelectedTime(t)}
                 className={`py-2.5 rounded-sm border text-xs transition-all ${
                   selectedTime === t
-                    ? 'border-[#c8ff00] bg-[#c8ff00]/10 text-[#c8ff00]'
+                    ? 'border-[#C6A664] bg-[#C6A664]/10 text-[#C6A664]'
                     : 'border-white/[0.08] text-white/40 hover:border-white/20 hover:text-white'
                 }`}
               >
@@ -420,9 +420,9 @@ function ScheduleStep({ onNext, userId, userName }: {
 
       {/* Confirmation */}
       {selectedDate && selectedTime && (
-        <div className="glass rounded-sm p-4 mb-6 border border-[#c8ff00]/20">
+        <div className="glass rounded-sm p-4 mb-6 border border-[#C6A664]/20">
           <div className="text-xs text-white/40 mb-1">Your consultation</div>
-          <div className="text-sm text-[#c8ff00] font-medium">
+          <div className="text-sm text-[#C6A664] font-medium">
             {formatDate(selectedDate)} at {selectedTime} EST
           </div>
           <div className="text-xs text-white/30 mt-1">~60 minutes · Video call link sent to your email</div>
@@ -439,7 +439,7 @@ function ScheduleStep({ onNext, userId, userName }: {
         <button
           onClick={handleBook}
           disabled={saving || !selectedDate || !selectedTime}
-          className="flex-1 py-3 bg-[#c8ff00] text-black font-bold text-sm rounded-sm hover:bg-white transition-colors disabled:opacity-50"
+          className="flex-1 py-3 bg-[#C6A664] text-black font-bold text-sm rounded-sm hover:bg-white transition-colors disabled:opacity-50"
         >
           {saving ? 'Booking...' : 'Confirm Booking →'}
         </button>
@@ -452,8 +452,8 @@ function ScheduleStep({ onNext, userId, userName }: {
 function DoneStep({ userName, router }: { userName: string; router: ReturnType<typeof useRouter> }) {
   return (
     <div className="max-w-md mx-auto text-center">
-      <div className="w-16 h-16 rounded-full bg-[#c8ff00]/10 border border-[#c8ff00]/30 flex items-center justify-center mx-auto mb-6">
-        <span className="text-[#c8ff00] text-2xl">✓</span>
+      <div className="w-16 h-16 rounded-full bg-[#C6A664]/10 border border-[#C6A664]/30 flex items-center justify-center mx-auto mb-6">
+        <span className="text-[#C6A664] text-2xl">✓</span>
       </div>
       <h2 className="text-3xl font-bold mb-3">You&apos;re in, {userName}.</h2>
       <p className="text-white/40 mb-8">
@@ -468,7 +468,7 @@ function DoneStep({ userName, router }: { userName: string; router: ReturnType<t
           'Dashboard access activated',
         ].map(item => (
           <div key={item} className="flex items-center gap-3 text-sm text-white/60">
-            <span className="text-[#c8ff00]">✓</span>
+            <span className="text-[#C6A664]">✓</span>
             {item}
           </div>
         ))}
@@ -476,7 +476,7 @@ function DoneStep({ userName, router }: { userName: string; router: ReturnType<t
 
       <button
         onClick={() => router.push('/intake')}
-        className="w-full py-4 bg-[#c8ff00] text-black font-bold rounded-sm hover:bg-white transition-colors"
+        className="w-full py-4 bg-[#C6A664] text-black font-bold rounded-sm hover:bg-white transition-colors"
       >
         Continue Intake →
       </button>
@@ -578,10 +578,10 @@ function OnboardingContent() {
   const stepIndex = STEPS.findIndex(s => s.id === step)
 
   return (
-    <div className="min-h-screen bg-[#080810] text-white">
+    <div className="min-h-screen bg-[#0A0A0B] text-white">
       {/* Header */}
       <header className="border-b border-white/[0.06] px-8 py-4 flex items-center justify-between">
-        <div className="font-bold text-lg">H<span className="text-[#c8ff00]">.</span></div>
+        <div className="font-bold text-lg">H<span className="text-[#C6A664]">.</span></div>
         <div className="text-xs text-white/30 tracking-widest uppercase">Onboarding</div>
       </header>
 
@@ -591,13 +591,13 @@ function OnboardingContent() {
           {STEPS.filter(s => s.id !== 'done').map((s, i) => (
             <div key={s.id} className="flex items-center flex-1">
               <div className={`flex items-center gap-2 text-xs transition-colors ${
-                i <= stepIndex ? 'text-[#c8ff00]' : 'text-white/20'
+                i <= stepIndex ? 'text-[#C6A664]' : 'text-white/20'
               }`}>
                 <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold border transition-all ${
                   i < stepIndex
-                    ? 'bg-[#c8ff00] border-[#c8ff00] text-black'
+                    ? 'bg-[#C6A664] border-[#C6A664] text-black'
                     : i === stepIndex
-                    ? 'border-[#c8ff00] text-[#c8ff00]'
+                    ? 'border-[#C6A664] text-[#C6A664]'
                     : 'border-white/20 text-white/20'
                 }`}>
                   {i < stepIndex ? '✓' : i + 1}
@@ -605,7 +605,7 @@ function OnboardingContent() {
                 <span className="hidden sm:block">{s.label}</span>
               </div>
               {i < STEPS.length - 2 && (
-                <div className={`flex-1 h-px mx-3 transition-colors ${i < stepIndex ? 'bg-[#c8ff00]/40' : 'bg-white/10'}`} />
+                <div className={`flex-1 h-px mx-3 transition-colors ${i < stepIndex ? 'bg-[#C6A664]/40' : 'bg-white/10'}`} />
               )}
             </div>
           ))}
@@ -622,10 +622,10 @@ function OnboardingContent() {
               appearance: {
                 theme: 'night',
                 variables: {
-                  colorPrimary: '#c8ff00',
-                  colorBackground: '#0d0d1a',
+                  colorPrimary: '#C6A664',
+                  colorBackground: '#141414',
                   colorText: '#ffffff',
-                  colorDanger: '#ff6b6b',
+                  colorDanger: '#7A2E32',
                   borderRadius: '2px',
                   fontFamily: 'system-ui, sans-serif',
                 },
@@ -643,7 +643,7 @@ function OnboardingContent() {
 
         {step === 'payment' && initializing && !paymentError && (
           <div className="text-center py-20">
-            <div className="w-8 h-8 border-2 border-[#c8ff00] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <div className="w-8 h-8 border-2 border-[#C6A664] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
             <div className="text-white/30 text-sm">Preparing your enrollment...</div>
           </div>
         )}
@@ -655,7 +655,7 @@ function OnboardingContent() {
               <p className="text-white/40 text-xs mb-4">{paymentError}</p>
               <button
                 onClick={() => window.location.reload()}
-                className="px-6 py-3 bg-[#c8ff00] text-black text-sm font-bold rounded-sm hover:bg-white transition-colors"
+                className="px-6 py-3 bg-[#C6A664] text-black text-sm font-bold rounded-sm hover:bg-white transition-colors"
               >
                 Try Again
               </button>
@@ -693,8 +693,8 @@ function OnboardingContent() {
 export default function OnboardingPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-[#080810] flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-[#c8ff00] border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen bg-[#0A0A0B] flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-[#C6A664] border-t-transparent rounded-full animate-spin" />
       </div>
     }>
       <OnboardingContent />

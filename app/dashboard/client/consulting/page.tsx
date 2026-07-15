@@ -35,7 +35,7 @@ const TYPE_LABELS: Record<string, string> = {
 };
 
 const STATUS_BADGES: Record<string, { label: string; color: string }> = {
-  scheduled: { label: "Scheduled", color: "bg-[#c8ff00] text-black" },
+  scheduled: { label: "Scheduled", color: "bg-[#C6A664] text-black" },
   completed: { label: "Completed", color: "bg-white/10 text-white/50" },
   cancelled: { label: "Cancelled", color: "bg-red-500/20 text-red-400" },
   rescheduled: { label: "Rescheduled", color: "bg-amber-500/20 text-amber-400" },
@@ -302,18 +302,18 @@ export default function ConsultingPage() {
       <div className="mb-10">
         <div className="flex items-center justify-between mb-1">
           <h1 className="font-display text-2xl font-bold tracking-tight">
-            <span className="text-[#c8ff00]">Evolved Eden Concierge</span>
+            <span className="text-[#C6A664]">Evolved Eden Concierge</span>
           </h1>
           <span
             className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-medium tracking-wider uppercase ${
               isEligible
-                ? "bg-[#c8ff00]/10 text-[#c8ff00] border border-[#c8ff00]/20"
+                ? "bg-[#C6A664]/10 text-[#C6A664] border border-[#C6A664]/20"
                 : "bg-white/5 text-white/30 border border-white/10"
             }`}
           >
             <span
               className={`w-1.5 h-1.5 rounded-full ${
-                isEligible ? "bg-[#c8ff00] animate-pulse-slow" : "bg-white/20"
+                isEligible ? "bg-[#C6A664] animate-pulse-slow" : "bg-white/20"
               }`}
             />
             {isEligible ? "Consultation Eligible" : "Not Eligible"}
@@ -376,8 +376,8 @@ export default function ConsultingPage() {
                           }}
                           className={`p-2 text-xs rounded-sm border transition-all ${
                             selected
-                              ? "border-[#c8ff00] bg-[#c8ff00]/10 text-[#c8ff00]"
-                              : "border-white/[0.06] hover:border-[#c8ff00]/40 text-white/60 hover:text-white"
+                              ? "border-[#C6A664] bg-[#C6A664]/10 text-[#C6A664]"
+                              : "border-white/[0.06] hover:border-[#C6A664]/40 text-white/60 hover:text-white"
                           }`}
                         >
                           <div className="text-[10px] opacity-50">
@@ -411,8 +411,8 @@ export default function ConsultingPage() {
                               isPast
                                 ? "border-white/[0.03] text-white/15 cursor-not-allowed"
                                 : selectedTime === t
-                                  ? "border-[#c8ff00] bg-[#c8ff00]/10 text-[#c8ff00]"
-                                  : "border-white/[0.06] hover:border-[#c8ff00]/40 text-white/60 hover:text-white"
+                                  ? "border-[#C6A664] bg-[#C6A664]/10 text-[#C6A664]"
+                                  : "border-white/[0.06] hover:border-[#C6A664]/40 text-white/60 hover:text-white"
                             }`}
                           >
                             {t}
@@ -433,13 +433,13 @@ export default function ConsultingPage() {
                         onClick={() => setConsultationType(ct.value)}
                         className={`p-3 rounded-sm border text-left transition-all ${
                           consultationType === ct.value
-                            ? "border-[#c8ff00] bg-[#c8ff00]/5"
+                            ? "border-[#C6A664] bg-[#C6A664]/5"
                             : "border-white/[0.06] hover:border-white/20"
                         }`}
                       >
                         <div
                           className={`text-xs font-medium mb-0.5 ${
-                            consultationType === ct.value ? "text-[#c8ff00]" : "text-white/70"
+                            consultationType === ct.value ? "text-[#C6A664]" : "text-white/70"
                           }`}
                         >
                           {ct.label}
@@ -469,7 +469,7 @@ export default function ConsultingPage() {
                   <button
                     onClick={() => setZuriFollowup(!zuriFollowup)}
                     className={`relative w-9 h-5 rounded-full transition-all ${
-                      zuriFollowup ? "bg-[#c8ff00]" : "bg-white/10"
+                      zuriFollowup ? "bg-[#C6A664]" : "bg-white/10"
                     }`}
                   >
                     <span
@@ -487,7 +487,7 @@ export default function ConsultingPage() {
                 <button
                   onClick={handleBook}
                   disabled={!selectedDate || !selectedTime || booking}
-                  className="w-full px-5 py-3 bg-[#c8ff00] text-black text-sm font-bold rounded-sm hover:bg-white transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="w-full px-5 py-3 bg-[#C6A664] text-black text-sm font-bold rounded-sm hover:bg-white transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   {booking ? "Booking..." : "Book Consultation"}
                 </button>
@@ -559,7 +559,7 @@ export default function ConsultingPage() {
                               href={c.meeting_link}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-block mt-1.5 text-[11px] text-[#c8ff00]/60 hover:text-[#c8ff00] underline underline-offset-2"
+                              className="inline-block mt-1.5 text-[11px] text-[#C6A664]/60 hover:text-[#C6A664] underline underline-offset-2"
                             >
                               {c.meeting_link}
                             </a>
@@ -663,13 +663,13 @@ export default function ConsultingPage() {
                 <span
                   className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
                     discordConnected
-                      ? "bg-[#c8ff00]/10 text-[#c8ff00] border border-[#c8ff00]/20"
+                      ? "bg-[#C6A664]/10 text-[#C6A664] border border-[#C6A664]/20"
                       : "bg-white/5 text-white/30 border border-white/10"
                   }`}
                 >
                   <span
                     className={`w-1.5 h-1.5 rounded-full ${
-                      discordConnected ? "bg-[#c8ff00]" : "bg-white/20"
+                      discordConnected ? "bg-[#C6A664]" : "bg-white/20"
                     }`}
                   />
                   {discordConnected ? "Connected" : "Disconnected"}
@@ -680,8 +680,8 @@ export default function ConsultingPage() {
               </p>
 
               {discordConnected ? (
-                <div className="mb-3 px-3 py-2 rounded-sm bg-[#c8ff00]/5 border border-[#c8ff00]/10">
-                  <div className="text-xs text-[#c8ff00] font-medium">Connected</div>
+                <div className="mb-3 px-3 py-2 rounded-sm bg-[#C6A664]/5 border border-[#C6A664]/10">
+                  <div className="text-xs text-[#C6A664] font-medium">Connected</div>
                   <div className="text-[11px] text-white/40 mt-0.5 font-mono truncate">
                     ID: {discordUserId || "synced"}
                   </div>
@@ -711,7 +711,7 @@ export default function ConsultingPage() {
                 className={`w-full px-4 py-2 text-xs font-bold rounded-sm transition-all ${
                   discordConnected
                     ? "border border-red-500/20 text-red-400/70 hover:text-red-400 hover:border-red-500/40 bg-transparent"
-                    : "bg-[#c8ff00] text-black hover:bg-white"
+                    : "bg-[#C6A664] text-black hover:bg-white"
                 } disabled:opacity-40`}
               >
                 {connectingDiscord
@@ -732,13 +732,13 @@ export default function ConsultingPage() {
                 <span
                   className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
                     whatsappConnected
-                      ? "bg-[#c8ff00]/10 text-[#c8ff00] border border-[#c8ff00]/20"
+                      ? "bg-[#C6A664]/10 text-[#C6A664] border border-[#C6A664]/20"
                       : "bg-white/5 text-white/30 border border-white/10"
                   }`}
                 >
                   <span
                     className={`w-1.5 h-1.5 rounded-full ${
-                      whatsappConnected ? "bg-[#c8ff00]" : "bg-white/20"
+                      whatsappConnected ? "bg-[#C6A664]" : "bg-white/20"
                     }`}
                   />
                   {whatsappConnected ? "Connected" : "Disconnected"}
@@ -749,8 +749,8 @@ export default function ConsultingPage() {
               </p>
 
               {whatsappConnected ? (
-                <div className="mb-3 px-3 py-2 rounded-sm bg-[#c8ff00]/5 border border-[#c8ff00]/10">
-                  <div className="text-xs text-[#c8ff00] font-medium">Connected</div>
+                <div className="mb-3 px-3 py-2 rounded-sm bg-[#C6A664]/5 border border-[#C6A664]/10">
+                  <div className="text-xs text-[#C6A664] font-medium">Connected</div>
                   <div className="text-[11px] text-white/40 mt-0.5 font-mono truncate">
                     {whatsappNumber || "Number synced"}
                   </div>
@@ -792,7 +792,7 @@ export default function ConsultingPage() {
                 className={`w-full px-4 py-2 text-xs font-bold rounded-sm transition-all ${
                   whatsappConnected
                     ? "border border-red-500/20 text-red-400/70 hover:text-red-400 hover:border-red-500/40 bg-transparent"
-                    : "bg-[#c8ff00] text-black hover:bg-white"
+                    : "bg-[#C6A664] text-black hover:bg-white"
                 } disabled:opacity-40`}
               >
                 {connectingWhatsApp
@@ -814,7 +814,7 @@ export default function ConsultingPage() {
                   <button
                     onClick={() => setDiscordBriefings(!discordBriefings)}
                     className={`relative w-8 h-4 rounded-full transition-all ${
-                      discordBriefings ? "bg-[#c8ff00]" : "bg-white/10"
+                      discordBriefings ? "bg-[#C6A664]" : "bg-white/10"
                     }`}
                   >
                     <span
@@ -829,7 +829,7 @@ export default function ConsultingPage() {
                   <button
                     onClick={() => setWhatsappReminders(!whatsappReminders)}
                     className={`relative w-8 h-4 rounded-full transition-all ${
-                      whatsappReminders ? "bg-[#c8ff00]" : "bg-white/10"
+                      whatsappReminders ? "bg-[#C6A664]" : "bg-white/10"
                     }`}
                   >
                     <span
@@ -844,7 +844,7 @@ export default function ConsultingPage() {
                   <button
                     onClick={() => setDailyDigest(!dailyDigest)}
                     className={`relative w-8 h-4 rounded-full transition-all ${
-                      dailyDigest ? "bg-[#c8ff00]" : "bg-white/10"
+                      dailyDigest ? "bg-[#C6A664]" : "bg-white/10"
                     }`}
                   >
                     <span
@@ -871,9 +871,9 @@ export default function ConsultingPage() {
             <div className="space-y-2">
               <Link
                 href="/dashboard/client/zuri"
-                className="flex items-center gap-3 px-4 py-3 rounded-sm border border-white/[0.06] hover:border-[#c8ff00]/30 hover:bg-white/[0.02] transition-all group"
+                className="flex items-center gap-3 px-4 py-3 rounded-sm border border-white/[0.06] hover:border-[#C6A664]/30 hover:bg-white/[0.02] transition-all group"
               >
-                <span className="text-base" style={{ color: "#c8ff00" }}>
+                <span className="text-base" style={{ color: "#C6A664" }}>
                   ◆
                 </span>
                 <div>
@@ -917,9 +917,9 @@ export default function ConsultingPage() {
                   setConsultationType("strategy");
                   window.scrollTo({ top: 0, behavior: "smooth" });
                 }}
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-sm border border-[#c8ff00]/10 hover:border-[#c8ff00]/30 hover:bg-[#c8ff00]/[0.02] transition-all group text-left"
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-sm border border-[#C6A664]/10 hover:border-[#C6A664]/30 hover:bg-[#C6A664]/[0.02] transition-all group text-left"
               >
-                <span className="text-base" style={{ color: "#c8ff00" }}>
+                <span className="text-base" style={{ color: "#C6A664" }}>
                   ↻
                 </span>
                 <div>
@@ -947,8 +947,8 @@ export default function ConsultingPage() {
             </button>
 
             {/* Icon */}
-            <div className="w-12 h-12 rounded-full bg-[#c8ff00]/10 border border-[#c8ff00]/20 flex items-center justify-center mb-4 mx-auto">
-              <span className="text-xl" style={{ color: "#c8ff00" }}>
+            <div className="w-12 h-12 rounded-full bg-[#C6A664]/10 border border-[#C6A664]/20 flex items-center justify-center mb-4 mx-auto">
+              <span className="text-xl" style={{ color: "#C6A664" }}>
                 ✓
               </span>
             </div>
@@ -992,7 +992,7 @@ export default function ConsultingPage() {
                     onClick={() => {
                       navigator.clipboard.writeText(confirmBooking.meeting_link!);
                     }}
-                    className="text-xs text-[#c8ff00]/70 hover:text-[#c8ff00] underline underline-offset-2"
+                    className="text-xs text-[#C6A664]/70 hover:text-[#C6A664] underline underline-offset-2"
                   >
                     Copy Link
                   </button>
@@ -1008,7 +1008,7 @@ export default function ConsultingPage() {
                   href={confirmBooking.meeting_link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-xs text-[#c8ff00]/80 hover:text-[#c8ff00] underline underline-offset-2 break-all"
+                  className="text-xs text-[#C6A664]/80 hover:text-[#C6A664] underline underline-offset-2 break-all"
                 >
                   {confirmBooking.meeting_link}
                 </a>
@@ -1043,7 +1043,7 @@ export default function ConsultingPage() {
                   setSelectedDate(null);
                   setSelectedTime("");
                 }}
-                className="flex-1 px-4 py-2.5 bg-[#c8ff00] text-black text-xs font-bold rounded-sm hover:bg-white transition-all"
+                className="flex-1 px-4 py-2.5 bg-[#C6A664] text-black text-xs font-bold rounded-sm hover:bg-white transition-all"
               >
                 Book Another
               </button>

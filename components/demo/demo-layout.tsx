@@ -73,10 +73,10 @@ export default function DemoVerticalPage({ slug }: { slug: string }) {
 
   if (!verticalData) {
     return (
-      <div className="min-h-screen bg-[#080810] text-white flex items-center justify-center">
+      <div className="min-h-screen bg-[#0A0A0B] text-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-2">Vertical not found</h1>
-          <Link href="/demo" className="text-[#c8ff00] hover:underline">← Back to demos</Link>
+          <Link href="/demo" className="text-[#C6A664] hover:underline">← Back to demos</Link>
         </div>
       </div>
     )
@@ -149,11 +149,11 @@ export default function DemoVerticalPage({ slug }: { slug: string }) {
   }
 
   return (
-    <div className="min-h-screen bg-[#080810] text-white">
+    <div className="min-h-screen bg-[#0A0A0B] text-white">
       {/* Header */}
-      <header className="sticky top-0 z-50 flex items-center justify-between px-6 py-4 border-b border-white/5 bg-[#080810]/90 backdrop-blur-xl">
+      <header className="sticky top-0 z-50 flex items-center justify-between px-6 py-4 border-b border-white/5 bg-[#0A0A0B]/90 backdrop-blur-xl">
         <Link href="/" className="font-display text-sm font-semibold tracking-wide">
-          EVOLVED <span className="text-[#c8ff00]">EDEN</span>
+          EVOLVED <span className="text-[#C6A664]">EDEN</span>
         </Link>
         <div className="flex items-center gap-4">
           <Link href="/define-intelligence" className="text-xs text-white/40 hover:text-white/70 transition-colors">
@@ -404,7 +404,7 @@ export default function DemoVerticalPage({ slug }: { slug: string }) {
                 <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                   <div className={`max-w-[80%] rounded-sm px-4 py-3 text-sm leading-relaxed whitespace-pre-line ${
                     msg.role === 'user'
-                      ? 'bg-[#c8ff00] text-black'
+                      ? 'bg-[#C6A664] text-black'
                       : 'bg-white/[0.04] text-white/80 border border-white/[0.06]'
                   }`}>
                     {msg.content || (
@@ -435,7 +435,7 @@ export default function DemoVerticalPage({ slug }: { slug: string }) {
                 <button
                   type="submit"
                   disabled={!input.trim() || isLoading}
-                  className="px-5 py-3 bg-[#c8ff00] text-black text-sm font-bold rounded-sm hover:bg-white transition-all disabled:opacity-40"
+                  className="px-5 py-3 bg-[#C6A664] text-black text-sm font-bold rounded-sm hover:bg-white transition-all disabled:opacity-40"
                 >
                   Send
                 </button>

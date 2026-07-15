@@ -204,7 +204,7 @@ export default function AdminDeploymentsPage() {
 
       {loading ? (
         <div className="flex items-center justify-center py-16">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#c8ff00] border-t-transparent" />
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#C6A664] border-t-transparent" />
         </div>
       ) : (
         <div className="space-y-4">
@@ -283,7 +283,7 @@ export default function AdminDeploymentsPage() {
                           <button
                             onClick={() => handleDeployAgent(cid)}
                             disabled={!agentPicked[cid]}
-                            className="px-3 py-1.5 text-xs font-medium bg-[#c8ff00] text-black rounded-sm hover:bg-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                            className="px-3 py-1.5 text-xs font-medium bg-[#C6A664] text-black rounded-sm hover:bg-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                           >
                             Deploy {agentPicked[cid] ? `"${agentPicked[cid]!.name}"` : ''}
                           </button>
@@ -336,7 +336,7 @@ export default function AdminDeploymentsPage() {
                           <button
                             onClick={() => handleDeploySwarm(cid)}
                             disabled={!swarmPicked[cid]}
-                            className="px-3 py-1.5 text-xs font-medium bg-[#c8ff00] text-black rounded-sm hover:bg-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                            className="px-3 py-1.5 text-xs font-medium bg-[#C6A664] text-black rounded-sm hover:bg-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                           >
                             Deploy {swarmPicked[cid] ? `"${swarmPicked[cid]!.name}"` : ''}
                           </button>

@@ -1,17 +1,18 @@
 import type { Metadata } from 'next'
-import { Inter, Space_Grotesk } from 'next/font/google'
+import { Manrope, Italiana } from 'next/font/google'
 import { Toaster } from 'sonner'
 import './globals.css'
 
-const inter = Inter({
+const manrope = Manrope({
   subsets: ['latin'],
-  variable: '--font-inter',
+  variable: '--font-body',
   display: 'swap',
 })
 
-const spaceGrotesk = Space_Grotesk({
+const italiana = Italiana({
   subsets: ['latin'],
-  variable: '--font-space',
+  weight: '400',
+  variable: '--font-display-face',
   display: 'swap',
 })
 
@@ -23,14 +24,14 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable}`}>
-      <body className="bg-[#080810] text-white antialiased">
+    <html lang="en" className={`${manrope.variable} ${italiana.variable}`}>
+      <body className="bg-[#0A0A0B] text-white antialiased">
         {children}
         <Toaster
           theme="dark"
           toastOptions={{
             style: {
-              background: '#0f0f1a',
+              background: '#141414',
               border: '1px solid rgba(255,255,255,0.08)',
               color: '#fff',
             },

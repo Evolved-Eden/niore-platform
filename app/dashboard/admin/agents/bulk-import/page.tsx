@@ -128,7 +128,7 @@ export default function BulkImportPage() {
         <button
           onClick={handleImport}
           disabled={importing}
-          className="px-4 py-2 text-sm font-medium bg-[#c8ff00] text-black rounded-sm hover:bg-white transition-colors font-bold w-full"
+          className="px-4 py-2 text-sm font-medium bg-[#C6A664] text-black rounded-sm hover:bg-white transition-colors font-bold w-full"
         >
           {importing ? 'Importing...' : `Import ${stats.valid} Agents`}
         </button>

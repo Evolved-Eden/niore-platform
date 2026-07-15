@@ -482,7 +482,7 @@ export default function AdminTwinPage() {
   if (loadingUsers) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="w-6 h-6 border-2 border-[#ff6b6b] border-t-transparent rounded-full animate-spin" />
+        <div className="w-6 h-6 border-2 border-[#7A2E32] border-t-transparent rounded-full animate-spin" />
       </div>
     )
   }
@@ -497,7 +497,7 @@ export default function AdminTwinPage() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="font-display text-2xl font-bold tracking-tight mb-1">
-            Twin <span className="text-[#ff6b6b]">Management</span>
+            Twin <span className="text-[#7A2E32]">Management</span>
           </h1>
           <p className="text-white/30 text-sm">Administer twins across all users</p>
         </div>
@@ -520,7 +520,7 @@ export default function AdminTwinPage() {
         <select
           value={selectedUserId}
           onChange={e => setSelectedUserId(e.target.value)}
-          className="flex-1 max-w-md px-3 py-2 bg-white/[0.04] border border-white/10 rounded-sm text-sm text-white/70 focus:outline-none focus:border-[#ff6b6b]/40"
+          className="flex-1 max-w-md px-3 py-2 bg-white/[0.04] border border-white/10 rounded-sm text-sm text-white/70 focus:outline-none focus:border-[#7A2E32]/40"
         >
           {users.map(u => (
             <option key={u.id} value={u.id}>
@@ -535,7 +535,7 @@ export default function AdminTwinPage() {
           <span className="text-xs capitalize px-2 py-0.5 rounded-sm"
             style={{
               backgroundColor: twin.twin_status === 'active' ? 'rgba(52,211,153,0.2)' : 'rgba(251,191,36,0.2)',
-              color: twin.twin_status === 'active' ? '#34d399' : '#fb923c',
+              color: twin.twin_status === 'active' ? '#5E8B84' : '#B5764A',
             }}
           >
             {twin.twin_status}
@@ -551,7 +551,7 @@ export default function AdminTwinPage() {
             onClick={() => setActiveTab(tab.id)}
             className={`px-4 py-2 text-xs font-medium rounded-sm transition-all ${
               activeTab === tab.id
-                ? 'bg-[#ff6b6b]/10 text-[#ff6b6b] border border-[#ff6b6b]/20'
+                ? 'bg-[#7A2E32]/10 text-[#7A2E32] border border-[#7A2E32]/20'
                 : 'text-white/30 hover:text-white/60 border border-transparent'
             }`}
           >
@@ -564,7 +564,7 @@ export default function AdminTwinPage() {
       {/* Panel wrapper */}
       {loadingTwin ? (
         <div className="flex items-center justify-center py-16">
-          <div className="w-5 h-5 border-2 border-[#ff6b6b] border-t-transparent rounded-full animate-spin" />
+          <div className="w-5 h-5 border-2 border-[#7A2E32] border-t-transparent rounded-full animate-spin" />
         </div>
       ) : (
         <>
@@ -579,8 +579,8 @@ export default function AdminTwinPage() {
                 <div className="glass rounded-sm overflow-hidden">
                   <div className="px-6 py-5 border-b border-white/[0.06]">
                     <div className="flex items-center gap-4 mb-5">
-                      <div className="w-14 h-14 rounded-full bg-[#ff6b6b]/10 border-2 border-[#ff6b6b]/30 flex items-center justify-center shrink-0">
-                        <span className="text-xl font-bold text-[#ff6b6b]">
+                      <div className="w-14 h-14 rounded-full bg-[#7A2E32]/10 border-2 border-[#7A2E32]/30 flex items-center justify-center shrink-0">
+                        <span className="text-xl font-bold text-[#7A2E32]">
                           {selectedUser?.full_name?.charAt(0) ?? selectedUser?.email?.charAt(0) ?? '?'}
                         </span>
                       </div>
@@ -675,7 +675,7 @@ export default function AdminTwinPage() {
                             max={100}
                             value={editFields.confidence_threshold}
                             onChange={e => setEditFields(f => ({ ...f, confidence_threshold: parseInt(e.target.value) }))}
-                            className="w-full accent-[#ff6b6b]"
+                            className="w-full accent-[#7A2E32]"
                           />
                         </div>
                         <div className="flex items-center">
@@ -684,7 +684,7 @@ export default function AdminTwinPage() {
                               type="checkbox"
                               checked={editFields.memory_enabled}
                               onChange={e => setEditFields(f => ({ ...f, memory_enabled: e.target.checked }))}
-                              className="accent-[#ff6b6b]"
+                              className="accent-[#7A2E32]"
                             />
                             <span className="text-sm text-white/60">Memory On</span>
                           </label>
@@ -694,7 +694,7 @@ export default function AdminTwinPage() {
                       <div className="flex items-center gap-3 pt-2">
                         <button
                           onClick={handleSaveOverview}
-                          className="px-5 py-2 bg-[#ff6b6b] text-black text-xs font-bold rounded-sm hover:bg-white transition-all"
+                          className="px-5 py-2 bg-[#7A2E32] text-black text-xs font-bold rounded-sm hover:bg-white transition-all"
                         >
                           Save Changes
                         </button>
@@ -713,10 +713,10 @@ export default function AdminTwinPage() {
                     <div className="text-xs text-white/30 tracking-widest uppercase mb-4">Metrics</div>
                     <div className="grid grid-cols-4 gap-3">
                       {[
-                        { label: 'Engagement', value: twin?.engagement_score ?? 0, color: '#ff6b6b' },
-                        { label: 'Confidence', value: twin?.confidence_score ?? 0, color: '#00d4ff' },
-                        { label: 'Loyalty', value: twin?.loyalty_score ?? 0, color: '#a78bfa' },
-                        { label: 'Intel', value: twin?.intelligence_score ?? 0, color: '#fb923c' },
+                        { label: 'Engagement', value: twin?.engagement_score ?? 0, color: '#7A2E32' },
+                        { label: 'Confidence', value: twin?.confidence_score ?? 0, color: '#5E8B84' },
+                        { label: 'Loyalty', value: twin?.loyalty_score ?? 0, color: '#8B7AA8' },
+                        { label: 'Intel', value: twin?.intelligence_score ?? 0, color: '#B5764A' },
                       ].map(s => (
                         <div key={s.label} className="bg-white/[0.03] rounded-sm p-3 border border-white/[0.06]">
                           <div className="text-[10px] text-white/30 uppercase mb-1">{s.label}</div>
@@ -786,7 +786,7 @@ export default function AdminTwinPage() {
                     value={memorySearch}
                     onChange={e => setMemorySearch(e.target.value)}
                     placeholder="Search memories..."
-                    className="w-full px-3 py-2 bg-white/[0.04] border border-white/10 rounded-sm text-sm text-white/70 pl-8 focus:outline-none focus:border-[#ff6b6b]/40"
+                    className="w-full px-3 py-2 bg-white/[0.04] border border-white/10 rounded-sm text-sm text-white/70 pl-8 focus:outline-none focus:border-[#7A2E32]/40"
                   />
                   <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-white/20">&#x1F50D;</span>
                 </div>
@@ -794,7 +794,7 @@ export default function AdminTwinPage() {
                   <select
                     value={memoryTypeFilter}
                     onChange={e => setMemoryTypeFilter(e.target.value)}
-                    className="px-3 py-2 bg-white/[0.04] border border-white/10 rounded-sm text-sm text-white/50 focus:outline-none focus:border-[#ff6b6b]/40"
+                    className="px-3 py-2 bg-white/[0.04] border border-white/10 rounded-sm text-sm text-white/50 focus:outline-none focus:border-[#7A2E32]/40"
                   >
                     <option value="">All types</option>
                     {memoryTypes.map(t => (
@@ -813,7 +813,7 @@ export default function AdminTwinPage() {
 
               {memoriesLoading ? (
                 <div className="flex justify-center py-12">
-                  <div className="w-5 h-5 border-2 border-[#ff6b6b] border-t-transparent rounded-full animate-spin" />
+                  <div className="w-5 h-5 border-2 border-[#7A2E32] border-t-transparent rounded-full animate-spin" />
                 </div>
               ) : filteredMemories.length === 0 ? (
                 <div className="glass rounded-sm p-8 text-center">
@@ -873,12 +873,12 @@ export default function AdminTwinPage() {
                     onChange={e => setInstructions(e.target.value)}
                     rows={6}
                     placeholder="e.g. Always consider the user's Blueprint archetype when tailoring responses..."
-                    className="w-full px-3 py-2.5 bg-white/[0.04] border border-white/10 rounded-sm text-sm text-white/70 focus:outline-none focus:border-[#ff6b6b]/40 resize-none"
+                    className="w-full px-3 py-2.5 bg-white/[0.04] border border-white/10 rounded-sm text-sm text-white/70 focus:outline-none focus:border-[#7A2E32]/40 resize-none"
                   />
                   <div className="flex justify-end mt-3">
                     <button
                       onClick={handleSaveInstructions}
-                      className="px-4 py-2 bg-[#ff6b6b] text-black text-xs font-bold rounded-sm hover:bg-white transition-all"
+                      className="px-4 py-2 bg-[#7A2E32] text-black text-xs font-bold rounded-sm hover:bg-white transition-all"
                     >
                       Save Instructions
                     </button>
@@ -894,7 +894,7 @@ export default function AdminTwinPage() {
                       value={uploadTitle}
                       onChange={e => setUploadTitle(e.target.value)}
                       placeholder="Document title..."
-                      className="flex-1 px-3 py-2 bg-white/[0.04] border border-white/10 rounded-sm text-sm text-white/70 focus:outline-none focus:border-[#ff6b6b]/40"
+                      className="flex-1 px-3 py-2 bg-white/[0.04] border border-white/10 rounded-sm text-sm text-white/70 focus:outline-none focus:border-[#7A2E32]/40"
                     />
                     <input ref={fileInputRef} type="file" accept=".txt,.md,.pdf" onChange={e => setUploadFile(e.target.files?.[0] ?? null)} className="hidden" />
                     <button
@@ -914,7 +914,7 @@ export default function AdminTwinPage() {
                       <button
                         onClick={handleUploadKnowledge}
                         disabled={uploading}
-                        className="px-4 py-1.5 bg-[#ff6b6b] text-black text-[11px] font-bold rounded-sm hover:bg-white transition-all disabled:opacity-40"
+                        className="px-4 py-1.5 bg-[#7A2E32] text-black text-[11px] font-bold rounded-sm hover:bg-white transition-all disabled:opacity-40"
                       >
                         {uploading ? 'Uploading...' : 'Upload'}
                       </button>
@@ -987,7 +987,7 @@ export default function AdminTwinPage() {
                                 onClick={() => handleToggleAgent(agent.agent_id)}
                                 className={`px-3 py-1.5 text-[10px] font-bold rounded-sm transition-all ${
                                   connected
-                                    ? 'bg-[#ff6b6b]/10 text-[#ff6b6b] border border-[#ff6b6b]/20 hover:bg-red-900/20'
+                                    ? 'bg-[#7A2E32]/10 text-[#7A2E32] border border-[#7A2E32]/20 hover:bg-red-900/20'
                                     : 'border border-white/10 text-white/30 hover:border-white/30 hover:text-white/60'
                                 }`}
                               >
@@ -1035,7 +1035,7 @@ export default function AdminTwinPage() {
                                 onClick={() => handleToggleSwarm(swarm.swarm_id)}
                                 className={`px-3 py-1.5 text-[10px] font-bold rounded-sm transition-all ${
                                   connected
-                                    ? 'bg-[#ff6b6b]/10 text-[#ff6b6b] border border-[#ff6b6b]/20 hover:bg-red-900/20'
+                                    ? 'bg-[#7A2E32]/10 text-[#7A2E32] border border-[#7A2E32]/20 hover:bg-red-900/20'
                                     : 'border border-white/10 text-white/30 hover:border-white/30 hover:text-white/60'
                                 }`}
                               >

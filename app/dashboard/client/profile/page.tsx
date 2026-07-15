@@ -3,10 +3,10 @@ import Link from 'next/link'
 
 // ─── Role color map ───────────────────────────────────────────
 const ROLE_COLORS: Record<string, string> = {
-  client: '#c8ff00',
-  creator: '#00d4ff',
-  admin: '#ff6b6b',
-  personal: '#fb923c',
+  client: '#C6A664',
+  creator: '#5E8B84',
+  admin: '#7A2E32',
+  personal: '#B5764A',
 }
 
 const ROLE_LABELS: Record<string, string> = {
@@ -26,7 +26,7 @@ const PLAN_LABELS: Record<string, string> = {
   none: 'None',
   // client_*
   client_founder: 'Founder',
-  client_team: 'Team',
+  client_org: 'Org',
   client_enterprise: 'Enterprise',
   // creator_*
   creator_studio: 'Studio',
@@ -176,7 +176,7 @@ export default async function ClientProfilePage() {
 
   const name = identity.full_name ?? user.email?.split('@')[0] ?? 'User'
   const role: string = identity.role ?? 'client'
-  const roleColor = ROLE_COLORS[role] ?? '#c8ff00'
+  const roleColor = ROLE_COLORS[role] ?? '#C6A664'
   const hasBlueprint = !!((twin as any)?.metadata?.blueprint)
   const completePct = profileComplete(identity, client, hasBlueprint)
 
@@ -226,19 +226,19 @@ export default async function ClientProfilePage() {
   }
 
   const PRIORITY_COLORS: Record<string, string> = {
-    high: '#ff6b6b',
-    medium: '#fb923c',
-    low: '#22d3ee',
+    high: '#7A2E32',
+    medium: '#B5764A',
+    low: '#8B7AA8',
   }
   const TYPE_CONFIG: Record<string, { label: string; color: string }> = {
-    focus: { label: 'Focus', color: '#c8ff00' },
-    optimization: { label: 'Optimization', color: '#00d4ff' },
-    timing: { label: 'Timing', color: '#a78bfa' },
-    opportunity: { label: 'Opportunity', color: '#34d399' },
-    growth: { label: 'Growth', color: '#fb923c' },
-    brand: { label: 'Brand', color: '#f472b6' },
-    habit: { label: 'Habit', color: '#22d3ee' },
-    action: { label: 'Action', color: '#e879f9' },
+    focus: { label: 'Focus', color: '#C6A664' },
+    optimization: { label: 'Optimization', color: '#5E8B84' },
+    timing: { label: 'Timing', color: '#8B7AA8' },
+    opportunity: { label: 'Opportunity', color: '#5E8B84' },
+    growth: { label: 'Growth', color: '#B5764A' },
+    brand: { label: 'Brand', color: '#C6A664' },
+    habit: { label: 'Habit', color: '#8B7AA8' },
+    action: { label: 'Action', color: '#C9974A' },
   }
 
   return (
@@ -246,7 +246,7 @@ export default async function ClientProfilePage() {
       {/* ═══ Header ═══ */}
       <div className="mb-8">
         <h1 className="font-display text-2xl font-bold tracking-tight mb-1">
-          My <span className="text-[#c8ff00]">Profile</span>
+          My <span className="text-[#C6A664]">Profile</span>
         </h1>
         <p className="text-white/30 text-sm">Your complete intelligence profile</p>
       </div>
@@ -295,7 +295,7 @@ export default async function ClientProfilePage() {
                   className="h-full rounded-full transition-all"
                   style={{
                     width: `${completePct}%`,
-                    backgroundColor: completePct === 100 ? '#34d399' : roleColor,
+                    backgroundColor: completePct === 100 ? '#5E8B84' : roleColor,
                   }}
                 />
               </div>
@@ -324,8 +324,8 @@ export default async function ClientProfilePage() {
             {/* Quick stat row */}
             <div className="px-6 py-4 grid grid-cols-3 gap-3">
               <StatCell label="Role" value={ROLE_LABELS[role] ?? role} color={roleColor} />
-              <StatCell label="Twin Status" value={twin ? 'Active' : 'Inactive'} color={twin ? '#34d399' : '#6b7280'} />
-              <StatCell label="Blueprint" value={hasBlueprint ? 'Complete' : 'Pending'} color={hasBlueprint ? '#c8ff00' : '#6b7280'} />
+              <StatCell label="Twin Status" value={twin ? 'Active' : 'Inactive'} color={twin ? '#5E8B84' : '#6b7280'} />
+              <StatCell label="Blueprint" value={hasBlueprint ? 'Complete' : 'Pending'} color={hasBlueprint ? '#C6A664' : '#6b7280'} />
             </div>
           </div>
 
@@ -375,7 +375,7 @@ export default async function ClientProfilePage() {
               <div className="mt-5 pt-4 border-t border-white/[0.06]">
                 <Link
                   href="/intake"
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-[#c8ff00]/10 border border-[#c8ff00]/25 text-[#c8ff00] text-xs font-semibold rounded-sm hover:bg-[#c8ff00]/20 transition-all"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-[#C6A664]/10 border border-[#C6A664]/25 text-[#C6A664] text-xs font-semibold rounded-sm hover:bg-[#C6A664]/20 transition-all"
                 >
                   Complete your intake profile →
                 </Link>
@@ -390,7 +390,7 @@ export default async function ClientProfilePage() {
               <div>
                 <div className="flex items-center justify-between mb-4">
                   <div>
-                    <div className="text-3xl font-bold text-[#c8ff00]">
+                    <div className="text-3xl font-bold text-[#C6A664]">
                       {(twin as any)?.metadata?.blueprint?.core?.overallScore ?? '—'}
                     </div>
                     <div className="text-[10px] text-white/30 tracking-widest uppercase mt-1">Overall Score</div>
@@ -411,7 +411,7 @@ export default async function ClientProfilePage() {
                           key={key}
                           label={key.replace(/_/g, ' ')}
                           value={val}
-                          color="#c8ff00"
+                          color="#C6A664"
                         />
                       ))}
                     </div>
@@ -425,7 +425,7 @@ export default async function ClientProfilePage() {
                 )}
                 <Link
                   href="/dashboard/client/blueprint"
-                  className="inline-block mt-4 text-xs text-[#c8ff00]/60 hover:text-[#c8ff00] transition-colors"
+                  className="inline-block mt-4 text-xs text-[#C6A664]/60 hover:text-[#C6A664] transition-colors"
                 >
                   View full blueprint →
                 </Link>
@@ -439,7 +439,7 @@ export default async function ClientProfilePage() {
                 <p className="text-xs text-white/20 mb-4">Complete the assessment to unlock your intelligence foundation</p>
                 <Link
                   href="/dashboard/client/blueprint/assess"
-                  className="inline-block px-5 py-2.5 bg-[#c8ff00] text-black text-xs font-bold rounded-sm hover:bg-white transition-all"
+                  className="inline-block px-5 py-2.5 bg-[#C6A664] text-black text-xs font-bold rounded-sm hover:bg-white transition-all"
                 >
                   Take Assessment →
                 </Link>
@@ -463,14 +463,14 @@ export default async function ClientProfilePage() {
             {twin ? (
               <div>
                 <div className="grid grid-cols-3 gap-3 mb-5">
-                  <StatCell label="Version" value={`v${twinVersion}`} color="#a78bfa" />
-                  <StatCell label="Status" value={twinStatus} color={twinStatus === 'active' ? '#34d399' : '#6b7280'} />
-                  <StatCell label="Loyalty" value={`${loyaltyScore}%`} color="#a78bfa" />
+                  <StatCell label="Version" value={`v${twinVersion}`} color="#8B7AA8" />
+                  <StatCell label="Status" value={twinStatus} color={twinStatus === 'active' ? '#5E8B84' : '#6b7280'} />
+                  <StatCell label="Loyalty" value={`${loyaltyScore}%`} color="#8B7AA8" />
                 </div>
                 <div className="space-y-3">
-                  <ScoreBar label="Engagement" value={engagementScore} color="#c8ff00" />
-                  <ScoreBar label="Confidence" value={confidenceScore} color="#00d4ff" />
-                  <ScoreBar label="Loyalty" value={loyaltyScore} color="#a78bfa" />
+                  <ScoreBar label="Engagement" value={engagementScore} color="#C6A664" />
+                  <ScoreBar label="Confidence" value={confidenceScore} color="#5E8B84" />
+                  <ScoreBar label="Loyalty" value={loyaltyScore} color="#8B7AA8" />
                 </div>
                 {(twin as any)?.personality_summary && (
                   <p className="text-sm text-white/50 leading-relaxed mt-4 pt-4 border-t border-white/[0.06]">
@@ -487,7 +487,7 @@ export default async function ClientProfilePage() {
                 <p className="text-xs text-white/20 mb-4">Complete your blueprint to generate your twin</p>
                 <Link
                   href="/dashboard/client/blueprint/assess"
-                  className="inline-block px-5 py-2.5 bg-[#c8ff00] text-black text-xs font-bold rounded-sm hover:bg-white transition-all"
+                  className="inline-block px-5 py-2.5 bg-[#C6A664] text-black text-xs font-bold rounded-sm hover:bg-white transition-all"
                 >
                   Deploy Twin →
                 </Link>
@@ -505,15 +505,15 @@ export default async function ClientProfilePage() {
           <div className="glass rounded-sm border border-white/[0.06] overflow-hidden">
             <div className="px-5 py-4 border-b border-white/[0.06]">
               <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-[#c8ff00] animate-pulse-slow" />
-                <span className="text-xs text-[#c8ff00] tracking-widest uppercase font-medium">
+                <div className="w-2 h-2 rounded-full bg-[#C6A664] animate-pulse-slow" />
+                <span className="text-xs text-[#C6A664] tracking-widest uppercase font-medium">
                   Essence Activity
                 </span>
               </div>
             </div>
             <div className="divide-y divide-white/[0.04]">
               {essenceItems.map((item, i) => {
-                const cfg = TYPE_CONFIG[item.type] ?? { label: 'Insight', color: '#a78bfa' }
+                const cfg = TYPE_CONFIG[item.type] ?? { label: 'Insight', color: '#8B7AA8' }
                 return (
                   <div
                     key={i}
@@ -523,7 +523,7 @@ export default async function ClientProfilePage() {
                     <div className="flex items-start gap-3">
                       <div
                         className="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0"
-                        style={{ backgroundColor: PRIORITY_COLORS[item.priority] ?? '#22d3ee' }}
+                        style={{ backgroundColor: PRIORITY_COLORS[item.priority] ?? '#8B7AA8' }}
                       />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-0.5">
@@ -532,7 +532,7 @@ export default async function ClientProfilePage() {
                           </span>
                           <span
                             className="text-[8px] uppercase tracking-widest"
-                            style={{ color: PRIORITY_COLORS[item.priority] ?? '#22d3ee' }}
+                            style={{ color: PRIORITY_COLORS[item.priority] ?? '#8B7AA8' }}
                           >
                             {item.priority}
                           </span>
@@ -564,7 +564,7 @@ export default async function ClientProfilePage() {
                 </svg>
               </div>
             </div>
-            <div className="text-3xl font-light text-[#c8ff00] mb-1">{vaultCount}</div>
+            <div className="text-3xl font-light text-[#C6A664] mb-1">{vaultCount}</div>
             <p className="text-xs text-white/40">document{vaultCount !== 1 ? 's' : ''} stored</p>
             {vaultCount === 0 && (
               <p className="text-[10px] text-white/20 mt-2">Upload your first document to seed your intelligence vault</p>
@@ -581,7 +581,7 @@ export default async function ClientProfilePage() {
                 </svg>
               </div>
             </div>
-            <div className="text-3xl font-light text-[#00d4ff] mb-1">{agentDeployments}</div>
+            <div className="text-3xl font-light text-[#5E8B84] mb-1">{agentDeployments}</div>
             <p className="text-xs text-white/40">deployed agent{agentDeployments !== 1 ? 's' : ''}</p>
             {agentDeployments === 0 && (
               <p className="text-[10px] text-white/20 mt-2">Deploy your first agent from the blueprint page</p>
@@ -596,7 +596,7 @@ export default async function ClientProfilePage() {
                 <span className="text-xs text-white/40">Current Plan</span>
                 <Badge
                   label={planLabel(planTier)}
-                  color={planTier === 'free' ? '#6b7280' : '#c8ff00'}
+                  color={planTier === 'free' ? '#6b7280' : '#C6A664'}
                 />
               </div>
               <div className="flex items-center justify-between">
@@ -610,7 +610,7 @@ export default async function ClientProfilePage() {
                 <span
                   className={`text-[10px] font-medium uppercase tracking-wider px-2 py-0.5 rounded-sm ${
                     consultationEligible
-                      ? 'text-[#34d399] bg-[#34d399]/10 border border-[#34d399]/25'
+                      ? 'text-[#5E8B84] bg-[#5E8B84]/10 border border-[#5E8B84]/25'
                       : 'text-white/20 bg-white/[0.03] border border-white/[0.06]'
                   }`}
                 >
@@ -620,7 +620,7 @@ export default async function ClientProfilePage() {
             </div>
             <Link
               href="/dashboard/client/plan"
-              className="inline-block mt-4 text-xs text-[#c8ff00]/60 hover:text-[#c8ff00] transition-colors"
+              className="inline-block mt-4 text-xs text-[#C6A664]/60 hover:text-[#C6A664] transition-colors"
             >
               View plan details →
             </Link>

@@ -385,7 +385,7 @@ const PATH_META = {
   client: {
     title: 'Client',
     subtitle: 'For professionals, business owners, and service providers',
-    color: '#c8ff00',
+    color: '#C6A664',
     prices: 'from $397/mo',
     icon: (
       <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -396,7 +396,7 @@ const PATH_META = {
   creator: {
     title: 'Creator',
     subtitle: 'For content creators, coaches, educators, and digital entrepreneurs',
-    color: '#a78bfa',
+    color: '#8B7AA8',
     prices: 'from $297/mo',
     icon: (
       <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -407,7 +407,7 @@ const PATH_META = {
   personal: {
     title: 'Personal',
     subtitle: 'For individuals, partners, and families',
-    color: '#22d3ee',
+    color: '#8B7AA8',
     prices: 'free to start',
     icon: (
       <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -418,7 +418,7 @@ const PATH_META = {
   affiliate: {
     title: 'Affiliate',
     subtitle: 'For affiliate marketers and referral partners',
-    color: '#fb923c',
+    color: '#B5764A',
     prices: 'from $0/mo',
     icon: (
       <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -487,26 +487,26 @@ export default function DefineIntelligenceFlow({ initialPath }: { initialPath?: 
   // ── Welcome Step ──
   if (step === 'welcome') {
     return (
-      <main className="min-h-screen bg-[#080810] text-white">
-        <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 py-5 border-b border-white/5 bg-[#080810]/80 backdrop-blur-xl">
+      <main className="min-h-screen bg-[#0A0A0B] text-white">
+        <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 py-5 border-b border-white/5 bg-[#0A0A0B]/80 backdrop-blur-xl">
           <Link href="/" className="font-display font-bold tracking-tight text-lg">
-            EVOLVED <span className="text-[#c8ff00]">EDEN</span>
+            EVOLVED <span className="text-[#C6A664]">EDEN</span>
           </Link>
           <div className="flex items-center gap-6 text-sm text-white/50">
             <Link href="/demo" className="hover:text-white transition-colors">Demo</Link>
             <Link href="/pricing" className="hover:text-white transition-colors">Pricing</Link>
             <Link href="/login" className="hover:text-white transition-colors">Sign In</Link>
-            <Link href="/pricing" className="px-4 py-2 bg-[#c8ff00] text-black text-xs font-bold rounded-sm hover:bg-white transition-colors">Get Started</Link>
+            <Link href="/pricing" className="px-4 py-2 bg-[#C6A664] text-black text-xs font-bold rounded-sm hover:bg-white transition-colors">Get Started</Link>
           </div>
         </nav>
 
         <section className="flex flex-col items-center justify-center min-h-screen px-6 pt-20">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 border border-white/10 rounded-full text-xs text-white/40 mb-8 tracking-widest uppercase">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#c8ff00] animate-pulse-slow" />
+            <span className="w-1.5 h-1.5 rounded-full bg-[#C6A664] animate-pulse-slow" />
             Define Your Intelligence
           </div>
           <h1 className="font-display text-5xl md:text-7xl font-bold tracking-tighter mb-6 max-w-3xl text-center leading-none">
-            What kind of intelligence<br /><span className="text-[#c8ff00]">do you need?</span>
+            What kind of intelligence<br /><span className="text-[#C6A664]">do you need?</span>
           </h1>
           <p className="text-white/40 text-lg max-w-xl text-center mb-12 leading-relaxed">
             Tell us about your world, and we&apos;ll design the system that fits how you work, create, and grow.
@@ -541,10 +541,10 @@ export default function DefineIntelligenceFlow({ initialPath }: { initialPath?: 
     const isValid = personalInfo.name.trim() && personalInfo.email.trim()
 
     return (
-      <main className="min-h-screen bg-[#080810] text-white">
+      <main className="min-h-screen bg-[#0A0A0B] text-white">
         <header className="flex items-center justify-between px-6 py-4 border-b border-white/5">
           <Link href="/" className="font-display text-sm font-semibold tracking-wide">
-            EVOLVED <span className="text-[#c8ff00]">EDEN</span>
+            EVOLVED <span className="text-[#C6A664]">EDEN</span>
           </Link>
           <span className="text-xs font-medium px-2 py-1 rounded-full" style={{ backgroundColor: `${meta.color}15`, color: meta.color }}>{meta.title}</span>
         </header>
@@ -556,31 +556,31 @@ export default function DefineIntelligenceFlow({ initialPath }: { initialPath?: 
               <div>
                 <label className="text-xs text-white/40 block mb-1.5">Full Name *</label>
                 <input type="text" value={personalInfo.name} onChange={e => setPersonalInfo(p => ({ ...p, name: e.target.value }))}
-                  className="w-full px-4 py-3 rounded-xl border border-white/10 bg-white/[0.03] text-white placeholder-white/30 focus:outline-none focus:border-[#c8ff00]/50 transition-all"
+                  className="w-full px-4 py-3 rounded-xl border border-white/10 bg-white/[0.03] text-white placeholder-white/30 focus:outline-none focus:border-[#C6A664]/50 transition-all"
                   placeholder="Your name" required />
               </div>
               <div>
                 <label className="text-xs text-white/40 block mb-1.5">Email Address *</label>
                 <input type="email" value={personalInfo.email} onChange={e => setPersonalInfo(p => ({ ...p, email: e.target.value }))}
-                  className="w-full px-4 py-3 rounded-xl border border-white/10 bg-white/[0.03] text-white placeholder-white/30 focus:outline-none focus:border-[#c8ff00]/50 transition-all"
+                  className="w-full px-4 py-3 rounded-xl border border-white/10 bg-white/[0.03] text-white placeholder-white/30 focus:outline-none focus:border-[#C6A664]/50 transition-all"
                   placeholder="you@example.com" required />
               </div>
               <div>
                 <label className="text-xs text-white/40 block mb-1.5">Phone Number <span className="text-white/20">(optional)</span></label>
                 <input type="tel" value={personalInfo.phone} onChange={e => setPersonalInfo(p => ({ ...p, phone: e.target.value }))}
-                  className="w-full px-4 py-3 rounded-xl border border-white/10 bg-white/[0.03] text-white placeholder-white/30 focus:outline-none focus:border-[#c8ff00]/50 transition-all"
+                  className="w-full px-4 py-3 rounded-xl border border-white/10 bg-white/[0.03] text-white placeholder-white/30 focus:outline-none focus:border-[#C6A664]/50 transition-all"
                   placeholder="(555) 123-4567" />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs text-white/40 block mb-1.5">Date of Birth <span className="text-white/20">(optional)</span></label>
                   <input type="date" value={personalInfo.dob} onChange={e => setPersonalInfo(p => ({ ...p, dob: e.target.value }))}
-                    className="w-full px-4 py-3 rounded-xl border border-white/10 bg-white/[0.03] text-white focus:outline-none focus:border-[#c8ff00]/50 transition-all [color-scheme:dark]" />
+                    className="w-full px-4 py-3 rounded-xl border border-white/10 bg-white/[0.03] text-white focus:outline-none focus:border-[#C6A664]/50 transition-all [color-scheme:dark]" />
                 </div>
                 <div>
                   <label className="text-xs text-white/40 block mb-1.5">Address <span className="text-white/20">(optional)</span></label>
                   <input type="text" value={personalInfo.address} onChange={e => setPersonalInfo(p => ({ ...p, address: e.target.value }))}
-                    className="w-full px-4 py-3 rounded-xl border border-white/10 bg-white/[0.03] text-white placeholder-white/30 focus:outline-none focus:border-[#c8ff00]/50 transition-all"
+                    className="w-full px-4 py-3 rounded-xl border border-white/10 bg-white/[0.03] text-white placeholder-white/30 focus:outline-none focus:border-[#C6A664]/50 transition-all"
                     placeholder="City, State" />
                 </div>
               </div>
@@ -588,7 +588,7 @@ export default function DefineIntelligenceFlow({ initialPath }: { initialPath?: 
                 <button type="button" onClick={() => setStep('welcome')}
                   className="text-sm text-white/30 hover:text-white/60 transition-colors">← Back</button>
                 <button type="submit" disabled={!isValid}
-                  className="px-8 py-3 bg-[#c8ff00] text-black font-bold text-sm rounded-sm hover:bg-white transition-all disabled:opacity-40 disabled:cursor-not-allowed">
+                  className="px-8 py-3 bg-[#C6A664] text-black font-bold text-sm rounded-sm hover:bg-white transition-all disabled:opacity-40 disabled:cursor-not-allowed">
                   Start Questions →
                 </button>
               </div>
@@ -606,10 +606,10 @@ export default function DefineIntelligenceFlow({ initialPath }: { initialPath?: 
     const hasPrev = currentQuestion > 0
 
     return (
-      <main className="min-h-screen bg-[#080810] text-white">
+      <main className="min-h-screen bg-[#0A0A0B] text-white">
         <header className="flex items-center justify-between px-6 py-4 border-b border-white/5">
           <Link href="/define-intelligence" className="font-display text-sm font-semibold tracking-wide">
-            EVOLVED <span className="text-[#c8ff00]">EDEN</span>
+            EVOLVED <span className="text-[#C6A664]">EDEN</span>
           </Link>
           <div className="flex items-center gap-3">
             <span className="text-xs font-medium px-2 py-1 rounded-full" style={{ backgroundColor: `${meta.color}15`, color: meta.color }}>{meta.title}</span>
@@ -656,21 +656,21 @@ export default function DefineIntelligenceFlow({ initialPath }: { initialPath?: 
     const other = analysis.recommendation === 'A' ? analysis.optionB : analysis.optionA
 
     return (
-      <main className="min-h-screen bg-[#080810] text-white">
+      <main className="min-h-screen bg-[#0A0A0B] text-white">
         <header className="flex items-center justify-between px-6 py-4 border-b border-white/5">
           <Link href="/" className="font-display text-sm font-semibold tracking-wide">
-            EVOLVED <span className="text-[#c8ff00]">EDEN</span>
+            EVOLVED <span className="text-[#C6A664]">EDEN</span>
           </Link>
           <span className="text-xs font-medium px-2 py-1 rounded-full" style={{ backgroundColor: `${meta.color}15`, color: meta.color }}>{meta.title}</span>
         </header>
         <div className="max-w-2xl mx-auto px-6 py-16">
           <div className="text-center mb-10 animate-fade-in">
-            <div className="w-16 h-16 rounded-full bg-[#c8ff00]/10 border border-[#c8ff00]/20 flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-[#c8ff00]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <div className="w-16 h-16 rounded-full bg-[#C6A664]/10 border border-[#C6A664]/20 flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-[#C6A664]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
             </div>
-            <h1 className="font-display text-3xl font-bold mb-2">Zuri&apos;s <span className="text-[#c8ff00]">Analysis</span></h1>
+            <h1 className="font-display text-3xl font-bold mb-2">Zuri&apos;s <span className="text-[#C6A664]">Analysis</span></h1>
             <p className="text-white/40 text-sm max-w-md mx-auto">Based on your answers, I&apos;ve designed two intelligence paths for you.</p>
           </div>
           <div className="rounded-sm p-6 mb-8 border animate-fade-in" style={{ backgroundColor: `${meta.color}08`, borderColor: `${meta.color}20` }}>
@@ -707,7 +707,7 @@ export default function DefineIntelligenceFlow({ initialPath }: { initialPath?: 
             <p className="text-sm text-white/40 mb-4">Ready to build your intelligence system?</p>
             <button
               onClick={() => setStep('plan-detail')}
-              className="inline-block px-8 py-3.5 bg-[#c8ff00] text-black font-bold text-sm rounded-sm hover:bg-white transition-all glow-acid"
+              className="inline-block px-8 py-3.5 bg-[#C6A664] text-black font-bold text-sm rounded-sm hover:bg-white transition-all glow-acid"
             >
               View Your Plan →
             </button>
@@ -726,7 +726,7 @@ export default function DefineIntelligenceFlow({ initialPath }: { initialPath?: 
 
     // Map analysis → actual plan tier
     const planMapping: Record<string, Record<string, string>> = {
-      client: { A: 'client_founder', B: 'client_team' },
+      client: { A: 'client_founder', B: 'client_org' },
       creator: { A: 'creator_studio', B: 'creator_premium' },
       personal: { A: 'personal_plus', B: 'personal_premium' },
     }
@@ -763,10 +763,10 @@ export default function DefineIntelligenceFlow({ initialPath }: { initialPath?: 
     }
 
     return (
-      <main className="min-h-screen bg-[#080810] text-white">
+      <main className="min-h-screen bg-[#0A0A0B] text-white">
         <header className="flex items-center justify-between px-6 py-4 border-b border-white/5">
           <Link href="/" className="font-display text-sm font-semibold tracking-wide">
-            EVOLVED <span className="text-[#c8ff00]">EDEN</span>
+            EVOLVED <span className="text-[#C6A664]">EDEN</span>
           </Link>
           <span className="text-xs font-medium px-2 py-1 rounded-full" style={{ backgroundColor: `${meta.color}15`, color: meta.color }}>{meta.title}</span>
         </header>
@@ -774,7 +774,7 @@ export default function DefineIntelligenceFlow({ initialPath }: { initialPath?: 
         <div className="max-w-2xl mx-auto px-6 py-16">
           {/* Plan header */}
           <div className="text-center mb-10 animate-fade-in">
-            <div className="text-xs text-[#c8ff00] uppercase tracking-widest mb-2">Your Intelligence System</div>
+            <div className="text-xs text-[#C6A664] uppercase tracking-widest mb-2">Your Intelligence System</div>
             <h1 className="font-display text-4xl font-bold mb-2">
               {plan?.name || 'Your Plan'}
             </h1>
@@ -783,14 +783,14 @@ export default function DefineIntelligenceFlow({ initialPath }: { initialPath?: 
 
           {/* Price card */}
           {plan && (
-            <div className="glass rounded-2xl p-6 border border-[#c8ff00]/20 mb-8 animate-fade-in" style={{ background: 'linear-gradient(135deg, rgba(200,255,0,0.05) 0%, rgba(200,255,0,0.01) 100%)' }}>
+            <div className="glass rounded-2xl p-6 border border-[#C6A664]/20 mb-8 animate-fade-in" style={{ background: 'linear-gradient(135deg, rgba(200,255,0,0.05) 0%, rgba(200,255,0,0.01) 100%)' }}>
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <div className="text-xs text-white/30 uppercase tracking-wider mb-1">{path!.charAt(0).toUpperCase() + path!.slice(1)} Plan</div>
                   <h2 className="text-2xl font-bold">{plan.name}</h2>
                 </div>
                 <div className="text-right">
-                  <div className="text-3xl font-bold text-[#c8ff00]">${plan.price.toLocaleString()}</div>
+                  <div className="text-3xl font-bold text-[#C6A664]">${plan.price.toLocaleString()}</div>
                   <div className="text-xs text-white/40">{plan.period || 'free'}</div>
                 </div>
               </div>
@@ -820,7 +820,7 @@ export default function DefineIntelligenceFlow({ initialPath }: { initialPath?: 
                   onClick={() => toggleAddon(addon.id)}
                   className={`flex items-center justify-between rounded-sm p-3 border text-left transition-all ${
                     selectedAddons.has(addon.id)
-                      ? 'border-[#c8ff00]/40 bg-[#c8ff00]/8'
+                      ? 'border-[#C6A664]/40 bg-[#C6A664]/8'
                       : 'border-white/[0.06] bg-white/[0.02] hover:border-white/20'
                   }`}
                 >
@@ -834,7 +834,7 @@ export default function DefineIntelligenceFlow({ initialPath }: { initialPath?: 
                     </span>
                     <div className={`w-4 h-4 rounded-sm border flex items-center justify-center transition-all ${
                       selectedAddons.has(addon.id)
-                        ? 'bg-[#c8ff00] border-[#c8ff00]'
+                        ? 'bg-[#C6A664] border-[#C6A664]'
                         : 'border-white/20'
                     }`}>
                       {selectedAddons.has(addon.id) && (
@@ -871,7 +871,7 @@ export default function DefineIntelligenceFlow({ initialPath }: { initialPath?: 
               <div className="flex justify-between items-baseline">
                 <span className="text-sm font-semibold text-white/80">Total</span>
                 <div className="text-right">
-                  <span className="text-xl font-bold text-[#c8ff00]">
+                  <span className="text-xl font-bold text-[#C6A664]">
                     ${monthlyTotal.toLocaleString()}
                   </span>
                   <span className="text-xs text-white/30 ml-1">
@@ -892,7 +892,7 @@ export default function DefineIntelligenceFlow({ initialPath }: { initialPath?: 
             <button
               onClick={handleCheckout}
               disabled={checkoutLoading}
-              className="flex-1 px-8 py-4 bg-[#c8ff00] text-black font-bold text-sm rounded-sm hover:bg-white transition-all disabled:opacity-40 disabled:cursor-not-allowed text-center"
+              className="flex-1 px-8 py-4 bg-[#C6A664] text-black font-bold text-sm rounded-sm hover:bg-white transition-all disabled:opacity-40 disabled:cursor-not-allowed text-center"
             >
               {checkoutLoading ? (
                 <span className="inline-flex items-center gap-2">

@@ -42,7 +42,7 @@ function SwarmsContent() {
         </div>
         <Link
           href="/dashboard/admin/swarms/new"
-          className="px-4 py-2 text-sm font-medium bg-[#c8ff00] text-black rounded-sm hover:bg-white transition-colors font-bold"
+          className="px-4 py-2 text-sm font-medium bg-[#C6A664] text-black rounded-sm hover:bg-white transition-colors font-bold"
         >
           + New Swarm
         </Link>

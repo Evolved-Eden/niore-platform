@@ -172,9 +172,9 @@ export default function ClientVault() {
   }
 
   const getTypeBadge = (type: string | null) => {
-    if (type === 'vault_note') return { label: 'Note', color: '#c8ff00' }
-    if (type === 'vault_upload' || type === 'onboarding_upload') return { label: 'File', color: '#00d4ff' }
-    return { label: type ?? 'Unknown', color: '#a78bfa' }
+    if (type === 'vault_note') return { label: 'Note', color: '#C6A664' }
+    if (type === 'vault_upload' || type === 'onboarding_upload') return { label: 'File', color: '#5E8B84' }
+    return { label: type ?? 'Unknown', color: '#8B7AA8' }
   }
 
   return (
@@ -183,7 +183,7 @@ export default function ClientVault() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="font-display text-2xl font-bold tracking-tight mb-1">
-            Intelligence <span className="text-[#c8ff00]">Vault</span>
+            Intelligence <span className="text-[#C6A664]">Vault</span>
           </h1>
           <p className="text-white/30 text-sm">Secure knowledge and document storage</p>
         </div>
@@ -197,7 +197,7 @@ export default function ClientVault() {
           </button>
           <button
             onClick={() => setShowNewNote(true)}
-            className="px-4 py-2 bg-[#c8ff00] text-black text-xs font-semibold rounded-sm hover:bg-white transition-all"
+            className="px-4 py-2 bg-[#C6A664] text-black text-xs font-semibold rounded-sm hover:bg-white transition-all"
           >
             + New Note
           </button>
@@ -223,7 +223,7 @@ export default function ClientVault() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search vault..."
-            className="w-full bg-white/[0.04] border border-white/10 rounded-sm pl-10 pr-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-[#c8ff00]/40 transition-all"
+            className="w-full bg-white/[0.04] border border-white/10 rounded-sm pl-10 pr-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-[#C6A664]/40 transition-all"
           />
         </div>
       </div>
@@ -231,7 +231,7 @@ export default function ClientVault() {
       {/* Vault entries */}
       {loading ? (
         <div className="text-center py-20">
-          <div className="w-8 h-8 border-2 border-[#c8ff00] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <div className="w-8 h-8 border-2 border-[#C6A664] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
           <p className="text-white/30 text-sm">Loading vault...</p>
         </div>
       ) : filtered.length === 0 ? (
@@ -304,7 +304,7 @@ export default function ClientVault() {
       {/* New Note Modal */}
       {showNewNote && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="bg-[#0d0d1a] border border-white/[0.08] rounded-2xl p-6 w-full max-w-lg mx-4 shadow-2xl">
+          <div className="bg-[#141414] border border-white/[0.08] rounded-2xl p-6 w-full max-w-lg mx-4 shadow-2xl">
             <h2 className="font-display text-lg font-bold mb-4">New Note</h2>
             <div className="space-y-4">
               <div>
@@ -314,7 +314,7 @@ export default function ClientVault() {
                   value={noteTitle}
                   onChange={(e) => setNoteTitle(e.target.value)}
                   placeholder="Note title"
-                  className="w-full bg-white/[0.04] border border-white/10 rounded-sm px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-[#c8ff00]/40 transition-all"
+                  className="w-full bg-white/[0.04] border border-white/10 rounded-sm px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-[#C6A664]/40 transition-all"
                   autoFocus
                 />
               </div>
@@ -325,7 +325,7 @@ export default function ClientVault() {
                   onChange={(e) => setNoteContent(e.target.value)}
                   placeholder="Write your note..."
                   rows={6}
-                  className="w-full bg-white/[0.04] border border-white/10 rounded-sm px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-[#c8ff00]/40 transition-all resize-none"
+                  className="w-full bg-white/[0.04] border border-white/10 rounded-sm px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-[#C6A664]/40 transition-all resize-none"
                 />
               </div>
             </div>
@@ -339,7 +339,7 @@ export default function ClientVault() {
               <button
                 onClick={createNote}
                 disabled={saving || !noteTitle.trim()}
-                className="px-5 py-2 bg-[#c8ff00] text-black text-sm font-semibold rounded-sm hover:bg-white transition-all disabled:opacity-40"
+                className="px-5 py-2 bg-[#C6A664] text-black text-sm font-semibold rounded-sm hover:bg-white transition-all disabled:opacity-40"
               >
                 {saving ? 'Saving...' : 'Save Note'}
               </button>

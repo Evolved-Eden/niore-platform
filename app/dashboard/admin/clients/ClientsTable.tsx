@@ -5,7 +5,7 @@ import type { ClientRow } from './page'
 
 // Kept in sync with the real plan_key values in membership_tiers /
 // tier_entitlements (verified via a full outer join -- 28/28 match).
-// Two corrections made here: 'client_team' -> 'client_teams' and
+// Two corrections made here: 'client_org' -> 'client_org' and
 // 'affiliate_starter'/'affiliate_pro'/'affiliate_enterprise' ->
 // 'affiliate_bronze'/'affiliate_silver'/'affiliate_gold'/'affiliate_platinum'
 // (the old values had zero matching entitlement row, so assigning them
@@ -21,7 +21,7 @@ import type { ClientRow } from './page'
 // "no entitlement tier configured" warning on the Deployments page.
 const TIERS = [
   'trial',
-  'client_founder', 'client_teams', 'client_enterprise',
+  'client_founder', 'client_org', 'client_enterprise',
   'creator_studio', 'creator_premium', 'creator_concierge',
   'personal_free', 'personal_plus', 'personal_premium',
   'affiliate_bronze', 'affiliate_silver', 'affiliate_gold', 'affiliate_platinum',
@@ -209,7 +209,7 @@ export default function ClientsTable({ initialClients }: { initialClients: Clien
             placeholder="Search name, email, business..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="w-64 bg-white/[0.04] border border-white/[0.08] rounded-sm px-4 py-2 text-sm text-white/70 placeholder:text-white/20 focus:outline-none focus:border-[#c8ff00]/40 transition-colors"
+            className="w-64 bg-white/[0.04] border border-white/[0.08] rounded-sm px-4 py-2 text-sm text-white/70 placeholder:text-white/20 focus:outline-none focus:border-[#C6A664]/40 transition-colors"
           />
         </div>
       </div>
@@ -238,7 +238,7 @@ export default function ClientsTable({ initialClients }: { initialClients: Clien
                 <tr key={c.id} className="hover:bg-white/[0.02] transition-colors">
                   <td className="px-4 py-4">
                     <button onClick={() => setDetailClient(c)} className="text-left">
-                      <div className="text-sm font-medium text-white/80 hover:text-[#c8ff00] transition-colors">
+                      <div className="text-sm font-medium text-white/80 hover:text-[#C6A664] transition-colors">
                         {c.full_name || c.biz_name || c.user_name || '—'}
                       </div>
                       <div className="text-xs text-white/40">{c.email || c.user_email || '—'}</div>
@@ -253,12 +253,12 @@ export default function ClientsTable({ initialClients }: { initialClients: Clien
                   <td className="px-4 py-4 text-sm text-white/40">{c.plan_tier_key || '—'}</td>
                   <td className="px-4 py-4 text-sm text-white/40">
                     {c.additional_plans && c.additional_plans.length > 0
-                      ? <span className="text-[#c8ff00]">{c.additional_plans.join(', ')}</span>
+                      ? <span className="text-[#C6A664]">{c.additional_plans.join(', ')}</span>
                       : '—'}
                   </td>
                   <td className="px-4 py-4 text-sm text-white/40">
                     {c.addons && c.addons.length > 0
-                      ? <span className="text-[#00d4ff]">{c.addons.join(', ')}</span>
+                      ? <span className="text-[#5E8B84]">{c.addons.join(', ')}</span>
                       : '—'}
                   </td>
                   <td className="px-4 py-4 text-sm text-white/40 max-w-[120px] truncate">{c.primary_vertical || '—'}</td>
@@ -287,7 +287,7 @@ export default function ClientsTable({ initialClients }: { initialClients: Clien
                         className="px-2.5 py-1 text-xs rounded-sm bg-cyan-900/30 text-cyan-400 hover:bg-cyan-900/60"
                       >Add-ons</button>
                       <button onClick={() => { setTwinClient(c); loadTwinMeta(c.id) }}
-                         className="px-2.5 py-1 text-xs rounded-sm bg-[#ff6b6b]/20 text-[#ff6b6b] hover:bg-[#ff6b6b]/40"
+                         className="px-2.5 py-1 text-xs rounded-sm bg-[#7A2E32]/20 text-[#7A2E32] hover:bg-[#7A2E32]/40"
                        >Twin</button>
                       {!c.plan_tier_key?.includes('trial') && c.status === 'active' && (
                         <button onClick={async () => {
@@ -359,7 +359,7 @@ export default function ClientsTable({ initialClients }: { initialClients: Clien
                 <label key={t} className="flex items-center gap-2 text-sm text-white/60 hover:text-white/80 cursor-pointer">
                   <input type="checkbox" checked={additionalPlansValue.includes(t)} onChange={() => {
                     setAdditionalPlansValue(prev => prev.includes(t) ? prev.filter(x => x !== t) : [...prev, t])
-                  }} className="accent-[#c8ff00]" />
+                  }} className="accent-[#C6A664]" />
                   {t}
                 </label>
               ))}
@@ -383,7 +383,7 @@ export default function ClientsTable({ initialClients }: { initialClients: Clien
                 <label key={a} className="flex items-center gap-2 text-sm text-white/60 hover:text-white/80 cursor-pointer">
                   <input type="checkbox" checked={addonsValue.includes(a)} onChange={() => {
                     setAddonsValue(prev => prev.includes(a) ? prev.filter(x => x !== a) : [...prev, a])
-                  }} className="accent-[#00d4ff]" />
+                  }} className="accent-[#5E8B84]" />
                   {a}
                 </label>
               ))}
@@ -456,7 +456,7 @@ export default function ClientsTable({ initialClients }: { initialClients: Clien
                 setEditKey('')
                 setEditVal('')
               }}
-                className="px-3 py-2 text-xs rounded-sm bg-[#c8ff00]/20 text-[#c8ff00] hover:bg-[#c8ff00]/30"
+                className="px-3 py-2 text-xs rounded-sm bg-[#C6A664]/20 text-[#C6A664] hover:bg-[#C6A664]/30"
               >Update</button>
             </div>
 
@@ -480,7 +480,7 @@ export default function ClientsTable({ initialClients }: { initialClients: Clien
               <div>
                 <label className="block text-xs text-white/40 mb-1">Status</label>
                 <select value={twinStatus} onChange={e => setTwinStatus(e.target.value)}
-                  className="w-full px-3 py-2 bg-white/[0.04] border border-white/10 rounded-sm text-sm text-white/70 focus:outline-none focus:border-[#ff6b6b]/40"
+                  className="w-full px-3 py-2 bg-white/[0.04] border border-white/10 rounded-sm text-sm text-white/70 focus:outline-none focus:border-[#7A2E32]/40"
                 >
                   <option value="active">Active</option>
                   <option value="suspended">Suspended</option>
@@ -492,7 +492,7 @@ export default function ClientsTable({ initialClients }: { initialClients: Clien
                 <textarea value={twinFields.personality_summary}
                   onChange={e => setTwinFields(f => ({ ...f, personality_summary: e.target.value }))}
                   rows={3}
-                  className="w-full px-3 py-2 bg-white/[0.04] border border-white/10 rounded-sm text-sm text-white/70 resize-none focus:outline-none focus:border-[#ff6b6b]/40"
+                  className="w-full px-3 py-2 bg-white/[0.04] border border-white/10 rounded-sm text-sm text-white/70 resize-none focus:outline-none focus:border-[#7A2E32]/40"
                 />
               </div>
               <div>
@@ -500,7 +500,7 @@ export default function ClientsTable({ initialClients }: { initialClients: Clien
                 <textarea value={twinFields.communication_style}
                   onChange={e => setTwinFields(f => ({ ...f, communication_style: e.target.value }))}
                   rows={2}
-                  className="w-full px-3 py-2 bg-white/[0.04] border border-white/10 rounded-sm text-sm text-white/70 resize-none focus:outline-none focus:border-[#ff6b6b]/40"
+                  className="w-full px-3 py-2 bg-white/[0.04] border border-white/10 rounded-sm text-sm text-white/70 resize-none focus:outline-none focus:border-[#7A2E32]/40"
                 />
               </div>
               <div>
@@ -508,13 +508,13 @@ export default function ClientsTable({ initialClients }: { initialClients: Clien
                 <textarea value={twinFields.preference_summary}
                   onChange={e => setTwinFields(f => ({ ...f, preference_summary: e.target.value }))}
                   rows={2}
-                  className="w-full px-3 py-2 bg-white/[0.04] border border-white/10 rounded-sm text-sm text-white/70 resize-none focus:outline-none focus:border-[#ff6b6b]/40"
+                  className="w-full px-3 py-2 bg-white/[0.04] border border-white/10 rounded-sm text-sm text-white/70 resize-none focus:outline-none focus:border-[#7A2E32]/40"
                 />
               </div>
 
               <div className="flex items-center gap-3 pt-2">
                 <button onClick={handleSaveTwin} disabled={twinSaving}
-                  className="px-5 py-2 bg-[#ff6b6b] text-black text-xs font-bold rounded-sm hover:bg-white transition-all disabled:opacity-40"
+                  className="px-5 py-2 bg-[#7A2E32] text-black text-xs font-bold rounded-sm hover:bg-white transition-all disabled:opacity-40"
                 >
                   {twinSaving ? 'Saving...' : 'Save Twin'}
                 </button>

@@ -92,7 +92,7 @@ export default function EditGeneratorPage({ params }: { params: Promise<{ id: st
           <label htmlFor="is_active" className="text-sm font-medium text-white/70">Active</label>
         </div>
         <div className="flex gap-3 pt-4">
-          <button type="submit" disabled={saving} className="px-4 py-2 text-sm font-medium bg-[#c8ff00] text-black rounded-sm hover:bg-white transition-colors font-bold flex-1">{saving ? 'Saving...' : 'Save Generator'}</button>
+          <button type="submit" disabled={saving} className="px-4 py-2 text-sm font-medium bg-[#C6A664] text-black rounded-sm hover:bg-white transition-colors font-bold flex-1">{saving ? 'Saving...' : 'Save Generator'}</button>
           <button type="button" onClick={() => router.back()} className="px-4 py-2 text-sm font-medium bg-white/5 border border-white/10 text-white/60 rounded-sm hover:text-white transition-colors">Cancel</button>
         </div>
       </form>

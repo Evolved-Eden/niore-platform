@@ -107,7 +107,7 @@ export default function EditSwarmPage({ params }: { params: Promise<{ id: string
           </div>
         </div>
         <div className="flex gap-3 pt-4">
-          <button type="submit" disabled={saving} className="px-4 py-2 text-sm font-medium bg-[#c8ff00] text-black rounded-sm hover:bg-white transition-colors font-bold flex-1">{saving ? 'Saving...' : 'Save Swarm'}</button>
+          <button type="submit" disabled={saving} className="px-4 py-2 text-sm font-medium bg-[#C6A664] text-black rounded-sm hover:bg-white transition-colors font-bold flex-1">{saving ? 'Saving...' : 'Save Swarm'}</button>
           <button type="button" onClick={() => router.back()} className="px-4 py-2 text-sm font-medium bg-white/5 border border-white/10 text-white/60 rounded-sm hover:text-white transition-colors">Cancel</button>
         </div>
       </form>

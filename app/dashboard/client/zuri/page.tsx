@@ -15,42 +15,42 @@ const QUICK_ACTIONS = [
     desc: "Assess your business intelligence",
     href: "/dashboard/client/blueprint/assess",
     icon: "◇",
-    color: "#c8ff00",
+    color: "#C6A664",
   },
   {
     label: "My Twin",
     desc: "View your AI digital twin",
     href: "/dashboard/client/twin",
     icon: "◆",
-    color: "#00d4ff",
+    color: "#5E8B84",
   },
   {
     label: "Essence Board",
     desc: "Today's intelligence brief",
     href: "/dashboard/client",
     icon: "✦",
-    color: "#a78bfa",
+    color: "#8B7AA8",
   },
   {
     label: "Vault",
     desc: "Documents & knowledge",
     href: "/dashboard/client/vault",
     icon: "▤",
-    color: "#fb923c",
+    color: "#B5764A",
   },
   {
     label: "Edit Profile",
     desc: "Update your intake & design",
     href: "/intake",
     icon: "⊙",
-    color: "#f472b6",
+    color: "#C6A664",
   },
   {
     label: "Pricing",
     desc: "Upgrade your plan",
     href: "/pricing",
     icon: "⊕",
-    color: "#34d399",
+    color: "#5E8B84",
   },
 ];
 
@@ -172,7 +172,7 @@ export default function ZuriChatPage() {
               <div
                 className={`max-w-[80%] rounded-sm px-4 py-3 text-sm leading-relaxed whitespace-pre-line ${
                   msg.role === "user"
-                    ? "bg-[#c8ff00] text-black"
+                    ? "bg-[#C6A664] text-black"
                     : "bg-white/[0.04] text-white/80 border border-white/[0.06]"
                 }`}
               >
@@ -223,7 +223,7 @@ export default function ZuriChatPage() {
             <button
               type="submit"
               disabled={!input.trim() || isLoading}
-              className="px-5 py-3 bg-[#c8ff00] text-black text-sm font-bold rounded-sm hover:bg-white transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+              className="px-5 py-3 bg-[#C6A664] text-black text-sm font-bold rounded-sm hover:bg-white transition-all disabled:opacity-40 disabled:cursor-not-allowed"
             >
               Send
             </button>

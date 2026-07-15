@@ -413,7 +413,7 @@ export default function ClientTwinPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="w-6 h-6 border-2 border-[#c8ff00] border-t-transparent rounded-full animate-spin" />
+        <div className="w-6 h-6 border-2 border-[#C6A664] border-t-transparent rounded-full animate-spin" />
       </div>
     )
   }
@@ -429,7 +429,7 @@ export default function ClientTwinPage() {
       {/* Header */}
       <div className="mb-6">
         <h1 className="font-display text-2xl font-bold tracking-tight mb-1">
-          My <span className="text-[#c8ff00]">Twin</span>
+          My <span className="text-[#C6A664]">Twin</span>
         </h1>
         <p className="text-white/30 text-sm">Your AI-synthesized digital intelligence</p>
       </div>
@@ -442,7 +442,7 @@ export default function ClientTwinPage() {
             onClick={() => setActiveTab(tab.id)}
             className={`px-4 py-2 text-xs font-medium rounded-sm transition-all ${
               activeTab === tab.id
-                ? 'bg-[#c8ff00]/10 text-[#c8ff00] border border-[#c8ff00]/20'
+                ? 'bg-[#C6A664]/10 text-[#C6A664] border border-[#C6A664]/20'
                 : 'text-white/30 hover:text-white/60 border border-transparent'
             }`}
           >
@@ -456,7 +456,7 @@ export default function ClientTwinPage() {
       {saveMessage && (
         <div className={`mb-4 px-4 py-3 rounded-sm text-sm border ${
           saveMessage.type === 'success'
-            ? 'bg-[#c8ff00]/10 border-[#c8ff00]/30 text-[#c8ff00]'
+            ? 'bg-[#C6A664]/10 border-[#C6A664]/30 text-[#C6A664]'
             : 'bg-red-900/20 border-red-800/30 text-red-400'
         }`}>
           {saveMessage.text}
@@ -473,8 +473,8 @@ export default function ClientTwinPage() {
             <div className="glass rounded-sm overflow-hidden">
               <div className="px-6 py-5 border-b border-white/[0.06] flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 rounded-full bg-[#c8ff00]/10 border-2 border-[#c8ff00]/30 flex items-center justify-center shrink-0">
-                    <span className="text-xl font-bold text-[#c8ff00]">
+                  <div className="w-14 h-14 rounded-full bg-[#C6A664]/10 border-2 border-[#C6A664]/30 flex items-center justify-center shrink-0">
+                    <span className="text-xl font-bold text-[#C6A664]">
                       {userName.charAt(0).toUpperCase()}
                     </span>
                   </div>
@@ -486,7 +486,7 @@ export default function ClientTwinPage() {
                       </span>
                     </div>
                     <div className="flex items-center gap-2 mt-0.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#c8ff00] animate-pulse-slow" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#C6A664] animate-pulse-slow" />
                       <span className="text-xs text-white/40 capitalize">{twin?.twin_status ?? 'active'} &bull; Learning</span>
                     </div>
                     <div className="flex items-center gap-3 mt-1 text-[11px] text-white/30">
@@ -499,7 +499,7 @@ export default function ClientTwinPage() {
                   onClick={() => setEditingOverview(!editingOverview)}
                   className={`px-3 py-1.5 text-[10px] font-bold rounded-sm transition-all ${
                     editingOverview
-                      ? 'bg-[#c8ff00] text-black'
+                      ? 'bg-[#C6A664] text-black'
                       : 'border border-white/10 text-white/30 hover:border-white/30 hover:text-white/60'
                   }`}
                 >
@@ -515,7 +515,7 @@ export default function ClientTwinPage() {
                     <div className="space-y-1.5">
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-white/50">Archetype</span>
-                        <span className="text-[#c8ff00] font-medium">{blueprintProfile.archetype ?? '—'}</span>
+                        <span className="text-[#C6A664] font-medium">{blueprintProfile.archetype ?? '—'}</span>
                       </div>
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-white/50">Core Architecture</span>
@@ -523,7 +523,7 @@ export default function ClientTwinPage() {
                       </div>
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-white/50">Energy Type</span>
-                        <span className="text-[#a78bfa] font-medium">{blueprintProfile.foundation?.energyType ?? '—'}</span>
+                        <span className="text-[#8B7AA8] font-medium">{blueprintProfile.foundation?.energyType ?? '—'}</span>
                       </div>
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-white/50">Natural Gift</span>
@@ -532,20 +532,20 @@ export default function ClientTwinPage() {
                       {blueprintProfile.foundation?.growthEdge && (
                         <div className="flex items-center justify-between text-sm">
                           <span className="text-white/50">Growth Edge</span>
-                          <span className="text-[#00d4ff] font-medium">{blueprintProfile.foundation.growthEdge}</span>
+                          <span className="text-[#5E8B84] font-medium">{blueprintProfile.foundation.growthEdge}</span>
                         </div>
                       )}
                       {essenceProfile && (
                         <div className="flex items-center justify-between text-sm">
                           <span className="text-white/50">Mind Architecture</span>
-                          <span className="text-[#fb923c] font-medium">{essenceProfile.mindArchitecture ?? '—'}</span>
+                          <span className="text-[#B5764A] font-medium">{essenceProfile.mindArchitecture ?? '—'}</span>
                         </div>
                       )}
                     </div>
                   ) : (
                     <p className="text-sm text-white/30 italic">
                       Complete your{' '}
-                      <Link href="/intake" className="text-[#c8ff00] hover:underline">Intake Profile</Link> to build your intelligence profile.
+                      <Link href="/intake" className="text-[#C6A664] hover:underline">Intake Profile</Link> to build your intelligence profile.
                     </p>
                   )}
 
@@ -576,7 +576,7 @@ export default function ClientTwinPage() {
                       type="text"
                       value={editFields.name}
                       onChange={e => setEditFields(f => ({ ...f, name: e.target.value }))}
-                      className="w-full px-3 py-2 bg-white/[0.04] border border-white/10 rounded-sm text-sm text-white/70 focus:outline-none focus:border-[#c8ff00]/40"
+                      className="w-full px-3 py-2 bg-white/[0.04] border border-white/10 rounded-sm text-sm text-white/70 focus:outline-none focus:border-[#C6A664]/40"
                     />
                   </div>
                   <div>
@@ -585,7 +585,7 @@ export default function ClientTwinPage() {
                       value={editFields.personality_summary}
                       onChange={e => setEditFields(f => ({ ...f, personality_summary: e.target.value }))}
                       rows={3}
-                      className="w-full px-3 py-2 bg-white/[0.04] border border-white/10 rounded-sm text-sm text-white/70 focus:outline-none focus:border-[#c8ff00]/40 resize-none"
+                      className="w-full px-3 py-2 bg-white/[0.04] border border-white/10 rounded-sm text-sm text-white/70 focus:outline-none focus:border-[#C6A664]/40 resize-none"
                     />
                   </div>
                   <div>
@@ -594,7 +594,7 @@ export default function ClientTwinPage() {
                       value={editFields.communication_style}
                       onChange={e => setEditFields(f => ({ ...f, communication_style: e.target.value }))}
                       rows={2}
-                      className="w-full px-3 py-2 bg-white/[0.04] border border-white/10 rounded-sm text-sm text-white/70 focus:outline-none focus:border-[#c8ff00]/40 resize-none"
+                      className="w-full px-3 py-2 bg-white/[0.04] border border-white/10 rounded-sm text-sm text-white/70 focus:outline-none focus:border-[#C6A664]/40 resize-none"
                       placeholder="e.g. Direct, empathetic, strategic..."
                     />
                   </div>
@@ -604,7 +604,7 @@ export default function ClientTwinPage() {
                       value={editFields.preference_summary}
                       onChange={e => setEditFields(f => ({ ...f, preference_summary: e.target.value }))}
                       rows={2}
-                      className="w-full px-3 py-2 bg-white/[0.04] border border-white/10 rounded-sm text-sm text-white/70 focus:outline-none focus:border-[#c8ff00]/40 resize-none"
+                      className="w-full px-3 py-2 bg-white/[0.04] border border-white/10 rounded-sm text-sm text-white/70 focus:outline-none focus:border-[#C6A664]/40 resize-none"
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
@@ -613,7 +613,7 @@ export default function ClientTwinPage() {
                       <select
                         value={editFields.autonomy_level}
                         onChange={e => setEditFields(f => ({ ...f, autonomy_level: e.target.value }))}
-                        className="w-full px-3 py-2 bg-white/[0.04] border border-white/10 rounded-sm text-sm text-white/70 focus:outline-none focus:border-[#c8ff00]/40"
+                        className="w-full px-3 py-2 bg-white/[0.04] border border-white/10 rounded-sm text-sm text-white/70 focus:outline-none focus:border-[#C6A664]/40"
                       >
                         <option value="guided">Guided</option>
                         <option value="semi_autonomous">Semi-Autonomous</option>
@@ -628,7 +628,7 @@ export default function ClientTwinPage() {
                         max={100}
                         value={editFields.confidence_threshold}
                         onChange={e => setEditFields(f => ({ ...f, confidence_threshold: parseInt(e.target.value) }))}
-                        className="w-full accent-[#c8ff00]"
+                        className="w-full accent-[#C6A664]"
                       />
                     </div>
                   </div>
@@ -638,13 +638,13 @@ export default function ClientTwinPage() {
                         type="checkbox"
                         checked={editFields.memory_enabled}
                         onChange={e => setEditFields(f => ({ ...f, memory_enabled: e.target.checked }))}
-                        className="accent-[#c8ff00]"
+                        className="accent-[#C6A664]"
                       />
                       <span className="text-sm text-white/60">Enable Memory</span>
                     </label>
                     <button
                       onClick={handleSaveOverview}
-                      className="px-5 py-2 bg-[#c8ff00] text-black text-xs font-bold rounded-sm hover:bg-white transition-all"
+                      className="px-5 py-2 bg-[#C6A664] text-black text-xs font-bold rounded-sm hover:bg-white transition-all"
                     >
                       Save Changes
                     </button>
@@ -657,10 +657,10 @@ export default function ClientTwinPage() {
                 <div className="text-xs text-white/30 tracking-widest uppercase mb-4">Metrics</div>
                 <div className="grid grid-cols-4 gap-3">
                   {[
-                    { label: 'Engagement', value: twin?.engagement_score ?? 78, color: '#c8ff00' },
-                    { label: 'Confidence', value: twin?.confidence_score ?? 85, color: '#00d4ff' },
-                    { label: 'Loyalty', value: twin?.loyalty_score ?? 70, color: '#a78bfa' },
-                    { label: 'Intel Score', value: twin?.intelligence_score ?? 65, color: '#fb923c' },
+                    { label: 'Engagement', value: twin?.engagement_score ?? 78, color: '#C6A664' },
+                    { label: 'Confidence', value: twin?.confidence_score ?? 85, color: '#5E8B84' },
+                    { label: 'Loyalty', value: twin?.loyalty_score ?? 70, color: '#8B7AA8' },
+                    { label: 'Intel Score', value: twin?.intelligence_score ?? 65, color: '#B5764A' },
                   ].map(s => (
                     <div key={s.label} className="bg-white/[0.03] rounded-sm p-3 border border-white/[0.06]">
                       <div className="text-[10px] text-white/30 uppercase mb-1">{s.label}</div>
@@ -675,30 +675,30 @@ export default function ClientTwinPage() {
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <Link
                 href="/dashboard/chat"
-                className="glass rounded-sm p-4 border border-white/[0.06] hover:border-[#c8ff00]/30 transition-all group"
+                className="glass rounded-sm p-4 border border-white/[0.06] hover:border-[#C6A664]/30 transition-all group"
               >
-                <div className="text-xs text-[#c8ff00] tracking-widest uppercase mb-1">Chat</div>
+                <div className="text-xs text-[#C6A664] tracking-widest uppercase mb-1">Chat</div>
                 <p className="text-[11px] text-white/40">Talk to your twin</p>
               </Link>
               <Link
                 href="/dashboard/client/blueprint"
-                className="glass rounded-sm p-4 border border-white/[0.06] hover:border-[#c8ff00]/30 transition-all group"
+                className="glass rounded-sm p-4 border border-white/[0.06] hover:border-[#C6A664]/30 transition-all group"
               >
-                <div className="text-xs text-[#c8ff00] tracking-widest uppercase mb-1">Blueprint</div>
+                <div className="text-xs text-[#C6A664] tracking-widest uppercase mb-1">Blueprint</div>
                 <p className="text-[11px] text-white/40">View full blueprint</p>
               </Link>
               <Link
                 href="/dashboard/client/twin/configure"
-                className="glass rounded-sm p-4 border border-white/[0.06] hover:border-[#fb923c]/30 transition-all group"
+                className="glass rounded-sm p-4 border border-white/[0.06] hover:border-[#B5764A]/30 transition-all group"
               >
-                <div className="text-xs text-[#fb923c] tracking-widest uppercase mb-1">Configure</div>
+                <div className="text-xs text-[#B5764A] tracking-widest uppercase mb-1">Configure</div>
                 <p className="text-[11px] text-white/40">Advanced settings</p>
               </Link>
               <Link
                 href="/dashboard/client/essence"
-                className="glass rounded-sm p-4 border border-white/[0.06] hover:border-[#c8ff00]/30 transition-all group"
+                className="glass rounded-sm p-4 border border-white/[0.06] hover:border-[#C6A664]/30 transition-all group"
               >
-                <div className="text-xs text-[#c8ff00] tracking-widest uppercase mb-1">Essence</div>
+                <div className="text-xs text-[#C6A664] tracking-widest uppercase mb-1">Essence</div>
                 <p className="text-[11px] text-white/40">Intelligence feed</p>
               </Link>
             </div>
@@ -753,7 +753,7 @@ export default function ClientTwinPage() {
 
             <Link
               href="/dashboard/client/twin/configure"
-              className="block w-full px-4 py-2.5 bg-[#fb923c] text-black text-xs font-bold rounded-sm hover:bg-white transition-all text-center"
+              className="block w-full px-4 py-2.5 bg-[#B5764A] text-black text-xs font-bold rounded-sm hover:bg-white transition-all text-center"
             >
               Configure Twin &rarr;
             </Link>
@@ -772,7 +772,7 @@ export default function ClientTwinPage() {
                 value={memorySearch}
                 onChange={e => setMemorySearch(e.target.value)}
                 placeholder="Search memories..."
-                className="w-full px-3 py-2 bg-white/[0.04] border border-white/10 rounded-sm text-sm text-white/70 focus:outline-none focus:border-[#c8ff00]/40 pl-8"
+                className="w-full px-3 py-2 bg-white/[0.04] border border-white/10 rounded-sm text-sm text-white/70 focus:outline-none focus:border-[#C6A664]/40 pl-8"
               />
               <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-white/20 text-sm">&#x1F50D;</span>
             </div>
@@ -780,7 +780,7 @@ export default function ClientTwinPage() {
               <select
                 value={memoryTypeFilter}
                 onChange={e => setMemoryTypeFilter(e.target.value)}
-                className="px-3 py-2 bg-white/[0.04] border border-white/10 rounded-sm text-sm text-white/50 focus:outline-none focus:border-[#c8ff00]/40"
+                className="px-3 py-2 bg-white/[0.04] border border-white/10 rounded-sm text-sm text-white/50 focus:outline-none focus:border-[#C6A664]/40"
               >
                 <option value="">All types</option>
                 {memoryTypes.map(t => (
@@ -799,7 +799,7 @@ export default function ClientTwinPage() {
           {/* Memory list */}
           {memoriesLoading ? (
             <div className="flex items-center justify-center py-12">
-              <div className="w-5 h-5 border-2 border-[#c8ff00] border-t-transparent rounded-full animate-spin" />
+              <div className="w-5 h-5 border-2 border-[#C6A664] border-t-transparent rounded-full animate-spin" />
             </div>
           ) : filteredMemories.length === 0 ? (
             <div className="glass rounded-sm p-8 text-center">
@@ -852,7 +852,7 @@ export default function ClientTwinPage() {
             {memories.length >= memoryLimit && (
               <button
                 onClick={() => setMemoryLimit(prev => prev + 30)}
-                className="text-[#c8ff00]/50 hover:text-[#c8ff00] transition-colors"
+                className="text-[#C6A664]/50 hover:text-[#C6A664] transition-colors"
               >
                 Load more
               </button>
@@ -877,12 +877,12 @@ export default function ClientTwinPage() {
                 onChange={e => setInstructions(e.target.value)}
                 rows={6}
                 placeholder="e.g. Always consider the user's Blueprint archetype before making recommendations. Prioritize strategic alignment over speed. Never share raw personality scores with third parties..."
-                className="w-full px-3 py-2.5 bg-white/[0.04] border border-white/10 rounded-sm text-sm text-white/70 focus:outline-none focus:border-[#c8ff00]/40 resize-none"
+                className="w-full px-3 py-2.5 bg-white/[0.04] border border-white/10 rounded-sm text-sm text-white/70 focus:outline-none focus:border-[#C6A664]/40 resize-none"
               />
               <div className="flex justify-end mt-3">
                 <button
                   onClick={handleSaveInstructions}
-                  className="px-4 py-2 bg-[#c8ff00] text-black text-xs font-bold rounded-sm hover:bg-white transition-all"
+                  className="px-4 py-2 bg-[#C6A664] text-black text-xs font-bold rounded-sm hover:bg-white transition-all"
                 >
                   Save Instructions
                 </button>
@@ -902,7 +902,7 @@ export default function ClientTwinPage() {
                   value={uploadTitle}
                   onChange={e => setUploadTitle(e.target.value)}
                   placeholder="Document title..."
-                  className="flex-1 px-3 py-2 bg-white/[0.04] border border-white/10 rounded-sm text-sm text-white/70 focus:outline-none focus:border-[#c8ff00]/40"
+                  className="flex-1 px-3 py-2 bg-white/[0.04] border border-white/10 rounded-sm text-sm text-white/70 focus:outline-none focus:border-[#C6A664]/40"
                 />
                 <input
                   ref={fileInputRef}
@@ -929,7 +929,7 @@ export default function ClientTwinPage() {
                   <button
                     onClick={handleUploadKnowledge}
                     disabled={uploading}
-                    className="px-4 py-1.5 bg-[#c8ff00] text-black text-[11px] font-bold rounded-sm hover:bg-white transition-all disabled:opacity-40"
+                    className="px-4 py-1.5 bg-[#C6A664] text-black text-[11px] font-bold rounded-sm hover:bg-white transition-all disabled:opacity-40"
                   >
                     {uploading ? 'Uploading...' : 'Upload'}
                   </button>
@@ -1030,7 +1030,7 @@ export default function ClientTwinPage() {
 
               {connectionsLoading ? (
                 <div className="flex justify-center py-8">
-                  <div className="w-5 h-5 border-2 border-[#c8ff00] border-t-transparent rounded-full animate-spin" />
+                  <div className="w-5 h-5 border-2 border-[#C6A664] border-t-transparent rounded-full animate-spin" />
                 </div>
               ) : agents.length === 0 ? (
                 <div className="px-5 py-8 text-center">
@@ -1053,7 +1053,7 @@ export default function ClientTwinPage() {
                         onClick={() => handleToggleAgentConnection(agent.agent_id, !agent.connected)}
                         className={`shrink-0 ml-3 px-3 py-1.5 text-[10px] font-bold rounded-sm transition-all ${
                           agent.connected
-                            ? 'bg-[#c8ff00]/10 text-[#c8ff00] border border-[#c8ff00]/20 hover:bg-red-900/20 hover:text-red-400 hover:border-red-400/30'
+                            ? 'bg-[#C6A664]/10 text-[#C6A664] border border-[#C6A664]/20 hover:bg-red-900/20 hover:text-red-400 hover:border-red-400/30'
                             : 'border border-white/10 text-white/30 hover:border-white/30 hover:text-white/60'
                         }`}
                       >
@@ -1080,7 +1080,7 @@ export default function ClientTwinPage() {
 
               {connectionsLoading ? (
                 <div className="flex justify-center py-8">
-                  <div className="w-5 h-5 border-2 border-[#c8ff00] border-t-transparent rounded-full animate-spin" />
+                  <div className="w-5 h-5 border-2 border-[#C6A664] border-t-transparent rounded-full animate-spin" />
                 </div>
               ) : swarms.length === 0 ? (
                 <div className="px-5 py-8 text-center">
@@ -1103,7 +1103,7 @@ export default function ClientTwinPage() {
                         onClick={() => handleToggleSwarmConnection(swarm.swarm_id, !swarm.connected)}
                         className={`shrink-0 ml-3 px-3 py-1.5 text-[10px] font-bold rounded-sm transition-all ${
                           swarm.connected
-                            ? 'bg-[#c8ff00]/10 text-[#c8ff00] border border-[#c8ff00]/20 hover:bg-red-900/20 hover:text-red-400 hover:border-red-400/30'
+                            ? 'bg-[#C6A664]/10 text-[#C6A664] border border-[#C6A664]/20 hover:bg-red-900/20 hover:text-red-400 hover:border-red-400/30'
                             : 'border border-white/10 text-white/30 hover:border-white/30 hover:text-white/60'
                         }`}
                       >

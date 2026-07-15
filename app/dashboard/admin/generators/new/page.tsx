@@ -66,7 +66,7 @@ export default function CreateGeneratorPage() {
         </div>
 
         <div className="flex gap-3 pt-4">
-          <button type="submit" disabled={loading} className="px-4 py-2 text-sm font-medium bg-[#c8ff00] text-black rounded-sm hover:bg-white transition-colors font-bold flex-1">{loading ? 'Creating...' : 'Create Generator'}</button>
+          <button type="submit" disabled={loading} className="px-4 py-2 text-sm font-medium bg-[#C6A664] text-black rounded-sm hover:bg-white transition-colors font-bold flex-1">{loading ? 'Creating...' : 'Create Generator'}</button>
           <button type="button" onClick={() => router.back()} className="px-4 py-2 text-sm font-medium bg-white/5 border border-white/10 text-white/60 rounded-sm hover:text-white transition-colors">Cancel</button>
         </div>
       </form>

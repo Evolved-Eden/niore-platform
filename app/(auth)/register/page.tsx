@@ -172,18 +172,18 @@ function RegisterForm() {
   };
 
   return (
-    <div className="min-h-screen bg-[#080810] text-white flex items-center justify-center px-4">
+    <div className="min-h-screen bg-[#0A0A0B] text-white flex items-center justify-center px-4">
       <div className="w-full max-w-sm">
         <form onSubmit={handleSignup} className="space-y-6">
           {/* Brand */}
           <div className="text-center mb-2">
-            <div className="w-12 h-12 rounded-full bg-[#c8ff00]/10 border border-[#c8ff00]/20 flex items-center justify-center mx-auto mb-4">
-              <svg className="w-6 h-6 text-[#c8ff00]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <div className="w-12 h-12 rounded-full bg-[#C6A664]/10 border border-[#C6A664]/20 flex items-center justify-center mx-auto mb-4">
+              <svg className="w-6 h-6 text-[#C6A664]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
             </div>
             <h1 className="font-display text-2xl font-bold tracking-tight">
-              Evolve Your <span className="text-[#c8ff00]">Intelligence</span>
+              Evolve Your <span className="text-[#C6A664]">Intelligence</span>
             </h1>
             <p className="text-white/40 text-sm mt-1">
               Create your account and begin your blueprint
@@ -208,7 +208,7 @@ function RegisterForm() {
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 placeholder="Your name"
-                className="w-full bg-white/[0.04] border border-white/10 rounded-sm px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-[#c8ff00]/40 focus:bg-white/[0.06] transition-all"
+                className="w-full bg-white/[0.04] border border-white/10 rounded-sm px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-[#C6A664]/40 focus:bg-white/[0.06] transition-all"
               />
             </div>
 
@@ -222,7 +222,7 @@ function RegisterForm() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
                 required
-                className="w-full bg-white/[0.04] border border-white/10 rounded-sm px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-[#c8ff00]/40 focus:bg-white/[0.06] transition-all"
+                className="w-full bg-white/[0.04] border border-white/10 rounded-sm px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-[#C6A664]/40 focus:bg-white/[0.06] transition-all"
               />
             </div>
 
@@ -235,7 +235,7 @@ function RegisterForm() {
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="+1 (555) 000-0000"
-                className="w-full bg-white/[0.04] border border-white/10 rounded-sm px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-[#c8ff00]/40 focus:bg-white/[0.06] transition-all"
+                className="w-full bg-white/[0.04] border border-white/10 rounded-sm px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-[#C6A664]/40 focus:bg-white/[0.06] transition-all"
               />
             </div>
 
@@ -251,7 +251,7 @@ function RegisterForm() {
                     onClick={() => setRole(r)}
                     className={`py-2.5 rounded-sm text-xs font-medium border transition-all ${
                       role === r
-                        ? 'bg-[#c8ff00]/10 border-[#c8ff00]/40 text-[#c8ff00]'
+                        ? 'bg-[#C6A664]/10 border-[#C6A664]/40 text-[#C6A664]'
                         : 'bg-white/[0.03] border-white/10 text-white/40 hover:border-white/20 hover:text-white/60'
                     }`}
                   >
@@ -272,14 +272,14 @@ function RegisterForm() {
                 placeholder="Min. 6 characters"
                 required
                 minLength={6}
-                className="w-full bg-white/[0.04] border border-white/10 rounded-sm px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-[#c8ff00]/40 focus:bg-white/[0.06] transition-all"
+                className="w-full bg-white/[0.04] border border-white/10 rounded-sm px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-[#C6A664]/40 focus:bg-white/[0.06] transition-all"
               />
             </div>
 
             <button
               type="submit"
               disabled={loading || !email || !password || !fullName}
-              className="w-full py-3.5 bg-[#c8ff00] text-black font-bold text-sm rounded-sm hover:bg-white transition-all disabled:opacity-40 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
+              className="w-full py-3.5 bg-[#C6A664] text-black font-bold text-sm rounded-sm hover:bg-white transition-all disabled:opacity-40 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
             >
               {loading ? (
                 <>
@@ -298,7 +298,7 @@ function RegisterForm() {
           Already have an account?{" "}
           <Link
             href={planTier ? `/login?tier=${planTier}` : "/login"}
-            className="text-[#c8ff00] hover:text-white transition-colors"
+            className="text-[#C6A664] hover:text-white transition-colors"
           >
             Sign in
           </Link>
@@ -311,8 +311,8 @@ function RegisterForm() {
 export default function RegisterPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-[#080810] flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-[#c8ff00] border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen bg-[#0A0A0B] flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-[#C6A664] border-t-transparent rounded-full animate-spin" />
       </div>
     }>
       <RegisterForm />

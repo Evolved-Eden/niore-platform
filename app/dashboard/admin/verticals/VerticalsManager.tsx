@@ -64,7 +64,7 @@ export default function VerticalsManager({ initialVerticals }: { initialVertical
           )}
           <input type="text" placeholder="Search..." value={search} onChange={e => setSearch(e.target.value)}
             className="w-48 bg-white/[0.04] border border-white/[0.08] rounded-sm px-3 py-2 text-sm text-white/70 placeholder:text-white/20 focus:outline-none" />
-          <button onClick={() => setEdit({})} className="px-4 py-2 text-xs rounded-sm bg-[#c8ff00]/20 text-[#c8ff00] hover:bg-[#c8ff00]/30">+ New Vertical</button>
+          <button onClick={() => setEdit({})} className="px-4 py-2 text-xs rounded-sm bg-[#C6A664]/20 text-[#C6A664] hover:bg-[#C6A664]/30">+ New Vertical</button>
         </div>
       </div>
 
@@ -148,12 +148,12 @@ export default function VerticalsManager({ initialVerticals }: { initialVertical
                 </div>
               </div>
               <label className="flex items-center gap-2">
-                <input type="checkbox" name="is_active" defaultChecked={edit.is_active !== false} className="accent-[#c8ff00]" />
+                <input type="checkbox" name="is_active" defaultChecked={edit.is_active !== false} className="accent-[#C6A664]" />
                 <span className="text-xs text-white/40">Active</span>
               </label>
               <div className="flex justify-end gap-3 pt-2">
                 <button type="button" onClick={() => setEdit(null)} className="px-4 py-2 text-sm text-white/50 hover:text-white/80">Cancel</button>
-                <button type="submit" className="px-4 py-2 text-sm bg-[#c8ff00]/20 text-[#c8ff00] hover:bg-[#c8ff00]/30 rounded-sm">Save</button>
+                <button type="submit" className="px-4 py-2 text-sm bg-[#C6A664]/20 text-[#C6A664] hover:bg-[#C6A664]/30 rounded-sm">Save</button>
               </div>
             </form>
           </div>

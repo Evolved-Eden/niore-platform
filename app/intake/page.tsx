@@ -243,11 +243,11 @@ export default function IntakePage() {
     : 100
 
   return (
-    <main className="min-h-screen bg-[#080810] text-white">
+    <main className="min-h-screen bg-[#0A0A0B] text-white">
       {/* Header */}
       <header className="flex items-center justify-between px-6 py-4 border-b border-white/5">
         <Link href="/" className="font-display text-sm font-semibold tracking-wide">
-          EVOLVED <span className="text-[#c8ff00]">EDEN</span>
+          EVOLVED <span className="text-[#C6A664]">EDEN</span>
         </Link>
         <span className="text-xs text-white/30">{progress}% complete</span>
       </header>
@@ -255,7 +255,7 @@ export default function IntakePage() {
       {/* Progress bar */}
       <div className="h-0.5 bg-white/[0.05]">
         <div
-          className="h-full bg-[#c8ff00] transition-all duration-500"
+          className="h-full bg-[#C6A664] transition-all duration-500"
           style={{ width: `${progress}%` }}
         />
       </div>
@@ -270,13 +270,13 @@ export default function IntakePage() {
         {/* ── WELCOME ── */}
         {step === 'welcome' && (
           <div className="text-center animate-fade-in">
-            <div className="w-16 h-16 rounded-full bg-[#c8ff00]/10 border border-[#c8ff00]/20 flex items-center justify-center mx-auto mb-6">
-              <svg className="w-8 h-8 text-[#c8ff00]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <div className="w-16 h-16 rounded-full bg-[#C6A664]/10 border border-[#C6A664]/20 flex items-center justify-center mx-auto mb-6">
+              <svg className="w-8 h-8 text-[#C6A664]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
             </div>
             <h1 className="font-display text-3xl font-bold tracking-tight mb-3">
-              Welcome to Your <span className="text-[#c8ff00]">Intelligence</span> Discovery
+              Welcome to Your <span className="text-[#C6A664]">Intelligence</span> Discovery
             </h1>
             <p className="text-white/40 leading-relaxed mb-8 max-w-md mx-auto">
               Before we begin, let us understand who you are. Share a few details about yourself,
@@ -284,7 +284,7 @@ export default function IntakePage() {
             </p>
             <button
               onClick={() => setStep('personal')}
-              className="px-8 py-3.5 bg-[#c8ff00] text-black font-bold text-sm rounded-sm hover:bg-white transition-all glow-acid"
+              className="px-8 py-3.5 bg-[#C6A664] text-black font-bold text-sm rounded-sm hover:bg-white transition-all glow-acid"
             >
               Begin Your Discovery
             </button>
@@ -316,7 +316,7 @@ export default function IntakePage() {
                   value={data.name}
                   onChange={e => update('name', e.target.value)}
                   placeholder="Your name"
-                  className="w-full bg-white/[0.04] border border-white/10 rounded-sm px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-[#c8ff00]/40 transition-all"
+                  className="w-full bg-white/[0.04] border border-white/10 rounded-sm px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-[#C6A664]/40 transition-all"
                 />
               </div>
 
@@ -327,7 +327,7 @@ export default function IntakePage() {
                   value={data.email}
                   onChange={e => update('email', e.target.value)}
                   placeholder="you@example.com"
-                  className="w-full bg-white/[0.04] border border-white/10 rounded-sm px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-[#c8ff00]/40 transition-all"
+                  className="w-full bg-white/[0.04] border border-white/10 rounded-sm px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-[#C6A664]/40 transition-all"
                 />
               </div>
 
@@ -338,7 +338,7 @@ export default function IntakePage() {
                     type="date"
                     value={data.dob}
                     onChange={e => update('dob', e.target.value)}
-                    className="w-full bg-white/[0.04] border border-white/10 rounded-sm px-4 py-3 text-sm text-white focus:outline-none focus:border-[#c8ff00]/40 transition-all [color-scheme:dark]"
+                    className="w-full bg-white/[0.04] border border-white/10 rounded-sm px-4 py-3 text-sm text-white focus:outline-none focus:border-[#C6A664]/40 transition-all [color-scheme:dark]"
                   />
                 </div>
                 <div>
@@ -347,7 +347,7 @@ export default function IntakePage() {
                     type="time"
                     value={data.birthTime}
                     onChange={e => update('birthTime', e.target.value)}
-                    className="w-full bg-white/[0.04] border border-white/10 rounded-sm px-4 py-3 text-sm text-white focus:outline-none focus:border-[#c8ff00]/40 transition-all [color-scheme:dark]"
+                    className="w-full bg-white/[0.04] border border-white/10 rounded-sm px-4 py-3 text-sm text-white focus:outline-none focus:border-[#C6A664]/40 transition-all [color-scheme:dark]"
                   />
                   <p className="text-[10px] text-white/20 mt-1">Approximate is fine</p>
                 </div>
@@ -361,7 +361,7 @@ export default function IntakePage() {
                     value={data.birthLocation}
                     onChange={e => update('birthLocation', e.target.value)}
                     placeholder="City, State/Country"
-                    className="w-full bg-white/[0.04] border border-white/10 rounded-sm px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-[#c8ff00]/40 transition-all"
+                    className="w-full bg-white/[0.04] border border-white/10 rounded-sm px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-[#C6A664]/40 transition-all"
                   />
                 </div>
                 <div>
@@ -369,10 +369,10 @@ export default function IntakePage() {
                   <select
                     value={data.birthTimezone}
                     onChange={e => update('birthTimezone', e.target.value)}
-                    className="w-full bg-white/[0.04] border border-white/10 rounded-sm px-4 py-3 text-sm text-white focus:outline-none focus:border-[#c8ff00]/40 transition-all"
+                    className="w-full bg-white/[0.04] border border-white/10 rounded-sm px-4 py-3 text-sm text-white focus:outline-none focus:border-[#C6A664]/40 transition-all"
                   >
                     {TIMEZONES.map(tz => (
-                      <option key={tz.value} value={tz.value} className="bg-[#12121f]">{tz.label}</option>
+                      <option key={tz.value} value={tz.value} className="bg-[#1A1A1A]">{tz.label}</option>
                     ))}
                   </select>
                 </div>
@@ -388,7 +388,7 @@ export default function IntakePage() {
                 <button
                   onClick={goToRole}
                   disabled={!data.name || !data.dob}
-                  className="px-6 py-3 bg-[#c8ff00] text-black text-sm font-bold rounded-sm hover:bg-white transition-all disabled:opacity-40"
+                  className="px-6 py-3 bg-[#C6A664] text-black text-sm font-bold rounded-sm hover:bg-white transition-all disabled:opacity-40"
                 >
                   Continue →
                 </button>
@@ -421,7 +421,7 @@ export default function IntakePage() {
                       onClick={() => update('sellTo', opt.value)}
                       className={`p-4 rounded-sm border text-sm text-left transition-all ${
                         data.sellTo === opt.value
-                          ? 'border-[#c8ff00] bg-[#c8ff00]/10 text-[#c8ff00]'
+                          ? 'border-[#C6A664] bg-[#C6A664]/10 text-[#C6A664]'
                           : 'border-white/10 bg-white/[0.03] text-white/60 hover:border-white/20 hover:bg-white/[0.06]'
                       }`}
                     >
@@ -446,7 +446,7 @@ export default function IntakePage() {
                       onClick={() => update('roleType', opt.value)}
                       className={`p-4 rounded-sm border text-sm text-left transition-all ${
                         data.roleType === opt.value
-                          ? 'border-[#c8ff00] bg-[#c8ff00]/10 text-[#c8ff00]'
+                          ? 'border-[#C6A664] bg-[#C6A664]/10 text-[#C6A664]'
                           : 'border-white/10 bg-white/[0.03] text-white/60 hover:border-white/20 hover:bg-white/[0.06]'
                       }`}
                     >
@@ -474,7 +474,7 @@ export default function IntakePage() {
                       onClick={() => update('offerType', opt.value)}
                       className={`p-4 rounded-sm border text-sm text-left transition-all ${
                         data.offerType === opt.value
-                          ? 'border-[#c8ff00] bg-[#c8ff00]/10 text-[#c8ff00]'
+                          ? 'border-[#C6A664] bg-[#C6A664]/10 text-[#C6A664]'
                           : 'border-white/10 bg-white/[0.03] text-white/60 hover:border-white/20 hover:bg-white/[0.06]'
                       }`}
                     >
@@ -498,7 +498,7 @@ export default function IntakePage() {
                       onClick={() => update('personalType', opt.value)}
                       className={`p-4 rounded-sm border text-sm text-center transition-all ${
                         data.personalType === opt.value
-                          ? 'border-[#c8ff00] bg-[#c8ff00]/10 text-[#c8ff00]'
+                          ? 'border-[#C6A664] bg-[#C6A664]/10 text-[#C6A664]'
                           : 'border-white/10 bg-white/[0.03] text-white/60 hover:border-white/20 hover:bg-white/[0.06]'
                       }`}
                     >
@@ -518,7 +518,7 @@ export default function IntakePage() {
                 <button
                   onClick={calculateProfile}
                   disabled={loading || !data.sellTo || !data.roleType}
-                  className="px-6 py-3 bg-[#c8ff00] text-black text-sm font-bold rounded-sm hover:bg-white transition-all disabled:opacity-40 inline-flex items-center gap-2"
+                  className="px-6 py-3 bg-[#C6A664] text-black text-sm font-bold rounded-sm hover:bg-white transition-all disabled:opacity-40 inline-flex items-center gap-2"
                 >
                   {loading ? (
                     <>
@@ -537,8 +537,8 @@ export default function IntakePage() {
           <div className="animate-fade-in">
             {/* Profile Header */}
             <div className="text-center mb-8">
-              <div className="w-16 h-16 rounded-full bg-[#c8ff00]/10 border-2 border-[#c8ff00]/30 flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl font-bold text-[#c8ff00]">
+              <div className="w-16 h-16 rounded-full bg-[#C6A664]/10 border-2 border-[#C6A664]/30 flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl font-bold text-[#C6A664]">
                   {data.name.charAt(0).toUpperCase()}
                 </span>
               </div>
@@ -547,9 +547,9 @@ export default function IntakePage() {
             </div>
 
             {/* Intelligence Archetype */}
-            <div className="glass rounded-sm p-6 mb-6 border border-[#c8ff00]/10 text-center">
+            <div className="glass rounded-sm p-6 mb-6 border border-[#C6A664]/10 text-center">
               <div className="text-xs text-white/30 tracking-widest uppercase mb-2">Your Intelligence Archetype</div>
-              <div className="font-display text-3xl font-bold text-[#c8ff00] mb-2">
+              <div className="font-display text-3xl font-bold text-[#C6A664] mb-2">
                 {profile.archetype.primary}
               </div>
               <p className="text-sm text-white/50">{profile.recommendation.reason}</p>
@@ -568,7 +568,7 @@ export default function IntakePage() {
                         <span className="text-white/40">{val}/100</span>
                       </div>
                       <div className="h-1.5 bg-white/[0.06] rounded-full overflow-hidden">
-                        <div className="h-full rounded-full bg-[#c8ff00]" style={{ width: `${val}%` }} />
+                        <div className="h-full rounded-full bg-[#C6A664]" style={{ width: `${val}%` }} />
                       </div>
                     </div>
                   ))}
@@ -579,7 +579,7 @@ export default function IntakePage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
               <div className="glass rounded-sm p-5">
                 <div className="text-xs text-white/30 tracking-widest uppercase mb-3">Core Architecture</div>
-                <div className="text-lg font-semibold text-[#c8ff00] mb-1">{profile.blueprint.foundation.coreArch}</div>
+                <div className="text-lg font-semibold text-[#C6A664] mb-1">{profile.blueprint.foundation.coreArch}</div>
                 <div className="space-y-1 mt-3 text-sm">
                   <div className="flex justify-between"><span className="text-white/40">Gift</span><span className="text-white/60">{profile.blueprint.foundation.naturalGift}</span></div>
                   <div className="flex justify-between"><span className="text-white/40">Growth Edge</span><span className="text-white/60">{profile.blueprint.foundation.growthEdge}</span></div>
@@ -601,12 +601,12 @@ export default function IntakePage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
               <div className="glass rounded-sm p-5">
                 <div className="text-xs text-white/30 tracking-widest uppercase mb-3">Decision Style</div>
-                <div className="text-lg font-semibold text-[#00d4ff] mb-2">{profile.essence.decisionStyle}</div>
+                <div className="text-lg font-semibold text-[#5E8B84] mb-2">{profile.essence.decisionStyle}</div>
                 <p className="text-sm text-white/50">{profile.essence.summary}</p>
               </div>
               <div className="glass rounded-sm p-5">
                 <div className="text-xs text-white/30 tracking-widest uppercase mb-3">Communication</div>
-                <div className="text-lg font-semibold text-[#fb923c] mb-2">{profile.essence.communicationStyle}</div>
+                <div className="text-lg font-semibold text-[#B5764A] mb-2">{profile.essence.communicationStyle}</div>
                 <div className="space-y-1 text-sm mt-2">
                   <div className="flex justify-between"><span className="text-white/40">Creative Style</span><span className="text-white/60">{profile.essence.creativityStyle}</span></div>
                   <div className="flex justify-between"><span className="text-white/40">Pattern</span><span className="text-white/60">{profile.essence.emotionalPattern}</span></div>
@@ -627,7 +627,7 @@ export default function IntakePage() {
               </p>
               <button
                 onClick={() => finishIntake()}
-                className="inline-block px-8 py-3.5 bg-[#c8ff00] text-black font-bold text-sm rounded-sm hover:bg-white transition-all glow-acid"
+                className="inline-block px-8 py-3.5 bg-[#C6A664] text-black font-bold text-sm rounded-sm hover:bg-white transition-all glow-acid"
               >
                 Complete & Enter Your Ecosystem →
               </button>
@@ -638,11 +638,11 @@ export default function IntakePage() {
         {/* ── COMPLETE ── */}
         {step === 'complete' && (
           <div className="text-center animate-fade-in">
-            <div className="w-16 h-16 rounded-full bg-[#c8ff00]/10 border-2 border-[#c8ff00]/30 flex items-center justify-center mx-auto mb-6">
-              <span className="text-3xl text-[#c8ff00]">✓</span>
+            <div className="w-16 h-16 rounded-full bg-[#C6A664]/10 border-2 border-[#C6A664]/30 flex items-center justify-center mx-auto mb-6">
+              <span className="text-3xl text-[#C6A664]">✓</span>
             </div>
             <h1 className="font-display text-3xl font-bold mb-3">
-              Intake <span className="text-[#c8ff00]">Complete</span>
+              Intake <span className="text-[#C6A664]">Complete</span>
             </h1>
             <p className="text-white/40 leading-relaxed mb-8 max-w-md mx-auto">
               Your profile has been saved. Zuri is synthesizing your intelligence blueprint
@@ -656,14 +656,14 @@ export default function IntakePage() {
                 'Dashboard access activated',
               ].map(item => (
                 <div key={item} className="flex items-center gap-3 text-sm text-white/60">
-                  <span className="text-[#c8ff00]">✓</span>
+                  <span className="text-[#C6A664]">✓</span>
                   {item}
                 </div>
               ))}
             </div>
             <a
               href={determinePath().path}
-              className="inline-block px-8 py-3.5 bg-[#c8ff00] text-black font-bold text-sm rounded-sm hover:bg-white transition-all glow-acid"
+              className="inline-block px-8 py-3.5 bg-[#C6A664] text-black font-bold text-sm rounded-sm hover:bg-white transition-all glow-acid"
             >
               Enter Your {determinePath().label} Ecosystem →
             </a>

@@ -16,15 +16,15 @@ export default async function CreatorIntelligencesPage() {
       <div className="grid grid-cols-3 gap-4 mb-8">
         <div className="glass rounded-sm p-5">
           <div className="text-xs text-white/30 tracking-widest uppercase mb-3">Published</div>
-          <div className="text-2xl font-light text-[#00d4ff]">—</div>
+          <div className="text-2xl font-light text-[#5E8B84]">—</div>
         </div>
         <div className="glass rounded-sm p-5">
           <div className="text-xs text-white/30 tracking-widest uppercase mb-3">Drafts</div>
-          <div className="text-2xl font-light text-[#c8ff00]">—</div>
+          <div className="text-2xl font-light text-[#C6A664]">—</div>
         </div>
         <div className="glass rounded-sm p-5">
           <div className="text-xs text-white/30 tracking-widest uppercase mb-3">Scheduled</div>
-          <div className="text-2xl font-light text-[#a78bfa]">—</div>
+          <div className="text-2xl font-light text-[#8B7AA8]">—</div>
         </div>
       </div>
 
@@ -34,7 +34,7 @@ export default async function CreatorIntelligencesPage() {
         </div>
         <div className="px-6 py-12 text-center text-white/20 text-sm">
           No content created yet.{' '}
-          <span className="text-[#00d4ff] cursor-pointer hover:underline">Create your first piece →</span>
+          <span className="text-[#5E8B84] cursor-pointer hover:underline">Create your first piece →</span>
         </div>
       </div>
     </div>

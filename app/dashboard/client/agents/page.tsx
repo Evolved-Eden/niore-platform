@@ -46,7 +46,7 @@ const ROLE_TYPES = [
 ]
 
 const STATUS_STYLES: Record<string, string> = {
-  active: 'bg-[#c8ff00]/10 text-[#c8ff00] border-[#c8ff00]/20',
+  active: 'bg-[#C6A664]/10 text-[#C6A664] border-[#C6A664]/20',
   paused: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
   pending: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
   error: 'bg-red-500/10 text-red-400 border-red-500/20',
@@ -242,11 +242,11 @@ export default function ClientAgentsPage() {
         </div>
         <div className="glass rounded-sm p-4 border border-white/[0.06]">
           <div className="text-[10px] text-white/30 tracking-widest uppercase mb-1">Active</div>
-          <div className="text-2xl font-light text-[#c8ff00]">{activeCount}</div>
+          <div className="text-2xl font-light text-[#C6A664]">{activeCount}</div>
         </div>
         <div className="glass rounded-sm p-4 border border-white/[0.06]">
           <div className="text-[10px] text-white/30 tracking-widest uppercase mb-1">Available Recommendations</div>
-          <div className="text-2xl font-light text-[#00d4ff]">{registryAgents.length}</div>
+          <div className="text-2xl font-light text-[#5E8B84]">{registryAgents.length}</div>
         </div>
       </div>
 
@@ -256,7 +256,7 @@ export default function ClientAgentsPage() {
           onClick={() => setTab('available')}
           className={`rounded-full px-5 py-2 text-xs font-bold transition-all ${
             tab === 'available'
-              ? 'bg-[#c8ff00] text-black'
+              ? 'bg-[#C6A664] text-black'
               : 'text-white/40 border border-white/[0.06] hover:text-white'
           }`}
         >
@@ -266,7 +266,7 @@ export default function ClientAgentsPage() {
           onClick={() => setTab('deployed')}
           className={`rounded-full px-5 py-2 text-xs font-bold transition-all ${
             tab === 'deployed'
-              ? 'bg-[#c8ff00] text-black'
+              ? 'bg-[#C6A664] text-black'
               : 'text-white/40 border border-white/[0.06] hover:text-white'
           }`}
         >
@@ -356,7 +356,7 @@ export default function ClientAgentsPage() {
                     ) : (
                       <button
                         onClick={() => openDeployModal(agent)}
-                        className="px-3 py-1.5 bg-[#c8ff00] text-black text-[10px] font-bold rounded-sm hover:bg-white transition-all shrink-0"
+                        className="px-3 py-1.5 bg-[#C6A664] text-black text-[10px] font-bold rounded-sm hover:bg-white transition-all shrink-0"
                       >
                         Deploy
                       </button>
@@ -416,22 +416,22 @@ export default function ClientAgentsPage() {
               </p>
               <button
                 onClick={() => setTab('available')}
-                className="mt-4 px-5 py-2 bg-[#c8ff00] text-black text-xs font-bold rounded-sm hover:bg-white transition-all"
+                className="mt-4 px-5 py-2 bg-[#C6A664] text-black text-xs font-bold rounded-sm hover:bg-white transition-all"
               >
                 Browse Registry →
               </button>
 
               {/* Recommendation */}
               {registryAgents.length > 0 && (
-                <div className="mt-6 p-4 bg-[#c8ff00]/5 border border-[#c8ff00]/10 rounded-sm inline-block">
-                  <p className="text-xs text-[#c8ff00]/70">
+                <div className="mt-6 p-4 bg-[#C6A664]/5 border border-[#C6A664]/10 rounded-sm inline-block">
+                  <p className="text-xs text-[#C6A664]/70">
                     💡 Based on your blueprint, we recommend deploying{' '}
                     <button
                       onClick={() => {
                         const rec = registryAgents[0]
                         openDeployModal(rec)
                       }}
-                      className="underline hover:text-[#c8ff00]"
+                      className="underline hover:text-[#C6A664]"
                     >
                       {registryAgents[0].name}
                     </button>
@@ -499,7 +499,7 @@ export default function ClientAgentsPage() {
                       <button
                         onClick={() => updateAgentStatus(agent.id, 'active')}
                         disabled={actionLoading === agent.id}
-                        className="px-2.5 py-1 text-[10px] bg-[#c8ff00]/10 text-[#c8ff00] border border-[#c8ff00]/20 rounded-sm hover:bg-[#c8ff00]/20 disabled:opacity-40"
+                        className="px-2.5 py-1 text-[10px] bg-[#C6A664]/10 text-[#C6A664] border border-[#C6A664]/20 rounded-sm hover:bg-[#C6A664]/20 disabled:opacity-40"
                       >
                         Resume
                       </button>
@@ -558,7 +558,7 @@ export default function ClientAgentsPage() {
               <div>
                 <h2 className="font-display text-lg font-bold text-white">Deploy Agent</h2>
                 <p className="text-xs text-white/40 mt-1">
-                  Customize and deploy <span className="text-[#c8ff00]">{deployModal.name}</span>
+                  Customize and deploy <span className="text-[#C6A664]">{deployModal.name}</span>
                 </p>
               </div>
               <button
@@ -642,7 +642,7 @@ export default function ClientAgentsPage() {
                   onDrop={handleDrop}
                   onDragOver={handleDragOver}
                   onClick={() => fileInputRef.current?.click()}
-                  className="border-2 border-dashed border-white/[0.08] rounded-sm p-6 text-center hover:border-[#c8ff00]/30 transition-all cursor-pointer"
+                  className="border-2 border-dashed border-white/[0.08] rounded-sm p-6 text-center hover:border-[#C6A664]/30 transition-all cursor-pointer"
                 >
                   <input
                     ref={fileInputRef}
@@ -698,7 +698,7 @@ export default function ClientAgentsPage() {
                 <button
                   onClick={handleDeploy}
                   disabled={deploying || !deployForm.agentName.trim()}
-                  className="flex-1 px-5 py-2.5 bg-[#c8ff00] text-black text-xs font-bold rounded-sm hover:bg-white transition-all disabled:opacity-40 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
+                  className="flex-1 px-5 py-2.5 bg-[#C6A664] text-black text-xs font-bold rounded-sm hover:bg-white transition-all disabled:opacity-40 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
                 >
                   {deploying ? (
                     <><div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />Deploying...</>

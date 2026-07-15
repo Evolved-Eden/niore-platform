@@ -14,14 +14,14 @@ type EssenceRow = {
 }
 
 const TYPE_CONFIG: Record<string, { label: string; icon: string; color: string }> = {
-  focus:        { label: 'Focus Priority',  icon: '🎯', color: '#ff6b6b' },
-  optimization: { label: 'Optimization',    icon: '⚡', color: '#00d4ff' },
-  timing:       { label: 'Timing',          icon: '🕐', color: '#a78bfa' },
-  opportunity:  { label: 'Opportunity',     icon: '💡', color: '#34d399' },
-  growth:       { label: 'Growth',          icon: '📈', color: '#fb923c' },
-  brand:        { label: 'Brand',           icon: '✨', color: '#f472b6' },
-  habit:        { label: 'Habit',           icon: '🔄', color: '#22d3ee' },
-  action:       { label: 'Action',          icon: '✓', color: '#e879f9' },
+  focus:        { label: 'Focus Priority',  icon: '🎯', color: '#7A2E32' },
+  optimization: { label: 'Optimization',    icon: '⚡', color: '#5E8B84' },
+  timing:       { label: 'Timing',          icon: '🕐', color: '#8B7AA8' },
+  opportunity:  { label: 'Opportunity',     icon: '💡', color: '#5E8B84' },
+  growth:       { label: 'Growth',          icon: '📈', color: '#B5764A' },
+  brand:        { label: 'Brand',           icon: '✨', color: '#C6A664' },
+  habit:        { label: 'Habit',           icon: '🔄', color: '#8B7AA8' },
+  action:       { label: 'Action',          icon: '✓', color: '#C9974A' },
 }
 
 export default function AdminEssencePage() {
@@ -120,14 +120,14 @@ export default function AdminEssencePage() {
       <div className="mb-8 flex items-start justify-between">
         <div>
           <h1 className="font-display text-2xl font-bold tracking-tight mb-1">
-            Essence <span className="text-[#ff6b6b]">Intel</span>
+            Essence <span className="text-[#7A2E32]">Intel</span>
           </h1>
           <p className="text-white/30 text-sm">Daily intelligence signals and priorities for {name}</p>
         </div>
         <button
           onClick={generateDaily}
           disabled={generating}
-          className="px-4 py-2 rounded-sm text-sm bg-[#ff6b6b]/10 border border-[#ff6b6b]/20 text-[#ff6b6b] hover:bg-[#ff6b6b]/20 transition-colors disabled:opacity-40"
+          className="px-4 py-2 rounded-sm text-sm bg-[#7A2E32]/10 border border-[#7A2E32]/20 text-[#7A2E32] hover:bg-[#7A2E32]/20 transition-colors disabled:opacity-40"
         >
           {generating ? 'Generating...' : 'Generate Daily ✦'}
         </button>

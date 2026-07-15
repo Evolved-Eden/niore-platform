@@ -40,7 +40,7 @@ export const VERTICALS: Record<string, VerticalData> = {
     title: 'Luxury Med Spa',
     tagline: 'Intelligence for aesthetics, wellness & client care',
     description: 'Full-spectrum intelligence system for med spas, aesthetic clinics, and wellness practices — from booking to retention.',
-    color: '#f472b6',
+    color: '#C6A664',
     gradient: 'from-pink-500/20 to-rose-600/10',
     emoji: '✦',
     agents: [
@@ -110,7 +110,7 @@ export const VERTICALS: Record<string, VerticalData> = {
     title: 'Luxury Hotel',
     tagline: 'Intelligence for hospitality & guest experience',
     description: 'End-to-end intelligence for boutique hotels, luxury resorts, and hospitality groups — from booking to unforgettable stays.',
-    color: '#00d4ff',
+    color: '#5E8B84',
     gradient: 'from-cyan-500/20 to-blue-600/10',
     emoji: '◆',
     agents: [
@@ -180,7 +180,7 @@ export const VERTICALS: Record<string, VerticalData> = {
     title: 'Luxury Real Estate',
     tagline: 'Intelligence for properties, leads & deals',
     description: 'Complete intelligence system for real estate agents, brokerages, and property developers — from lead to closing.',
-    color: '#a78bfa',
+    color: '#8B7AA8',
     gradient: 'from-purple-500/20 to-violet-600/10',
     emoji: '◇',
     agents: [
@@ -250,7 +250,7 @@ export const VERTICALS: Record<string, VerticalData> = {
     title: 'Corporate HR',
     tagline: 'Intelligence for people operations & talent',
     description: 'Enterprise-grade intelligence for HR departments, talent teams, and people operations — from hiring to retention.',
-    color: '#fb923c',
+    color: '#B5764A',
     gradient: 'from-orange-500/20 to-amber-600/10',
     emoji: '▤',
     agents: [
@@ -311,7 +311,7 @@ export const VERTICALS: Record<string, VerticalData> = {
       ],
     },
     walkthrough: 'Your HR Intelligence deploys five specialized agents as one unified workforce system.\n\nThe Talent Acquisition Agent screens candidates and manages your entire hiring pipeline. The Onboarding Automator ensures every new hire is productive from day one. Your Employee Intelligence Engine tracks engagement, performance, and satisfaction to reduce turnover. The Compliance Sentinel keeps your organization audit-ready at all times. And the Workforce Planner analyzes headcount needs and skill gaps to guide strategic decisions.\n\nThese five collaborate inside the Workforce Intelligence Swarm — powering your entire people operations from hire to retire.\n\nYour daily Essence Board shows: hiring priorities, engagement flags, compliance deadlines, workforce metrics, and Zuri\'s recommended focus.\n\nYour AI Twin reflects your organizational health. Your dashboard gives you a complete people intelligence view.',
-    defaultPlan: 'client_team',
+    defaultPlan: 'client_org',
   },
 
   legal: {
@@ -320,7 +320,7 @@ export const VERTICALS: Record<string, VerticalData> = {
     title: 'Legal Practice',
     tagline: 'Intelligence for law firms & legal teams',
     description: 'Complete practice intelligence for attorneys, law firms, and legal departments — from intake to billing.',
-    color: '#34d399',
+    color: '#5E8B84',
     gradient: 'from-emerald-500/20 to-teal-600/10',
     emoji: '⊙',
     agents: [
@@ -395,7 +395,7 @@ export function getVerticalBySlug(slug: string): VerticalData | undefined {
 export const BASE_PLANS = {
   client: {
     founder: { name: 'Founder', price: 397, period: '/month', tagline: 'Solo Intelligence System' },
-    team: { name: 'Teams', price: 1497, period: '/month', tagline: 'Collaborative Intelligence', popular: true },
+    team: { name: 'Org', price: 1497, period: '/month', tagline: 'Collaborative Intelligence', popular: true },
     enterprise: { name: 'Enterprise', price: 5000, period: '/month (starting)', tagline: 'Organizational OS' },
   },
   creator: {

@@ -15,7 +15,7 @@ function StatusBadge({ connected, label }: { connected: boolean; label?: string 
   return (
     <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
       connected
-        ? 'bg-[#c8ff00]/10 text-[#c8ff00] border border-[#c8ff00]/20'
+        ? 'bg-[#C6A664]/10 text-[#C6A664] border border-[#C6A664]/20'
         : 'bg-white/5 text-white/30 border border-white/10'
     }`}>
       {label ?? (connected ? 'Connected' : 'Disconnected')}
@@ -38,7 +38,7 @@ function Toggle({ enabled, onChange, label, description }: {
       <button
         onClick={() => onChange(!enabled)}
         className={`relative w-9 h-5 rounded-full transition-all shrink-0 ml-3 ${
-          enabled ? 'bg-[#c8ff00]' : 'bg-white/10'
+          enabled ? 'bg-[#C6A664]' : 'bg-white/10'
         }`}
       >
         <span
@@ -250,8 +250,8 @@ export default function ClientConnectorsPage() {
 
           {discordConnected ? (
             <div className="space-y-4">
-              <div className="px-4 py-3 rounded-sm bg-[#c8ff00]/5 border border-[#c8ff00]/10">
-                <div className="flex items-center gap-2 text-sm text-[#c8ff00]">
+              <div className="px-4 py-3 rounded-sm bg-[#C6A664]/5 border border-[#C6A664]/10">
+                <div className="flex items-center gap-2 text-sm text-[#C6A664]">
                   <span>✓</span>
                   <span className="font-medium">Connected</span>
                 </div>
@@ -288,7 +288,7 @@ export default function ClientConnectorsPage() {
               <button
                 onClick={handleConnectDiscord}
                 disabled={connectingDiscord || !discordUserId.trim()}
-                className="w-full px-4 py-2.5 bg-[#c8ff00] text-black text-xs font-bold rounded-sm hover:bg-white transition-all disabled:opacity-40"
+                className="w-full px-4 py-2.5 bg-[#C6A664] text-black text-xs font-bold rounded-sm hover:bg-white transition-all disabled:opacity-40"
               >
                 {connectingDiscord ? 'Connecting...' : 'Connect Discord'}
               </button>
@@ -313,8 +313,8 @@ export default function ClientConnectorsPage() {
 
           {whatsappConnected ? (
             <div className="space-y-4">
-              <div className="px-4 py-3 rounded-sm bg-[#c8ff00]/5 border border-[#c8ff00]/10">
-                <div className="flex items-center gap-2 text-sm text-[#c8ff00]">
+              <div className="px-4 py-3 rounded-sm bg-[#C6A664]/5 border border-[#C6A664]/10">
+                <div className="flex items-center gap-2 text-sm text-[#C6A664]">
                   <span>✓</span>
                   <span className="font-medium">Connected</span>
                 </div>
@@ -362,7 +362,7 @@ export default function ClientConnectorsPage() {
               <button
                 onClick={handleConnectWhatsApp}
                 disabled={connectingWhatsApp || !whatsappNumber.trim()}
-                className="w-full px-4 py-2.5 bg-[#c8ff00] text-black text-xs font-bold rounded-sm hover:bg-white transition-all disabled:opacity-40"
+                className="w-full px-4 py-2.5 bg-[#C6A664] text-black text-xs font-bold rounded-sm hover:bg-white transition-all disabled:opacity-40"
               >
                 {connectingWhatsApp ? 'Connecting...' : 'Connect WhatsApp'}
               </button>
@@ -405,8 +405,8 @@ export default function ClientConnectorsPage() {
             />
           </div>
 
-          <div className="mt-5 px-4 py-3 rounded-sm bg-[#c8ff00]/5 border border-[#c8ff00]/10 text-center">
-            <p className="text-xs text-[#c8ff00]/60">
+          <div className="mt-5 px-4 py-3 rounded-sm bg-[#C6A664]/5 border border-[#C6A664]/10 text-center">
+            <p className="text-xs text-[#C6A664]/60">
               Preferences are saved and synced to your account.
             </p>
           </div>
@@ -423,7 +423,7 @@ export default function ClientConnectorsPage() {
           </p>
           <Link
             href="/dashboard/client/consulting"
-            className="inline-block px-6 py-2.5 bg-[#c8ff00] text-black text-xs font-bold rounded-sm hover:bg-white transition-all"
+            className="inline-block px-6 py-2.5 bg-[#C6A664] text-black text-xs font-bold rounded-sm hover:bg-white transition-all"
           >
             Book a Consultation
           </Link>

@@ -525,7 +525,7 @@ function BlueprintAssessContent() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {q.options?.map(o => (
               <button key={o.value} onClick={() => setAnswer(q.key, o.value)}
-                className={`text-left p-4 rounded-xl border transition-all ${val === o.value ? 'border-[#c8ff00] bg-[#c8ff00]/10 text-[#c8ff00]' : 'border-white/10 bg-white/[0.03] text-white/70 hover:border-white/20 hover:bg-white/[0.06]'}`}>
+                className={`text-left p-4 rounded-xl border transition-all ${val === o.value ? 'border-[#C6A664] bg-[#C6A664]/10 text-[#C6A664]' : 'border-white/10 bg-white/[0.03] text-white/70 hover:border-white/20 hover:bg-white/[0.06]'}`}>
                 <div className="text-sm font-medium">{o.label}</div>
               </button>
             ))}
@@ -540,8 +540,8 @@ function BlueprintAssessContent() {
               const checked = sel.includes(o.value)
               return (
                 <label key={o.value} onClick={() => toggle(o.value)}
-                  className={`flex items-start gap-3 p-4 rounded-xl border cursor-pointer transition-all ${checked ? 'border-[#c8ff00] bg-[#c8ff00]/10' : 'border-white/10 bg-white/[0.03] hover:border-white/20 hover:bg-white/[0.06]'}`}>
-                  <div className={`w-5 h-5 mt-0.5 rounded border-2 flex items-center justify-center shrink-0 transition-all ${checked ? 'bg-[#c8ff00] border-[#c8ff00]' : 'border-white/30'}`}>
+                  className={`flex items-start gap-3 p-4 rounded-xl border cursor-pointer transition-all ${checked ? 'border-[#C6A664] bg-[#C6A664]/10' : 'border-white/10 bg-white/[0.03] hover:border-white/20 hover:bg-white/[0.06]'}`}>
+                  <div className={`w-5 h-5 mt-0.5 rounded border-2 flex items-center justify-center shrink-0 transition-all ${checked ? 'bg-[#C6A664] border-[#C6A664]' : 'border-white/30'}`}>
                     {checked && (
                       <svg className="w-3 h-3 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
@@ -569,7 +569,7 @@ function BlueprintAssessContent() {
             <div className="flex gap-2 flex-wrap">
               {Array.from({ length: max - min + 1 }, (_, i) => min + i).map(n => (
                 <button key={n} onClick={() => setAnswer(q.key, n)}
-                  className={`w-10 h-10 rounded-lg text-sm font-medium transition-all ${val === n ? 'bg-[#c8ff00] text-[#080810]' : 'bg-white/[0.05] text-white/50 hover:bg-white/[0.1]'}`}>
+                  className={`w-10 h-10 rounded-lg text-sm font-medium transition-all ${val === n ? 'bg-[#C6A664] text-[#0A0A0B]' : 'bg-white/[0.05] text-white/50 hover:bg-white/[0.1]'}`}>
                   {n}
                 </button>
               ))}
@@ -582,7 +582,7 @@ function BlueprintAssessContent() {
           <div className="flex gap-4">
             {[true, false].map(b => (
               <button key={String(b)} onClick={() => setAnswer(q.key, b)}
-                className={`px-6 py-3 rounded-xl border transition-all ${val === b ? 'border-[#c8ff00] bg-[#c8ff00]/10 text-[#c8ff00]' : 'border-white/10 bg-white/[0.03] text-white/70 hover:border-white/20'}`}>
+                className={`px-6 py-3 rounded-xl border transition-all ${val === b ? 'border-[#C6A664] bg-[#C6A664]/10 text-[#C6A664]' : 'border-white/10 bg-white/[0.03] text-white/70 hover:border-white/20'}`}>
                 {b ? 'Yes' : 'No'}
               </button>
             ))}
@@ -592,7 +592,7 @@ function BlueprintAssessContent() {
         return (
           <textarea value={val ?? ''} onChange={e => setAnswer(q.key, e.target.value)}
             placeholder={q.description ?? 'Type your answer...'}
-            className="w-full px-4 py-3 rounded-xl border border-white/10 bg-white/[0.03] text-white placeholder-white/30 focus:outline-none focus:border-[#c8ff00]/50 focus:bg-white/[0.06] transition-all resize-none" rows={3} />
+            className="w-full px-4 py-3 rounded-xl border border-white/10 bg-white/[0.03] text-white placeholder-white/30 focus:outline-none focus:border-[#C6A664]/50 focus:bg-white/[0.06] transition-all resize-none" rows={3} />
         )
       default:
         return <p className="text-white/40 text-sm">Unsupported</p>
@@ -614,8 +614,8 @@ function BlueprintAssessContent() {
   ) => {
     if (!section || !section.questions.length) {
       return (
-        <main className="min-h-screen bg-[#080810] text-white flex items-center justify-center">
-          <div className="w-8 h-8 border-2 border-[#c8ff00] border-t-transparent rounded-full animate-spin" />
+        <main className="min-h-screen bg-[#0A0A0B] text-white flex items-center justify-center">
+          <div className="w-8 h-8 border-2 border-[#C6A664] border-t-transparent rounded-full animate-spin" />
         </main>
       )
     }
@@ -644,7 +644,7 @@ function BlueprintAssessContent() {
     }
 
     return (
-      <main className="min-h-screen bg-[#080810] text-white">
+      <main className="min-h-screen bg-[#0A0A0B] text-white">
         <div className="max-w-2xl mx-auto px-6 py-12">
           {/* Progress header */}
           <div className="mb-6">
@@ -653,13 +653,13 @@ function BlueprintAssessContent() {
               <span className="text-white/20 text-xs">Question {qIndex + 1} of {totalQ}</span>
             </div>
             <div className="h-1 bg-white/[0.05] rounded-full mt-2 overflow-hidden">
-              <div className="h-full bg-[#c8ff00] rounded-full transition-all duration-300" style={{ width: `${((qIndex) / totalQ) * 100}%` }} />
+              <div className="h-full bg-[#C6A664] rounded-full transition-all duration-300" style={{ width: `${((qIndex) / totalQ) * 100}%` }} />
             </div>
           </div>
 
           {/* Zuri conversation bubble */}
           <div className="flex gap-3 mb-6 animate-fade-in" key={`${section.key}-${qIndex}`}>
-            <div className="w-9 h-9 rounded-full bg-[#c8ff00]/20 flex items-center justify-center text-base shrink-0 mt-1">
+            <div className="w-9 h-9 rounded-full bg-[#C6A664]/20 flex items-center justify-center text-base shrink-0 mt-1">
               ◈
             </div>
             <div className="flex-1">
@@ -690,7 +690,7 @@ function BlueprintAssessContent() {
               <button
                 onClick={advance}
                 disabled={!hasAnswer}
-                className="px-6 py-2.5 rounded-xl bg-[#c8ff00] text-[#080810] text-sm font-medium hover:bg-[#b8ee00] transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                className="px-6 py-2.5 rounded-xl bg-[#C6A664] text-[#0A0A0B] text-sm font-medium hover:bg-[#b8ee00] transition-all disabled:opacity-30 disabled:cursor-not-allowed"
               >
                 {isLastQ ? 'Complete Section →' : 'Continue →'}
               </button>
@@ -719,18 +719,18 @@ function BlueprintAssessContent() {
 
   // Loading states
   if (checkingAuth || step === 'loading') return (
-    <main className="min-h-screen bg-[#080810] text-white flex items-center justify-center">
-      <div className="w-8 h-8 border-2 border-[#c8ff00] border-t-transparent rounded-full animate-spin" />
+    <main className="min-h-screen bg-[#0A0A0B] text-white flex items-center justify-center">
+      <div className="w-8 h-8 border-2 border-[#C6A664] border-t-transparent rounded-full animate-spin" />
     </main>
   )
 
   if (error) return (
-    <main className="min-h-screen bg-[#080810] text-white flex items-center justify-center">
+    <main className="min-h-screen bg-[#0A0A0B] text-white flex items-center justify-center">
       <div className="text-center max-w-md">
         <h2 className="text-xl font-semibold mb-2">Something went wrong</h2>
         <p className="text-white/50 mb-6">{error}</p>
         <button onClick={() => { setError(null); setStep('welcome') }}
-          className="px-6 py-3 bg-[#c8ff00] text-[#080810] rounded-xl font-medium">
+          className="px-6 py-3 bg-[#C6A664] text-[#0A0A0B] rounded-xl font-medium">
           Try Again
         </button>
       </div>
@@ -738,9 +738,9 @@ function BlueprintAssessContent() {
   )
 
   if (loadingMessage) return (
-    <main className="min-h-screen bg-[#080810] text-white flex items-center justify-center">
+    <main className="min-h-screen bg-[#0A0A0B] text-white flex items-center justify-center">
       <div className="text-center">
-        <div className="w-12 h-12 border-2 border-[#c8ff00] border-t-transparent rounded-full animate-spin mx-auto mb-6" />
+        <div className="w-12 h-12 border-2 border-[#C6A664] border-t-transparent rounded-full animate-spin mx-auto mb-6" />
         <h2 className="text-xl font-semibold mb-2">{loadingMessage}</h2>
       </div>
     </main>
@@ -748,12 +748,12 @@ function BlueprintAssessContent() {
 
   // ── WELCOME ──
   if (step === 'welcome') return (
-    <main className="min-h-screen bg-[#080810] text-white flex flex-col">
+    <main className="min-h-screen bg-[#0A0A0B] text-white flex flex-col">
       <div className="max-w-2xl mx-auto w-full px-6 py-20">
         <div className="text-center mb-12">
-          <div className="text-xs text-[#c8ff00] uppercase tracking-widest mb-3">Intelligence Mapping Layer</div>
+          <div className="text-xs text-[#C6A664] uppercase tracking-widest mb-3">Intelligence Mapping Layer</div>
           <h1 className="text-4xl font-display font-bold tracking-tight mb-3">
-            Welcome to Your <span className="text-[#c8ff00]">Blueprint</span>
+            Welcome to Your <span className="text-[#C6A664]">Blueprint</span>
           </h1>
           <p className="text-white/40 max-w-lg mx-auto leading-relaxed">
             This is not a form. It&apos;s an intelligence mapping layer — discovering your identity,
@@ -789,7 +789,7 @@ function BlueprintAssessContent() {
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <button onClick={() => { clearProgress(); setStep('core') }}
-            className="px-8 py-3 bg-[#c8ff00] text-[#080810] rounded-xl font-bold hover:bg-white transition-all">
+            className="px-8 py-3 bg-[#C6A664] text-[#0A0A0B] rounded-xl font-bold hover:bg-white transition-all">
             Start Core Blueprint
           </button>
           <button onClick={async () => {
@@ -831,13 +831,13 @@ function BlueprintAssessContent() {
 
   // ── CORE COMPLETE ──
   if (step === 'core_complete') return (
-    <main className="min-h-screen bg-[#080810] text-white">
+    <main className="min-h-screen bg-[#0A0A0B] text-white">
       <div className="max-w-2xl mx-auto px-6 py-16">
         <div className="text-center mb-10">
           <div className="text-5xl mb-4">◈</div>
           <h1 className="text-3xl font-display font-bold mb-2">Core Blueprint Complete</h1>
           {coreResult?.archetype && (
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#c8ff00]/10 border border-[#c8ff00]/20 text-[#c8ff00] text-sm mb-4">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#C6A664]/10 border border-[#C6A664]/20 text-[#C6A664] text-sm mb-4">
               Archetype: {coreResult.archetype}
             </div>
           )}
@@ -845,7 +845,7 @@ function BlueprintAssessContent() {
 
         {/* Score */}
         <div className="glass rounded-2xl p-8 border border-white/[0.06] mb-8 text-center">
-          <div className="text-5xl font-bold text-[#c8ff00] mb-2">{coreResult?.overallScore ?? 0}</div>
+          <div className="text-5xl font-bold text-[#C6A664] mb-2">{coreResult?.overallScore ?? 0}</div>
           <div className="text-white/40 text-sm">Blueprint Score</div>
         </div>
 
@@ -860,7 +860,7 @@ function BlueprintAssessContent() {
                   <span className="text-white/50">{score}/100</span>
                 </div>
                 <div className="h-2 bg-white/[0.06] rounded-full overflow-hidden">
-                  <div className="h-full bg-[#c8ff00] rounded-full transition-all" style={{ width: `${score}%` }} />
+                  <div className="h-full bg-[#C6A664] rounded-full transition-all" style={{ width: `${score}%` }} />
                 </div>
               </div>
             ))}
@@ -898,7 +898,7 @@ function BlueprintAssessContent() {
               }
               setStep('extended')
             }}
-            className="flex-1 px-6 py-3 bg-[#c8ff00] text-[#080810] rounded-xl font-bold hover:bg-white transition-all text-center">
+            className="flex-1 px-6 py-3 bg-[#C6A664] text-[#0A0A0B] rounded-xl font-bold hover:bg-white transition-all text-center">
             {hasExpandedAccess ? 'Continue to Extended Scan' : 'Unlock Extended Scan — $150'}
           </button>
           <button onClick={() => setStep('intake_role')}
@@ -938,7 +938,7 @@ function BlueprintAssessContent() {
 
   // ── EXTENDED COMPLETE ──
   if (step === 'extended_complete') return (
-    <main className="min-h-screen bg-[#080810] text-white">
+    <main className="min-h-screen bg-[#0A0A0B] text-white">
       <div className="max-w-3xl mx-auto px-6 py-16">
         <div className="text-center mb-10">
           <div className="text-5xl mb-4">✦</div>
@@ -951,7 +951,7 @@ function BlueprintAssessContent() {
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mb-10">
             {Object.entries(extResult.life_profile).map(([key, score]: [string, any]) => (
               <div key={key} className="glass rounded-xl p-4 border border-white/[0.06] text-center">
-                <div className="text-2xl font-bold text-[#c8ff00]">{score}</div>
+                <div className="text-2xl font-bold text-[#C6A664]">{score}</div>
                 <div className="text-xs text-white/40 capitalize mt-1">{key.replace(/_/g, ' ')}</div>
               </div>
             ))}
@@ -967,10 +967,10 @@ function BlueprintAssessContent() {
                 <div key={d.domain}>
                   <div className="flex justify-between text-sm mb-1">
                     <span className="text-white/70 capitalize">{d.domain.replace(/_/g, ' ')}</span>
-                    <span className="text-[#c8ff00]">{d.score}%</span>
+                    <span className="text-[#C6A664]">{d.score}%</span>
                   </div>
                   <div className="h-2 bg-white/[0.06] rounded-full overflow-hidden">
-                    <div className="h-full bg-[#c8ff00] rounded-full" style={{ width: `${d.score}%` }} />
+                    <div className="h-full bg-[#C6A664] rounded-full" style={{ width: `${d.score}%` }} />
                   </div>
                 </div>
               ))}
@@ -996,7 +996,7 @@ function BlueprintAssessContent() {
         {/* Next steps */}
         <div className="flex flex-col sm:flex-row gap-4 pt-8 border-t border-white/10">
           <button onClick={() => setStep('intake_role')}
-            className="flex-1 px-6 py-3 bg-[#c8ff00] text-[#080810] rounded-xl font-bold hover:bg-white transition-all text-center">
+            className="flex-1 px-6 py-3 bg-[#C6A664] text-[#0A0A0B] rounded-xl font-bold hover:bg-white transition-all text-center">
             Continue to Deployment Intake
           </button>
           <button onClick={async () => {
@@ -1016,10 +1016,10 @@ function BlueprintAssessContent() {
 
   // ── INTAKE ROLE SELECTION ──
   if (step === 'intake_role') return (
-    <main className="min-h-screen bg-[#080810] text-white">
+    <main className="min-h-screen bg-[#0A0A0B] text-white">
       <div className="max-w-2xl mx-auto px-6 py-20">
         <div className="text-center mb-10">
-          <h1 className="text-3xl font-display font-bold mb-3">Deployment <span className="text-[#c8ff00]">Intake</span></h1>
+          <h1 className="text-3xl font-display font-bold mb-3">Deployment <span className="text-[#C6A664]">Intake</span></h1>
           <p className="text-white/50 text-sm max-w-md mx-auto">
             How will you use your intelligence system?
           </p>
@@ -1033,8 +1033,8 @@ function BlueprintAssessContent() {
             { role: 'affiliate' as IntakeRole, title: 'Affiliate OS', desc: 'For affiliate marketers and referral partners', icon: '⊘' },
           ].map(({ role, title, desc, icon }) => (
             <button key={role} onClick={() => { setIntakeRole(role); loadIntakeQuestions(role); setStep('intake') }}
-              className="w-full glass rounded-2xl p-6 border border-white/[0.06] hover:border-[#c8ff00]/30 hover:bg-white/[0.03] transition-all text-left flex items-center gap-5">
-              <div className="text-3xl text-[#c8ff00]">{icon}</div>
+              className="w-full glass rounded-2xl p-6 border border-white/[0.06] hover:border-[#C6A664]/30 hover:bg-white/[0.03] transition-all text-left flex items-center gap-5">
+              <div className="text-3xl text-[#C6A664]">{icon}</div>
               <div>
                 <h3 className="text-lg font-semibold">{title}</h3>
                 <p className="text-white/50 text-sm mt-1">{desc}</p>
@@ -1060,8 +1060,8 @@ function BlueprintAssessContent() {
     const setAnswer = (k: string, v: any) => setIntakeAnswers(p => ({ ...p, [k]: v }))
 
     if (intakeQuestions.length === 0) return (
-      <main className="min-h-screen bg-[#080810] text-white flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-[#c8ff00] border-t-transparent rounded-full animate-spin" />
+      <main className="min-h-screen bg-[#0A0A0B] text-white flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-[#C6A664] border-t-transparent rounded-full animate-spin" />
       </main>
     )
 
@@ -1080,13 +1080,13 @@ function BlueprintAssessContent() {
     }
 
     if (!q) return (
-      <main className="min-h-screen bg-[#080810] text-white flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-[#c8ff00] border-t-transparent rounded-full animate-spin" />
+      <main className="min-h-screen bg-[#0A0A0B] text-white flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-[#C6A664] border-t-transparent rounded-full animate-spin" />
       </main>
     )
 
     return (
-      <main className="min-h-screen bg-[#080810] text-white">
+      <main className="min-h-screen bg-[#0A0A0B] text-white">
         <div className="max-w-2xl mx-auto px-6 py-12">
           {/* Progress */}
           <div className="mb-6">
@@ -1095,13 +1095,13 @@ function BlueprintAssessContent() {
               <span className="text-white/20 text-xs">Question {intakeQIndex + 1} of {intakeQuestions.length}</span>
             </div>
             <div className="h-1 bg-white/[0.05] rounded-full mt-2 overflow-hidden">
-              <div className="h-full bg-[#c8ff00] rounded-full transition-all duration-300" style={{ width: `${(intakeQIndex / intakeQuestions.length) * 100}%` }} />
+              <div className="h-full bg-[#C6A664] rounded-full transition-all duration-300" style={{ width: `${(intakeQIndex / intakeQuestions.length) * 100}%` }} />
             </div>
           </div>
 
           {/* Zuri bubble */}
           <div className="flex gap-3 mb-6 animate-fade-in" key={`intake-${intakeQIndex}`}>
-            <div className="w-9 h-9 rounded-full bg-[#c8ff00]/20 flex items-center justify-center text-base shrink-0 mt-1">
+            <div className="w-9 h-9 rounded-full bg-[#C6A664]/20 flex items-center justify-center text-base shrink-0 mt-1">
               ◈
             </div>
             <div className="flex-1">
@@ -1141,7 +1141,7 @@ function BlueprintAssessContent() {
               <button
                 onClick={advance}
                 disabled={!hasAnswer}
-                className="px-6 py-2.5 rounded-xl bg-[#c8ff00] text-[#080810] text-sm font-medium hover:bg-[#b8ee00] transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                className="px-6 py-2.5 rounded-xl bg-[#C6A664] text-[#0A0A0B] text-sm font-medium hover:bg-[#b8ee00] transition-all disabled:opacity-30 disabled:cursor-not-allowed"
               >
                 {isLastQ ? 'Complete Setup →' : 'Continue →'}
               </button>
@@ -1171,7 +1171,7 @@ function BlueprintAssessContent() {
     const plan = pricingRec?.recommended_plan
 
     return (
-      <main className="min-h-screen bg-[#080810] text-white">
+      <main className="min-h-screen bg-[#0A0A0B] text-white">
         <div className="max-w-2xl mx-auto px-6 py-16">
           <div className="text-center mb-10">
             <div className="text-5xl mb-4">⛭</div>
@@ -1182,12 +1182,12 @@ function BlueprintAssessContent() {
           {/* Combined scores */}
           <div className="grid grid-cols-2 gap-4 mb-8">
             <div className="glass rounded-xl p-6 border border-white/[0.06] text-center">
-              <div className="text-3xl font-bold text-[#c8ff00]">{combinedScore}</div>
+              <div className="text-3xl font-bold text-[#C6A664]">{combinedScore}</div>
               <div className="text-xs text-white/40 mt-1">Blueprint Score</div>
             </div>
             {lifeScore !== null && (
               <div className="glass rounded-xl p-6 border border-white/[0.06] text-center">
-                <div className="text-3xl font-bold text-[#34d399]">{lifeScore}</div>
+                <div className="text-3xl font-bold text-[#5E8B84]">{lifeScore}</div>
                 <div className="text-xs text-white/40 mt-1">Life Intelligence</div>
               </div>
             )}
@@ -1196,7 +1196,7 @@ function BlueprintAssessContent() {
           {/* Archetype */}
           {coreResult?.archetype && (
             <div className="text-center mb-8">
-              <span className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-[#c8ff00]/10 border border-[#c8ff00]/20 text-[#c8ff00] text-sm">
+              <span className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-[#C6A664]/10 border border-[#C6A664]/20 text-[#C6A664] text-sm">
                 Archetype: {coreResult.archetype}
               </span>
             </div>
@@ -1205,22 +1205,22 @@ function BlueprintAssessContent() {
           {/* ── RECOMMENDED PLAN ── */}
           {pricingLoading && (
             <div className="glass rounded-2xl p-8 border border-white/[0.06] mb-8 text-center">
-              <div className="w-6 h-6 border-2 border-[#c8ff00] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+              <div className="w-6 h-6 border-2 border-[#C6A664] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
               <p className="text-xs text-white/40">Calculating your best plan...</p>
             </div>
           )}
 
           {pricingRec && plan && (
-            <div className="glass rounded-2xl p-6 border border-[#c8ff00]/20 mb-8" style={{ background: 'linear-gradient(135deg, rgba(200,255,0,0.05) 0%, rgba(200,255,0,0.01) 100%)' }}>
+            <div className="glass rounded-2xl p-6 border border-[#C6A664]/20 mb-8" style={{ background: 'linear-gradient(135deg, rgba(200,255,0,0.05) 0%, rgba(200,255,0,0.01) 100%)' }}>
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <div className="text-xs text-[#c8ff00] uppercase tracking-widest mb-1">Recommended Plan</div>
+                  <div className="text-xs text-[#C6A664] uppercase tracking-widest mb-1">Recommended Plan</div>
                   <h2 className="text-2xl font-bold">
                     {plan.name} <span className="text-base font-normal text-white/40">{plan.period}</span>
                   </h2>
                 </div>
                 <div className="text-right">
-                  <div className="text-3xl font-bold text-[#c8ff00]">${plan.price.toLocaleString()}</div>
+                  <div className="text-3xl font-bold text-[#C6A664]">${plan.price.toLocaleString()}</div>
                   <div className="text-xs text-white/40">{plan.period || 'free'}</div>
                 </div>
               </div>
@@ -1229,7 +1229,7 @@ function BlueprintAssessContent() {
               <div className="text-sm text-white/50 mb-4">
                 <span className="text-white/70 font-medium">${plan.price.toLocaleString()}</span> base + <span className="text-white/70 font-medium">${pricingRec.addon_total.toLocaleString()}</span> recommended add-ons
                 {pricingRec.monthly_total > plan.price && (
-                  <span className="block mt-1 text-xs text-white/30">= <span className="text-[#c8ff00] font-medium">${pricingRec.monthly_total.toLocaleString()}/month</span> total</span>
+                  <span className="block mt-1 text-xs text-white/30">= <span className="text-[#C6A664] font-medium">${pricingRec.monthly_total.toLocaleString()}/month</span> total</span>
                 )}
               </div>
 
@@ -1240,7 +1240,7 @@ function BlueprintAssessContent() {
                   <div className="flex flex-wrap gap-2">
                     {pricingRec.recommended_addons.map((a: any) => (
                       <span key={a.id} className="px-3 py-1 rounded-full border border-white/10 text-xs text-white/60 bg-white/[0.03]">
-                        {a.name} <span className="text-[#c8ff00]">+${a.price}{a.period}</span>
+                        {a.name} <span className="text-[#C6A664]">+${a.price}{a.period}</span>
                       </span>
                     ))}
                   </div>
@@ -1259,7 +1259,7 @@ function BlueprintAssessContent() {
                   <p className="text-xs text-white/40 mt-1 max-w-md">{pricingRec.business_os.description}</p>
                 </div>
                 <div className="text-right">
-                  <div className="text-lg font-bold text-[#c8ff00]">{pricingRec.business_os.price_label}</div>
+                  <div className="text-lg font-bold text-[#C6A664]">{pricingRec.business_os.price_label}</div>
                   <div className="text-[10px] text-white/30">Enterprise-grade</div>
                 </div>
               </div>
@@ -1278,7 +1278,7 @@ function BlueprintAssessContent() {
                 { label: 'Dashboard Configuration', done: true },
               ].map((item, i) => (
                 <div key={i} className="flex items-center gap-3 text-sm">
-                  <div className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold ${item.done ? 'bg-[#c8ff00] text-[#080810]' : 'bg-white/[0.06] text-white/30'}`}>
+                  <div className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold ${item.done ? 'bg-[#C6A664] text-[#0A0A0B]' : 'bg-white/[0.06] text-white/30'}`}>
                     {item.done ? '✓' : i + 1}
                   </div>
                   <span className={item.done ? 'text-white/70' : 'text-white/30'}>{item.label}</span>
@@ -1313,7 +1313,7 @@ function BlueprintAssessContent() {
                   <div className="mt-4 flex flex-col sm:flex-row gap-3">
                     <button
                       onClick={() => router.push('/login?redirect=' + encodeURIComponent(window.location.pathname + window.location.search))}
-                      className="flex-1 px-5 py-3 rounded-xl bg-[#c8ff00] text-[#080810] font-semibold hover:bg-white transition-all"
+                      className="flex-1 px-5 py-3 rounded-xl bg-[#C6A664] text-[#0A0A0B] font-semibold hover:bg-white transition-all"
                     >
                       Sign in to save
                     </button>
@@ -1341,7 +1341,7 @@ function BlueprintAssessContent() {
             <button
               onClick={handleDeployNow}
               disabled={checkoutLoading || trialLoading || !pricingRec?.recommended_plan?.key}
-              className="flex-1 px-8 py-4 bg-[#c8ff00] text-[#080810] rounded-xl font-bold hover:bg-white transition-all text-center disabled:opacity-40 disabled:cursor-not-allowed text-base"
+              className="flex-1 px-8 py-4 bg-[#C6A664] text-[#0A0A0B] rounded-xl font-bold hover:bg-white transition-all text-center disabled:opacity-40 disabled:cursor-not-allowed text-base"
             >
               {checkoutLoading ? (
                 <span className="inline-flex items-center gap-2">
@@ -1356,11 +1356,11 @@ function BlueprintAssessContent() {
               <button
                 onClick={handleStartTrial}
                 disabled={trialLoading || checkoutLoading}
-                className="flex-1 px-8 py-4 rounded-xl border-2 border-[#c8ff00]/40 text-[#c8ff00] font-bold hover:bg-[#c8ff00]/10 transition-all text-center disabled:opacity-40 disabled:cursor-not-allowed text-base"
+                className="flex-1 px-8 py-4 rounded-xl border-2 border-[#C6A664]/40 text-[#C6A664] font-bold hover:bg-[#C6A664]/10 transition-all text-center disabled:opacity-40 disabled:cursor-not-allowed text-base"
               >
                 {trialLoading ? (
                   <span className="inline-flex items-center gap-2">
-                    <span className="w-4 h-4 border-2 border-[#c8ff00] border-t-transparent rounded-full animate-spin" />
+                    <span className="w-4 h-4 border-2 border-[#C6A664] border-t-transparent rounded-full animate-spin" />
                     Activating Trial...
                   </span>
                 ) : (
@@ -1395,8 +1395,8 @@ function BlueprintAssessContent() {
 
 function BlueprintAssessFallback() {
   return (
-    <main className="min-h-screen bg-[#080810] text-white flex items-center justify-center">
-      <div className="w-8 h-8 border-2 border-[#c8ff00] border-t-transparent rounded-full animate-spin" />
+    <main className="min-h-screen bg-[#0A0A0B] text-white flex items-center justify-center">
+      <div className="w-8 h-8 border-2 border-[#C6A664] border-t-transparent rounded-full animate-spin" />
     </main>
   )
 }

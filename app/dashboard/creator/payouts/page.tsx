@@ -16,15 +16,15 @@ export default async function CreatorPayoutsPage() {
       <div className="grid grid-cols-3 gap-4 mb-8">
         <div className="glass rounded-sm p-5">
           <div className="text-xs text-white/30 tracking-widest uppercase mb-3">Total Revenue</div>
-          <div className="text-2xl font-light text-[#c8ff00]">$—</div>
+          <div className="text-2xl font-light text-[#C6A664]">$—</div>
         </div>
         <div className="glass rounded-sm p-5">
           <div className="text-xs text-white/30 tracking-widest uppercase mb-3">This Month</div>
-          <div className="text-2xl font-light text-[#00d4ff]">$—</div>
+          <div className="text-2xl font-light text-[#5E8B84]">$—</div>
         </div>
         <div className="glass rounded-sm p-5">
           <div className="text-xs text-white/30 tracking-widest uppercase mb-3">Pending</div>
-          <div className="text-2xl font-light text-[#a78bfa]">$—</div>
+          <div className="text-2xl font-light text-[#8B7AA8]">$—</div>
         </div>
       </div>
 

@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
         let plan = body.plan as string
         const PREFIX_MAP: Record<string, string> = {
           'founder': 'client_founder',
-          'team': 'client_team',
+          'team': 'client_org',
           'enterprise': 'client_enterprise',
           'studio': 'creator_studio',
           'premium': 'creator_premium',

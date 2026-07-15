@@ -14,7 +14,7 @@ type PlanBuilderProps = {
   agentIds?: string[]
 }
 
-export default function PlanBuilder({ path, defaultPlan, verticalColor = '#c8ff00', vertical, agentIds }: PlanBuilderProps) {
+export default function PlanBuilder({ path, defaultPlan, verticalColor = '#C6A664', vertical, agentIds }: PlanBuilderProps) {
   const router = useRouter()
   const plans: Record<string, { name: string; price: number; period: string; tagline: string; popular?: boolean }> = BASE_PLANS[path]
   const planEntries = Object.entries(plans)
@@ -93,12 +93,12 @@ export default function PlanBuilder({ path, defaultPlan, verticalColor = '#c8ff0
               onClick={() => setSelectedPlan(key)}
               className={`relative rounded-sm p-4 border text-left transition-all ${
                 selectedPlan === key
-                  ? 'border-[#c8ff00] bg-[#c8ff00]/10'
+                  ? 'border-[#C6A664] bg-[#C6A664]/10'
                   : 'border-white/[0.06] bg-white/[0.02] hover:border-white/20'
               }`}
             >
               {(plan as any).popular && (
-                <div className="absolute -top-2 left-3 px-2 py-0.5 bg-[#c8ff00] text-black text-[9px] font-bold rounded-full uppercase tracking-wider">
+                <div className="absolute -top-2 left-3 px-2 py-0.5 bg-[#C6A664] text-black text-[9px] font-bold rounded-full uppercase tracking-wider">
                   Popular
                 </div>
               )}
@@ -125,7 +125,7 @@ export default function PlanBuilder({ path, defaultPlan, verticalColor = '#c8ff0
               onClick={() => toggleAddon(addon.id)}
               className={`flex items-center justify-between rounded-sm p-3 border text-left transition-all ${
                 selectedAddons.has(addon.id)
-                  ? 'border-[#c8ff00]/40 bg-[#c8ff00]/8'
+                  ? 'border-[#C6A664]/40 bg-[#C6A664]/8'
                   : 'border-white/[0.06] bg-white/[0.02] hover:border-white/20'
               }`}
             >
@@ -139,7 +139,7 @@ export default function PlanBuilder({ path, defaultPlan, verticalColor = '#c8ff0
                 </span>
                 <div className={`w-4 h-4 rounded-sm border flex items-center justify-center transition-all ${
                   selectedAddons.has(addon.id)
-                    ? 'bg-[#c8ff00] border-[#c8ff00]'
+                    ? 'bg-[#C6A664] border-[#C6A664]'
                     : 'border-white/20'
                 }`}>
                   {selectedAddons.has(addon.id) && (

@@ -7,7 +7,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: STRIPE_A
 
 const PLAN_PRICES: Record<string, { amount: number; name: string; recurring: boolean }> = {
   client_founder:     { amount: 39700,  name: 'Client Founder',       recurring: true },
-  client_team:        { amount: 149700, name: 'Client Teams',         recurring: true },
+  client_org:        { amount: 149700, name: 'Client Org',         recurring: true },
   client_enterprise:  { amount: 500000, name: 'Client Enterprise',    recurring: true },
   creator_studio:     { amount: 29700,  name: 'Creator Studio',       recurring: true },
   creator_premium:    { amount: 99700,  name: 'Creator Premium',      recurring: true },
@@ -15,6 +15,15 @@ const PLAN_PRICES: Record<string, { amount: number; name: string; recurring: boo
   personal_free:     { amount: 0,      name: 'Personal Free',       recurring: false },
   personal_plus:     { amount: 9700,   name: 'Personal Plus',        recurring: true },
   personal_premium:  { amount: 19700,  name: 'Personal Premium',     recurring: true },
+
+  // Unpublicized — never shown in the public plan catalog (see
+  // PLAN_CATEGORIES in app/dashboard/client/plan/page.tsx, which does NOT
+  // include this key). Only reachable through the org-offboarding "transfer"
+  // path in /api/client/organization/members/remove. Priced above Personal
+  // Plus because it arrives pre-trained — the twin keeps whatever it
+  // learned while working inside the org (see client_twins.metadata),
+  // instead of starting over as a basic twin.
+  personal_trained_intelligence: { amount: 19700, name: 'Trained Intelligence', recurring: true },
   affiliate_starter:     { amount: 0,      name: 'Affiliate Starter',    recurring: false },
   affiliate_pro:         { amount: 9700,   name: 'Affiliate Pro',        recurring: true },
   affiliate_enterprise:  { amount: 29700,  name: 'Affiliate Enterprise',  recurring: true },

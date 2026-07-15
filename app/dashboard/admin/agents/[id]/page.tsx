@@ -179,7 +179,7 @@ export default function EditAgentPage({ params }: { params: Promise<{ id: string
               <input
                 value={tagline}
                 onChange={(e) => setTagline(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-sm px-3 py-2 text-sm text-white/80 focus:outline-none focus:border-[#c8ff00]/40"
+                className="w-full bg-white/5 border border-white/10 rounded-sm px-3 py-2 text-sm text-white/80 focus:outline-none focus:border-[#C6A664]/40"
               />
             </div>
             <div>
@@ -188,7 +188,7 @@ export default function EditAgentPage({ params }: { params: Promise<{ id: string
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={2}
-                className="w-full bg-white/5 border border-white/10 rounded-sm px-3 py-2 text-sm text-white/80 resize-none focus:outline-none focus:border-[#c8ff00]/40"
+                className="w-full bg-white/5 border border-white/10 rounded-sm px-3 py-2 text-sm text-white/80 resize-none focus:outline-none focus:border-[#C6A664]/40"
               />
             </div>
             <div>
@@ -197,14 +197,14 @@ export default function EditAgentPage({ params }: { params: Promise<{ id: string
                 value={systemPrompt}
                 onChange={(e) => setSystemPrompt(e.target.value)}
                 rows={8}
-                className="w-full bg-white/5 border border-white/10 rounded-sm px-3 py-2 text-xs text-white/80 font-mono resize-y focus:outline-none focus:border-[#c8ff00]/40"
+                className="w-full bg-white/5 border border-white/10 rounded-sm px-3 py-2 text-xs text-white/80 font-mono resize-y focus:outline-none focus:border-[#C6A664]/40"
               />
             </div>
             <div className="flex items-center gap-3">
               <button
                 onClick={saveContent}
                 disabled={contentSaving}
-                className="px-5 py-2 bg-[#c8ff00] text-[#080810] text-sm font-bold rounded-sm hover:bg-white transition-all disabled:opacity-40"
+                className="px-5 py-2 bg-[#C6A664] text-[#0A0A0B] text-sm font-bold rounded-sm hover:bg-white transition-all disabled:opacity-40"
               >
                 {contentSaving ? 'Saving...' : 'Save Content'}
               </button>
@@ -262,7 +262,7 @@ export default function EditAgentPage({ params }: { params: Promise<{ id: string
             <button
               onClick={() => setIsPublished(!isPublished)}
               className={`relative w-12 h-6 rounded-full transition-colors ${
-                isPublished ? 'bg-[#c8ff00]' : 'bg-white/10'
+                isPublished ? 'bg-[#C6A664]' : 'bg-white/10'
               }`}
             >
               <div
@@ -278,7 +278,7 @@ export default function EditAgentPage({ params }: { params: Promise<{ id: string
             <button
               onClick={saveScores}
               disabled={saving}
-              className="flex-1 px-5 py-2.5 bg-[#c8ff00] text-[#080810] text-sm font-bold rounded-sm hover:bg-white transition-all disabled:opacity-40"
+              className="flex-1 px-5 py-2.5 bg-[#C6A664] text-[#0A0A0B] text-sm font-bold rounded-sm hover:bg-white transition-all disabled:opacity-40"
             >
               {saving ? 'Saving...' : 'Save MAS Scores'}
             </button>

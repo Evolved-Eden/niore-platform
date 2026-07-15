@@ -609,7 +609,7 @@ export default function WorkflowDesigner() {
             <h2 className="text-lg font-bold text-white/80">Workflow Stages (Drag to reorder)</h2>
             <button
               onClick={addStage}
-              className="px-4 py-2 text-sm font-medium bg-[#c8ff00] text-black rounded-sm hover:bg-white transition-colors font-bold"
+              className="px-4 py-2 text-sm font-medium bg-[#C6A664] text-black rounded-sm hover:bg-white transition-colors font-bold"
             >
               + Add Stage
             </button>
@@ -738,7 +738,7 @@ export default function WorkflowDesigner() {
         <button
           onClick={handleSave}
           disabled={!workflowName || loading}
-          className="px-4 py-2 text-sm font-medium bg-[#c8ff00] text-black rounded-sm hover:bg-white transition-colors font-bold flex-1 disabled:opacity-40"
+          className="px-4 py-2 text-sm font-medium bg-[#C6A664] text-black rounded-sm hover:bg-white transition-colors font-bold flex-1 disabled:opacity-40"
         >
           {loading ? 'Saving...' : workflowId ? 'Update Workflow' : 'Save Workflow'}
         </button>

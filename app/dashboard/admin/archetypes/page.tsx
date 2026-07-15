@@ -78,7 +78,7 @@ export default function ArchetypesPage() {
             .sort((a, b) => (b.agent_count || 0) - (a.agent_count || 0))
             .map((arc) => (
             <div key={arc.archetype_id} className={`glass rounded-sm p-5 border border-white/[0.06] border-l-4 ${
-              arc.agent_count > 0 ? 'border-l-[#c8ff00]' : 'border-l-white/10'
+              arc.agent_count > 0 ? 'border-l-[#C6A664]' : 'border-l-white/10'
             }`}>
               <div className="flex items-start justify-between mb-3">
                 <div>

@@ -110,7 +110,7 @@ export default function AdminBlueprintPage() {
       {/* Header */}
       <div className="mb-8">
         <h1 className="font-display text-2xl font-bold tracking-tight mb-1">
-          My <span className="text-[#ff6b6b]">Blueprint</span>
+          My <span className="text-[#7A2E32]">Blueprint</span>
         </h1>
         <p className="text-white/30 text-sm">Personal intelligence archetype and profile</p>
       </div>
@@ -121,8 +121,8 @@ export default function AdminBlueprintPage() {
           {/* Archetype card */}
           <div className="glass rounded-sm overflow-hidden">
             <div className="px-6 py-5 border-b border-white/[0.06] flex items-center gap-4">
-              <div className="w-16 h-16 rounded-full bg-[#ff6b6b]/10 border-2 border-[#ff6b6b]/30 flex items-center justify-center shrink-0">
-                <span className="text-2xl font-bold text-[#ff6b6b]">
+              <div className="w-16 h-16 rounded-full bg-[#7A2E32]/10 border-2 border-[#7A2E32]/30 flex items-center justify-center shrink-0">
+                <span className="text-2xl font-bold text-[#7A2E32]">
                   {blueprint?.archetype?.charAt(0) ?? '?'}
                 </span>
               </div>
@@ -138,12 +138,12 @@ export default function AdminBlueprintPage() {
                 <div>
                   <div className="flex items-center justify-between text-sm mb-2">
                     <span className="text-white/40">Blueprint Score</span>
-                    <span className="text-[#ff6b6b] font-bold">{blueprint.overallScore}%</span>
+                    <span className="text-[#7A2E32] font-bold">{blueprint.overallScore}%</span>
                   </div>
                   <div className="h-2 rounded-full bg-white/[0.06] overflow-hidden">
                     <div
                       className="h-full rounded-full transition-all duration-1000"
-                      style={{ width: `${blueprint.overallScore}%`, background: 'linear-gradient(90deg, #ff6b6b, #ff8e8e)' }}
+                      style={{ width: `${blueprint.overallScore}%`, background: 'linear-gradient(90deg, #7A2E32, #ff8e8e)' }}
                     />
                   </div>
                 </div>
@@ -192,7 +192,7 @@ export default function AdminBlueprintPage() {
                 <div className="flex flex-wrap justify-center gap-3">
                   <Link
                     href="/blueprint/assess"
-                    className="inline-flex px-5 py-2.5 rounded-sm text-sm font-bold bg-[#ff6b6b] text-white hover:bg-[#ff6b6b]/80 transition-colors"
+                    className="inline-flex px-5 py-2.5 rounded-sm text-sm font-bold bg-[#7A2E32] text-white hover:bg-[#7A2E32]/80 transition-colors"
                   >
                     Take Blueprint Assessment →
                   </Link>
@@ -215,9 +215,9 @@ export default function AdminBlueprintPage() {
           {blueprint && (
             <Link
               href="/blueprint/assess"
-              className="block p-4 rounded-sm glass-hover border border-[#ff6b6b]/20 hover:border-[#ff6b6b]/40 transition-colors"
+              className="block p-4 rounded-sm glass-hover border border-[#7A2E32]/20 hover:border-[#7A2E32]/40 transition-colors"
             >
-              <div className="text-xs text-[#ff6b6b] tracking-widest uppercase mb-1">Re-Assess</div>
+              <div className="text-xs text-[#7A2E32] tracking-widest uppercase mb-1">Re-Assess</div>
               <div className="text-sm text-white/60">Update your blueprint →</div>
             </Link>
           )}

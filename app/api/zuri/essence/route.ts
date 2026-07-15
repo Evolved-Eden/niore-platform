@@ -894,34 +894,40 @@ ${context ? `\nUser context: ${context}` : ''}
 ${lensContext ? `\nProfile data:\n${lensContext}` : ''}
 ${userId ? `\nUser ID: ${userId}` : ''}${memoryBlock}`
 
-    // Try the configured provider
-    switch (provider) {
-      case 'openai':
-        result = await generateWithOpenAI(prompt)
-        usedProvider = 'openai'
-        break
-      case 'anthropic':
-        result = await generateWithAnthropic(prompt)
-        usedProvider = 'anthropic'
-        break
-      case 'openrouter':
-        result = await generateWithOpenAI(prompt, 'openrouter')
-        usedProvider = 'openrouter'
-        break
-      case 'local':
-        result = generateLocal(userRole || 'user', context || '', scores, archetypeName, pendingTasks, recentMemories, lensData)
-        usedProvider = 'local'
-        break
-      case 'disabled':
-        result = generateLocal(userRole || 'user', context || '', scores, archetypeName, pendingTasks, recentMemories, lensData)
-        usedProvider = 'local'
-        break
+    // Try the configured provider — wrapped in try-catch so AI errors
+    // fall through to generateLocal() instead of the outer catch which
+    // returns the completely static FALLBACK constant.
+    try {
+      switch (provider) {
+        case 'openai':
+          result = await generateWithOpenAI(prompt)
+          usedProvider = 'openai'
+          break
+        case 'anthropic':
+          result = await generateWithAnthropic(prompt)
+          usedProvider = 'anthropic'
+          break
+        case 'openrouter':
+          result = await generateWithOpenAI(prompt, 'openrouter')
+          usedProvider = 'openrouter'
+          break
+        case 'local':
+          result = generateLocal(userRole || 'user', context || '', scores, archetypeName, pendingTasks, recentMemories, lensData)
+          usedProvider = 'local'
+          break
+        case 'disabled':
+          result = generateLocal(userRole || 'user', context || '', scores, archetypeName, pendingTasks, recentMemories, lensData)
+          usedProvider = 'local'
+          break
+      }
+    } catch (e) {
+      console.error('Essence: AI provider threw, falling back to deterministic:', e)
     }
 
-    // If AI generation failed, fall back to deterministic
+    // If AI generation failed or threw, fall back to deterministic
     if (!result || !result.items?.length) {
       result = generateLocal(userRole || 'user', context || '', scores, archetypeName, pendingTasks, recentMemories, lensData)
-      usedProvider = 'local-fallback'
+      usedProvider = result === null ? 'local' : 'local-fallback'
     }
 
     // ── Always-computed factual extras (numerology/color/modality/crystals/

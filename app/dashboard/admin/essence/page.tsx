@@ -13,6 +13,14 @@ type EssenceRow = {
   created_at?: string | null
 }
 
+type DailyEssenceItem = {
+  type: string
+  content: string
+  priority: 'high' | 'medium' | 'low'
+}
+
+type EssenceRange = 'daily' | 'weekly' | 'monthly'
+
 const TYPE_CONFIG: Record<string, { label: string; icon: string; color: string }> = {
   focus:        { label: 'Focus Priority',  icon: '🎯', color: '#7A2E32' },
   optimization: { label: 'Optimization',    icon: '⚡', color: '#5E8B84' },
@@ -24,20 +32,41 @@ const TYPE_CONFIG: Record<string, { label: string; icon: string; color: string }
   action:       { label: 'Action',          icon: '✓', color: '#C9974A' },
 }
 
+const PRIORITY_COLORS: Record<string, string> = {
+  high: '#7A2E32',
+  medium: '#B5764A',
+  low: '#8B7AA8',
+}
+
 export default function AdminEssencePage() {
   const router = useRouter()
   const [loading, setLoading] = useState(true)
   const [name, setName] = useState('')
-  const [items, setItems] = useState<EssenceRow[]>([])
+  const [storedItems, setStoredItems] = useState<EssenceRow[]>([])
   const [newItem, setNewItem] = useState<{ type: string; content: string }>({ type: 'focus', content: '' })
   const [generating, setGenerating] = useState(false)
+  const [range, setRange] = useState<EssenceRange>('daily')
+
+  // Generated essence
+  const [dailyItems, setDailyItems] = useState<DailyEssenceItem[]>([])
+  const [dailyQuestion, setDailyQuestion] = useState('')
+  const [provider, setProvider] = useState('')
+  const [numerology, setNumerology] = useState<any>(null)
+  const [color, setColor] = useState<any>(null)
+  const [modality, setModality] = useState<any>(null)
+  const [crystals, setCrystals] = useState<any[]>([])
+  const [postingTime, setPostingTime] = useState<any>(null)
+  const [businessMove, setBusinessMove] = useState<any>(null)
+  const [personality, setPersonality] = useState('')
+  const [blueprintTile, setBlueprintTile] = useState<any>(null)
+  const [domainTiles, setDomainTiles] = useState<any[]>([])
+
   const inputRef = useRef<HTMLTextAreaElement>(null)
 
   useEffect(() => {
     async function load() {
       const supabase = createClient()
       const { data: { user: _user } } = await supabase.auth.getUser()
-      // Guaranteed non-null by root middleware
       const user = _user!
 
       const { data: identity } = await supabase
@@ -52,7 +81,7 @@ export default function AdminEssencePage() {
         .select('*')
         .eq('client_id', user.id)
         .order('created_at', { ascending: false })
-      if (essenceRows) setItems(essenceRows as EssenceRow[])
+      if (essenceRows) setStoredItems(essenceRows as EssenceRow[])
 
       setLoading(false)
     }
@@ -77,7 +106,7 @@ export default function AdminEssencePage() {
       .single()
 
     if (!error && data) {
-      setItems(prev => [(data as any) as EssenceRow, ...prev])
+      setStoredItems(prev => [(data as any) as EssenceRow, ...prev])
       setNewItem({ type: 'focus', content: '' })
     }
   }
@@ -92,17 +121,27 @@ export default function AdminEssencePage() {
       const res = await fetch('/api/zuri/essence', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ client_id: user.id }),
+        body: JSON.stringify({ userId: user.id, userRole: 'admin', range }),
       })
+
       if (res.ok) {
-        const { data: fresh } = await supabase
-          .from('essence_intelligence')
-          .select('*')
-          .eq('client_id', user.id)
-          .order('created_at', { ascending: false })
-        if (fresh) setItems(fresh as EssenceRow[])
+        const data = await res.json()
+        if (data.items?.length) setDailyItems(data.items)
+        if (data.dailyQuestion) setDailyQuestion(data.dailyQuestion)
+        if (data.provider) setProvider(data.provider)
+        setNumerology(data.numerology ?? null)
+        setColor(data.color ?? null)
+        setModality(data.modality ?? null)
+        setCrystals(data.crystals ?? [])
+        setPostingTime(data.postingTime ?? null)
+        setBusinessMove(data.businessMove ?? null)
+        setPersonality(data.personality ?? '')
+        setBlueprintTile(data.blueprint ?? null)
+        setDomainTiles(data.domainTiles ?? [])
       }
-    } catch {}
+    } catch (e) {
+      console.error('Essence generation failed:', e)
+    }
     setGenerating(false)
   }
 
@@ -115,26 +154,201 @@ export default function AdminEssencePage() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto animate-fade-in">
+    <div className="max-w-6xl mx-auto animate-fade-in">
       {/* Header */}
-      <div className="mb-8 flex items-start justify-between">
+      <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="font-display text-2xl font-bold tracking-tight mb-1">
             Essence <span className="text-[#7A2E32]">Intel</span>
           </h1>
           <p className="text-white/30 text-sm">Daily intelligence signals and priorities for {name}</p>
         </div>
-        <button
-          onClick={generateDaily}
-          disabled={generating}
-          className="px-4 py-2 rounded-sm text-sm bg-[#7A2E32]/10 border border-[#7A2E32]/20 text-[#7A2E32] hover:bg-[#7A2E32]/20 transition-colors disabled:opacity-40"
-        >
-          {generating ? 'Generating...' : 'Generate Daily ✦'}
-        </button>
+
+        <div className="flex items-center gap-2">
+          {/* Range selector */}
+          <div className="flex items-center gap-1 bg-white/[0.04] rounded-sm p-1 border border-white/[0.06]">
+            {(['daily', 'weekly', 'monthly'] as EssenceRange[]).map((r) => (
+              <button
+                key={r}
+                onClick={() => setRange(r)}
+                className={`px-3 py-1.5 text-xs font-medium rounded-sm capitalize transition-colors ${
+                  range === r ? 'bg-[#7A2E32] text-white' : 'text-white/50 hover:text-white/80'
+                }`}
+              >
+                {r}
+              </button>
+            ))}
+          </div>
+          <button
+            onClick={generateDaily}
+            disabled={generating}
+            className="px-4 py-2 rounded-sm text-sm bg-[#7A2E32] text-white hover:bg-[#7A2E32]/80 transition-colors disabled:opacity-40"
+          >
+            {generating ? 'Generating...' : `Generate ${range} ✦`}
+          </button>
+        </div>
       </div>
 
-      {/* Add new item */}
+      {/* Generated Essence Board */}
+      {dailyItems.length > 0 && (
+        <div className="glass rounded-sm border border-[#7A2E32]/15 overflow-hidden mb-6">
+          <div className="px-5 py-4 border-b border-white/[0.06] flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-[#7A2E32] animate-pulse-slow" />
+              <span className="text-xs text-[#7A2E32] tracking-widest uppercase font-medium">
+                Generated Essence — {range}
+              </span>
+              {provider && (
+                <span className="text-[9px] px-2 py-0.5 rounded-full bg-white/10 text-white/40 uppercase">
+                  {provider}
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Multi-lens tiles */}
+          {(numerology || color || modality || crystals.length > 0 || postingTime || businessMove) && (
+            <div className="px-5 py-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 border-b border-white/[0.06]">
+              {numerology && (
+                <div className="bg-white/[0.03] rounded-sm p-3">
+                  <div className="text-[10px] uppercase tracking-widest text-white/30 mb-1">Numerology</div>
+                  <div className="text-lg font-bold text-[#7A2E32]">{numerology.number}</div>
+                  <div className="text-[11px] text-white/40">{numerology.label}</div>
+                </div>
+              )}
+              {color && (
+                <div className="bg-white/[0.03] rounded-sm p-3">
+                  <div className="text-[10px] uppercase tracking-widest text-white/30 mb-1">Your Color</div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 rounded-full border border-white/20" style={{ backgroundColor: color.hex }} />
+                    <span className="text-sm font-semibold">{color.name}</span>
+                  </div>
+                  <div className="text-[11px] text-white/40 mt-1">{color.reason}</div>
+                </div>
+              )}
+              {modality && (
+                <div className="bg-white/[0.03] rounded-sm p-3">
+                  <div className="text-[10px] uppercase tracking-widest text-white/30 mb-1">Modality</div>
+                  <div className="text-sm font-semibold capitalize">{modality.type}{modality.sign ? ` (${modality.sign})` : ''}</div>
+                  <div className="text-[11px] text-white/40 mt-1">{modality.reason}</div>
+                </div>
+              )}
+              {crystals.length > 0 && (
+                <div className="bg-white/[0.03] rounded-sm p-3">
+                  <div className="text-[10px] uppercase tracking-widest text-white/30 mb-1">Crystal{crystals.length > 1 ? 's' : ''}</div>
+                  <div className="text-sm font-semibold">{crystals.map((c: any) => c.name).join(', ')}</div>
+                  <div className="text-[11px] text-white/40 mt-1">{crystals[0]?.reason}</div>
+                </div>
+              )}
+              {postingTime && (
+                <div className="bg-white/[0.03] rounded-sm p-3">
+                  <div className="text-[10px] uppercase tracking-widest text-white/30 mb-1">Best Time to Post</div>
+                  <div className="text-sm font-semibold">{postingTime.window}</div>
+                  <div className="text-[11px] text-white/40 mt-1">{postingTime.reason}</div>
+                </div>
+              )}
+              {businessMove && (
+                <div className="bg-white/[0.03] rounded-sm p-3">
+                  <div className="text-[10px] uppercase tracking-widest text-white/30 mb-1">Business Move{businessMove.hdType ? ` — ${businessMove.hdType}` : ''}</div>
+                  <div className="text-[11px] text-white/60">{businessMove.action}</div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Personality */}
+          {personality && (
+            <div className="px-5 py-3 border-b border-white/[0.06]">
+              <div className="text-[10px] uppercase tracking-widest text-white/30 mb-1">Personality</div>
+              <div className="text-[11px] text-white/60">{personality}</div>
+            </div>
+          )}
+
+          {/* Essence items */}
+          <div className="divide-y divide-white/[0.04]">
+            {dailyItems.map((item, i) => {
+              const config = TYPE_CONFIG[item.type] ?? TYPE_CONFIG.action
+              return (
+                <div key={i} className="px-5 py-3.5 hover:bg-white/[0.02] transition-colors animate-fade-in" style={{ animationDelay: `${i * 50}ms` }}>
+                  <div className="flex items-start gap-3">
+                    <div className="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0" style={{ backgroundColor: PRIORITY_COLORS[item.priority] ?? '#8B7AA8' }} />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <span className="text-xs" style={{ color: config.color }}>{config.icon}</span>
+                        <span className="text-xs font-medium" style={{ color: config.color }}>{config.label}</span>
+                        <span className="text-[9px] uppercase tracking-widest" style={{ color: PRIORITY_COLORS[item.priority] ?? '#8B7AA8' }}>{item.priority}</span>
+                      </div>
+                      <p className="text-sm text-white/70">{item.content}</p>
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+
+          {/* Daily question */}
+          {dailyQuestion && (
+            <div className="px-5 py-4 bg-white/[0.02] border-t border-white/[0.06]">
+              <div className="flex items-start gap-3">
+                <span className="text-sm shrink-0 mt-0.5 opacity-60">💭</span>
+                <div>
+                  <p className="text-xs text-white/30 mb-1">Daily Intelligence Question</p>
+                  <p className="text-sm text-white/60 italic">&ldquo;{dailyQuestion}&rdquo;</p>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Blueprint tile */}
+      {blueprintTile && (
+        <div className="mb-6 glass rounded-sm border border-white/[0.06] p-4">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] uppercase tracking-widest text-[#7A2E32] font-medium">Blueprint</span>
+              <span className="text-[9px] px-2 py-0.5 rounded-full bg-white/10 text-white/50 uppercase">{blueprintTile.tier}</span>
+            </div>
+            {blueprintTile.agentsUsed?.length > 0 && (
+              <span className="text-[10px] text-white/30">{blueprintTile.agentsUsed.join(' + ')}</span>
+            )}
+          </div>
+          <p className="text-sm text-white/70 whitespace-pre-line">{blueprintTile.content}</p>
+          {blueprintTile.upgradeMessage && (
+            <Link href="/dashboard/client/blueprint?upgrade=expanded" className="inline-block mt-3 text-xs font-medium text-[#7A2E32] hover:underline">
+              {blueprintTile.upgradeMessage} →
+            </Link>
+          )}
+        </div>
+      )}
+
+      {/* Domain tiles */}
+      {domainTiles.length > 0 && (
+        <div className="mb-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {domainTiles.map((d: any) => (
+            <div key={d.domain} className="glass rounded-sm border border-white/[0.06] p-3">
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-[10px] uppercase tracking-widest text-white/30">{d.label} Module</span>
+                <span className="text-[10px] text-[#7A2E32] font-semibold">{d.score}/100</span>
+              </div>
+              {d.insight && <p className="text-[11px] text-white/60">{d.insight}</p>}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Empty state */}
+      {dailyItems.length === 0 && storedItems.length === 0 && (
+        <div className="text-center py-12 mb-6">
+          <div className="text-3xl mb-3 opacity-30">⊙</div>
+          <p className="text-white/30 text-sm">Generate your daily essence to see AI-powered intelligence here</p>
+          <p className="text-white/20 text-xs mt-1">Or manually add signals below</p>
+        </div>
+      )}
+
+      {/* ── Manual add — stored intelligence ── */}
       <div className="glass rounded-sm p-4 mb-6 border border-white/[0.06]">
+        <div className="text-xs text-white/30 tracking-widest uppercase mb-3">Manual Signal</div>
         <div className="flex items-start gap-3">
           <select
             value={newItem.type}
@@ -163,41 +377,38 @@ export default function AdminEssencePage() {
         </div>
       </div>
 
-      {/* Essence items */}
-      <div className="space-y-3">
-        {items.length === 0 && (
-          <div className="text-center py-16">
-            <div className="text-3xl mb-3 opacity-30">⊙</div>
-            <p className="text-white/30 text-sm">No essence signals yet</p>
-            <p className="text-white/20 text-xs mt-1">Add one above or generate daily intelligence</p>
-          </div>
-        )}
-
-        {items.map(item => {
-          const cfg = TYPE_CONFIG[item.type ?? ''] ?? { label: item.type ?? '', icon: '◈', color: '#fff' }
-          return (
-            <div key={item.id} className="glass rounded-sm p-4 border border-white/[0.06] flex items-start gap-4 group">
-              <div
-                className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-sm"
-                style={{ background: `${cfg.color}15` }}
-              >
-                {cfg.icon}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-xs font-medium" style={{ color: cfg.color }}>{cfg.label}</span>
+      {/* Stored intelligence items */}
+      {storedItems.length > 0 && (
+        <div>
+          <div className="text-xs text-white/20 tracking-widest uppercase mb-3">Stored Signals</div>
+          <div className="space-y-3">
+            {storedItems.map(item => {
+              const cfg = TYPE_CONFIG[item.type ?? ''] ?? { label: item.type ?? '', icon: '◈', color: '#fff' }
+              return (
+                <div key={item.id} className="glass rounded-sm p-4 border border-white/[0.06] flex items-start gap-4 group">
+                  <div
+                    className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-sm"
+                    style={{ background: `${cfg.color}15` }}
+                  >
+                    {cfg.icon}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-xs font-medium" style={{ color: cfg.color }}>{cfg.label}</span>
+                    </div>
+                    <p className="text-sm text-white/70 leading-relaxed">{item.content}</p>
+                    {item.created_at && (
+                      <p className="text-[10px] text-white/20 mt-1">
+                        {new Date(item.created_at).toLocaleDateString()}
+                      </p>
+                    )}
+                  </div>
                 </div>
-                <p className="text-sm text-white/70 leading-relaxed">{item.content}</p>
-                {item.created_at && (
-                  <p className="text-[10px] text-white/20 mt-1">
-                    {new Date(item.created_at).toLocaleDateString()}
-                  </p>
-                )}
-              </div>
-            </div>
-          )
-        })}
-      </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

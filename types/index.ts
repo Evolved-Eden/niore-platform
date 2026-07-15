@@ -692,6 +692,18 @@ export type ClientZuriSessionRow = {
   updated_at?: string
 }
 
+// ── Journal ─────────────────────────────────────────────────
+export type JournalEntry = {
+  id: string
+  user_id: string
+  title?: string | null
+  content: string
+  mood?: string | null
+  shared_with: string[]
+  created_at: string
+  updated_at: string
+}
+
 // ── Additional DB table types ──────────────────────────────
 export type Agent = {
   id: string
@@ -942,6 +954,7 @@ export type Database = {
       essence_templates: TableWithDefaults<EssenceTemplateRow>
       evolved_eden_agents: TableWithDefaults<EvolvedEdenAgentRow>
       human_profiles: TableWithDefaults<HumanProfileRow>
+      journal_entries: TableWithDefaults<JournalEntry>
       identities: TableWithDefaults<Identity>
       intelligence_profiles: TableWithDefaults<IntelligenceProfile>
       knowledge_base: TableWithDefaults<KnowledgeBaseEntry>

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
+import type { JournalEntry } from '@/types'
 
 export const dynamic = 'force-dynamic'
 
@@ -27,7 +28,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     shareWithRoles?: { organizationId: string; roles: string[] } // adds members matching any of these roles
   }
 
-  const update: Record<string, unknown> = {}
+  const update: Partial<JournalEntry> = {}
   if (title !== undefined) update.title = title
   if (content !== undefined) update.content = content
   if (mood !== undefined) update.mood = mood

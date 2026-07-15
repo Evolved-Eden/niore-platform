@@ -5,9 +5,9 @@ import { useRouter } from 'next/navigation'
 
 type Entry = {
   id: string
-  title: string | null
+  title: string | null | undefined
   content: string
-  mood: string | null
+  mood: string | null | undefined
   shared_with: string[]
   created_at: string
 }

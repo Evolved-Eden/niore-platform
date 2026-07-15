@@ -31,6 +31,7 @@
     "ai": "^6.0.168",
     "astronomy-engine": "^2.1.19",
     "eventsource": "^4.1.0",
+    "lucide-react": "^0.542.0",
     "framer-motion": "^11.3.19",
     "next": "^16.2.10",
     "node-ssh": "^13.2.1",

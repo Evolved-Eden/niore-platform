@@ -12,15 +12,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "seed": "node scripts/seed.mjs"
-  },"pnpm": {
-  "onlyBuiltDependencies": [
-    "@sentry/cli",
-    "cpu-features",
-    "sharp",
-    "ssh2",
-    "unrs-resolver"
-  ]
-},
+  },
   "dependencies": {
     "@ai-sdk/anthropic": "^3.0.81",
     "@ai-sdk/deepseek": "^2.0.35",

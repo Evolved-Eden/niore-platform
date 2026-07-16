@@ -2,7 +2,15 @@
   "name": "three-three-blog",
   "version": "0.1.0",
   "private": true,
-  "scripts": {
+ "pnpm": {
+  "onlyBuiltDependencies": [
+    "@sentry/cli",
+    "cpu-features",
+    "sharp",
+    "ssh2",
+    "unrs-resolver"
+  ]
+} "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",

@@ -6,23 +6,7 @@ import { VERTICAL_LIST } from '@/components/demo/vertical-data'
 export default function DemoHubPage() {
   return (
     <div className="min-h-screen bg-[#0A0A0B] text-white">
-      {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 py-5 border-b border-white/5 bg-[#0A0A0B]/80 backdrop-blur-xl">
-        <Link href="/" className="font-display font-bold tracking-tight text-lg">
-          EVOLVED <span className="text-[#C6A664]">EDEN</span>
-        </Link>
-        <div className="flex items-center gap-6 text-sm text-white/50">
-          <Link href="/define-intelligence" className="hover:text-white transition-colors">Design Yours</Link>
-          <Link href="/pricing" className="hover:text-white transition-colors">Pricing</Link>
-          <Link href="/login" className="hover:text-white transition-colors">Sign In</Link>
-          <Link
-            href="/pricing"
-            className="px-4 py-2 bg-[#C6A664] text-black text-xs font-bold rounded-sm hover:bg-white transition-colors"
-          >
-            Get Started
-          </Link>
-        </div>
-      </header>
+
 
       {/* Hero */}
       <section className="pt-32 pb-16 px-6 text-center">

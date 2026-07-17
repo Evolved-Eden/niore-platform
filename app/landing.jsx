@@ -295,23 +295,15 @@ export default function EvolvedEdenLanding() {
             </div>
           </div>
 
-          <div className="relative reveal flex justify-center" style={{ animationDelay: "0.15s" }}>
-            <div className="relative w-[280px] h-[280px] flex items-center justify-center">
-              {/* Spinning ring */}
-              <div className="absolute inset-0 rounded-full bg-[conic-gradient(from_0deg,#C6A664,transparent_35%,#C6A664)] animate-spin-slow" />
-              {/* Inner border */}
-              <div className="absolute inset-[3px] rounded-full border border-white/10" />
-              {/* Image */}
-              <div className="absolute inset-[4px] rounded-full overflow-hidden bg-[#0A0A0B]">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/media/JSUJE9856.JPG" alt="Evolved Eden" className="w-full h-full object-cover" />
-              </div>
-              {/* Logo overlay */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="font-display text-5xl font-bold text-white/90 drop-shadow-2xl" style={{ textShadow: "0 0 40px rgba(0,0,0,0.8), 0 0 80px rgba(0,0,0,0.6)" }}>
-                  EE
-                </span>
-              </div>
+          <div className="relative reveal flex justify-center items-center min-h-[420px]" style={{ animationDelay: "0.15s" }}>
+            {/* Decorative spinning ring — behind image, not around it */}
+            <div className="absolute w-[420px] h-[420px] rounded-full bg-[conic-gradient(from_0deg,#C6A664,transparent_35%,#C6A664)] animate-spin-slow opacity-30" />
+            {/* Soft glow */}
+            <div className="absolute w-[320px] h-[320px] rounded-full bg-[#C6A664]/5 blur-3xl" />
+            {/* Photo — uncircled, full portrait */}
+            <div className="relative w-full max-w-[380px] aspect-[3/4] overflow-hidden rounded-lg border border-white/10 shadow-2xl">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/media/VJAFE1305.JPG" alt="Zuri Niorè" className="w-full h-full object-cover" />
             </div>
           </div>
         </section>

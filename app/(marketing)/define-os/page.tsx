@@ -36,19 +36,7 @@ export default function DefineOSPage() {
 
   return (
     <div className="min-h-screen bg-[#0A0A0B] text-white">
-      {/* Nav */}
-      <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 py-5 border-b border-white/5 bg-[#0A0A0B]/80 backdrop-blur-xl">
-        <Link href="/" className="font-display font-bold tracking-tight text-lg">
-          EVOLVED <span className="text-[#C6A664]">EDEN</span>
-        </Link>
-        <div className="flex items-center gap-6 text-sm text-white/50">
-          <Link href="/define-intelligence" className="hover:text-white transition-colors">Define Intelligence</Link>
-          <Link href="/pricing" className="hover:text-white transition-colors">Pricing</Link>
-          <Link href="/demo" className="hover:text-white transition-colors">Demos</Link>
-        </div>
-      </header>
-
-      <main className="pt-24">
+      <main>
         {/* Hero */}
         <section className="px-6 py-20 text-center max-w-4xl mx-auto">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 border border-white/10 rounded-full text-xs text-white/40 mb-6 tracking-widest uppercase">

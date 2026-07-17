@@ -1,661 +1,418 @@
-import React, { useState } from "react";
-import {
-  Menu,
-  X,
-  ChevronDown,
-  Sparkles,
-  Building2,
-  Users,
-  UserSquare2,
-  UserPlus,
-  Zap,
-  Crown,
-  Boxes,
-  Layers,
-  BookOpen,
-  Brain,
-  Search,
-  TrendingUp,
-} from "lucide-react";
+import { createClient } from '@/lib/supabase/server'
+import { redirect } from 'next/navigation'
+import Link from 'next/link'
+import EssenceBoard from '@/components/EssenceBoard'
+import { deriveRoleFromPlanTier } from '@/types'
 
-/* ---------------------------------------------------------
-   TOKENS — luxe editorial: obsidian, champagne, ivory, wine
-   (unchanged from prior pass — this round is story, not UI)
---------------------------------------------------------- */
-const INK = "#0A0A0B";
-const SURFACE = "#141414";
-const LINE = "#2A2A2A";
-const GOLD = "#C6A664";
-const IVORY = "#F3EEE6";
-const STONE = "#A8A29A";
-
-
-function SealBadge({ size = 150 }) {
-  const id = "sealpath";
-  return (
-    <svg width={size} height={size} viewBox="0 0 200 200" style={{ animation: "spin 40s linear infinite" }}>
-      <defs>
-        <path id={id} d="M 100,100 m -78,0 a 78,78 0 1,1 156,0 a 78,78 0 1,1 -156,0" />
-      </defs>
-      <circle cx="100" cy="100" r="96" fill="none" stroke={GOLD} strokeWidth="0.75" />
-      <circle cx="100" cy="100" r="60" fill="none" stroke={GOLD} strokeWidth="0.75" />
-      <text fill={GOLD} fontSize="9.5" letterSpacing="2.5" style={{ fontFamily: "'Manrope', sans-serif" }}>
-        <textPath href={`#${id}`} startOffset="0%">
-          AUDACITY IN EVERY ALGORITHM • EVOLVED EDEN • AUDACITY IN EVERY ALGORITHM •
-        </textPath>
-      </text>
-      <text x="100" y="107" textAnchor="middle" fill={IVORY} fontSize="26" style={{ fontFamily: "'Italiana', serif" }}>
-        EE
-      </text>
-    </svg>
-  );
+const ROLE_COLOR: Record<string, string> = {
+  admin: '#7A2E32',
+  creator: '#5E8B84',
+  client: '#C6A664',
+  personal: '#B5764A',
 }
 
-function Eyebrow({ children }) {
-  return (
-    <div className="uppercase tracking-[0.3em] text-xs mb-4 font-medium" style={{ fontFamily: "'Manrope', sans-serif", color: GOLD }}>
-      {children}
-    </div>
-  );
+interface QuickAction {
+  title: string
+  desc: string
+  href: string
+  icon: string
 }
 
-function Chip({ children }) {
-  return (
-    <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm" style={{ border: `1px solid ${LINE}`, color: IVORY, backgroundColor: "rgba(198,166,100,0.05)" }}>
-      {children}
-    </span>
-  );
+const QUICK_ACTIONS: Record<string, QuickAction[]> = {
+  client: [
+    { title: 'Open Zuri', desc: 'Your personal intelligence concierge', href: '/dashboard/client/zuri', icon: '◈' },
+    { title: 'My Twin', desc: 'View your AI Executive Twin', href: '/dashboard/client/twin', icon: '⟐' },
+    { title: 'Essence Intel', desc: 'Daily intelligence briefings', href: '/dashboard/client/essence', icon: '⊙' },
+    { title: 'My Agents', desc: 'Deploy and manage AI agents', href: '/dashboard/client/agents', icon: '⊕' },
+    { title: 'Vault', desc: 'Secure document & knowledge', href: '/dashboard/client/vault', icon: '▣' },
+    { title: 'Book Consultation', desc: '30-min strategy session', href: '/dashboard/client/consulting', icon: '✦' },
+  ],
+  creator: [
+    { title: 'Content Studio', desc: 'Create and schedule content', href: '/dashboard/creator/intelligences', icon: '✦' },
+    { title: 'Analytics', desc: 'Audience and growth metrics', href: '/dashboard/creator/analytics', icon: '⊙' },
+    { title: 'Payouts', desc: 'Revenue and commission tracking', href: '/dashboard/creator/payouts', icon: '◈' },
+  ],
+  admin: [
+    { title: 'Users', desc: 'Manage platform users', href: '/dashboard/admin/users', icon: '✦' },
+    { title: 'Agents', desc: 'Deploy and monitor agents', href: '/dashboard/admin/agents', icon: '⊕' },
+    { title: 'OmniGrid', desc: 'Full system control panel', href: '/dashboard/admin', icon: '◈' },
+  ],
+  personal: [
+    { title: 'My Hub', desc: 'Your personal intelligence hub', href: '/dashboard/personal', icon: '✦' },
+    { title: 'Profile', desc: 'Manage your personal profile', href: '/dashboard/personal/profile', icon: '◈' },
+    { title: 'Settings', desc: 'Account & privacy settings', href: '/dashboard/personal/settings', icon: '⊙' },
+  ],
 }
 
-function PrimaryButton({ children, className = "" }) {
+const SYSTEM_STATUSES = [
+  { label: 'Blueprint', key: 'blueprint', online: true },
+  { label: 'Twin', key: 'twin', online: true },
+  { label: 'Essence', key: 'essence', online: true },
+  { label: 'Agents', key: 'agents', online: true },
+  { label: 'Consultation', key: 'consultation', online: true },
+]
+
+const KPI_ITEMS = [
+  { label: 'Blueprint Score', value: '92%', icon: '◆', color: '#C6A664' },
+  { label: 'Twin Status', value: 'Active', icon: '⟐', color: '#5E8B84' },
+  { label: 'Essence Items', value: '14', icon: '⊙', color: '#8B7AA8' },
+  { label: 'Agents Deployed', value: '3', icon: '⊕', color: '#C6A664' },
+  { label: 'Swarms Active', value: '1', icon: '⊗', color: '#5E8B84' },
+  { label: 'Consultation', value: 'Scheduled', icon: '✦', color: '#B5764A' },
+]
+
+const QUICK_STATS = [
+  { label: 'System Uptime', value: '99.9%' },
+  { label: 'Intelligence Level', value: 'Lv. 7' },
+  { label: 'Blueprint Status', value: 'Optimized' },
+  { label: 'Active Agents', value: '3 Online' },
+]
+
+const SERVICES = [
+  {
+    title: 'Front Desk Agents',
+    eyebrow: 'Intake and scheduling',
+    copy: 'Qualify leads, answer common questions, route requests, and hand off clean context to your team.',
+    accent: 'border-[#5E8B84]/35 text-cyan',
+  },
+  {
+    title: 'Business Twins',
+    eyebrow: 'Operations memory',
+    copy: 'Turn your services, policies, offers, and workflows into a deployable intelligence layer.',
+    accent: 'border-[#C6A664]/35 text-acid',
+  },
+  {
+    title: 'Creator Systems',
+    eyebrow: 'Content and monetization',
+    copy: 'Package expertise into assistants, campaigns, premium experiences, and affiliate-ready funnels.',
+    accent: 'border-[#8B7AA8]/35 text-violet',
+  },
+]
+
+const ROLE_PATHS = [
+  {
+    role: 'Clients',
+    href: '/define-intelligence/client',
+    metric: 'Blueprint -> Twin -> Deploy',
+    copy: 'Build a practical AI operating system around the way your business already works.',
+  },
+  {
+    role: 'Creators',
+    href: '/define-intelligence/creator',
+    metric: 'IP -> Product -> Revenue',
+    copy: 'Turn your perspective, voice, and playbooks into an always-on intelligence product.',
+  },
+  {
+    role: 'Personal',
+    href: '/define-intelligence/personal',
+    metric: 'Life -> Systems -> Growth',
+    copy: 'Build a personal AI companion that learns your world, simplifies your day, and grows with you.',
+  },
+  {
+    role: 'Affiliates',
+    href: '/define-intelligence/affiliate',
+    metric: 'Audience -> Match -> Commission',
+    copy: 'Route the right people into the right systems with partner-ready tracking and offers.',
+  },
+]
+
+const DEMO_LANES = [
+  ['Real Estate', '/demo/real-estate'],
+  ['Hotel', '/demo/hotel'],
+  ['Legal', '/demo/legal'],
+  ['HR', '/demo/hr'],
+  ['Med Spa', '/demo/med-spa'],
+]
+
+const EXCHANGE_ITEMS = [
+  'Agent templates for vertical demos',
+  'Blueprint scoring and pricing paths',
+  'n8n workflow bridge to Discord and social',
+  'Supabase identity, roles, and vault data',
+]
+
+// Drop the 5 team photos into public/images/team/ using these exact filenames,
+// or edit the src paths below to match wherever you save them.
+const TEAM_PHOTOS = [
+  { src: '/images/team/team-laptop.jpg', alt: 'Working session' },
+  { src: '/images/team/team-dinner.jpg', alt: 'Client dinner' },
+  { src: '/images/team/team-office.jpg', alt: 'Office portrait' },
+  { src: '/images/team/team-boardroom.jpg', alt: 'Boardroom' },
+  { src: '/images/team/team-ai-twin.jpg', alt: 'Your AI Twin' },
+]
+
+export default async function DashboardHub({ searchParams }: { searchParams?: Promise<{ [key: string]: string | string[] | undefined }> }) {
+  const supabase = await createClient()
+  const { data: { user: _user } } = await supabase.auth.getUser()
+  // Guaranteed non-null by root middleware
+  const user = _user!
+
+  // Fetch client record to get plan_tier_key (reflects what user actually paid for)
+  const { data: clientRecord } = await supabase
+    .from('clients')
+    .select('plan_tier_key, metadata')
+    .eq('id', user.id)
+    .maybeSingle()
+
+  const { data: identity } = await supabase
+    .from('users')
+    .select('role, full_name')
+    .eq('id', user.id)
+    .single()
+
+  const userRole = (identity?.role as string) ?? 'client'
+  const name = identity?.full_name ?? user.email?.split('@')[0] ?? 'User'
+
+  // Admin always wins regardless of plan_tier_key (see app/dashboard/layout.tsx
+  // for the full explanation -- same bug fixed there, admins with a purchased
+  // plan were getting silently demoted to their plan's role).
+  const planRole = deriveRoleFromPlanTier(clientRecord?.plan_tier_key)
+  const role: string = userRole === 'admin' ? 'admin' : (planRole ?? userRole)
+
+  // Handle checkout=success — redirect to role-specific dashboard
+  const sp = await searchParams
+  const checkout = sp?.checkout as string
+
+  if (checkout === 'success') {
+    redirect(`/dashboard/${role}`)
+  }
+  const color = ROLE_COLOR[role] ?? '#C6A664'
+  const actions = QUICK_ACTIONS[role] ?? QUICK_ACTIONS.client
+  const kpis = KPI_ITEMS
+
   return (
-    <button className={`px-8 py-3.5 text-sm md:text-base tracking-wide transition-transform hover:scale-[1.02] ${className}`} style={{ backgroundColor: GOLD, color: INK }}>
-      {children}
-    </button>
-  );
-}
-
-function GhostButton({ children, className = "" }) {
-  return (
-    <button className={`px-8 py-3.5 text-sm md:text-base tracking-wide transition-colors ${className}`} style={{ border: `1px solid ${GOLD}`, color: IVORY }}>
-      {children}
-    </button>
-  );
-}
-
-
-
-function OrgTier({ label, items, caption }) {
-  return (
-    <div className="flex flex-col items-center">
-      <div
-        className="uppercase tracking-[0.25em] text-xs mb-3"
-        style={{ color: GOLD, fontFamily: "'Manrope', sans-serif" }}
-      >
-        {label}
+    <div className="max-w-6xl mx-auto animate-fade-in space-y-6">
+      {/* ── Hero Section ── */}
+      <div className="mb-6">
+        <h1
+          className="font-display text-3xl font-bold tracking-tight mb-1 bg-gradient-to-r from-[#C6A664] via-white to-[#C6A664] bg-clip-text text-transparent bg-[length:200%] animate-gradient"
+        >
+          Welcome back, {name}
+        </h1>
+        <p className="text-white/30 text-sm">Your {role} intelligence command center</p>
       </div>
-      <div className="flex flex-wrap justify-center gap-2 max-w-3xl mb-2">
-        {items.map((it, i) => (
-          <span
-            key={i}
-            className="px-4 py-2 text-sm"
-            style={{ border: `1px solid ${LINE}`, color: IVORY, backgroundColor: SURFACE }}
-          >
-            {it}
-          </span>
+
+      {/* ── System Status Bar ── */}
+      <div className="flex flex-wrap gap-6 mb-4">
+        {SYSTEM_STATUSES.map((s) => (
+          <div key={s.key} className="flex items-center gap-2">
+            <span
+              className={`w-2 h-2 rounded-full ${s.online ? 'animate-pulse' : ''}`}
+              style={{ background: s.online ? '#C6A664' : '#555' }}
+            />
+            <span className="text-xs text-white/40 tracking-wider">{s.label}</span>
+          </div>
         ))}
       </div>
-      {caption && <p className="text-xs italic" style={{ color: STONE }}>{caption}</p>}
-    </div>
-  );
-}
 
-function OrgConnector() {
-  return <div className="w-px h-8" style={{ backgroundColor: GOLD, opacity: 0.5 }} />;
-}
-<div className="mt-12">
-  <h3
-    className="uppercase text-xs tracking-[0.25em] mb-6"
-    style={{ color: GOLD }}
-  >
-    Live Industry Demos
-  </h3>
-
-  <div className="grid md:grid-cols-5 gap-4">
-    {[
-      { title: "Real Estate", href: "/demo/real-estate" },
-      { title: "Hotel", href: "/demo/hotel" },
-      { title: "Legal", href: "/demo/legal" },
-      { title: "HR", href: "/demo/hr" },
-      { title: "Med Spa", href: "/demo/med-spa" },
-    ].map((demo) => (
-      <a
-        key={demo.title}
-        href={demo.href}
-        className="p-5 transition-all hover:scale-[1.02]"
-        style={{
-          border: `1px solid ${LINE}`,
-          backgroundColor: SURFACE,
-        }}
-      >
-        <div
-          className="text-sm uppercase tracking-[0.18em] mb-2"
-          style={{ color: GOLD }}
-        >
-          {demo.title}
-        </div>
-
-        <div
-          className="text-sm"
-          style={{ color: STONE }}
-        >
-          Launch Demo →
-        </div>
-      </a>
-    ))}
-  </div>
-</div>
-const zuriCapabilities = [
-  { icon: Brain, title: "Remembers Everything", body: "Every decision, every preference, permanently retained." },
-  { icon: Search, title: "Learns Your Business", body: "Studies your market, your voice, your standards." },
-  { icon: Users, title: "Delegates Work", body: "Assigns the right task to the right Employee, instantly." },
-  { icon: UserPlus, title: "Hires Intelligence", body: "Recruits new Elite Employees the moment you need them." },
-  { icon: Building2, title: "Installs Departments", body: "Adds entire functions to your organization on demand." },
-  { icon: Crown, title: "Supervises Executives", body: "Keeps your Executive Council aligned to your goals." },
-  { icon: TrendingUp, title: "Improves Over Time", body: "Gets sharper with every decision she makes for you." },
-];
-
-const workforceTiers = [
-  {
-    icon: Crown,
-    title: "Executives",
-    tagline: "Leadership that coordinates your Workforce.",
-    roles: ["Chief Marketing Officer", "Chief Financial Officer", "Chief Operations Officer", "Chief Growth Officer"],
-    note: "Zuri sits above them.",
-  },
-  {
-    icon: Building2,
-    title: "Departments",
-    tagline: "Multiple Teams, orchestrated as one operating function.",
-    roles: ["Marketing", "Sales", "Finance", "Operations", "Research", "Creative"],
-  },
-  {
-    icon: Users,
-    title: "Teams",
-    tagline: "Specialized groups of Employees solving one objective.",
-    roles: ["Launch Team", "Content Team", "Sales Team", "Growth Team", "Support Team"],
-  },
-  {
-    icon: UserSquare2,
-    title: "Elite Employees",
-    tagline: "Experts trained for one responsibility.",
-    roles: ["Marketing Strategist", "Research Analyst", "Operations Specialist", "Sales Representative", "Creative Director"],
-  },
-];
-
-const flagshipOS = [
-  {
-    title: "Personal OS",
-    forWhom: "For your own life",
-    result: "Clearer decisions, less mental load, every day.",
-    features: ["Identity Profile", "Decision Support", "Daily Planning", "Personal Assistant"],
-  },
-  {
-    title: "Founder OS",
-    forWhom: "For building companies",
-    result: "Go from idea to running organization, fast.",
-    features: ["Company Formation", "Operating Structure", "Executive Team", "Growth Systems"],
-  },
-  {
-    title: "Creator OS",
-    forWhom: "For building an audience",
-    result: "Turn what you know into products that sell.",
-    features: ["Content Engine", "Course Builder", "Brand Voice", "Sales Funnel"],
-  },
-  {
-    title: "Business OS",
-    forWhom: "For running what you already have",
-    result: "Every department covered, without new headcount.",
-    features: ["Sales Team", "Marketing Team", "Operations Team", "Finance Team"],
-  },
-];
-const moreOS = ["Executive OS", "Enterprise OS", "Relationship OS", "Legacy OS"];
-
-const exchangeCategories = [
-  { title: "Personal Intelligence", items: ["Identity Profiles", "Essence Profile", "Decision Systems", "Growth Maps"] },
-  { title: "Business Intelligence", items: ["Founder Systems", "Marketing Intelligence", "Sales Intelligence", "Operations Intelligence"] },
-  { title: "Creative Intelligence", items: ["Creator Systems", "Content Engines", "Brand Intelligence"] },
-  { title: "Automated Intelligence", items: ["Workflows", "Business Machines", "Autonomous Systems"] },
-];
-
-const faqs = [
-  {
-    q: "What makes Evolved Eden different from AI assistants?",
-    a: "Most AI gives you a conversation. Evolved Eden gives you an intelligence ecosystem designed around you — your goals, your work, your decisions, and your growth.",
-  },
-  {
-    q: "What's the difference between an Elite Employee, a Team, and a Department?",
-    a: "An Elite Employee is a single expert trained for one responsibility. A Team is a group of Employees solving one objective together. A Department orchestrates multiple Teams into a single operating function — with Executives coordinating above them, and Zuri above that.",
-  },
-  {
-    q: "Who is Zuri Niorè?",
-    a: "Zuri Niorè is your Chief Intelligence Officer — the mind behind your Workforce. She coordinates your Executives, manages your Departments, deploys Elite Employees, and installs new capability from the Intelligence Exchange. She isn't a chatbot; she's the intelligence layer connecting your entire organization.",
-  },
-  {
-    q: "What can I add to my intelligence ecosystem?",
-    a: "You can expand your system with new capabilities, specialized experts, business functions, creative tools, and automated solutions — the moment you need them.",
-  },
-  {
-    q: "Which membership is right for me?",
-    a: "Affiliate is built for referral and partnership income. Personal is your private command center. Creator is for building and selling your own work. Client is built for B2C — consumer-facing brands and large organizations selling at scale. All four share one Operating System underneath, and Concierge is available separately if you'd rather have it built for you.",
-  },
-];
-
-export default function EvolvedEdenLanding() {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [openFaq, setOpenFaq] = useState(0);
-
-  return (
-    <div style={{ backgroundColor: INK, color: IVORY }} className="min-h-screen w-full overflow-x-hidden">
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Italiana&family=Manrope:wght@400;500;600;700&display=swap');
-        .font-display { font-family: 'Italiana', serif; }
-        .font-body { font-family: 'Manrope', sans-serif; }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-        @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
-        .reveal { animation: fadeUp 0.8s ease both; }
-        @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
-      `}</style>
-
-      <div className="font-body">
-        {/* NAV */}
-        <header className="sticky top-0 z-50 backdrop-blur" style={{ backgroundColor: "rgba(10,10,11,0.88)", borderBottom: `1px solid ${LINE}` }}>
-          <div className="max-w-6xl mx-auto px-6 md:px-10 h-20 flex items-center justify-between">
-            <span className="font-display text-xl tracking-widest">EVOLVED EDEN</span>
-
-            <nav className="hidden lg:flex items-center gap-7 text-sm tracking-wide" style={{ color: STONE }}>
-              <a href="#workforce" className="hover:text-white transition-colors">Workforce™</a>
-              <a href="#os" className="hover:text-white transition-colors">Operating Systems</a>
-              <a href="#zuri" className="hover:text-white transition-colors">Zuri Niorè</a>
-              <a href="#exchange" className="hover:text-white transition-colors">Intelligence Exchange</a>
-            </nav>
-
-            <div className="hidden md:block">
-              <PrimaryButton>Enter Platform</PrimaryButton>
-            </div>
-
-            <button className="lg:hidden" onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle menu">
-              {menuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
-          </div>
-
-          {menuOpen && (
-            <div className="lg:hidden px-6 pb-6 flex flex-col gap-4 text-sm" style={{ color: STONE }}>
-              <a href="#workforce">Workforce™</a>
-              <a href="#os">Operating Systems</a>
-              <a href="#zuri">Zuri Niorè</a>
-              <a href="#exchange">Intelligence Exchange</a>
-              <PrimaryButton className="mt-2 w-full">Enter Platform</PrimaryButton>
-            </div>
-          )}
-        </header>
-
-        {/* HERO */}
-        <section className="max-w-6xl mx-auto px-6 md:px-10 pt-16 md:pt-24 pb-20 grid md:grid-cols-2 gap-14 items-center">
-          <div className="reveal">
-            <Eyebrow>The Intelligence Operating System™</Eyebrow>
-            <h1 className="font-display text-5xl md:text-6xl leading-[1.05] mb-6">
-              Design Your Intelligence.
-              <br />
-              <span style={{ color: GOLD }}>Build the Organization</span>
-              <br />
-              You Are Meant to Lead.
-            </h1>
-            <p className="text-lg leading-relaxed mb-4 max-w-md font-medium" style={{ color: GOLD }}>
-              Most AI helps you complete tasks. Evolved Eden helps you build an
-              intelligent ecosystem around who you are.
-            </p>
-            <p className="text-lg leading-relaxed mb-8 max-w-md" style={{ color: STONE }}>
-              Meet Zuri Niorè — your Chief Intelligence Officer. You stay in charge.
-              She coordinates your Workforce.
-            </p>
-            <div className="flex flex-wrap gap-4">
-              <PrimaryButton>Design My Workforce</PrimaryButton>
-              <GhostButton>Explore Operating Systems</GhostButton>
-            </div>
-          </div>
-
-          <div className="relative reveal flex justify-center" style={{ animationDelay: "0.15s" }}>
-            <SealBadge size={280} />
-          </div>
-        </section>
-
-        {/* TICKER */}
-        <div className="overflow-hidden py-4" style={{ borderTop: `1px solid ${LINE}`, borderBottom: `1px solid ${LINE}` }}>
-          <div className="flex whitespace-nowrap text-sm md:text-base tracking-[0.3em] uppercase" style={{ color: GOLD, animation: "ticker 26s linear infinite", width: "max-content" }}>
-            {Array(2)
-              .fill("Design Intelligence  ·  Build Workforce  ·  Scale Legacy  ·  ")
-              .map((t, i) => (
-                <span key={i} className="pr-4">{t}</span>
-              ))}
-          </div>
-        </div>
-
-        {/* HOW ZURI WORKS */}
-        <section id="zuri" className="px-6 md:px-10 py-20 md:py-28" style={{ backgroundColor: SURFACE, borderTop: `1px solid ${LINE}`, borderBottom: `1px solid ${LINE}` }}>
-          <div className="max-w-6xl mx-auto">
-            <div className="max-w-2xl mb-16">
-              <Eyebrow>How Zuri Works</Eyebrow>
-              <h2 className="font-display text-4xl md:text-5xl mb-5">Meet Your Chief Intelligence Officer</h2>
-              <p className="text-lg leading-relaxed" style={{ color: STONE }}>
-                Zuri isn't another chatbot. She coordinates your intelligence
-                ecosystem — your Workforce™, your Operating System, and every
-                capability you add as you grow.
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
-              {zuriCapabilities.map(({ icon: Icon, title, body }, i) => (
-                <div key={i} className="p-6" style={{ border: `1px solid ${LINE}`, backgroundColor: INK }}>
-                  <Icon size={20} style={{ color: GOLD }} className="mb-3" />
-                  <h3 className="font-display text-lg mb-2">{title}</h3>
-                  <p className="text-sm" style={{ color: STONE }}>{body}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ORG CHART */}
-        <section className="px-6 md:px-10 py-20 md:py-28" style={{ backgroundColor: SURFACE, borderTop: `1px solid ${LINE}`, borderBottom: `1px solid ${LINE}` }}>
-          <div className="max-w-5xl mx-auto text-center mb-10">
-            <Eyebrow>How It's Organized</Eyebrow>
-            <h2 className="font-display text-4xl md:text-5xl mb-6">One Chart Says It All</h2>
-            <p className="text-lg leading-relaxed max-w-xl mx-auto" style={{ color: IVORY }}>
-              You're in charge of your organization. Zuri runs it for you.
-            </p>
-          </div>
-
-          <div className="flex flex-col items-center">
-            <div className="px-8 py-4 mb-1 text-center" style={{ border: `1px solid ${LINE}`, backgroundColor: INK }}>
-              <div className="font-display text-xl tracking-widest">YOU</div>
-              <div className="text-[10px] uppercase tracking-[0.2em] mt-1" style={{ color: GOLD }}>In Charge</div>
-            </div>
-            <p className="text-xs italic mb-2" style={{ color: STONE }}>Vision.</p>
-            <OrgConnector />
-            <div className="px-8 py-3 mb-1 text-center" style={{ border: `1px solid ${LINE}`, backgroundColor: SURFACE }}>
-              <div className="text-sm uppercase tracking-[0.2em]" style={{ color: IVORY }}>Your Intelligence Ecosystem</div>
-            </div>
-            <OrgConnector />
-            <div className="px-8 py-4 mb-1 mt-1 text-center" style={{ border: `1px solid ${GOLD}`, backgroundColor: INK }}>
-              <div className="font-display text-2xl tracking-widest">ZURI NIORÈ</div>
-              <div className="text-xs uppercase tracking-[0.25em] mt-1" style={{ color: GOLD }}>
-                Chief Intelligence Officer
+      {/* ── Quick Actions Grid ── */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {actions.map((cta) => (
+          <Link
+            key={cta.href}
+            href={cta.href}
+            className="group glass rounded-sm p-5 border border-white/[0.06] hover:border-white/[0.15] transition-all duration-300 hover:translate-y-[-2px]"
+          >
+            <div className="flex items-center gap-3 mb-3">
+              <span className="text-sm w-5 text-center" style={{ color }}>{cta.icon}</span>
+              <div className="text-xs tracking-widest uppercase" style={{ color }}>
+                {cta.title}
               </div>
             </div>
-            <p className="text-xs italic mb-2" style={{ color: STONE }}>Runs It.</p>
-            <OrgConnector />
-            <OrgTier label="Executive Leadership Council" items={["CMO", "COO", "CFO", "CGO", "CSO", "CXO"]} caption="Lead." />
-            <OrgConnector />
-            <OrgTier label="Departments" items={["Marketing", "Sales", "Operations", "Finance", "Research", "Creative", "Customer Success"]} caption="Manage." />
-            <OrgConnector />
-            <OrgTier label="Teams" items={["Content Team", "Growth Team", "Launch Team", "Analytics Team", "Support Team"]} caption="Collaborate." />
-            <OrgConnector />
-            <OrgTier label="Elite Employees" items={["Marketing Strategist", "SEO Specialist", "Research Analyst", "Financial Planner", "Creative Writer", "Automation Specialist"]} caption="Execute." />
-            <OrgConnector />
-            <OrgTier label="Workflows & Automations" items={["Workflows", "Knowledge", "Generators"]} caption="Repeat." />
-          </div>
-        </section>
+            <p className="text-sm text-white/40 group-hover:text-white/60 transition-colors">{cta.desc}</p>
+          </Link>
+        ))}
+      </div>
 
-        {/* BUILD YOUR WORKFORCE */}
-        <section id="workforce" className="px-6 md:px-10 py-20 md:py-28" style={{ backgroundColor: SURFACE, borderTop: `1px solid ${LINE}`, borderBottom: `1px solid ${LINE}` }}>
-          <div className="max-w-6xl mx-auto">
-            <div className="max-w-xl mb-14">
-              <Eyebrow>Workforce™</Eyebrow>
-              <h2 className="font-display text-4xl md:text-5xl mb-4">Build Your Workforce</h2>
-              <p className="text-lg leading-relaxed" style={{ color: STONE }}>
-                Every organization needs leaders, specialists, and systems. Now you can
-                deploy all three.
+      {/* ── Intelligence Command Center ── */}
+      <div className="glass rounded-sm overflow-hidden">
+        <div className="px-6 py-4 border-b border-white/[0.06] flex items-center justify-between">
+          <span className="text-xs text-white/30 tracking-widest uppercase flex items-center gap-2">
+            <span>◈</span> Intelligence Command Center
+          </span>
+          <span className="flex items-center gap-2 text-xs text-white/20">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#C6A664] animate-pulse-slow" />
+            Live
+          </span>
+        </div>
+        <div className="p-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6">
+            {kpis.map((kpi) => (
+              <div key={kpi.label} className="text-center">
+                <div className="text-lg mb-2" style={{ color: kpi.color }}>{kpi.icon}</div>
+                <div className="text-xl font-light mb-1" style={{ color: kpi.color }}>{kpi.value}</div>
+                <div className="text-[10px] text-white/30 tracking-widest uppercase">{kpi.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ── Role-Specific CTA ── */}
+      <div className="relative rounded-sm p-[2px] bg-gradient-to-r from-[#C6A664] via-white/20 to-[#C6A664] group/cta">
+        <div className="bg-[#0A0A0B] rounded-[3px] p-6 h-full">
+          <div className="flex items-center justify-between flex-wrap gap-4">
+            <div>
+              <h2 className="font-display text-lg font-semibold mb-1 text-white">
+                {role === 'client' ? 'Run Your Blueprint Assessment' : 'Open Your Dashboard'}
+              </h2>
+              <p className="text-sm text-white/40">
+                {role === 'client'
+                  ? 'Discover which intelligence agents and systems are optimal for your business.'
+                  : 'Continue to your dashboard to access tools tailored for your role.'}
               </p>
             </div>
+            <Link
+              href={role === 'client' ? '/dashboard/client/blueprint/assess' : `/dashboard/${role}`}
+              className="px-6 py-3 bg-[#C6A664] text-black text-sm font-bold rounded-sm hover:bg-white transition-all shrink-0 glow-acid group-hover/cta:shadow-[0_0_32px_rgba(200,255,0,0.3)]"
+            >
+              {role === 'client' ? 'Start Blueprint →' : 'Go to Dashboard →'}
+            </Link>
+          </div>
+        </div>
+      </div>
 
-            <div className="grid md:grid-cols-2 gap-6">
-              {workforceTiers.map(({ icon: Icon, title, tagline, roles, note }, i) => (
-                <div key={i} className="p-8" style={{ backgroundColor: INK, border: `1px solid ${LINE}` }}>
-                  <Icon size={22} style={{ color: GOLD }} className="mb-4" />
-                  <h3 className="font-display text-2xl mb-2">{title}</h3>
-                  <p className="mb-5" style={{ color: STONE }}>{tagline}</p>
-                  <div className="flex flex-wrap gap-2 mb-3">
-                    {roles.map((r, j) => (
-                      <span key={j} className="text-xs px-3 py-1.5" style={{ border: `1px solid ${LINE}`, color: IVORY }}>
-                        {r}
-                      </span>
-                    ))}
+      {/* ── Quick Stats Bar ── */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        {QUICK_STATS.map((stat) => (
+          <div key={stat.label} className="glass rounded-sm p-4 text-center">
+            <div className="text-lg font-light mb-1 text-white/80">{stat.value}</div>
+            <div className="text-[10px] text-white/30 tracking-widest uppercase">{stat.label}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* ── Services ── */}
+      <div>
+        <p className="text-xs uppercase tracking-[0.3em] text-white/35 mb-3">Services</p>
+        <div className="grid gap-4 md:grid-cols-3">
+          {SERVICES.map((service) => (
+            <div key={service.title} className={`rounded-lg border bg-white/[0.025] p-6 ${service.accent}`}>
+              <p className="text-xs uppercase tracking-[0.26em] text-white/35">{service.eyebrow}</p>
+              <h3 className="mt-4 text-xl font-semibold text-white">{service.title}</h3>
+              <p className="mt-4 text-sm leading-7 text-white/45">{service.copy}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Role Paths ── */}
+      <div>
+        <p className="text-xs uppercase tracking-[0.3em] text-white/35 mb-3">Role Paths</p>
+        <div className="grid gap-4 lg:grid-cols-4">
+          {ROLE_PATHS.map((path) => (
+            <Link
+              key={path.role}
+              href={path.href}
+              className="group rounded-lg border border-white/10 bg-white/[0.025] p-5 transition-colors hover:border-[#C6A664]/50"
+            >
+              <p className="text-xs uppercase tracking-[0.28em] text-[#C6A664]/70">{path.metric}</p>
+              <h3 className="mt-4 text-xl font-semibold text-white">{path.role}</h3>
+              <p className="mt-3 min-h-16 text-sm leading-6 text-white/45">{path.copy}</p>
+              <span className="mt-4 inline-flex text-sm font-semibold text-white/60 transition-colors group-hover:text-[#C6A664]">
+                Open path
+              </span>
+            </Link>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Demo Lanes ── */}
+      <div className="glass rounded-sm overflow-hidden">
+        <div className="px-6 py-4 border-b border-white/[0.06]">
+          <span className="text-xs text-white/30 tracking-widest uppercase">Demo Lanes</span>
+        </div>
+        <div className="p-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {DEMO_LANES.map(([label, href]) => (
+            <Link
+              key={label}
+              href={href}
+              className="rounded-lg border border-white/10 bg-white/[0.03] p-5 transition-colors hover:border-white/25 hover:bg-white/[0.055]"
+            >
+              <span className="text-base font-semibold text-white">{label}</span>
+              <span className="mt-2 block text-xs text-white/40">Explore demo</span>
+            </Link>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Team ── */}
+      <div>
+        <p className="text-xs uppercase tracking-[0.3em] text-white/35 mb-3">Team</p>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-5 items-center">
+          {TEAM_PHOTOS.map((photo, i) => {
+            const featured = i === TEAM_PHOTOS.length - 1
+            if (featured) {
+              return (
+                <div key={photo.src} className="relative mx-auto w-full aspect-square max-w-[180px]">
+                  <div className="absolute inset-0 rounded-full bg-[conic-gradient(from_0deg,#C6A664,transparent_35%,#C6A664)] animate-spin-slow" />
+                  <div className="absolute inset-[3px] rounded-full overflow-hidden bg-[#0A0A0B] border border-white/10">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={photo.src} alt={photo.alt} className="w-full h-full object-cover" />
                   </div>
-                  {note && <p className="text-xs tracking-wide" style={{ color: GOLD }}>{note}</p>}
                 </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* OPERATING SYSTEMS */}
-        <section id="os" className="max-w-6xl mx-auto px-6 md:px-10 py-20 md:py-28 text-center">
-          <Eyebrow>Operating Systems</Eyebrow>
-          <h2 className="font-display text-4xl md:text-5xl mb-5">Choose the Intelligence System That Matches Your Life</h2>
-          <p className="text-lg leading-relaxed mb-14 max-w-2xl mx-auto" style={{ color: STONE }}>
-            One Operating System, chosen for who you are — every Department, Team, and
-            Executive already fits inside it.
-          </p>
-          <div className="grid md:grid-cols-4 gap-5 text-left mb-8">
-            {flagshipOS.map((os, i) => (
-              <div key={i} className="p-7 flex flex-col" style={{ border: `1px solid ${LINE}`, backgroundColor: SURFACE }}>
-                <h3 className="font-display text-2xl mb-1">{os.title}</h3>
-                <div className="text-xs uppercase tracking-[0.2em] mb-4" style={{ color: GOLD }}>{os.forWhom}</div>
-                <p className="text-sm mb-5" style={{ color: IVORY }}>{os.result}</p>
-                <div className="flex flex-col gap-2 mt-auto">
-                  {os.features.map((f, j) => (
-                    <React.Fragment key={j}>
-                      <span className="text-sm" style={{ color: STONE }}>{f}</span>
-                      {j < os.features.length - 1 && <div style={{ borderTop: `1px solid ${LINE}` }} />}
-                    </React.Fragment>
-                  ))}
-                </div>
+              )
+            }
+            return (
+              <div key={photo.src} className="rounded-lg overflow-hidden border border-white/10 bg-white/[0.025] aspect-square">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={photo.src} alt={photo.alt} className="w-full h-full object-cover" />
               </div>
-            ))}
-          </div>
-          <div className="flex flex-wrap justify-center gap-3">
-            {moreOS.map((os, i) => (
-              <Chip key={i}>{os}</Chip>
-            ))}
-          </div>
-        </section>
+            )
+          })}
+        </div>
+      </div>
 
-        {/* INTELLIGENCE EXCHANGE */}
-        <section id="exchange" className="max-w-6xl mx-auto px-6 md:px-10 py-20 md:py-28 text-center">
-          <Boxes size={26} style={{ color: GOLD }} className="mx-auto mb-5" />
-          <Eyebrow>Intelligence Exchange™</Eyebrow>
-          <h2 className="font-display text-4xl md:text-5xl mb-5">Where Your Ecosystem Expands</h2>
-          <p className="text-lg leading-relaxed mb-14 max-w-2xl mx-auto" style={{ color: STONE }}>
-            New capabilities, specialized experts, business functions, creative tools,
-            and automated solutions — added the moment you need them.
-          </p>
-          <div className="grid md:grid-cols-4 gap-5 text-left">
-            {exchangeCategories.map((cat, i) => (
-              <div key={i} className="p-6" style={{ border: `1px solid ${LINE}`, backgroundColor: SURFACE }}>
-                <h4 className="uppercase text-xs tracking-widest mb-4" style={{ color: GOLD }}>{cat.title}</h4>
-                <div className="flex flex-col gap-2 text-sm" style={{ color: STONE }}>
-                  {cat.items.map((it, j) => (
-                    <span key={j}>{it}</span>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-          <p className="text-sm mt-10" style={{ color: STONE }}>
-            The Twin Registry — people whose trained Twins are available to hire, entirely by their own choice.
-          </p>
-        </section>
-
-        {/* DEFINE THE FUTURE */}
-        <section className="px-6 md:px-10 py-20 md:py-28" style={{ backgroundColor: SURFACE, borderTop: `1px solid ${LINE}`, borderBottom: `1px solid ${LINE}` }}>
-          <div className="max-w-4xl mx-auto text-center">
-            <Eyebrow>Define the Future</Eyebrow>
-            <h2 className="font-display text-4xl md:text-5xl mb-6 leading-tight">
-              Define the Future of AI,
-              <br /> With Audacity.
+      {/* ── Exchange ── */}
+      <div className="rounded-lg border border-white/10 bg-white/[0.025] p-6">
+        <div className="grid gap-8 lg:grid-cols-[1fr_0.9fr] lg:items-center">
+          <div>
+            <p className="text-xs uppercase tracking-[0.3em] text-white/35">Exchange</p>
+            <h2 className="mt-3 font-display text-2xl font-bold tracking-tight">
+              A marketplace for repeatable intelligence.
             </h2>
-            <p className="text-lg leading-relaxed mb-14 max-w-2xl mx-auto" style={{ color: STONE }}>
-              Step into a new paradigm where intelligence meets boldness. Evolved Eden is
-              more than software — it's a movement where your instinct leads the
-              technology, setting not just a path, but a standard.
+            <p className="mt-4 max-w-xl text-sm leading-7 text-white/45">
+              Evolved Eden is evolving into an exchange where proven agents, workflow packs, creator systems, and
+              referral paths can be reused across the ecosystem.
             </p>
-            <div className="grid md:grid-cols-3 gap-10 text-left">
-              <div>
-                <h3 className="font-display text-xl mb-2">Confidence</h3>
-                <p style={{ color: STONE }}>Be the leader, not the follower, of the digital revolution.</p>
-              </div>
-              <div>
-                <h3 className="font-display text-xl mb-2">Ambition</h3>
-                <p style={{ color: STONE }}>Set standards that don't just meet the industry — they redefine it.</p>
-              </div>
-              <div>
-                <h3 className="font-display text-xl mb-2">Influence</h3>
-                <p style={{ color: STONE }}>Craft solutions that are intelligent first, and iconic because of it.</p>
-              </div>
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+              <a
+                href={process.env.NEXT_PUBLIC_EXCHANGE_URL || '/exchange'}
+                target="_blank" rel="noopener"
+                className="inline-flex items-center justify-center rounded-sm bg-[#C6A664] px-6 py-3 text-sm font-bold text-black transition-colors hover:bg-white glow-acid"
+              >
+                Visit the Exchange
+              </a>
+              <a
+                href="/pricing"
+                className="inline-flex items-center justify-center rounded-sm border border-white/15 px-6 py-3 text-sm text-white/70 transition-colors hover:border-white/30 hover:text-white"
+              >
+                Pricing
+              </a>
             </div>
           </div>
-        </section>
-
-        {/* HOW EVOLVED EDEN WORKS */}
-        <section className="max-w-5xl mx-auto px-6 md:px-10 py-20 md:py-24 text-center">
-          <Eyebrow>How Evolved Eden Works</Eyebrow>
-          <h2 className="font-display text-4xl md:text-5xl mb-14">A Simple Journey</h2>
-          <div className="flex flex-col items-center max-w-md mx-auto">
-            {[
-              "Choose Membership",
-              "Install Operating System",
-              "Deploy Workforce™",
-              "Customize Intelligence",
-              "Scale Through the Intelligence Exchange",
-            ].map((step, i, arr) => (
-              <React.Fragment key={i}>
-                <div className="flex items-center gap-4 w-full">
-                  <span className="font-display text-2xl" style={{ color: GOLD }}>{i + 1}</span>
-                  <span className="font-display text-lg text-left">{step}</span>
-                </div>
-                {i < arr.length - 1 && <div className="my-3 w-px h-6" style={{ backgroundColor: LINE }} />}
-              </React.Fragment>
-            ))}
-          </div>
-        </section>
-
-        {/* CHOOSE YOUR MEMBERSHIP */}
-        <section className="max-w-6xl mx-auto px-6 md:px-10 py-20 md:py-28 text-center">
-          <Eyebrow>Begin Here</Eyebrow>
-          <h2 className="font-display text-4xl md:text-5xl mb-4">Choose Your Membership</h2>
-          <p className="text-lg leading-relaxed mb-12 max-w-xl mx-auto" style={{ color: STONE }}>
-            Membership defines who you join as. Your Operating System defines what you build.
-          </p>
-          <div className="grid md:grid-cols-4 gap-5">
-            {[
-              { t: "Affiliate", d: "Grow your income by sharing intelligence." },
-              { t: "Personal", d: "Your private intelligence ecosystem." },
-              { t: "Creator", d: "Build, publish, and monetize your expertise." },
-              { t: "Client", d: "Deploy a complete intelligent organization — built for B2C brands and large organizations." },
-            ].map((m, i) => (
-              <div key={i} className="p-8" style={{ border: `1px solid ${LINE}`, backgroundColor: SURFACE }}>
-                <h3 className="font-display text-xl mb-2">{m.t}</h3>
-                <p className="text-sm" style={{ color: STONE }}>{m.d}</p>
+          <div className="space-y-3">
+            {EXCHANGE_ITEMS.map((item) => (
+              <div key={item} className="flex gap-3 rounded-md border border-white/10 bg-black/20 p-4">
+                <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-[#C6A664]" />
+                <p className="text-sm leading-6 text-white/55">{item}</p>
               </div>
             ))}
           </div>
-        </section>
+        </div>
+      </div>
 
-        {/* OUR STORY */}
-        <section className="max-w-2xl mx-auto px-6 md:px-10 py-20 md:py-28 text-center">
-          <Eyebrow>Our Story</Eyebrow>
-          <h2 className="font-display text-4xl md:text-5xl mb-5">A Sibling Ecosystem</h2>
-          <p className="text-lg leading-relaxed" style={{ color: STONE }}>
-            Evolved Eden shares its foundation with a family of platform ecosystems —
-            same engine, distinct standard. Built for those who were never going to
-            wait their turn.
-          </p>
-        </section>
-
-        {/* FAQ */}
-        <section className="max-w-4xl mx-auto px-6 md:px-10 py-20 md:py-28">
-          <div className="text-center mb-14">
-            <Eyebrow>Common Questions</Eyebrow>
-            <h2 className="font-display text-4xl md:text-5xl">Frequently Asked Questions</h2>
-          </div>
-          <div className="flex flex-col gap-3">
-            {faqs.map((f, i) => (
-              <div key={i} style={{ border: `1px solid ${LINE}`, backgroundColor: SURFACE }}>
-                <button className="w-full flex items-center justify-between gap-4 p-6 text-left" onClick={() => setOpenFaq(openFaq === i ? -1 : i)}>
-                  <span className="font-display text-lg">{f.q}</span>
-                  <ChevronDown size={20} style={{ color: GOLD, transform: openFaq === i ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s", flexShrink: 0 }} />
-                </button>
-                {openFaq === i && <p className="px-6 pb-6 -mt-2" style={{ color: STONE }}>{f.a}</p>}
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* FINAL CTA */}
-        <section className="relative px-6 md:px-10 py-24 md:py-32 text-center" style={{ borderTop: `1px solid ${LINE}`, backgroundColor: SURFACE }}>
-          <div className="relative">
-            <Sparkles size={24} style={{ color: GOLD }} className="mx-auto mb-5" />
-            <h2 className="font-display text-4xl md:text-5xl mb-5 max-w-2xl mx-auto leading-tight">
-              The Future Doesn't Need More Software.
-              <br /> It Needs Better Organizations.
-            </h2>
-            <p className="text-lg mb-8 max-w-xl mx-auto" style={{ color: STONE }}>
-              Design Your Intelligence. Build Your Workforce. Lead What's Next.
-            </p>
-            <div className="flex flex-wrap justify-center gap-4">
-              <PrimaryButton>Design My Operating System</PrimaryButton>
-              <GhostButton>Design Your Intelligence</GhostButton>
-            </div>
-          </div>
-        </section>
-
-        {/* FOOTER */}
-        <footer className="max-w-6xl mx-auto px-6 md:px-10 py-14 border-t" style={{ borderColor: LINE }}>
-          <div className="grid md:grid-cols-4 gap-10">
-            <div>
-              <span className="font-display text-lg tracking-widest">EVOLVED EDEN</span>
-              <p className="text-sm mt-3" style={{ color: STONE }}>The Intelligence Operating System™</p>
-            </div>
-            <div>
-              <h4 className="uppercase text-xs tracking-widest mb-4" style={{ color: GOLD }}>Platform</h4>
-              <div className="flex flex-col gap-3 text-sm" style={{ color: STONE }}>
-                <a href="#workforce" className="hover:text-white">Workforce™</a>
-                <a href="#os" className="hover:text-white">Operating Systems</a>
-                <a href="#exchange" className="hover:text-white">Intelligence Exchange</a>
-              </div>
-            </div>
-            <div>
-              <h4 className="uppercase text-xs tracking-widest mb-4" style={{ color: GOLD }}>Membership</h4>
-              <div className="flex flex-col gap-3 text-sm" style={{ color: STONE }}>
-                <a href="#" className="hover:text-white">Affiliate</a>
-                <a href="#" className="hover:text-white">Personal</a>
-                <a href="#" className="hover:text-white">Creator</a>
-                <a href="#" className="hover:text-white">Client</a>
-              </div>
-            </div>
-            <div>
-              <h4 className="uppercase text-xs tracking-widest mb-4" style={{ color: GOLD }}>Company</h4>
-              <div className="flex flex-col gap-3 text-sm" style={{ color: STONE }}>
-                <a href="#" className="hover:text-white">Our Story</a>
-                <a href="#zuri" className="hover:text-white">Zuri Niorè</a>
-                <a href="#" className="hover:text-white">Enterprise</a>
-              </div>
-            </div>
-          </div>
-        </footer>
+      {/* ── Essence Board ── */}
+      <div className="glass rounded-sm overflow-hidden">
+        <div className="px-6 py-4 border-b border-white/[0.06]">
+          <span className="text-xs text-white/30 tracking-widest uppercase flex items-center gap-2">
+            <span>⊙</span> Essence Intelligence Board
+          </span>
+        </div>
+        <div className="p-6">
+          <EssenceBoard userId={user.id} userRole={role} />
+        </div>
       </div>
     </div>
-  );
+  )
 }

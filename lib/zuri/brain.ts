@@ -1,13 +1,13 @@
 import OpenAI from "openai";
+import { lazy } from '@/lib/lazy-client'
 
 const useOpenRouter = !!process.env.OPENROUTER_API_KEY
 
-const client = new OpenAI({
+const client = lazy(() => new OpenAI({
   apiKey: useOpenRouter ? process.env.OPENROUTER_API_KEY! : process.env.OPENAI_API_KEY!,
   ...(useOpenRouter ? { baseURL: process.env.OPENROUTER_BASE_URL || 'https://openrouter.ai/api/v1' } : {}),
-})
-import { lazy } from '@/lib/lazy-client'
-const client = lazy(() => new OpenAI({ /* keep existing options exactly as they were */ }))
+}))
+
 export async function runZuriBrain(input: string) {
   const response = await client.chat.completions.create({
     model: useOpenRouter

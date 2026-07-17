@@ -248,7 +248,7 @@ export default function EvolvedEdenLanding() {
             </nav>
 
             <div className="hidden md:flex items-center gap-5">
-              <Link href="/pricing" className="text-sm tracking-wide hover:text-white transition-colors" style={{ color: STONE }}>Pricing</Link>
+              <Link href="/pricing" className="lg:hidden text-sm tracking-wide hover:text-white transition-colors" style={{ color: STONE }}>Pricing</Link>
               <PrimaryButton href="/define-intelligence">Enter Platform</PrimaryButton>
             </div>
 
@@ -291,7 +291,7 @@ export default function EvolvedEdenLanding() {
             </p>
             <div className="flex flex-wrap gap-4">
               <PrimaryButton href="/define-intelligence">Design My Workforce</PrimaryButton>
-              <GhostButton href="/pricing">Explore Operating Systems</GhostButton>
+              <GhostButton href="/define-os">Explore Operating Systems</GhostButton>
             </div>
           </div>
 
@@ -462,7 +462,10 @@ export default function EvolvedEdenLanding() {
               </div>
             ))}
           </div>
-          <p className="text-sm mt-10" style={{ color: STONE }}>
+          <div className="mt-10">
+            <PrimaryButton href="/intelligence-exchange">Explore Intelligence Exchange →</PrimaryButton>
+          </div>
+          <p className="text-sm mt-6" style={{ color: STONE }}>
             The Twin Registry — people whose trained Twins are available to hire, entirely by their own choice.
           </p>
         </section>
@@ -584,7 +587,7 @@ export default function EvolvedEdenLanding() {
               Design Your Intelligence. Build Your Workforce. Lead What's Next.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
-              <PrimaryButton href="/define-intelligence">Design My Operating System</PrimaryButton>
+              <PrimaryButton href="/define-os">Design My Operating System</PrimaryButton>
               <GhostButton href="/define-intelligence">Design Your Intelligence</GhostButton>
             </div>
           </div>

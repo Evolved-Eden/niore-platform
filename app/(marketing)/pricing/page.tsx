@@ -7,7 +7,7 @@ import { createClient } from '@/lib/supabase/client'
 import PlanBuilder from '@/components/demo/plan-builder'
 import { type PathType } from '@/components/demo/vertical-data'
 
-const PATHS: PathType[] = ['client', 'creator', 'personal']
+const PATHS: PathType[] = ['client', 'creator', 'personal', 'affiliate']
 
 function PricingContent() {
   const router = useRouter()
@@ -102,7 +102,7 @@ function StandardPricing({ path, setPath, pathname }: { path: PathType; setPath:
             <div className="space-y-6">
               <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6">
                 <p className="text-xs uppercase tracking-[0.3em] text-white/30 mb-4">Choose your path</p>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                   {PATHS.map((option) => (
                     <button
                       key={option}
@@ -117,6 +117,7 @@ function StandardPricing({ path, setPath, pathname }: { path: PathType; setPath:
                   {path === 'client' && 'Personal and small-team intelligence systems optimized for fast deployment.'}
                   {path === 'creator' && 'Creator and studio pricing for premium workflows, content systems, and agency operations.'}
                   {path === 'personal' && 'Personal intelligence pricing for individuals, partners, and families.'}
+                  {path === 'affiliate' && 'Affiliate OS — built for referral income, partnership tracking, and commission management.'}
                 </p>
               </div>
 

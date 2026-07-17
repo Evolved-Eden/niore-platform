@@ -9,6 +9,7 @@ type PathType = 'client' | 'creator' | 'personal' | 'affiliate' | null
 
 type Step =
   | 'welcome'
+  | 'scope-intro'
   | 'path-select'
   | 'personal-info'
   | 'questions'
@@ -434,9 +435,44 @@ const TIERS = [
   { key: 'intelligence_os', name: 'Intelligence OS', tagline: 'Full ecosystem intelligence', description: 'The complete system: AI Twin, swarms, essence boards, cross-platform intelligence.', features: ['AI Twin', 'Swarm orchestration', 'Essence Boards', 'Cross-platform intelligence'], price: 'From $997/mo' },
 ]
 
+const SCOPE_DATA = {
+  client: {
+    title: 'Client Intelligence',
+    tagline: 'For professionals, business owners, and service providers',
+    scope: 'Client Intelligence is designed for businesses that need an AI-powered operating system — from front desk to executive orchestration. It covers customer acquisition, service delivery, team coordination, and growth operations. This is for anyone running a business who wants intelligence baked into every department, not just a chatbot on their website.',
+    features: ['Customer acquisition systems', 'Service delivery automation', 'Team & department orchestration', 'Revenue operations intelligence', 'AI Twin for your business'],
+    cta: 'Design Your Client Intelligence',
+    color: '#C6A664',
+  },
+  creator: {
+    title: 'Creator Intelligence',
+    tagline: 'For content creators, coaches, educators, and digital entrepreneurs',
+    scope: 'Creator Intelligence is purpose-built for people who turn their expertise, voice, and perspective into products. It handles content strategy, audience growth, monetization systems, and community building. Whether you are a solo creator or building a media business, this intelligence system learns your brand voice and scales your output without burning you out.',
+    features: ['Content strategy & production', 'Audience growth intelligence', 'Monetization & product systems', 'Brand voice consistency', 'Community management'],
+    cta: 'Design Your Creator Intelligence',
+    color: '#8B7AA8',
+  },
+  personal: {
+    title: 'Personal Intelligence',
+    tagline: 'For individuals, partners, and families',
+    scope: 'Personal Intelligence is a private AI companion that learns your world — your routines, goals, relationships, and growth edges. It helps you make better decisions, stay organized, and build systems around what matters most. This is not a business tool; it is your personal cognitive layer for life management, self-development, and daily clarity.',
+    features: ['Personal decision support', 'Daily planning & reflection', 'Goal tracking & growth', 'Relationship & family coordination', 'Private AI companion'],
+    cta: 'Design Your Personal Intelligence',
+    color: '#8B7AA8',
+  },
+  affiliate: {
+    title: 'Affiliate Intelligence',
+    tagline: 'For affiliate marketers and referral partners',
+    scope: 'Affiliate Intelligence is built for partners who earn by sharing intelligence products. It tracks referrals, optimizes conversion paths, manages link infrastructure, and provides real-time commission intelligence. This system learns your audience and automatically surfaces the right offers, at the right time, to the right people — turning your influence into automated income.',
+    features: ['Smart link management', 'Conversion optimization', 'Commission tracking & analytics', 'Audience matching intelligence', 'Automated campaign systems'],
+    cta: 'Design Your Affiliate Intelligence',
+    color: '#B5764A',
+  },
+}
+
 export default function DefineIntelligenceFlow({ initialPath }: { initialPath?: PathType }) {
   const router = useRouter()
-  const [step, setStep] = useState<Step>(initialPath ? 'personal-info' : 'welcome')
+  const [step, setStep] = useState<Step>(initialPath ? 'scope-intro' : 'welcome')
   const [path, setPath] = useState<PathType>(initialPath || null)
   const [currentQuestion, setCurrentQuestion] = useState(0)
   const [answers, setAnswers] = useState<Record<string, string>>({})
@@ -530,6 +566,59 @@ export default function DefineIntelligenceFlow({ initialPath }: { initialPath?: 
           <p className="text-xs text-white/20 text-center max-w-md">
             Every account starts with a universal package — including Zuri, Front Desk, Blueprint Profile, Essence Board, and RIS License.
           </p>
+        </section>
+      </main>
+    )
+  }
+
+  // ── Scope Intro Step ──
+  if (step === 'scope-intro' && path) {
+    const scope = SCOPE_DATA[path]
+    return (
+      <main className="min-h-screen bg-[#0A0A0B] text-white">
+        <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 py-5 border-b border-white/5 bg-[#0A0A0B]/80 backdrop-blur-xl">
+          <Link href="/" className="font-display font-bold tracking-tight text-lg">
+            EVOLVED <span className="text-[#C6A664]">EDEN</span>
+          </Link>
+          <div className="flex items-center gap-6 text-sm text-white/50">
+            <Link href="/demo" className="hover:text-white transition-colors">Demo</Link>
+            <Link href="/pricing" className="hover:text-white transition-colors">Pricing</Link>
+            <Link href="/login" className="hover:text-white transition-colors">Sign In</Link>
+          </div>
+        </nav>
+
+        <section className="flex flex-col items-center justify-center min-h-screen px-6 pt-24 pb-16">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 border border-white/10 rounded-full text-xs text-white/40 mb-6 tracking-widest uppercase">
+            <span className="w-1.5 h-1.5 rounded-full animate-pulse-slow" style={{ backgroundColor: scope.color }} />
+            Define Intelligence
+          </div>
+          <h1 className="font-display text-4xl md:text-6xl font-bold tracking-tighter mb-4 max-w-3xl text-center leading-none">
+            {scope.title}
+          </h1>
+          <p className="text-lg max-w-xl text-center mb-3" style={{ color: scope.color }}>
+            {scope.tagline}
+          </p>
+          <p className="text-white/40 text-sm max-w-2xl text-center leading-relaxed mb-10">
+            {scope.scope}
+          </p>
+          <div className="flex flex-wrap justify-center gap-3 mb-12 max-w-xl">
+            {scope.features.map((f: string) => (
+              <span key={f} className="text-xs px-3 py-1.5 rounded-full border" style={{ borderColor: `${scope.color}30`, color: scope.color }}>
+                {f}
+              </span>
+            ))}
+          </div>
+          <div className="flex flex-col items-center gap-4">
+            <button
+              onClick={() => setStep('personal-info')}
+              className="px-10 py-4 bg-[#C6A664] text-black font-bold text-sm rounded-sm hover:bg-white transition-all glow-acid text-center"
+            >
+              {scope.cta} →
+            </button>
+            <button onClick={() => setStep('welcome')} className="text-sm text-white/30 hover:text-white/60 transition-colors">
+              ← Choose a different intelligence type
+            </button>
+          </div>
         </section>
       </main>
     )

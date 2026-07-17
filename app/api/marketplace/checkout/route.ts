@@ -7,7 +7,8 @@ import { STRIPE_API_VERSION } from '@/lib/constants'
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: STRIPE_API_VERSION })
 
 export const dynamic = 'force-dynamic'
-
+import { lazy } from '@/lib/lazy-client'
+const stripe = lazy(() => new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: STRIPE_API_VERSION }))
 // One-time purchase of a single catalog_item. Uses a destination charge:
 // the platform account collects the PaymentIntent, Stripe automatically
 // transfers (price - application_fee) to the creator's connected account.

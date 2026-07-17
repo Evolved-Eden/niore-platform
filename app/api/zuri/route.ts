@@ -3,7 +3,8 @@ import { OpenAI } from 'openai'
 import { NextRequest, NextResponse } from 'next/server'
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY || '' })
-
+import { lazy } from '@/lib/lazy-client'
+const openai = lazy(() => new OpenAI({ apiKey: process.env.OPENAI_API_KEY || '' }))
 export async function POST(req: NextRequest) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()

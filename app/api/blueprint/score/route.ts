@@ -2,7 +2,8 @@ import { OpenAI } from 'openai'
 import { NextRequest, NextResponse } from 'next/server'
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
-
+import { lazy } from '@/lib/lazy-client'
+const openai = lazy(() => new OpenAI({ apiKey: process.env.OPENAI_API_KEY }))
 /**
  * POST /api/blueprint/score
  * Takes all Core Blueprint answers and generates the full intelligence map:

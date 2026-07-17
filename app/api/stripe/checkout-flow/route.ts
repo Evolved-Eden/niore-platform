@@ -4,7 +4,8 @@ import { createClient } from '@/lib/supabase/server'
 import { STRIPE_API_VERSION } from '@/lib/constants'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: STRIPE_API_VERSION })
-
+import { lazy } from '@/lib/lazy-client'
+const stripe = lazy(() => new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: STRIPE_API_VERSION }))
 const PLAN_PRICES: Record<string, { amount: number; name: string; recurring: boolean }> = {
   client_founder:     { amount: 39700,  name: 'Client Founder',       recurring: true },
   client_org:        { amount: 149700, name: 'Client Org',         recurring: true },

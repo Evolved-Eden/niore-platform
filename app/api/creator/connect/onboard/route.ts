@@ -7,7 +7,8 @@ import { STRIPE_API_VERSION, APP_URL } from '@/lib/constants'
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: STRIPE_API_VERSION })
 
 export const dynamic = 'force-dynamic'
-
+import { lazy } from '@/lib/lazy-client'
+const stripe = lazy(() => new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: STRIPE_API_VERSION }))
 // Creates (or resumes) a Stripe Connect Express account for a creator's
 // organization, and returns a fresh onboarding link. Express chosen per
 // user decision: Stripe-hosted KYC/onboarding, lightest lift on our side.

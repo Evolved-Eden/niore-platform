@@ -113,48 +113,7 @@ function OrgTier({ label, items, caption }) {
 function OrgConnector() {
   return <div className="w-px h-8" style={{ backgroundColor: GOLD, opacity: 0.5 }} />;
 }
-<div className="mt-12">
-  <h3
-    className="uppercase text-xs tracking-[0.25em] mb-6"
-    style={{ color: GOLD }}
-  >
-    Live Industry Demos
-  </h3>
 
-  <div className="grid md:grid-cols-5 gap-4">
-    {[
-      { title: "Real Estate", href: "/demo/real-estate" },
-      { title: "Hotel", href: "/demo/hotel" },
-      { title: "Legal", href: "/demo/legal" },
-      { title: "HR", href: "/demo/hr" },
-      { title: "Med Spa", href: "/demo/med-spa" },
-    ].map((demo) => (
-      <a
-        key={demo.title}
-        href={demo.href}
-        className="p-5 transition-all hover:scale-[1.02]"
-        style={{
-          border: `1px solid ${LINE}`,
-          backgroundColor: SURFACE,
-        }}
-      >
-        <div
-          className="text-sm uppercase tracking-[0.18em] mb-2"
-          style={{ color: GOLD }}
-        >
-          {demo.title}
-        </div>
-
-        <div
-          className="text-sm"
-          style={{ color: STONE }}
-        >
-          Launch Demo →
-        </div>
-      </a>
-    ))}
-  </div>
-</div>
 const zuriCapabilities = [
   { icon: Brain, title: "Remembers Everything", body: "Every decision, every preference, permanently retained." },
   { icon: Search, title: "Learns Your Business", body: "Studies your market, your voice, your standards." },

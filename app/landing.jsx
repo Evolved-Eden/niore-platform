@@ -1,4 +1,7 @@
+'use client'
+
 import React, { useState } from "react";
+import Link from 'next/link'
 import {
   Menu,
   X,
@@ -67,20 +70,22 @@ function Chip({ children }) {
   );
 }
 
-function PrimaryButton({ children, className = "" }) {
-  return (
-    <button className={`px-8 py-3.5 text-sm md:text-base tracking-wide transition-transform hover:scale-[1.02] ${className}`} style={{ backgroundColor: GOLD, color: INK }}>
-      {children}
-    </button>
-  );
+function PrimaryButton({ children, className = "", href }) {
+  const cls = `px-8 py-3.5 text-sm md:text-base tracking-wide transition-transform hover:scale-[1.02] inline-block ${className}`
+  const style = { backgroundColor: GOLD, color: INK }
+  if (href) {
+    return <Link href={href} className={cls} style={style}>{children}</Link>
+  }
+  return <button className={cls} style={style}>{children}</button>
 }
 
-function GhostButton({ children, className = "" }) {
-  return (
-    <button className={`px-8 py-3.5 text-sm md:text-base tracking-wide transition-colors ${className}`} style={{ border: `1px solid ${GOLD}`, color: IVORY }}>
-      {children}
-    </button>
-  );
+function GhostButton({ children, className = "", href }) {
+  const cls = `px-8 py-3.5 text-sm md:text-base tracking-wide transition-colors inline-block ${className}`
+  const style = { border: `1px solid ${GOLD}`, color: IVORY }
+  if (href) {
+    return <Link href={href} className={cls} style={style}>{children}</Link>
+  }
+  return <button className={cls} style={style}>{children}</button>
 }
 
 
@@ -238,10 +243,13 @@ export default function EvolvedEdenLanding() {
               <a href="#os" className="hover:text-white transition-colors">Operating Systems</a>
               <a href="#zuri" className="hover:text-white transition-colors">Zuri Niorè</a>
               <a href="#exchange" className="hover:text-white transition-colors">Intelligence Exchange</a>
+              <Link href="/pricing" className="hover:text-white transition-colors">Pricing</Link>
+              <Link href="/demo" className="hover:text-white transition-colors">Demos</Link>
             </nav>
 
-            <div className="hidden md:block">
-              <PrimaryButton>Enter Platform</PrimaryButton>
+            <div className="hidden md:flex items-center gap-5">
+              <Link href="/pricing" className="text-sm tracking-wide hover:text-white transition-colors" style={{ color: STONE }}>Pricing</Link>
+              <PrimaryButton href="/define-intelligence">Enter Platform</PrimaryButton>
             </div>
 
             <button className="lg:hidden" onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle menu">
@@ -255,7 +263,9 @@ export default function EvolvedEdenLanding() {
               <a href="#os">Operating Systems</a>
               <a href="#zuri">Zuri Niorè</a>
               <a href="#exchange">Intelligence Exchange</a>
-              <PrimaryButton className="mt-2 w-full">Enter Platform</PrimaryButton>
+              <Link href="/pricing" className="hover:text-white transition-colors">Pricing</Link>
+              <Link href="/demo" className="hover:text-white transition-colors">Demos</Link>
+              <PrimaryButton href="/define-intelligence" className="mt-2 w-full">Enter Platform</PrimaryButton>
             </div>
           )}
         </header>
@@ -280,8 +290,8 @@ export default function EvolvedEdenLanding() {
               She coordinates your Workforce.
             </p>
             <div className="flex flex-wrap gap-4">
-              <PrimaryButton>Design My Workforce</PrimaryButton>
-              <GhostButton>Explore Operating Systems</GhostButton>
+              <PrimaryButton href="/define-intelligence">Design My Workforce</PrimaryButton>
+              <GhostButton href="/pricing">Explore Operating Systems</GhostButton>
             </div>
           </div>
 
@@ -519,15 +529,15 @@ export default function EvolvedEdenLanding() {
           </p>
           <div className="grid md:grid-cols-4 gap-5">
             {[
-              { t: "Affiliate", d: "Grow your income by sharing intelligence." },
-              { t: "Personal", d: "Your private intelligence ecosystem." },
-              { t: "Creator", d: "Build, publish, and monetize your expertise." },
-              { t: "Client", d: "Deploy a complete intelligent organization — built for B2C brands and large organizations." },
+              { t: "Affiliate", d: "Grow your income by sharing intelligence.", slug: "affiliate" },
+              { t: "Personal", d: "Your private intelligence ecosystem.", slug: "personal" },
+              { t: "Creator", d: "Build, publish, and monetize your expertise.", slug: "creator" },
+              { t: "Client", d: "Deploy a complete intelligent organization — built for B2C brands and large organizations.", slug: "client" },
             ].map((m, i) => (
-              <div key={i} className="p-8" style={{ border: `1px solid ${LINE}`, backgroundColor: SURFACE }}>
+              <Link key={i} href={`/define-intelligence/${m.slug}`} className="block p-8" style={{ border: `1px solid ${LINE}`, backgroundColor: SURFACE }}>
                 <h3 className="font-display text-xl mb-2">{m.t}</h3>
                 <p className="text-sm" style={{ color: STONE }}>{m.d}</p>
-              </div>
+              </Link>
             ))}
           </div>
         </section>
@@ -574,8 +584,8 @@ export default function EvolvedEdenLanding() {
               Design Your Intelligence. Build Your Workforce. Lead What's Next.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
-              <PrimaryButton>Design My Operating System</PrimaryButton>
-              <GhostButton>Design Your Intelligence</GhostButton>
+              <PrimaryButton href="/define-intelligence">Design My Operating System</PrimaryButton>
+              <GhostButton href="/define-intelligence">Design Your Intelligence</GhostButton>
             </div>
           </div>
         </section>
@@ -598,18 +608,18 @@ export default function EvolvedEdenLanding() {
             <div>
               <h4 className="uppercase text-xs tracking-widest mb-4" style={{ color: GOLD }}>Membership</h4>
               <div className="flex flex-col gap-3 text-sm" style={{ color: STONE }}>
-                <a href="#" className="hover:text-white">Affiliate</a>
-                <a href="#" className="hover:text-white">Personal</a>
-                <a href="#" className="hover:text-white">Creator</a>
-                <a href="#" className="hover:text-white">Client</a>
+                <Link href="/define-intelligence/affiliate" className="hover:text-white">Affiliate</Link>
+                <Link href="/define-intelligence/personal" className="hover:text-white">Personal</Link>
+                <Link href="/define-intelligence/creator" className="hover:text-white">Creator</Link>
+                <Link href="/define-intelligence/client" className="hover:text-white">Client</Link>
               </div>
             </div>
             <div>
               <h4 className="uppercase text-xs tracking-widest mb-4" style={{ color: GOLD }}>Company</h4>
               <div className="flex flex-col gap-3 text-sm" style={{ color: STONE }}>
-                <a href="#" className="hover:text-white">Our Story</a>
-                <a href="#zuri" className="hover:text-white">Zuri Niorè</a>
-                <a href="#" className="hover:text-white">Enterprise</a>
+                <Link href="/define-intelligence" className="hover:text-white">Our Story</Link>
+                <Link href="#zuri" className="hover:text-white">Zuri Niorè</Link>
+                <Link href="/pricing" className="hover:text-white">Enterprise</Link>
               </div>
             </div>
           </div>

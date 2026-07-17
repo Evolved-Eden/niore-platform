@@ -21,7 +21,7 @@ interface QuickAction {
 const QUICK_ACTIONS: Record<string, QuickAction[]> = {
   client: [
     { title: 'Open Zuri', desc: 'Your personal intelligence concierge', href: '/dashboard/client/zuri', icon: '◈' },
-    { title: 'My Twin', desc: 'View your AI digital twin', href: '/dashboard/client/twin', icon: '⟐' },
+    { title: 'My Twin', desc: 'View your AI Executive Twin', href: '/dashboard/client/twin', icon: '⟐' },
     { title: 'Essence Intel', desc: 'Daily intelligence briefings', href: '/dashboard/client/essence', icon: '⊙' },
     { title: 'My Agents', desc: 'Deploy and manage AI agents', href: '/dashboard/client/agents', icon: '⊕' },
     { title: 'Vault', desc: 'Secure document & knowledge', href: '/dashboard/client/vault', icon: '▣' },

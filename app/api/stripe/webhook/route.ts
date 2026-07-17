@@ -3,12 +3,10 @@ import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { STRIPE_API_VERSION } from "@/lib/constants";
 import { sendEmail } from "@/lib/email";
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: STRIPE_API_VERSION,
-});
 import { lazy } from '@/lib/lazy-client'
+
 const stripe = lazy(() => new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: STRIPE_API_VERSION }))
+
 async function activatePaidAccess({
   userId,
   email,

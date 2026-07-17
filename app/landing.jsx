@@ -174,7 +174,7 @@ const flagshipOS = [
     title: "Creator OS",
     forWhom: "For building an audience",
     result: "Turn what you know into products that sell.",
-    features: ["Content Engine", "Course Builder", "Brand Voice", "Sales Funnel"],
+    features: ["Content Engine", "Course Creator", "Brand Voice", "Sales Funnel"],
   },
   {
     title: "Business OS",
@@ -290,13 +290,29 @@ export default function EvolvedEdenLanding() {
               She coordinates your Workforce.
             </p>
             <div className="flex flex-wrap gap-4">
-              <PrimaryButton href="/define-intelligence">Design My Workforce</PrimaryButton>
+              <PrimaryButton href="/define-os">Design My Workforce</PrimaryButton>
               <GhostButton href="/define-os">Explore Operating Systems</GhostButton>
             </div>
           </div>
 
           <div className="relative reveal flex justify-center" style={{ animationDelay: "0.15s" }}>
-            <SealBadge size={280} />
+            <div className="relative w-[280px] h-[280px] flex items-center justify-center">
+              {/* Spinning ring */}
+              <div className="absolute inset-0 rounded-full bg-[conic-gradient(from_0deg,#C6A664,transparent_35%,#C6A664)] animate-spin-slow" />
+              {/* Inner border */}
+              <div className="absolute inset-[3px] rounded-full border border-white/10" />
+              {/* Image */}
+              <div className="absolute inset-[4px] rounded-full overflow-hidden bg-[#0A0A0B]">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/media/JSUJE9856.JPG" alt="Evolved Eden" className="w-full h-full object-cover" />
+              </div>
+              {/* Logo overlay */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="font-display text-5xl font-bold text-white/90 drop-shadow-2xl" style={{ textShadow: "0 0 40px rgba(0,0,0,0.8), 0 0 80px rgba(0,0,0,0.6)" }}>
+                  EE
+                </span>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -532,15 +548,25 @@ export default function EvolvedEdenLanding() {
           </p>
           <div className="grid md:grid-cols-4 gap-5">
             {[
-              { t: "Affiliate", d: "Grow your income by sharing intelligence.", slug: "affiliate" },
-              { t: "Personal", d: "Your private intelligence ecosystem.", slug: "personal" },
-              { t: "Creator", d: "Build, publish, and monetize your expertise.", slug: "creator" },
-              { t: "Client", d: "Deploy a complete intelligent organization — built for B2C brands and large organizations.", slug: "client" },
+              { t: "Affiliate", d: "Grow your income by sharing intelligence.", slug: "affiliate", exchangeHref: "/intelligence-exchange", pricingHref: "/pricing/affiliate" },
+              { t: "Personal", d: "Your private intelligence ecosystem.", slug: "personal", exchangeHref: "/intelligence-exchange", pricingHref: "/pricing/personal" },
+              { t: "Creator", d: "Build, publish, and monetize your expertise.", slug: "creator", exchangeHref: "/intelligence-exchange", pricingHref: "/pricing/creator" },
+              { t: "Client", d: "Deploy a complete intelligent organization — built for B2C brands and large organizations.", slug: "client", exchangeHref: "/intelligence-exchange", pricingHref: "/pricing/client" },
             ].map((m, i) => (
-              <Link key={i} href={`/define-intelligence/${m.slug}`} className="block p-8" style={{ border: `1px solid ${LINE}`, backgroundColor: SURFACE }}>
-                <h3 className="font-display text-xl mb-2">{m.t}</h3>
-                <p className="text-sm" style={{ color: STONE }}>{m.d}</p>
-              </Link>
+              <div key={i} className="block p-8" style={{ border: `1px solid ${LINE}`, backgroundColor: SURFACE }}>
+                <Link href={`/define-intelligence/${m.slug}`}>
+                  <h3 className="font-display text-xl mb-2 hover:text-[#C6A664] transition-colors">{m.t}</h3>
+                </Link>
+                <p className="text-sm mb-4" style={{ color: STONE }}>{m.d}</p>
+                <div className="flex flex-col gap-2 mt-auto">
+                  <Link href={m.exchangeHref} className="text-xs uppercase tracking-wider hover:text-white transition-colors" style={{ color: GOLD }}>
+                    Browse in Exchange →
+                  </Link>
+                  <Link href={m.pricingHref} className="text-xs uppercase tracking-wider text-white/30 hover:text-white/60 transition-colors">
+                    View Pricing
+                  </Link>
+                </div>
+              </div>
             ))}
           </div>
         </section>

@@ -6,7 +6,6 @@ import { STRIPE_API_VERSION } from '@/lib/constants'
 
 export const dynamic = 'force-dynamic'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: STRIPE_API_VERSION })
 import { lazy } from '@/lib/lazy-client'
 const stripe = lazy(() => new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: STRIPE_API_VERSION }))
 // Offboards a member from an Organization. Two paths:

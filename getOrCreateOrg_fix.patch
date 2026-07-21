@@ -1,0 +1,69 @@
+diff --git a/app/api/stripe/webhook/route.ts b/app/api/stripe/webhook/route.ts
+index 8ccb345..d825aeb 100644
+--- a/app/api/stripe/webhook/route.ts
++++ b/app/api/stripe/webhook/route.ts
+@@ -68,7 +68,7 @@ async function activatePaidAccess({
+     .eq("id", userId)
+ }
+ 
+-async function getOrCreateOrg(userId: string, userName: string) {
++async function getOrCreateOrg(userId: string, userName: string, tierKey: string) {
+   const { data: existingOrg } = await supabaseAdmin
+     .from('organizations')
+     .select('id')
+@@ -77,14 +77,39 @@ async function getOrCreateOrg(userId: string, userName: string) {
+ 
+   if (existingOrg) return existingOrg
+ 
++  // Only Client-family tiers (Founder/Teams/Enterprise -- membership_tiers.is_organization
++  // = true) get an organization. Personal/Affiliate/Creator tiers, and events with no tier
++  // at all (pure OS-addon purchases on an existing account), must NOT create one. This used
++  // to insert an org unconditionally for every checkout.session.completed event regardless
++  // of tier, which is the loophole flagged during the RLS/entitlement audit.
++  if (!tierKey) return null
++
++  const { data: tierRow } = await supabaseAdmin
++    .from('membership_tiers')
++    .select('is_organization')
++    .eq('key', tierKey)
++    .maybeSingle()
++
++  if (!tierRow?.is_organization) return null
++
++  // Delegate to the canonical provisioning path (handles slug generation, the
++  // owner's membership row, default entitlements, and Core OS auto-activation)
++  // instead of duplicating that logic here.
++  const { data: newOrgId, error } = await supabaseAdmin.rpc('provision_organization_for_tier', {
++    p_user_id: userId,
++    p_tier_key: tierKey,
++  })
++
++  if (error || !newOrgId) {
++    console.error('provision_organization_for_tier failed in Stripe webhook:', error)
++    return null
++  }
++
+   const { data: org } = await supabaseAdmin
+-    .from("organizations")
+-    .insert({
+-      name: "My Intelligence",
+-      owner_id: userId,
+-    })
+-    .select()
+-    .single()
++    .from('organizations')
++    .select('id')
++    .eq('id', newOrgId)
++    .maybeSingle()
+ 
+   return org
+ }
+@@ -474,7 +499,7 @@ export async function POST(req: Request) {
+     }
+ 
+     // ── 3. Provision org + Base Twin + Zuri (idempotent) ──
+-    const org = await getOrCreateOrg(userId, userData?.full_name || email.split('@')[0])
++    const org = await getOrCreateOrg(userId, userData?.full_name || email.split('@')[0], tier)
+     if (org) {
+       await upsertClientTwin(userId, org.id)
+       await createZuriAgent(userId, org.id)

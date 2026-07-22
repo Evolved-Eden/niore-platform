@@ -213,7 +213,7 @@ export const ADDONS: Record<string, Addon> = {
   plus_500_workflow_runs:{ id: 'plus_500_workflow_runs', name: '+500 Workflow Runs',   amount: 9900,  stripePriceId: price('PLUS_500_WORKFLOW_RUNS'), recurring: true, description: 'Additional workflow runs' },
   plus_1000_api_calls:  { id: 'plus_1000_api_calls',  name: '+1000 API Calls',         amount: 9900,  stripePriceId: price('PLUS_1000_API_CALLS'),   recurring: true, description: 'Additional API calls' },
   additional_business:  { id: 'additional_business',  name: 'Additional Business',     amount: 9900,  stripePriceId: price('ADDITIONAL_BUSINESS'),   recurring: true, description: 'Add another business location' },
-  additional_member:    { id: 'additional_member',    name: 'Additional Member',       amount: 12900, stripePriceId: price('ADDITIONAL_MEMBER'),     recurring: true, description: 'Add a team member' },
+  additional_member:    { id: 'additional_member',    name: 'Additional Member',       amount: 49900, stripePriceId: price('ADDITIONAL_MEMBER'),     recurring: true, description: 'Add a team member' },
   additional_location:  { id: 'additional_location',  name: 'Additional Location',     amount: 4900,  stripePriceId: price('ADDITIONAL_LOCATION'),   recurring: true, description: 'Add another physical location' },
 
   // Legacy add-on IDs (for backward compatibility)

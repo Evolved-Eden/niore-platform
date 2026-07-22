@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 import ErrorBoundary from '@/components/ErrorBoundary'
+import EssenceMatrix from '@/components/EssenceMatrix'
 
 // ─────────────────────────────────────────────
 // Types
@@ -134,6 +135,9 @@ function EssenceIntelligencePage() {
     topFive: [], numerology: null, color: null, modality: null, crystals: [],
     postingTime: null, businessMove: null, personality: '', blueprintTile: null, domainTiles: [],
   })
+
+  // Essence Matrix
+  const [showMatrix, setShowMatrix] = useState(false)
 
   // Feed
   const [expandedFeed, setExpandedFeed] = useState(false)
@@ -558,6 +562,14 @@ function EssenceIntelligencePage() {
             ))}
           </div>
           <button
+            onClick={() => setShowMatrix(true)}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-sm border border-white/[0.06] text-white/40 hover:text-white/80 hover:border-white/20 transition-all"
+            title="View Essence Matrix"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
+            Matrix
+          </button>
+          <button
             onClick={() => window.open('/api/zuri/essence/export?format=txt', '_blank')}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-sm border border-white/[0.06] text-white/40 hover:text-white/80 hover:border-white/20 transition-all"
             title="Export as text"
@@ -568,7 +580,14 @@ function EssenceIntelligencePage() {
         </div>
       </div>
 
-      {/* ── Multi-lens Essence Tiles ── */}
+      {/* ── Essence Matrix View ── */}
+      {showMatrix && (
+        <EssenceMatrix onClose={() => setShowMatrix(false)} />
+      )}
+
+      {/* ── Multi-lens Essence Tiles (hidden during matrix view) ── */}
+      {!showMatrix && (<>
+        {/* ── Multi-lens Essence Tiles ── */}
       <div className="mb-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
         {extras.numerology && (
           <div className="glass rounded-sm border border-white/[0.06] p-3">
@@ -1331,6 +1350,7 @@ function EssenceIntelligencePage() {
           </div>
         </div>
       )}
+    </>)} {/* end !showMatrix */}
     </div>
   )
 }

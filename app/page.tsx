@@ -3,18 +3,30 @@ import { redirect } from 'next/navigation'
 import EvolvedEdenLanding from './landing'
 
 export default async function HomePage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  let user = null
+
+  try {
+    const supabase = await createClient()
+    const { data } = await supabase.auth.getUser()
+    user = data?.user ?? null
+  } catch {
+    // env vars not configured yet — show landing page
+  }
 
   if (user) {
-    const { data: identity } = await supabase
-      .from('users')
-      .select('role')
-      .eq('id', user.id)
-      .single()
+    try {
+      const supabase = await createClient()
+      const { data: identity } = await supabase
+        .from('users')
+        .select('role')
+        .eq('id', user.id)
+        .single()
 
-    const role = identity?.role ?? 'client'
-    redirect(`/dashboard/${role}`)
+      const role = identity?.role ?? 'client'
+      redirect(`/dashboard/${role}`)
+    } catch {
+      redirect('/dashboard')
+    }
   }
 
   return <EvolvedEdenLanding />

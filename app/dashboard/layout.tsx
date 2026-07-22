@@ -100,8 +100,17 @@ const ROLE_COLOR: Record<UserRole, string> = {
 }
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  let user = null
+  let supabase: Awaited<ReturnType<typeof createClient>> | null = null
+
+  try {
+    supabase = await createClient()
+    const { data } = await supabase.auth.getUser()
+    user = data?.user ?? null
+  } catch {
+    redirect('/login')
+  }
+
   // Middleware should already redirect unauthenticated requests before they
   // reach this layout, but that guarantee doesn't always hold (e.g. a stale
   // or just-expired refresh token can pass middleware's cookie check and
@@ -109,7 +118,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
   // Cannot read properties of null (reading 'id')" on this exact line,
   // 11 occurrences on /dashboard/admin/settings. Redirect defensively
   // instead of trusting the non-null assertion.
-  if (!user) {
+  if (!user || !supabase) {
     redirect('/login')
   }
 

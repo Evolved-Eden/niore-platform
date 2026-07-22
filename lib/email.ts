@@ -130,7 +130,7 @@ export async function sendWelcomeEmail({ to, name }: { to: string; name: string 
                   </tr>
                   <tr>
                     <td align="center" style="padding-bottom:24px;">
-                      <a href="https://dashboard.evolvededen.com/dashboard" style="display:inline-block;padding:14px 32px;background:#c8ff00;color:#000000;font-size:14px;font-weight:700;text-decoration:none;border-radius:4px;">
+                      <a href="https://app.evolvededen.com/dashboard" style="display:inline-block;padding:14px 32px;background:#c8ff00;color:#000000;font-size:14px;font-weight:700;text-decoration:none;border-radius:4px;">
                         Go to Dashboard
                       </a>
                     </td>

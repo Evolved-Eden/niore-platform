@@ -205,6 +205,7 @@ export const ADDONS: Record<string, Addon> = {
   team_essence:         { id: 'team_essence',         name: 'Team Essence',            amount: 15000, stripePriceId: price('TEAM_ESSENCE'),          recurring: true, description: 'Team-wide intelligence sharing' },
   usb_export:           { id: 'usb_export',           name: 'USB Export',              amount: 15000, stripePriceId: price('USB_EXPORT'),            recurring: true, description: 'Export intelligence to USB' },
   custom_subdomain:     { id: 'custom_subdomain',     name: 'Custom Subdomain',        amount: 500,   stripePriceId: price('CUSTOM_SUBDOMAIN'),      recurring: true, description: 'Custom subdomain URL' },
+  secret_vault:         { id: 'secret_vault',         name: 'Secret Vault',             amount: 999,   stripePriceId: price('SECRET_VAULT'),          recurring: true, description: 'Secure env var & secret management via Coolify' },
 
   // Usage Packs
   additional_ai_twin:   { id: 'additional_ai_twin',   name: 'Additional AI Twin',      amount: 19500, stripePriceId: price('ADDITIONAL_AI_TWIN'),    recurring: true, description: 'Add another AI twin' },
@@ -246,6 +247,15 @@ export const STANDALONE_PRODUCTS: Record<string, StandaloneProduct> = {
   domain_lifestyle:   { id: 'domain_lifestyle',   name: 'Lifestyle Module',       amount: 5000,  description: 'Lifestyle intelligence domain assessment', recurring: false },
   domain_creativity:  { id: 'domain_creativity',  name: 'Creativity Module',      amount: 5000,  description: 'Creativity intelligence domain assessment', recurring: false },
   domain_legacy:      { id: 'domain_legacy',      name: 'Legacy Module',          amount: 5000,  description: 'Legacy & impact intelligence domain assessment', recurring: false },
+
+  // Blueprint Assessments (one-time purchases, maps to catalog_items of type blueprint)
+  blueprint_core:             { id: 'blueprint_core',             name: 'Blueprint Core',                  amount: 29900, description: 'Foundational blueprint — core identity, spiritual, and growth systems (50 systems)', recurring: false },
+  essence_profile:            { id: 'essence_profile',            name: 'Essence Profile Blueprint',        amount: 19900, description: 'Emotional, somatic, and relational intelligence blueprint (40 systems)', recurring: false },
+  rhythm_state:               { id: 'rhythm_state',               name: 'Rhythm & State Blueprint',         amount: 19900, description: 'Timing, cycles, somatic rhythms, and peak performance blueprint (40 systems)', recurring: false },
+  alignment_purpose:          { id: 'alignment_purpose',          name: 'Alignment & Purpose Blueprint',    amount: 14900, description: 'Vocation, purpose, and life direction blueprint (10 systems)', recurring: false },
+  momentum_execution:         { id: 'momentum_execution',         name: 'Momentum & Execution Blueprint',   amount: 14900, description: 'Financial abundance and execution intelligence blueprint (14 systems)', recurring: false },
+  connections_relationships:  { id: 'connections_relationships',  name: 'Connections & Relationships Blueprint', amount: 9900, description: 'Social, relational, and influence intelligence blueprint (4 systems)', recurring: false },
+  evolution_intelligence:     { id: 'evolution_intelligence',     name: 'Evolution & Intelligence Blueprint',amount: 19900, description: 'AI-enhanced learning, cognitive, and growth intelligence blueprint (29 systems)', recurring: false },
 }
 
 // ── Vertical Add-On Packs ──────────────────────────────────

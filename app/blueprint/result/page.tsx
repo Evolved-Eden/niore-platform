@@ -216,6 +216,34 @@ export default function BlueprintResultPage() {
               </section>
             )}
 
+            {/* Export / Download */}
+            <section className="mb-12">
+              <h2 className="text-lg font-semibold mb-4">Export Blueprint</h2>
+              <div className="flex flex-wrap gap-3">
+                <button
+                  onClick={() => window.open(`/api/blueprint/export?template=${result.template_key}&format=txt`, '_blank')}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-white/10 bg-white/[0.03] text-sm text-white/70 hover:text-white hover:border-[#C6A664]/40 transition-all"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                  TXT
+                </button>
+                <button
+                  onClick={() => window.open(`/api/blueprint/export?template=${result.template_key}&format=docx`, '_blank')}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-white/10 bg-white/[0.03] text-sm text-white/70 hover:text-white hover:border-[#C6A664]/40 transition-all"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+                  DOCX
+                </button>
+                <button
+                  onClick={() => window.open(`/api/blueprint/export?template=${result.template_key}&format=pdf`, '_blank')}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-white/10 bg-white/[0.03] text-sm text-white/70 hover:text-white hover:border-[#C6A664]/40 transition-all"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+                  PDF
+                </button>
+              </div>
+            </section>
+
             {/* Error */}
             {error && (
               <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">

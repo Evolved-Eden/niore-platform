@@ -541,20 +541,30 @@ function EssenceIntelligencePage() {
           </p>
         </div>
 
-        {/* Daily / Weekly / Monthly */}
-        <div className="flex items-center gap-1 bg-white/[0.04] rounded-sm p-1 border border-white/[0.06]">
-          {(['daily', 'weekly', 'monthly'] as EssenceRange[]).map((r) => (
-            <button
-              key={r}
-              onClick={() => handleRangeChange(r)}
-              disabled={rangeLoading}
-              className={`px-3 py-1.5 text-xs font-medium rounded-sm capitalize transition-colors disabled:opacity-50 ${
-                range === r ? 'bg-[#C6A664] text-black' : 'text-white/50 hover:text-white/80'
-              }`}
-            >
-              {r}
-            </button>
-          ))}
+        {/* Daily / Weekly / Monthly + Export */}
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 bg-white/[0.04] rounded-sm p-1 border border-white/[0.06]">
+            {(['daily', 'weekly', 'monthly'] as EssenceRange[]).map((r) => (
+              <button
+                key={r}
+                onClick={() => handleRangeChange(r)}
+                disabled={rangeLoading}
+                className={`px-3 py-1.5 text-xs font-medium rounded-sm capitalize transition-colors disabled:opacity-50 ${
+                  range === r ? 'bg-[#C6A664] text-black' : 'text-white/50 hover:text-white/80'
+                }`}
+              >
+                {r}
+              </button>
+            ))}
+          </div>
+          <button
+            onClick={() => window.open('/api/zuri/essence/export?format=txt', '_blank')}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-sm border border-white/[0.06] text-white/40 hover:text-white/80 hover:border-white/20 transition-all"
+            title="Export as text"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+            Export
+          </button>
         </div>
       </div>
 

@@ -56,6 +56,7 @@ const NAV: Record<UserRole, { label: string; href: string }[]> = {
     { label: 'Users',          href: '/dashboard/admin/users' },
     { label: 'Clients',        href: '/dashboard/admin/clients' },
     { label: 'Pricing',        href: '/dashboard/admin/pricing' },
+    { label: 'Coupons',        href: '/dashboard/admin/coupons' },
     { label: 'Deployments',    href: '/dashboard/admin/deployments' },
     { label: 'Verticals',      href: '/dashboard/admin/verticals' },
     { label: 'Avatars',        href: '/dashboard/admin/avatars' },

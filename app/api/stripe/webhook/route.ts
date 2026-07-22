@@ -404,26 +404,28 @@ export async function POST(req: Request) {
       // WF-106/107: the metadata unlock above already ran (and already did,
       // before this pass) -- the one real gap was no confirmation email ever
       // went out. Send one now for whichever products were purchased.
-      try {
-        const { sendEmail } = await import("@/lib/email")
-        const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
-        if (products.includes("expanded_blueprint") || products.includes("enhanced_blueprint")) {
-          await sendEmail({
-            to: email,
-            subject: "Your expanded Blueprint tier is unlocked",
-            html: `<p>Your Blueprint tier has been unlocked. <a href="${appUrl}/dashboard/client/blueprint">View your full Blueprint</a>.</p>`,
-          })
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL
+      if (appUrl) {
+        try {
+          const { sendEmail } = await import("@/lib/email")
+          if (products.includes("expanded_blueprint") || products.includes("enhanced_blueprint")) {
+            await sendEmail({
+              to: email,
+              subject: "Your expanded Blueprint tier is unlocked",
+              html: `<p>Your Blueprint tier has been unlocked. <a href="${appUrl}/dashboard/client/blueprint">View your full Blueprint</a>.</p>`,
+            })
+          }
+          for (const pid of newlyPurchasedDomains) {
+            const domainKey = pid.replace(/^domain_/, "")
+            await sendEmail({
+              to: email,
+              subject: "Your Domain Module is ready",
+              html: `<p>Your ${domainKey.replace(/_/g, " ")} Domain Module is ready. <a href="${appUrl}/dashboard/client/blueprint/domain">Start your assessment</a>.</p>`,
+            })
+          }
+        } catch (emailError) {
+          console.error("WF-106/107 confirmation email failed:", emailError)
         }
-        for (const pid of newlyPurchasedDomains) {
-          const domainKey = pid.replace(/^domain_/, "")
-          await sendEmail({
-            to: email,
-            subject: "Your Domain Module is ready",
-            html: `<p>Your ${domainKey.replace(/_/g, " ")} Domain Module is ready. <a href="${appUrl}/dashboard/client/blueprint/domain">Start your assessment</a>.</p>`,
-          })
-        }
-      } catch (emailError) {
-        console.error("WF-106/107 confirmation email failed:", emailError)
       }
     }
 

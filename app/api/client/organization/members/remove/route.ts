@@ -115,7 +115,10 @@ export async function POST(request: NextRequest) {
       .eq('id', memberId)
     if (memberError) throw memberError
 
-    const origin = request.headers.get('origin') || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+    const origin = process.env.NEXT_PUBLIC_APP_URL || request.headers.get('origin')
+    if (!origin) {
+      return NextResponse.json({ error: 'APP_URL not configured' }, { status: 500 })
+    }
 
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',

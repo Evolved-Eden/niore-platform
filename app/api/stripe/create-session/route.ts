@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
   try {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
-    const { tier, path, addons = [], email, name, products } = await req.json()
+    const { tier, path, addons = [], email, name, products, coupon } = await req.json()
 
     // Build line items via unified pricing lib
     const lineItems = buildLineItems({ tier, addons, products })
@@ -55,15 +55,25 @@ export async function POST(req: NextRequest) {
     if (products?.length) metadata.products = JSON.stringify(products)
     if (addons?.length && tier) metadata.addons = JSON.stringify(addons.map((a: any) => a.id || a))
 
-    const origin = req.headers.get('origin') || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
-    const session = await stripe.checkout.sessions.create({
+    const origin = process.env.NEXT_PUBLIC_APP_URL || req.headers.get('origin')
+    if (!origin) {
+      return NextResponse.json({ error: 'APP_URL not configured' }, { status: 500 })
+    }
+    const sessionParams: any = {
       mode: checkoutMode,
       line_items: lineItems,
       customer_email: user?.email || email,
       metadata,
       success_url: `${origin}/dashboard?checkout=success${tier ? `&tier=${tier}` : ''}${path ? `&path=${path}` : ''}${products?.length ? `&products=${encodeURIComponent(JSON.stringify(products))}` : ''}`,
       cancel_url: `${origin}/dashboard/client/blueprint`,
-    })
+    }
+
+    // Apply coupon/promotion code if provided
+    if (coupon) {
+      sessionParams.discounts = [{ promotion_code: coupon }]
+    }
+
+    const session = await stripe.checkout.sessions.create(sessionParams)
 
     return NextResponse.json({ url: session.url, sessionId: session.id })
   } catch (err: any) {

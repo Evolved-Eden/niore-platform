@@ -10,22 +10,24 @@ function RegisterForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [password, setPassword] = useState("");
   const pathParam = searchParams.get("path") || "";
   const initialRole = ["client", "creator", "personal", "affiliate"].includes(pathParam) ? pathParam : "client";
-  const [role, setRole] = useState(initialRole);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
   const planTier = searchParams.get("tier") || searchParams.get("plan") || "";
   const selectedAddons = searchParams.get("addons") || "";
   const selectedAgentIds = searchParams.get("agent_ids") || "";
   const selectedVertical = searchParams.get("vertical") || "";
   const isCheckoutFlow = searchParams.get("checkout") === "1";
   const redirectTo = searchParams.get("redirect") || "";
+  const couponParam = searchParams.get("coupon") || "";
+
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [password, setPassword] = useState("");
+  const [coupon, setCoupon] = useState(couponParam);
+  const [role, setRole] = useState(initialRole);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // If already logged in, redirect
   useEffect(() => {
@@ -49,6 +51,7 @@ function RegisterForm() {
               addons: addonsList,
               agent_ids: agentIds,
               vertical: selectedVertical,
+              coupon: coupon || undefined,
             }),
           });
 
@@ -146,6 +149,7 @@ function RegisterForm() {
             addons: addonsList,
             agent_ids: agentIds,
             vertical: selectedVertical,
+            coupon: coupon || undefined,
           }),
         });
 
@@ -276,6 +280,19 @@ function RegisterForm() {
               />
             </div>
 
+            <div>
+              <label className="block text-xs text-white/20 mb-1.5 tracking-wider uppercase">
+                Coupon Code <span className="normal-case font-normal text-white/10">(optional)</span>
+              </label>
+              <input
+                type="text"
+                value={coupon}
+                onChange={(e) => setCoupon(e.target.value)}
+                placeholder="Enter coupon code"
+                className="w-full bg-white/[0.02] border border-white/5 rounded-sm px-4 py-2.5 text-sm text-white/60 placeholder-white/10 focus:outline-none focus:border-[#C6A664]/30 transition-all"
+              />
+            </div>
+
             <button
               type="submit"
               disabled={loading || !email || !password || !fullName}
@@ -297,7 +314,7 @@ function RegisterForm() {
         <div className="text-center text-sm text-white/30 mt-6">
           Already have an account?{" "}
           <Link
-            href={planTier ? `/login?tier=${planTier}` : "/login"}
+            href={planTier ? `/login?tier=${planTier}${coupon ? `&coupon=${encodeURIComponent(coupon)}` : ''}` : "/login"}
             className="text-[#C6A664] hover:text-white transition-colors"
           >
             Sign in

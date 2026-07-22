@@ -55,8 +55,6 @@ export async function POST(req: NextRequest) {
 
     if (emailRes?.error) {
       console.error("forgot-password Resend error:", JSON.stringify(emailRes.error))
-    } else {
-      console.log(`forgot-password: reset email sent to ${email.trim()} via Resend`)
     }
 
     return NextResponse.json({ ok: true })

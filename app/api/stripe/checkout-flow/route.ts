@@ -43,6 +43,7 @@ export async function POST(req: NextRequest) {
       addons = [],
       agent_ids = [],
       vertical = '',
+      coupon,
     } = body
 
     // Collect all tier keys to bill
@@ -121,7 +122,10 @@ export async function POST(req: NextRequest) {
     if (vertical) metadata.vertical = vertical
     if (addonIds.size) metadata.addons = JSON.stringify(Array.from(addonIds))
 
-    const origin = req.headers.get('origin') || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+    const origin = process.env.NEXT_PUBLIC_APP_URL || req.headers.get('origin')
+    if (!origin) {
+      return NextResponse.json({ error: 'APP_URL not configured' }, { status: 500 })
+    }
     const successParams = new URLSearchParams({ checkout: 'success' })
     if (allTiers.length) successParams.set('tiers', JSON.stringify(allTiers))
     if (tier) successParams.set('tier', tier)
@@ -130,14 +134,21 @@ export async function POST(req: NextRequest) {
     if (vertical) successParams.set('vertical', vertical)
     if (addonIds.size) successParams.set('addons', encodeURIComponent(JSON.stringify(Array.from(addonIds))))
 
-    const session = await stripe.checkout.sessions.create({
+    const sessionParams: any = {
       mode: mode as any,
       line_items: lineItems,
       customer_email: user.email || undefined,
       metadata,
       success_url: `${origin}/dashboard?${successParams.toString()}`,
       cancel_url: `${origin}/pricing${path ? `/${path}` : ''}`,
-    })
+    }
+
+    // Apply coupon/promotion code if provided
+    if (coupon) {
+      sessionParams.discounts = [{ promotion_code: coupon }]
+    }
+
+    const session = await stripe.checkout.sessions.create(sessionParams)
 
     return NextResponse.json({ url: session.url, sessionId: session.id })
   } catch (err: any) {

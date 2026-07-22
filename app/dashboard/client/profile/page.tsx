@@ -200,24 +200,24 @@ export default async function ClientProfilePage() {
 
   // ── Essence items (server-side fetch) ───────────────────────
   let essenceItems: { type: string; content: string; priority: string }[] = []
-  try {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL || process.env.NEXT_PUBLIC_APP_URL}`
-      : 'http://localhost:3000'
-    const res = await fetch(`${baseUrl}/api/zuri/essence`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId: user.id, userRole: role }),
-      cache: 'no-store',
-    })
-    if (res.ok) {
-      const data = await res.json()
-      if (data.items?.length) {
-        essenceItems = data.items.slice(0, 5)
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL
+  if (appUrl) {
+    try {
+      const res = await fetch(`${appUrl}/api/zuri/essence`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: user.id, userRole: role }),
+        cache: 'no-store',
+      })
+      if (res.ok) {
+        const data = await res.json()
+        if (data.items?.length) {
+          essenceItems = data.items.slice(0, 5)
+        }
       }
+    } catch {
+      // Fallback below
     }
-  } catch {
-    // Fallback below
   }
   if (essenceItems.length === 0) {
     essenceItems = [

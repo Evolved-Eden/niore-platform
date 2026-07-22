@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
 
       userId = rpcUserId;
     } catch (rpcErrorOrException: any) {
-      console.log('RPC method failed, trying GoTrue admin API:', rpcErrorOrException.message);
+      console.warn('RPC method failed, trying GoTrue admin API:', rpcErrorOrException.message);
       try {
         const { data: authUser, error: authError } = await supabase.auth.admin.createUser({
           email,

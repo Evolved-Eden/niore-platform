@@ -203,7 +203,7 @@ export const ADDONS: Record<string, Addon> = {
   white_label:          { id: 'white_label',          name: 'White Label',             amount: 49900, stripePriceId: price('WHITE_LABEL'),           recurring: true, description: 'Full white-label rebranding' },
   premium_essenceboard: { id: 'premium_essenceboard', name: 'Premium EssenceBoard',    amount: 10000, stripePriceId: price('PREMIUM_ESSENCEBOARD'),  recurring: true, description: 'Enhanced daily intelligence' },
   team_essence:         { id: 'team_essence',         name: 'Team Essence',            amount: 15000, stripePriceId: price('TEAM_ESSENCE'),          recurring: true, description: 'Team-wide intelligence sharing' },
-  usb_export:           { id: 'usb_export',           name: 'USB Export',              amount: 15000, stripePriceId: price('USB_EXPORT'),            recurring: true, description: 'Export intelligence to USB' },
+  usb_export:           { id: 'usb_export',           name: 'USB Export',              amount: 15000, stripePriceId: price('USB_EXPORT'),            recurring: false, description: 'Export intelligence to USB' },
   custom_subdomain:     { id: 'custom_subdomain',     name: 'Custom Subdomain',        amount: 500,   stripePriceId: price('CUSTOM_SUBDOMAIN'),      recurring: true, description: 'Custom subdomain URL' },
   secret_vault:         { id: 'secret_vault',         name: 'Secret Vault',             amount: 999,   stripePriceId: price('SECRET_VAULT'),          recurring: true, description: 'Secure env var & secret management via Coolify' },
 
@@ -213,7 +213,7 @@ export const ADDONS: Record<string, Addon> = {
   plus_500_workflow_runs:{ id: 'plus_500_workflow_runs', name: '+500 Workflow Runs',   amount: 9900,  stripePriceId: price('PLUS_500_WORKFLOW_RUNS'), recurring: true, description: 'Additional workflow runs' },
   plus_1000_api_calls:  { id: 'plus_1000_api_calls',  name: '+1000 API Calls',         amount: 9900,  stripePriceId: price('PLUS_1000_API_CALLS'),   recurring: true, description: 'Additional API calls' },
   additional_business:  { id: 'additional_business',  name: 'Additional Business',     amount: 9900,  stripePriceId: price('ADDITIONAL_BUSINESS'),   recurring: true, description: 'Add another business location' },
-  additional_member:    { id: 'additional_member',    name: 'Additional Member',       amount: 49900, stripePriceId: price('ADDITIONAL_MEMBER'),     recurring: true, description: 'Add a team member' },
+  additional_member:    { id: 'additional_member',    name: 'Additional Member',       amount: 12900, stripePriceId: price('ADDITIONAL_MEMBER'),     recurring: true, description: 'Add a team member' },
   additional_location:  { id: 'additional_location',  name: 'Additional Location',     amount: 4900,  stripePriceId: price('ADDITIONAL_LOCATION'),   recurring: true, description: 'Add another physical location' },
 
   // Legacy add-on IDs (for backward compatibility)
@@ -249,7 +249,7 @@ export const STANDALONE_PRODUCTS: Record<string, StandaloneProduct> = {
   domain_legacy:      { id: 'domain_legacy',      name: 'Legacy Module',          amount: 5000,  description: 'Legacy & impact intelligence domain assessment', recurring: false },
 
   // Blueprint Assessments (one-time purchases, maps to catalog_items of type blueprint)
-  blueprint_core:             { id: 'blueprint_core',             name: 'Blueprint Core',                  amount: 29900, description: 'Foundational blueprint — core identity, spiritual, and growth systems (50 systems)', recurring: false },
+  // blueprint_core is included free with every account — not listed here
   essence_profile:            { id: 'essence_profile',            name: 'Essence Profile Blueprint',        amount: 19900, description: 'Emotional, somatic, and relational intelligence blueprint (40 systems)', recurring: false },
   rhythm_state:               { id: 'rhythm_state',               name: 'Rhythm & State Blueprint',         amount: 19900, description: 'Timing, cycles, somatic rhythms, and peak performance blueprint (40 systems)', recurring: false },
   alignment_purpose:          { id: 'alignment_purpose',          name: 'Alignment & Purpose Blueprint',    amount: 14900, description: 'Vocation, purpose, and life direction blueprint (10 systems)', recurring: false },

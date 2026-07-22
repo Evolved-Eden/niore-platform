@@ -15,6 +15,10 @@ import { NextRequest, NextResponse } from 'next/server'
 export async function POST(req: NextRequest) {
   try {
     const supabase = await createAdminClient()
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
     const body = await req.json()
 
     // ── Detect legacy vs new format ──
@@ -77,8 +81,22 @@ export async function POST(req: NextRequest) {
       intake_data,
       core_result,
       ext_result,
-      organization_id = 'b0eebc99-9c0b-4ef8-9a01-ff0000000001', // placeholder
     } = body
+
+    // Resolve organization from authenticated user
+    const { data: membership } = await supabase
+      .from('organization_members')
+      .select('organization_id')
+      .eq('user_id', user.id)
+      .eq('status', 'active')
+      .order('created_at', { ascending: true })
+      .limit(1)
+      .single()
+
+    if (!membership) {
+      return NextResponse.json({ error: 'No active organization found' }, { status: 400 })
+    }
+    const organization_id = membership.organization_id
 
     if (!blueprint_score && !intake_role) {
       return NextResponse.json({ error: 'Incomplete deployment data' }, { status: 400 })

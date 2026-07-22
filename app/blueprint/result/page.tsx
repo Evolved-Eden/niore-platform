@@ -60,7 +60,6 @@ export default function BlueprintResultPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          organization_id: 'b0eebc99-9c0b-4ef8-9a01-ff0000000001', // placeholder — will use auth org later
           blueprint_template_id: result.template_key,
           vertical_key: result.vertical_key,
           subcategory_key: result.subcategory_key,

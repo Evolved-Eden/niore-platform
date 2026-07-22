@@ -391,41 +391,57 @@ export function getVerticalBySlug(slug: string): VerticalData | undefined {
   return VERTICAL_LIST.find(v => v.slug === slug)
 }
 
-// ── Concrete Pricing ──
+// ── Concrete Pricing (aligned with catalog_items & lib/pricing.ts) ──
+// Prices in dollars (display), mirror catalog_items.base_price.
+// Tier keys match the {path}_{plan} convention for backend lookup.
 export const BASE_PLANS = {
   client: {
-    founder: { name: 'Founder', price: 397, period: '/month', tagline: 'Solo Intelligence System' },
-    team: { name: 'Org', price: 1497, period: '/month', tagline: 'Collaborative Intelligence', popular: true },
-    enterprise: { name: 'Enterprise', price: 5000, period: '/month (starting)', tagline: 'Organizational OS' },
+    founder:   { name: 'Founder',    price: 497,  period: '/month', tagline: 'Personal Intelligence System' },
+    groups:    { name: 'Groups',     price: 2500, period: '/month', tagline: 'Collaborative Intelligence', popular: true },
+    enterprise:{ name: 'Enterprise', price: 5000, period: '/month', tagline: 'Organizational OS' },
   },
   creator: {
-    studio: { name: 'Studio', price: 297, period: '/month', tagline: 'Creator Operating System' },
-    premium: { name: 'Premium', price: 997, period: '/month', tagline: 'Creator Business System', popular: true },
-    concierge: { name: 'Concierge', price: 4000, period: '/month', tagline: 'Luxury Creator System' },
+    studio:    { name: 'Studio',     price: 49,   period: '/month', tagline: 'Creator Operating System' },
+    premium:   { name: 'Premium',    price: 297,  period: '/month', tagline: 'Creator Business System', popular: true },
+    concierge: { name: 'Concierge',  price: 4000, period: '/month', tagline: 'Luxury Creator System' },
   },
   personal: {
-    free: { name: 'Free', price: 0, period: '', tagline: 'Personal Layer' },
-    plus: { name: 'Plus', price: 97, period: '/month', tagline: 'Personal Intelligence Plus', popular: true },
-    premium: { name: 'Premium', price: 197, period: '/month', tagline: 'Personal Intelligence Premium' },
+    solo:      { name: 'Solo',       price: 49,   period: '/month', tagline: 'Personal Layer' },
+    partner:   { name: 'Partner',    price: 79,   period: '/month', tagline: 'Personal Intelligence Plus', popular: true },
+    family:    { name: 'Family',     price: 99,   period: '/month', tagline: 'Personal Intelligence Premium' },
   },
   affiliate: {
-    starter: { name: 'Affiliate Starter', price: 0, period: '', tagline: 'Affiliate OS Starter' },
-    pro: { name: 'Affiliate Pro', price: 97, period: '/month', tagline: 'Affiliate OS Professional', popular: true },
-    enterprise: { name: 'Affiliate Enterprise', price: 297, period: '/month', tagline: 'Affiliate OS Enterprise' },
+    annual:    { name: 'Annual',     price: 97,   period: '/month', tagline: 'Affiliate OS Starter' },
+    plug:      { name: 'Plug',       price: 149,  period: '/month', tagline: 'Affiliate OS Professional', popular: true },
   },
 } as const
 
 export const ADDONS = [
+  { id: 'voice',                name: 'Voice',                      price: 250, period: '/mo', desc: 'Voice-based AI interaction' },
+  { id: 'sdk_api_access',       name: 'SDK/API Access',             price: 150, period: '/mo', desc: 'Programmatic access to intelligence layer' },
+  { id: 'white_label',          name: 'White Label',                price: 499, period: '/mo', desc: 'Full white-label rebranding' },
+  { id: 'premium_essenceboard', name: 'Premium EssenceBoard',       price: 100, period: '/mo', desc: 'Enhanced daily intelligence briefs' },
+  { id: 'team_essence',         name: 'Team Essence',               price: 150, period: '/mo', desc: 'Team-wide intelligence sharing' },
+  { id: 'usb_export',           name: 'USB Export',                 price: 150, period: '/mo', desc: 'Export intelligence to USB' },
+  { id: 'custom_domain',        name: 'Custom Domain',              price: 9,   period: '/mo', desc: 'Bring your own domain' },
+  { id: 'custom_subdomain',     name: 'Custom Subdomain',           price: 5,   period: '/mo', desc: 'Custom subdomain URL' },
+  { id: 'premium_branding',     name: 'Premium Branding',           price: 99,  period: '/mo', desc: 'Premium brand customization' },
+  { id: 'additional_ai_twin',   name: 'Additional AI Twin',         price: 195, period: '/mo', desc: 'Add another AI twin instance' },
+  { id: 'plus_50gb_storage',    name: '+50GB Storage',              price: 100, period: '/mo', desc: 'Extra storage capacity' },
+  { id: 'plus_500_workflow_runs', name: '+500 Workflow Runs',       price: 99,  period: '/mo', desc: 'Additional workflow runs' },
+  { id: 'plus_1000_api_calls',  name: '+1000 API Calls',            price: 99,  period: '/mo', desc: 'Additional API calls' },
+  { id: 'additional_member',    name: 'Additional Member',          price: 499, period: '/mo', desc: 'Add a team member' },
+  { id: 'additional_location',  name: 'Additional Location',        price: 49,  period: '/mo', desc: 'Add another physical location' },
+  // Legacy aliases (map to same Stripe products)
   { id: 'additional_intelligence', name: 'Additional Intelligence', price: 195, period: '/mo', desc: 'Add another intelligence instance' },
-  { id: 'additional_agent', name: 'Additional Agent', price: 150, period: '/mo', desc: 'Deploy a new specialized agent' },
-  { id: 'additional_swarm', name: 'Additional Swarm', price: 300, period: '/mo', desc: 'Orchestrate a new agent swarm' },
-  { id: 'additional_memory', name: 'Additional Memory (50GB)', price: 100, period: '/mo', desc: 'Expand memory capacity' },
-  { id: 'additional_workflow', name: 'Additional Workflow', price: 75, period: '/mo', desc: 'Add deployable customer workflows' },
-  { id: 'twin_expansion', name: 'AI Twin Expansion', price: 200, period: '/mo', desc: 'Upgrade to full AI Twin capabilities' },
-  { id: 'premium_essence', name: 'Premium Essence Board', price: 100, period: '/mo', desc: 'Enhanced daily intelligence briefs' },
-  { id: 'sdk_api', name: 'SDK/API Access', price: 150, period: '/mo', desc: 'Programmatic access to the intelligence layer' },
-  { id: 'white_label', name: 'White Label', price: 500, period: '/mo', desc: 'Rebrand the platform as your own' },
-  { id: 'voice_systems', name: 'Voice Systems', price: 250, period: '/mo', desc: 'Voice-based interaction with your intelligence' },
+  { id: 'additional_agent',       name: 'Additional Agent',         price: 150, period: '/mo', desc: 'Deploy a new specialized agent' },
+  { id: 'additional_swarm',       name: 'Additional Swarm',         price: 300, period: '/mo', desc: 'Orchestrate a new agent swarm' },
+  { id: 'additional_workflow',    name: 'Additional Workflow',      price: 75,  period: '/mo', desc: 'Add deployable customer workflows' },
+  { id: 'additional_memory',      name: 'Additional Memory (50GB)', price: 100, period: '/mo', desc: 'Expand memory capacity' },
+  { id: 'premium_essence',        name: 'Premium Essence Board',    price: 100, period: '/mo', desc: 'Enhanced daily intelligence briefs' },
+  { id: 'sdk_api',                name: 'SDK/API Access',           price: 150, period: '/mo', desc: 'Programmatic access to the intelligence layer' },
+  { id: 'white_label_addon',      name: 'White Label',              price: 499, period: '/mo', desc: 'Rebrand the platform as your own' },
+  { id: 'voice_systems',          name: 'Voice Systems',            price: 250, period: '/mo', desc: 'Voice-based interaction with your intelligence' },
 ] as const
 
 export type PlanKey = keyof typeof BASE_PLANS.client | keyof typeof BASE_PLANS.creator | keyof typeof BASE_PLANS.personal | keyof typeof BASE_PLANS.affiliate

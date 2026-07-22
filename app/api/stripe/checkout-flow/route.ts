@@ -2,67 +2,21 @@ import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { createClient } from '@/lib/supabase/server'
 import { STRIPE_API_VERSION } from '@/lib/constants'
-
 import { lazy } from '@/lib/lazy-client'
+import {
+  buildLineItems,
+  getCheckoutMode,
+  resolveTier,
+} from '@/lib/pricing'
+
 const stripe = lazy(() => new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: STRIPE_API_VERSION }))
-const PLAN_PRICES: Record<string, { amount: number; name: string; recurring: boolean }> = {
-  client_founder:     { amount: 39700,  name: 'Client Founder',       recurring: true },
-  client_org:        { amount: 149700, name: 'Client Org',         recurring: true },
-  client_enterprise:  { amount: 500000, name: 'Client Enterprise',    recurring: true },
-  creator_studio:     { amount: 29700,  name: 'Creator Studio',       recurring: true },
-  creator_premium:    { amount: 99700,  name: 'Creator Premium',      recurring: true },
-  creator_concierge:  { amount: 400000, name: 'Creator Concierge',    recurring: true },
-  personal_free:     { amount: 0,      name: 'Personal Free',       recurring: false },
-  personal_plus:     { amount: 9700,   name: 'Personal Plus',        recurring: true },
-  personal_premium:  { amount: 19700,  name: 'Personal Premium',     recurring: true },
-
-  // Unpublicized — never shown in the public plan catalog (see
-  // PLAN_CATEGORIES in app/dashboard/client/plan/page.tsx, which does NOT
-  // include this key). Only reachable through the org-offboarding "transfer"
-  // path in /api/client/organization/members/remove. Priced above Personal
-  // Plus because it arrives pre-trained — the twin keeps whatever it
-  // learned while working inside the org (see client_twins.metadata),
-  // instead of starting over as a basic twin.
-  personal_trained_intelligence: { amount: 19700, name: 'Trained Intelligence', recurring: true },
-  affiliate_starter:     { amount: 0,      name: 'Affiliate Starter',    recurring: false },
-  affiliate_pro:         { amount: 9700,   name: 'Affiliate Pro',        recurring: true },
-  affiliate_enterprise:  { amount: 29700,  name: 'Affiliate Enterprise',  recurring: true },
-
-  // New product category tiers
-  service_free:       { amount: 0,     name: 'Service Free',       recurring: false },
-  service_basic:      { amount: 997,   name: 'Service Basic',      recurring: true },
-  service_premium:    { amount: 2997,  name: 'Service Premium',    recurring: true },
-  employee_starter:   { amount: 4997,  name: 'Employee Starter',   recurring: true },
-  employee_growth:    { amount: 9797,  name: 'Employee Growth',    recurring: true },
-  employee_pro:       { amount: 19797, name: 'Employee Pro',       recurring: true },
-  employee_enterprise:{ amount: 49797, name: 'Employee Enterprise',recurring: true },
-  department_starter: { amount: 49797, name: 'Department Starter', recurring: true },
-  department_premium: { amount: 99797, name: 'Department Premium', recurring: true },
-  os_creator:         { amount: 99797, name: 'Creator OS',         recurring: true },
-  os_founder:         { amount: 199797,name: 'Founder OS',         recurring: true },
-  os_business:        { amount: 499797,name: 'Business OS',        recurring: true },
-  os_agency:          { amount: 999797,name: 'Agency OS',          recurring: true },
-}
-
-const ADDON_AMOUNTS: Record<string, number> = {
-  additional_intelligence: 19500,
-  additional_agent: 15000,
-  additional_swarm: 30000,
-  additional_memory: 10000,
-  additional_workflow: 7500,
-  twin_expansion: 20000,
-  premium_essence: 10000,
-  sdk_api: 15000,
-  white_label: 50000,
-  voice_systems: 25000,
-}
 
 /**
  * POST /api/stripe/checkout-flow
  *
  * Unified checkout flow that:
  * 1. Accepts plan + add-ons + agent selections + optional vertical
- * 2. Creates Stripe Checkout Session
+ * 2. Creates Stripe Checkout Session via unified pricing map
  * 3. Returns redirect URL
  *
  * Body:
@@ -115,56 +69,47 @@ export async function POST(req: NextRequest) {
       })
     }
 
-    // ── Build Stripe Checkout Session ──
-    const lineItems: any[] = []
+    // ── Build line items via unified pricing lib ──
     const purchasedTiers: string[] = []
+    const addonIds = new Set<string>()
 
-    for (const t of allTiers) {
-      const plan = PLAN_PRICES[t]
-      if (!plan) continue
-      purchasedTiers.push(t)
-
-      if (plan.amount > 0) {
-        lineItems.push({
-          price_data: {
-            currency: 'usd',
-            product_data: {
-              name: `${plan.name}${path ? ` — ${path.charAt(0).toUpperCase() + path.slice(1)}` : ''}`,
-            },
-            unit_amount: plan.amount,
-            ...(plan.recurring ? { recurring: { interval: 'month' } } : {}),
-          },
-          quantity: 1,
-        })
-      }
+    // Collect addon IDs (deduplicate)
+    for (const addon of addons) {
+      const aid = typeof addon === 'string' ? addon : (addon.id || addon)
+      addonIds.add(aid)
     }
 
-    // Add-ons (deduplicate by id)
-    const addonIds = new Set<string>()
-    for (const addon of addons) {
-      const aid = addon.id || addon
-      if (addonIds.has(aid)) continue
-      addonIds.add(aid)
-      const amount = ADDON_AMOUNTS[aid]
-      if (!amount || amount <= 0) continue
-      const anyRecurring = allTiers.some((t: string) => PLAN_PRICES[t]?.recurring)
-      lineItems.push({
-        price_data: {
-          currency: 'usd',
-          product_data: { name: addon.name || aid },
-          unit_amount: amount,
-          ...(anyRecurring ? { recurring: { interval: 'month' } } : {}),
-        },
-        quantity: 1,
-      })
+    // Build line items: first tier, then additional tiers, then addons
+    const lineItems = buildLineItems({
+      tier: allTiers[0] || undefined,
+      addons: Array.from(addonIds),
+    })
+
+    // Add additional tiers beyond the first
+    for (let i = 1; i < allTiers.length; i++) {
+      const extraTier = resolveTier(allTiers[i])
+      if (extraTier && 'amount' in extraTier) {
+        const t = extraTier as any
+        if (t.amount > 0) {
+          purchasedTiers.push(allTiers[i])
+          lineItems.push({
+            price_data: {
+              currency: 'usd',
+              product_data: { name: t.name },
+              unit_amount: t.amount,
+              ...(t.recurring ? { recurring: { interval: 'month' as const } } : {}),
+            },
+            quantity: 1,
+          })
+        }
+      }
     }
 
     if (lineItems.length === 0) {
       return NextResponse.json({ error: 'No payable items selected. Free plans are activated on registration.' }, { status: 400 })
     }
 
-    const hasSubscription = lineItems.some((li: any) => li.price_data?.recurring)
-    const mode = hasSubscription ? 'subscription' : 'payment'
+    const mode = getCheckoutMode(lineItems)
 
     // Build metadata for webhook
     const metadata: Record<string, string> = {}

@@ -33,6 +33,14 @@ ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
 ENV SUPABASE_SERVICE_ROLE_KEY=$SUPABASE_SERVICE_ROLE_KEY
 ENV RESEND_API_KEY=$RESEND_API_KEY
 
+# Next 16's build runs a full separate TypeScript check phase after
+# compiling. On a codebase this size, that phase needs more than Node's
+# default heap (~2GB), which is what was causing
+# "JavaScript heap out of memory" / SIGABRT during `npm run build` --
+# not a code error, a memory ceiling. Confirmed locally: the exact same
+# OOM happened running `tsc --noEmit` directly until the heap was raised.
+ENV NODE_OPTIONS="--max-old-space-size=4096"
+
 RUN npm run build
 
 # ---------- Runner ----------

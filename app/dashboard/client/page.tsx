@@ -1,6 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
+import { supabaseAdmin } from '@/lib/supabase/admin'
 import Link from 'next/link'
 import EssenceBoard from '@/components/EssenceBoard'
+import UpgradePanel from '@/components/UpgradePanel'
 
 export default async function ClientDashboard() {
   const supabase = await createClient()
@@ -22,7 +24,7 @@ export default async function ClientDashboard() {
 
   const { data: identity } = await supabase
     .from('users')
-    .select('full_name, role')
+    .select('full_name, role, organization_id')
     .eq('id', user.id)
     .maybeSingle()
 
@@ -30,6 +32,51 @@ export default async function ClientDashboard() {
     .from('agents')
     .select('*', { count: 'exact', head: true })
     .eq('is_system_agent', true)
+
+  // ── Business layer: pipeline + connector usage ──
+  // crm_pipelines/crm_deals/crm_leads have existed in the schema all along
+  // but were never surfaced anywhere in the UI -- this is their first
+  // appearance. (Workflows are a different thing: WFS = automation
+  // sequences; the pipeline = sales-stage tracking. Both matter to a
+  // Business, they're not interchangeable.)
+  const orgId = identity?.organization_id ?? client?.organization_id ?? null
+  let pipeline: { openDeals: number; openValue: number; wonThisMonth: number; wonValue: number; newLeads: number } | null = null
+  if (orgId) {
+    const monthStart = new Date()
+    monthStart.setDate(1)
+    monthStart.setHours(0, 0, 0, 0)
+
+    const [openDealsRes, wonDealsRes, leadsRes] = await Promise.all([
+      supabaseAdmin.from('crm_deals').select('value').eq('organization_id', orgId).eq('status', 'open'),
+      supabaseAdmin.from('crm_deals').select('value').eq('organization_id', orgId).eq('status', 'won').gte('closed_at', monthStart.toISOString()),
+      supabaseAdmin.from('crm_leads').select('id', { count: 'exact', head: true }).eq('organization_id', orgId).gte('created_at', monthStart.toISOString()),
+    ])
+
+    const sum = (rows: any[] | null) => (rows ?? []).reduce((acc, r) => acc + (Number(r.value) || 0), 0)
+    pipeline = {
+      openDeals: openDealsRes.data?.length ?? 0,
+      openValue: sum(openDealsRes.data),
+      wonThisMonth: wonDealsRes.data?.length ?? 0,
+      wonValue: sum(wonDealsRes.data),
+      newLeads: leadsRes.count ?? 0,
+    }
+  }
+
+  // Connector usage this month vs entitlement caps
+  const periodMonth = new Date()
+  periodMonth.setDate(1)
+  const periodStr = periodMonth.toISOString().slice(0, 10)
+  const [{ data: usageRows }, { data: entRow }] = await Promise.all([
+    supabaseAdmin.from('connector_usage_counters').select('metric, count').eq('client_id', user.id).eq('period_month', periodStr),
+    client?.plan_tier_key
+      ? supabaseAdmin.from('tier_entitlements').select('max_dms_per_month, max_emails_per_month').eq('plan_key', client.plan_tier_key).maybeSingle()
+      : Promise.resolve({ data: null }),
+  ])
+  const dmUsed = usageRows?.find((u: any) => u.metric === 'dm')?.count ?? 0
+  const emailUsed = usageRows?.find((u: any) => u.metric === 'email')?.count ?? 0
+  const packBonus = (client?.connector_pack_quantity ?? 0)
+  const dmLimit = entRow?.max_dms_per_month != null ? entRow.max_dms_per_month + packBonus * 100 : null
+  const emailLimit = entRow?.max_emails_per_month != null ? entRow.max_emails_per_month + packBonus * 200 : null
 
   const name = client?.full_name ?? identity?.full_name ?? 'Client'
 
@@ -101,6 +148,63 @@ export default async function ClientDashboard() {
           </div>
         ))}
       </div>
+
+      {/* ── Pipeline — Business layer. First UI surfacing of the CRM
+          tables that have existed in the schema all along. ── */}
+      {pipeline && (
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-xs text-[#5E8B84] tracking-widest uppercase font-medium">Pipeline</span>
+            <span className="text-[10px] text-white/20">This month</span>
+          </div>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="glass rounded-sm p-5 border-l-2" style={{ borderLeftColor: '#5E8B84' }}>
+              <div className="text-[10px] text-white/30 tracking-widest uppercase mb-2">Open Deals</div>
+              <div className="text-2xl font-light text-[#5E8B84]">{pipeline.openDeals}</div>
+            </div>
+            <div className="glass rounded-sm p-5 border-l-2" style={{ borderLeftColor: '#C6A664' }}>
+              <div className="text-[10px] text-white/30 tracking-widest uppercase mb-2">Open Value</div>
+              <div className="text-2xl font-light text-[#C6A664]">${pipeline.openValue.toLocaleString()}</div>
+            </div>
+            <div className="glass rounded-sm p-5 border-l-2" style={{ borderLeftColor: '#8B7AA8' }}>
+              <div className="text-[10px] text-white/30 tracking-widest uppercase mb-2">Won This Month</div>
+              <div className="text-2xl font-light text-[#8B7AA8]">{pipeline.wonThisMonth} <span className="text-sm text-white/30">/ ${pipeline.wonValue.toLocaleString()}</span></div>
+            </div>
+            <div className="glass rounded-sm p-5 border-l-2" style={{ borderLeftColor: '#B5764A' }}>
+              <div className="text-[10px] text-white/30 tracking-widest uppercase mb-2">New Leads</div>
+              <div className="text-2xl font-light text-[#B5764A]">{pipeline.newLeads}</div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Connector usage vs entitlements ── */}
+      {(dmLimit !== null || emailLimit !== null) && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+          {dmLimit !== null && (
+            <div className="glass rounded-sm p-5">
+              <div className="flex items-baseline justify-between mb-2">
+                <span className="text-[10px] text-white/30 tracking-widest uppercase">DMs This Month</span>
+                <span className="text-xs text-white/50">{dmUsed} / {dmLimit}</span>
+              </div>
+              <div className="h-1 bg-white/[0.06] rounded-full overflow-hidden">
+                <div className="h-full bg-[#C6A664]" style={{ width: `${Math.min(100, Math.round((dmUsed / dmLimit) * 100))}%` }} />
+              </div>
+            </div>
+          )}
+          {emailLimit !== null && (
+            <div className="glass rounded-sm p-5">
+              <div className="flex items-baseline justify-between mb-2">
+                <span className="text-[10px] text-white/30 tracking-widest uppercase">Emails This Month</span>
+                <span className="text-xs text-white/50">{emailUsed} / {emailLimit}</span>
+              </div>
+              <div className="h-1 bg-white/[0.06] rounded-full overflow-hidden">
+                <div className="h-full bg-[#5E8B84]" style={{ width: `${Math.min(100, Math.round((emailUsed / emailLimit) * 100))}%` }} />
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* ── 3-Column Layout ── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -280,6 +384,11 @@ export default async function ClientDashboard() {
             </p>
           </div>
         </div>
+      </div>
+
+      {/* ── Expand Your System — upgrades built into the dash ── */}
+      <div className="mt-8">
+        <UpgradePanel currentRole="client" />
       </div>
     </div>
   )

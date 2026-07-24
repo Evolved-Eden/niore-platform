@@ -10,6 +10,20 @@ type ClientData = {
   zuri_whatsapp_connected: boolean
 }
 
+type ConnectorField = { key: string; label: string; type: 'text' | 'password' }
+
+type AvailableConnector = {
+  id: string
+  key: string
+  name: string
+  description: string | null
+  category: string
+  icon: string | null
+  fields: ConnectorField[]
+  connected: boolean
+  connected_at: string | null
+}
+
 // ── Sub-components ────────────────────────────────────────────
 function StatusBadge({ connected, label }: { connected: boolean; label?: string }) {
   return (
@@ -69,6 +83,122 @@ export default function ClientConnectorsPage() {
   const [discordBriefings, setDiscordBriefings] = useState(true)
   const [whatsappReminders, setWhatsappReminders] = useState(true)
   const [dailyDigest, setDailyDigest] = useState(false)
+
+  // ── Your own API connections (client-owned credentials) ────
+  const [apiConnectors, setApiConnectors] = useState<AvailableConnector[]>([])
+  const [apiFormData, setApiFormData] = useState<Record<string, Record<string, string>>>({})
+  const [apiSaving, setApiSaving] = useState<Record<string, boolean>>({})
+  const [apiMsg, setApiMsg] = useState<{ type: 'ok' | 'err'; text: string } | null>(null)
+
+  const fetchApiConnectors = useCallback(async () => {
+    try {
+      const res = await fetch('/api/client/connectors')
+      if (res.ok) {
+        const data = await res.json()
+        setApiConnectors(data.connectors ?? [])
+      }
+    } catch { /* best-effort -- section just shows empty if this fails */ }
+  }, [])
+
+  useEffect(() => { fetchApiConnectors() }, [fetchApiConnectors])
+
+  // ── Calendar <-> Email linking ──────────────────────────────
+  const [calendarLink, setCalendarLink] = useState<{ connector_credential_id: string | null; email_connector_credential_id: string | null } | null>(null)
+  const [linkSaving, setLinkSaving] = useState(false)
+  const [linkMsg, setLinkMsg] = useState<{ type: 'ok' | 'err'; text: string } | null>(null)
+  const [selectedEmailForCalendar, setSelectedEmailForCalendar] = useState('')
+
+  const fetchCalendarLink = useCallback(async () => {
+    try {
+      const res = await fetch('/api/client/calendar')
+      if (res.ok) {
+        const data = await res.json()
+        setCalendarLink(data.calendar)
+        if (data.calendar?.email_connector_credential_id) {
+          setSelectedEmailForCalendar(data.calendar.email_connector_credential_id)
+        }
+      }
+    } catch { /* best-effort */ }
+  }, [])
+
+  useEffect(() => { fetchCalendarLink() }, [fetchCalendarLink])
+
+  async function handleLinkCalendarToEmail(calendarConnectorId: string) {
+    setLinkSaving(true)
+    setLinkMsg(null)
+    try {
+      const res = await fetch('/api/client/calendar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          calendar_connector_id: calendarConnectorId,
+          email_connector_id: selectedEmailForCalendar || null,
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Failed to link')
+      setCalendarLink(data.calendar)
+      setLinkMsg({ type: 'ok', text: selectedEmailForCalendar ? 'Calendar linked to your email' : 'Calendar saved' })
+      setTimeout(() => setLinkMsg(null), 3000)
+    } catch (err: any) {
+      setLinkMsg({ type: 'err', text: err.message })
+    } finally {
+      setLinkSaving(false)
+    }
+  }
+
+  function setApiField(connectorId: string, fieldKey: string, value: string) {
+    setApiFormData((prev) => ({
+      ...prev,
+      [connectorId]: { ...prev[connectorId], [fieldKey]: value },
+    }))
+  }
+
+  async function handleSaveApiConnector(connector: AvailableConnector) {
+    setApiSaving((prev) => ({ ...prev, [connector.id]: true }))
+    setApiMsg(null)
+    try {
+      const credentials = apiFormData[connector.id] ?? {}
+      const missing = connector.fields.filter((f) => !credentials[f.key]?.trim())
+      if (missing.length > 0) {
+        throw new Error(`Please fill in: ${missing.map((f) => f.label).join(', ')}`)
+      }
+      const res = await fetch('/api/client/connectors', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ connector_type_id: connector.id, credentials }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Failed to save')
+      setApiMsg({ type: 'ok', text: `${connector.name} connected` })
+      setApiFormData((prev) => ({ ...prev, [connector.id]: {} }))
+      await fetchApiConnectors()
+    } catch (err: any) {
+      setApiMsg({ type: 'err', text: err.message })
+    } finally {
+      setApiSaving((prev) => ({ ...prev, [connector.id]: false }))
+    }
+  }
+
+  async function handleDisconnectApiConnector(connector: AvailableConnector) {
+    setApiSaving((prev) => ({ ...prev, [connector.id]: true }))
+    setApiMsg(null)
+    try {
+      const res = await fetch('/api/client/connectors', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ connector_type_id: connector.id }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Failed to disconnect')
+      setApiMsg({ type: 'ok', text: `${connector.name} disconnected` })
+      await fetchApiConnectors()
+    } catch (err: any) {
+      setApiMsg({ type: 'err', text: err.message })
+    } finally {
+      setApiSaving((prev) => ({ ...prev, [connector.id]: false }))
+    }
+  }
 
   // ── Fetch client data ─────────────────────────────────────
   const fetchClient = useCallback(async () => {
@@ -233,6 +363,152 @@ export default function ClientConnectorsPage() {
       )}
 
       <div className="space-y-6">
+        {/* ── Your API Connections (client-owned credentials) ─── */}
+        {apiMsg && (
+          <div className={`px-4 py-3 rounded-sm text-sm ${
+            apiMsg.type === 'ok'
+              ? 'bg-[#C6A664]/10 border border-[#C6A664]/20 text-[#C6A664]'
+              : 'bg-red-500/10 border border-red-500/20 text-red-400'
+          }`}>
+            {apiMsg.text}
+            <button onClick={() => setApiMsg(null)} className="ml-3 underline opacity-60 hover:opacity-100">
+              Dismiss
+            </button>
+          </div>
+        )}
+
+        {apiConnectors.length > 0 && (
+          <div>
+            <h2 className="font-display text-base font-semibold tracking-tight text-white mb-1">
+              Your API Connections
+            </h2>
+            <p className="text-white/30 text-xs mb-5">
+              Connect your own accounts -- your credentials, encrypted and never shared.
+            </p>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {apiConnectors.map((connector) => {
+                const isSaving = apiSaving[connector.id] ?? false
+                const currentData = apiFormData[connector.id] ?? {}
+                return (
+                  <div key={connector.id} className="glass rounded-sm border border-white/[0.06] p-6">
+                    <div className="flex items-center gap-4 mb-6">
+                      <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-xl">
+                        {connector.icon ?? '◈'}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-display font-semibold text-white">{connector.name}</h3>
+                        {connector.description && (
+                          <p className="text-xs text-white/40">{connector.description}</p>
+                        )}
+                      </div>
+                      <StatusBadge connected={connector.connected} />
+                    </div>
+
+                    {connector.connected ? (
+                      <div className="space-y-4">
+                        <div className="px-4 py-3 rounded-sm bg-[#C6A664]/5 border border-[#C6A664]/10">
+                          <div className="flex items-center gap-2 text-sm text-[#C6A664]">
+                            <span>✓</span>
+                            <span className="font-medium">Connected</span>
+                          </div>
+                          {connector.connected_at && (
+                            <p className="text-xs text-white/40 mt-1">
+                              Since {new Date(connector.connected_at).toLocaleDateString()}
+                            </p>
+                          )}
+                        </div>
+                        <button
+                          onClick={() => handleDisconnectApiConnector(connector)}
+                          disabled={isSaving}
+                          className="w-full px-4 py-2.5 border border-red-500/20 text-red-400/70 hover:text-red-400 hover:border-red-500/40 text-xs font-bold rounded-sm transition-all disabled:opacity-40"
+                        >
+                          {isSaving ? 'Disconnecting...' : `Disconnect ${connector.name}`}
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        {connector.fields.map((field) => (
+                          <div key={field.key}>
+                            <label className="block text-xs text-white/40 mb-1.5">{field.label}</label>
+                            <input
+                              type={field.type === 'password' ? 'password' : 'text'}
+                              value={currentData[field.key] ?? ''}
+                              onChange={(e) => setApiField(connector.id, field.key, e.target.value)}
+                              className="w-full bg-white/5 border border-white/10 rounded-sm px-4 py-2.5 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-white/20 transition-colors"
+                            />
+                          </div>
+                        ))}
+                        <button
+                          onClick={() => handleSaveApiConnector(connector)}
+                          disabled={isSaving}
+                          className="w-full px-4 py-2.5 bg-[#C6A664] text-black text-xs font-bold rounded-sm hover:bg-white transition-all disabled:opacity-40"
+                        >
+                          {isSaving ? 'Connecting...' : `Connect ${connector.name}`}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* ── Link Calendar to Email ────────────────────────────── */}
+        {(() => {
+          const connectedCalendar = apiConnectors.find((c) => c.category === 'calendar' && c.connected)
+          const connectedEmails = apiConnectors.filter((c) => c.category === 'email' && c.connected)
+          if (!connectedCalendar) return null
+
+          return (
+            <div className="glass rounded-sm border border-white/[0.06] p-6">
+              <h3 className="font-display font-semibold text-white mb-1">Link Calendar to Email</h3>
+              <p className="text-xs text-white/40 mb-4">
+                When linked, booking confirmations for events on {connectedCalendar.name} send from your own connected email instead of the platform default.
+              </p>
+
+              {linkMsg && (
+                <div className={`mb-4 px-3 py-2 rounded-sm text-xs ${
+                  linkMsg.type === 'ok'
+                    ? 'bg-[#C6A664]/10 text-[#C6A664] border border-[#C6A664]/20'
+                    : 'bg-red-500/10 text-red-400 border border-red-500/20'
+                }`}>
+                  {linkMsg.text}
+                </div>
+              )}
+
+              {connectedEmails.length === 0 ? (
+                <p className="text-xs text-white/30 italic">
+                  Connect an email account above (e.g. Gmail) to link it here.
+                </p>
+              ) : (
+                <div className="space-y-3">
+                  <select
+                    value={selectedEmailForCalendar}
+                    onChange={(e) => setSelectedEmailForCalendar(e.target.value)}
+                    className="w-full bg-white/5 border border-white/10 rounded-sm px-4 py-2.5 text-sm text-white focus:outline-none focus:border-white/20"
+                  >
+                    <option value="">No email linked</option>
+                    {connectedEmails.map((e) => (
+                      <option key={e.id} value={e.id}>{e.name}</option>
+                    ))}
+                  </select>
+                  <button
+                    onClick={() => handleLinkCalendarToEmail(connectedCalendar.id)}
+                    disabled={linkSaving}
+                    className="w-full px-4 py-2.5 bg-[#C6A664] text-black text-xs font-bold rounded-sm hover:bg-white transition-all disabled:opacity-40"
+                  >
+                    {linkSaving ? 'Saving...' : 'Save Link'}
+                  </button>
+                  {calendarLink?.email_connector_credential_id && (
+                    <p className="text-[11px] text-[#C6A664]/60 text-center">Currently linked</p>
+                  )}
+                </div>
+              )}
+            </div>
+          )
+        })()}
+
         {/* ── Discord Card ───────────────────────────────────── */}
         <div className="glass rounded-sm border border-white/[0.06] p-6">
           <div className="flex items-center gap-4 mb-6">

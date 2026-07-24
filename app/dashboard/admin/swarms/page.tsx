@@ -1,143 +1,60 @@
-'use client';
+'use client'
 
-import { useState, useEffect, Suspense } from 'react';
-import Link from 'next/link';
-import { useSearchParams, useRouter } from 'next/navigation';
-import { useVerticals } from '@/lib/verticals';
+import { useState } from 'react'
+import SwarmsTab from './SwarmsTab'
+import AdminMySwarmsPage from '../my-swarms/page'
+import AdminDepartmentsTab from './DepartmentsTab'
 
-function SwarmsContent() {
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const search = searchParams.get('search') || '';
-  const vertical = searchParams.get('vertical') || '';
+type Tab = 'swarms' | 'my_swarms' | 'departments'
 
-  const { verticals, loading: verticalsLoading } = useVerticals();
-  const [swarms, setSwarms] = useState<any[]>([]);
-  const [count, setCount] = useState(0);
-  const [loading, setLoading] = useState(true);
+const TABS: { key: Tab; label: string }[] = [
+  { key: 'swarms', label: 'Swarms' },
+  { key: 'my_swarms', label: 'My Deployments' },
+  { key: 'departments', label: 'Departments' },
+]
 
-  useEffect(() => {
-    setLoading(true);
-    const params = new URLSearchParams();
-    if (search) params.set('search', search);
-    if (vertical) params.set('vertical', vertical);
-
-    fetch(`/api/admin/swarms?${params.toString()}`)
-      .then(res => res.json())
-      .then(data => {
-        setSwarms(data.swarms || []);
-        setCount(data.count || 0);
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, [search, vertical]);
+/**
+ * Consolidated Swarms & Departments page -- folds the previously-separate
+ * Swarms and My Swarms admin pages together with a new Departments tab
+ * (departments had no admin UI at all before this). The old standalone
+ * /dashboard/admin/my-swarms route still exists and works if linked
+ * directly, it's just no longer a separate nav entry.
+ */
+export default function AdminSwarmsConsolidatedPage() {
+  const [tab, setTab] = useState<Tab>('swarms')
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="font-display text-2xl font-bold tracking-tight text-white">Swarms</h1>
-          <p className="text-white/40 text-sm mt-1">Manage {count || 0} agent swarms</p>
-        </div>
-        <Link
-          href="/dashboard/admin/swarms/new"
-          className="px-4 py-2 text-sm font-medium bg-[#C6A664] text-black rounded-sm hover:bg-white transition-colors font-bold"
-        >
-          + New Swarm
-        </Link>
+    <div className="max-w-6xl mx-auto animate-fade-in">
+      <div className="mb-6">
+        <h1 className="font-display text-2xl font-bold tracking-tight text-white">Swarms &amp; Departments</h1>
+        <p className="text-white/40 text-sm mt-1">Swarm templates, your own deployments, and cross-client department oversight</p>
       </div>
 
-      {/* Filters */}
-      <div className="flex gap-3">
-        <input
-          type="text"
-          defaultValue={search}
-          placeholder="Search swarms..."
-          className="bg-white/5 border border-white/10 rounded-sm px-3 py-2 text-sm text-white/70 placeholder-white/30"
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              const params = new URLSearchParams();
-              if (e.currentTarget.value) params.set('search', e.currentTarget.value);
-              if (vertical) params.set('vertical', vertical);
-              router.push(`/dashboard/admin/swarms?${params.toString()}`);
-            }
-          }}
-        />
-        <select
-          value={vertical}
-          onChange={(e) => {
-            const params = new URLSearchParams();
-            if (search) params.set('search', search);
-            if (e.target.value) params.set('vertical', e.target.value);
-            router.push(`/dashboard/admin/swarms?${params.toString()}`);
-          }}
-          className="bg-white/5 border border-white/10 rounded-sm px-3 py-2 text-sm text-white/70"
-        >
-          <option value="">All Verticals</option>
-          {verticalsLoading ? (
-            <option value="" disabled>Loading...</option>
-          ) : (
-            verticals.map((v) => (
-              <option key={v.key || v.id} value={v.key || v.id}>{v.name}</option>
-            ))
-          )}
-        </select>
+      <div className="flex gap-1 mb-8 border-b border-white/[0.06]">
+        {TABS.map((t) => (
+          <button
+            key={t.key}
+            onClick={() => setTab(t.key)}
+            className={`px-5 py-3 text-sm font-medium tracking-wide transition-all border-b-2 -mb-px ${
+              tab === t.key
+                ? 'border-[#C6A664] text-white'
+                : 'border-transparent text-white/40 hover:text-white/70'
+            }`}
+          >
+            {t.label}
+          </button>
+        ))}
       </div>
 
-      {loading ? (
-        <div className="text-center py-12 text-white/30 text-sm">Loading...</div>
-      ) : swarms.length === 0 ? (
-        <div className="text-center py-12 text-white/30 text-sm">No swarms found</div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {swarms.map((swarm: any) => (
-            <div key={swarm.key} className="glass rounded-sm p-6 border border-white/[0.06]">
-              <div className="flex items-start justify-between">
-                <div>
-                  <h3 className="font-bold text-lg text-white/80">{swarm.name}</h3>
-                  <p className="text-sm text-white/40 mt-1 font-mono">{swarm.key}</p>
-                </div>
-                <span className={`px-2 py-0.5 rounded text-xs font-medium border ${
-                  swarm.is_active ? 'bg-green-500/10 text-green-400 border-green-500/20' : 'bg-white/5 text-white/40 border-white/10'
-                }`}>
-                  {swarm.is_active ? 'Active' : 'Inactive'}
-                </span>
-              </div>
-
-              <div className="mt-4">
-                <div className="text-sm text-white/50 mb-2">Agent Members ({swarm.member_agents?.length || 0})</div>
-                <div className="flex flex-wrap gap-1">
-                  {swarm.member_agents?.slice(0, 5).map((agent: string) => (
-                    <span key={agent} className="px-2 py-0.5 bg-white/5 text-white/60 border border-white/10 rounded text-xs font-mono">{agent}</span>
-                  ))}
-                  {swarm.member_agents?.length > 5 && (
-                    <span className="px-2 py-0.5 bg-white/5 text-white/30 border border-white/10 rounded text-xs">+{swarm.member_agents.length - 5} more</span>
-                  )}
-                </div>
-              </div>
-
-              {swarm.vertical_key && (
-                <div className="mt-3">
-                  <span className="px-2 py-0.5 bg-purple-500/10 text-purple-400 border border-purple-500/20 rounded text-xs">{swarm.vertical_key}</span>
-                </div>
-              )}
-
-              <div className="mt-4 flex gap-2">
-                <Link href={`/dashboard/admin/swarms/${swarm.key}`} className="text-sm text-blue-400 hover:text-blue-300">Edit</Link>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+      <div className={tab === 'swarms' ? '' : 'hidden'}>
+        <SwarmsTab />
+      </div>
+      <div className={tab === 'my_swarms' ? '' : 'hidden'}>
+        <AdminMySwarmsPage />
+      </div>
+      <div className={tab === 'departments' ? '' : 'hidden'}>
+        <AdminDepartmentsTab />
+      </div>
     </div>
-  );
-}
-
-export default function SwarmsPage() {
-  return (
-    <Suspense fallback={<div className="p-6 text-white/30 text-sm">Loading swarms...</div>}>
-      <SwarmsContent />
-    </Suspense>
-  );
+  )
 }

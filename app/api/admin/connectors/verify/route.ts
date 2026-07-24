@@ -7,10 +7,23 @@ export async function POST(request: NextRequest) {
     const auth = await requireAdmin()
     if (auth instanceof NextResponse) return auth
     const body = await request.json()
-    const { platform, config_data } = body
+    const { platform } = body
+    let { config_data } = body
 
     if (!platform) {
       return NextResponse.json({ error: 'platform is required' }, { status: 400 })
+    }
+
+    // Fall back to the saved config if the caller didn't send form data
+    // (e.g. testing a connector that was configured previously and hasn't
+    // been re-entered in the form this session).
+    if (!config_data || Object.keys(config_data).length === 0) {
+      const { data: saved } = await supabaseAdmin
+        .from('connector_configs')
+        .select('config_data')
+        .eq('platform', platform)
+        .maybeSingle()
+      config_data = saved?.config_data ?? {}
     }
 
     const results: Record<string, any> = {}
@@ -74,6 +87,47 @@ export async function POST(request: NextRequest) {
       } else {
         results.connected = false
         results.detail = 'Missing phone number ID or access token'
+      }
+    }
+
+    if (platform === 'google_calendar') {
+      const serviceAccountRaw = config_data?.service_account_json
+      const calendarId = config_data?.calendar_id || 'primary'
+      if (serviceAccountRaw) {
+        try {
+          const serviceAccountJson = typeof serviceAccountRaw === 'string' ? JSON.parse(serviceAccountRaw) : serviceAccountRaw
+          const { google } = await import('googleapis')
+          const auth2 = new google.auth.JWT({
+            email: serviceAccountJson.client_email,
+            key: serviceAccountJson.private_key,
+            scopes: ['https://www.googleapis.com/auth/calendar.readonly'],
+          })
+          const calendar = google.calendar({ version: 'v3', auth: auth2 })
+          const res = await calendar.calendars.get({ calendarId })
+          results.connected = true
+          results.detail = `Connected: ${res.data.summary ?? calendarId}`
+        } catch (e: any) {
+          results.connected = false
+          results.detail = e.message?.includes('JSON') ? 'Invalid service account JSON' : e.message
+        }
+      } else {
+        results.connected = false
+        results.detail = 'Missing service account JSON'
+      }
+    }
+
+    if (platform === 'email') {
+      const { smtp_host, smtp_port, smtp_username, smtp_password } = config_data ?? {}
+      if (smtp_host && smtp_port && smtp_username && smtp_password) {
+        // No SMTP client library is installed in this codebase yet
+        // (nodemailer or similar) -- this confirms the fields are present
+        // rather than performing a live connection test. Add nodemailer as
+        // a dependency to upgrade this to a real handshake test.
+        results.connected = true
+        results.detail = `Configuration complete (${smtp_host}:${smtp_port}) -- fields present, not a live connection test`
+      } else {
+        results.connected = false
+        results.detail = 'Missing SMTP host, port, username, or password'
       }
     }
 

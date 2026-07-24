@@ -9,6 +9,7 @@ const ROLE_COLOR: Record<string, string> = {
   creator: '#5E8B84',
   client: '#C6A664',
   personal: '#B5764A',
+  collective: '#8B7AA8',
 }
 
 interface QuickAction {
@@ -41,6 +42,12 @@ const QUICK_ACTIONS: Record<string, QuickAction[]> = {
     { title: 'My Hub', desc: 'Your personal intelligence hub', href: '/dashboard/personal', icon: '✦' },
     { title: 'Profile', desc: 'Manage your personal profile', href: '/dashboard/personal/profile', icon: '◈' },
     { title: 'Settings', desc: 'Account & privacy settings', href: '/dashboard/personal/settings', icon: '⊙' },
+  ],
+  collective: [
+    { title: 'Members', desc: 'Manage roles and invitations', href: '/dashboard/client/organization', icon: '✦' },
+    { title: 'Workstations', desc: 'Breakout groups -- Board, Committees, sub-teams', href: '/dashboard/collective/workstations', icon: '⊞' },
+    { title: 'Essence Intel', desc: 'Collective intelligence briefings', href: '/dashboard/collective/essence', icon: '⊙' },
+    { title: 'Governance', desc: 'Roles, activity, and decisions', href: '/dashboard/collective/governance', icon: '⚖' },
   ],
 }
 

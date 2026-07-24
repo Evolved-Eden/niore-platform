@@ -102,22 +102,29 @@ async function getOrCreateOrg(userId: string, userName: string) {
 // supports multiple concurrent OS's on one org (personal_os + family_os +
 // creator_os all at once) and doubles as the Blueprint Passive/Active/
 // Mastered state per system.
-async function activateOsPackage(params: {
+async function activateEssintelligence(params: {
   organizationId: string
-  osPackageKey: string
+  essintelligenceKey: string
   tierLevel?: 'standard' | 'prime' | 'elite'
   source?: string
 }) {
-  const { organizationId, osPackageKey, tierLevel = 'standard', source = 'checkout' } = params
-  if (!organizationId || !osPackageKey) return null
+  const { organizationId, essintelligenceKey, tierLevel = 'standard', source = 'checkout' } = params
+  if (!organizationId || !essintelligenceKey) return null
 
-  const { data } = await supabaseAdmin
-    .from('organization_os_activations')
+  // NOTE: this used to query `organization_os_activations`, a table that
+  // never existed -- the real table has always been `os_activations`
+  // (renamed to `organization_essintelligence_activations`). Because the
+  // old code only destructured `data` and never checked `error`, every
+  // checkout silently failed to activate anything and nothing surfaced.
+  // Fixed here: correct table name, and errors now throw instead of being
+  // swallowed, so a real failure is visible in logs/monitoring again.
+  const { data, error } = await supabaseAdmin
+    .from('organization_essintelligence_activations')
     .upsert(
       {
         organization_id: organizationId,
-        item_type: 'os_package',
-        item_key: osPackageKey,
+        item_type: 'essintelligence',
+        item_key: essintelligenceKey,
         tier_level: tierLevel,
         state: 'active',
         source,
@@ -128,6 +135,11 @@ async function activateOsPackage(params: {
     )
     .select()
     .single()
+
+  if (error) {
+    console.error('activateEssintelligence failed:', error)
+    throw error
+  }
 
   return data
 }
@@ -481,17 +493,63 @@ export async function POST(req: Request) {
       await upsertClientTwin(userId, org.id)
       await createZuriAgent(userId, org.id)
 
-      // Record the OS activation (supports multiple concurrent OS's per org/human,
-      // and is the Blueprint Passive/Active/Mastered state tracker).
+      // Core Essintelligence build: buying a membership tier means the
+      // corresponding system build gets activated -- this is the mechanism
+      // for "membership tier purchase = core system build". Wrapped in
+      // try/catch (not left to throw uncaught) so a failure here is now
+      // loud (logged, unlike before) without blocking the rest of
+      // provisioning -- Twin/Zuri are already created above regardless.
       if (tier) {
-        await activateOsPackage({ organizationId: org.id, osPackageKey: tier, source: 'checkout' })
+        try {
+          await activateEssintelligence({ organizationId: org.id, essintelligenceKey: tier, source: 'checkout' })
+        } catch (err) {
+          console.error(`Essintelligence activation failed for tier ${tier}, org ${org.id}:`, err)
+        }
       }
 
-      // Addons purchased alongside the base tier (e.g. someone on personal_os
-      // also adding family_os + creator_os) each get their own activation row,
-      // so one org/human can hold several OS's concurrently.
+      // Essintelligence Modules purchased alongside the base tier (optional
+      // deeper-build layers on top of the core build -- formerly sold as
+      // standalone "OS Packages") each get their own activation row, so one
+      // org/human can hold several concurrently.
       for (const addonKey of addons) {
-        await activateOsPackage({ organizationId: org.id, osPackageKey: addonKey, source: 'checkout_addon' })
+        try {
+          await activateEssintelligence({ organizationId: org.id, essintelligenceKey: addonKey, source: 'checkout_addon' })
+        } catch (err) {
+          console.error(`Essintelligence module activation failed for ${addonKey}, org ${org.id}:`, err)
+        }
+      }
+
+      // Connector Pack is a stackable usage pack (+100 DMs / +200 emails per
+      // purchase), not an Essintelligence Module -- tracked as a plain
+      // incrementing counter on the client row
+      // (clients.connector_pack_quantity), read by
+      // check_and_increment_connector_usage() at send time. Kept separate
+      // from activateEssintelligence on purpose -- Connector Pack applies
+      // uniformly across tiers, not as a per-tier build layer.
+      const connectorPackCount = addons.filter((a: string) => a === 'connector_pack' || a === 'connector-pack').length
+      if (connectorPackCount > 0) {
+        await supabaseAdmin.rpc('increment', {
+          table_name: 'clients',
+          row_id: userId,
+          column_name: 'connector_pack_quantity',
+          amount: connectorPackCount,
+        }).then(async (res: any) => {
+          // Fallback if a generic increment() RPC doesn't exist in this
+          // project -- do it as a plain read-then-write instead. Less safe
+          // under concurrency than an atomic RPC, acceptable for a
+          // low-frequency purchase event.
+          if (res.error) {
+            const { data: current } = await supabaseAdmin
+              .from('clients')
+              .select('connector_pack_quantity')
+              .eq('id', userId)
+              .single()
+            await supabaseAdmin
+              .from('clients')
+              .update({ connector_pack_quantity: (current?.connector_pack_quantity ?? 0) + connectorPackCount })
+              .eq('id', userId)
+          }
+        })
       }
 
       // additional_intelligence: was priced (see ADDON_AMOUNTS) but never

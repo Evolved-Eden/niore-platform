@@ -178,7 +178,7 @@ export async function POST(request: NextRequest) {
     const body: Record<string, unknown> = await request.json()
     const userId = body.userId as string
     const email = body.email as string
-    const planTierKey = (body.planTierKey as string) || 'client_enterprise'
+    const planTierKey = (body.planTierKey as string) || 'client_founder'
     const role = (body.role as string) || 'client'
     const verticalKey = (body.verticalKey as string) || null
     const swarmKey = (body.swarmKey as string) || null

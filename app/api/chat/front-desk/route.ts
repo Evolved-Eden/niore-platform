@@ -66,7 +66,7 @@ After the walkthrough, say:
 Then recommend their plan options. Be specific about what they get:
 - **Solo/Founder**: 1 intelligence (twin), 1 district, 1 suite, 1 vertical, 1 engine, 1 worker
 - **Team**: 3 agents, 2 generators, team collaboration, swarm deployment
-- **Enterprise**: unlimited agents & swarms, multi-vertical, custom development, dedicated architect
+- **Enterprise**: custom agent & swarm scale, multi-vertical, custom development, dedicated architect
 
 End with: "Ready to see your pricing and get started? I'll take you there."
 

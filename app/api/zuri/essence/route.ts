@@ -688,6 +688,12 @@ export async function POST(req: NextRequest) {
     // app/dashboard/admin/essence/page.tsx sends client_id instead of userId --
     // accept both rather than silently no-op'ing on a mismatched field name.
     const userId: string | undefined = body.userId || body.client_id
+    // Real context scoping: null/undefined = Personal (memories with no org
+    // attached). A real organization_id = that org's context -- which
+    // could be the person's Business, or a Collective they belong to, or
+    // any other organization_members row. Not a fixed 3-way enum -- driven
+    // by the person's actual memberships (see admin/essence/page.tsx).
+    const organizationId: string | null = body.organizationId ?? null
 
     const internalSecret = req.headers.get('x-internal-cron-secret')
     const isInternalServiceCall =
@@ -856,14 +862,23 @@ export async function POST(req: NextRequest) {
     }
 
     // Fetch recent memories from ai_memories (use admin client to bypass RLS)
+    // Scoped by context: personal memories (organization_id IS NULL) vs a
+    // specific org/collective's memories -- so a Business owner's personal
+    // reflections don't bleed into their org-level essence generation.
     try {
       const { supabaseAdmin } = await import('@/lib/supabase/admin')
-      const { data: memories } = await supabaseAdmin
+      let memoryQuery = supabaseAdmin
         .from('ai_memories')
         .select('content, memory_type')
         .eq('entity_id', userId)
         .order('created_at', { ascending: false })
         .limit(5)
+
+      memoryQuery = organizationId
+        ? memoryQuery.eq('organization_id', organizationId)
+        : memoryQuery.is('organization_id', null)
+
+      const { data: memories } = await memoryQuery
 
       if (memories?.length) {
         recentMemories = memories.map(m => `[${m.memory_type}] ${m.content}`)
@@ -890,6 +905,7 @@ export async function POST(req: NextRequest) {
 
     const prompt = `Generate an Essence Board for a ${userRole ?? 'user'} in the Evolved Eden intelligence ecosystem.
 ${horizonInstruction}
+${organizationId ? `\nContext: Organization/Collective-level intelligence (org id ${organizationId}) -- focus on shared, group-level priorities, not individual personal reflection.` : `\nContext: Personal intelligence -- individual priorities, not organizational.`}
 ${context ? `\nUser context: ${context}` : ''}
 ${lensContext ? `\nProfile data:\n${lensContext}` : ''}
 ${userId ? `\nUser ID: ${userId}` : ''}${memoryBlock}`

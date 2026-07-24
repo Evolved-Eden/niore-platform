@@ -46,7 +46,7 @@ export const FAQ_CATEGORIES: FaqCategory[] = [
       },
       {
         q: "How many agents can I have?",
-        a: "The Founder plan includes 1 intelligence instance with 3 agent slots. Teams get 3 agents with swarm deployment. Enterprise has unlimited agents and swarms. You can always add more agents as add-ons regardless of your plan.",
+        a: "The Founder plan includes 1 intelligence instance with 3 agent slots. Teams get 3 agents with swarm deployment. Enterprise has custom agent and swarm scale. You can always add more agents as add-ons regardless of your plan.",
         tags: ["agents", "limit", "slots", "how many"],
       },
       {
@@ -83,7 +83,7 @@ export const FAQ_CATEGORIES: FaqCategory[] = [
       },
       {
         q: "What is Business OS?",
-        a: "Business OS is our enterprise-grade tier for organizations requiring dedicated deployment, multi-vertical orchestration, white-label capabilities, and full governance. It includes unlimited agents, swarms, memory, and a dedicated intelligence architect. Custom pricing — available when your blueprint score is 85+ or you need Enterprise scale.",
+        a: "Business OS is our enterprise-grade tier for organizations requiring dedicated deployment, multi-vertical orchestration, white-label capabilities, and full governance. It includes custom agent, swarm, and memory scale, plus a dedicated intelligence architect. Custom pricing -- available when your blueprint score is 85+ or you need Enterprise scale.",
         tags: ["business os", "enterprise", "custom"],
       },
     ],

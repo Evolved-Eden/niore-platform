@@ -47,6 +47,15 @@ export default function AdminEssencePage() {
   const [generating, setGenerating] = useState(false)
   const [range, setRange] = useState<EssenceRange>('daily')
 
+  // ── Context switcher: Personal vs real Organization/Collective memberships ──
+  // The same person can hold multiple intelligence contexts at once -- their
+  // own Personal essence, their Business's, a Family Collective they belong
+  // to. This is driven by their actual organization_members rows, not a
+  // fixed enum -- a person could belong to 0, 1, or several organizations.
+  type ContextOption = { id: string | null; label: string; type: string | null }
+  const [contextOptions, setContextOptions] = useState<ContextOption[]>([{ id: null, label: 'Personal', type: null }])
+  const [activeContext, setActiveContext] = useState<ContextOption>({ id: null, label: 'Personal', type: null })
+
   // Generated essence
   const [dailyItems, setDailyItems] = useState<DailyEssenceItem[]>([])
   const [dailyQuestion, setDailyQuestion] = useState('')
@@ -82,6 +91,23 @@ export default function AdminEssencePage() {
         .eq('client_id', user.id)
         .order('created_at', { ascending: false })
       if (essenceRows) setStoredItems(essenceRows as EssenceRow[])
+
+      // Real memberships -- however many organizations/collectives this
+      // person actually belongs to, not a fixed enum.
+      const { data: memberships } = await supabase
+        .from('organization_members')
+        .select('organization_id, organizations:organization_id(name, organization_type)')
+        .eq('user_id', user.id)
+        .eq('status', 'active')
+
+      if (memberships?.length) {
+        const orgOptions: ContextOption[] = memberships.map((m: any) => ({
+          id: m.organization_id,
+          label: m.organizations?.name ?? 'Organization',
+          type: m.organizations?.organization_type ?? null,
+        }))
+        setContextOptions([{ id: null, label: 'Personal', type: null }, ...orgOptions])
+      }
 
       setLoading(false)
     }
@@ -121,7 +147,7 @@ export default function AdminEssencePage() {
       const res = await fetch('/api/zuri/essence', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: user.id, userRole: 'admin', range }),
+        body: JSON.stringify({ userId: user.id, userRole: 'admin', range, organizationId: activeContext.id }),
       })
 
       if (res.ok) {
@@ -165,6 +191,21 @@ export default function AdminEssencePage() {
         </div>
 
         <div className="flex items-center gap-2">
+          {/* Context switcher: Personal + each real organization/collective membership */}
+          <div className="flex items-center gap-1 bg-white/[0.04] rounded-sm p-1 border border-white/[0.06]">
+            {contextOptions.map((opt) => (
+              <button
+                key={opt.id ?? 'personal'}
+                onClick={() => setActiveContext(opt)}
+                title={opt.type ? `${opt.label} (${opt.type})` : opt.label}
+                className={`px-3 py-1.5 text-xs font-medium rounded-sm transition-colors ${
+                  activeContext.id === opt.id ? 'bg-[#C6A664] text-black' : 'text-white/50 hover:text-white/80'
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
           {/* Range selector */}
           <div className="flex items-center gap-1 bg-white/[0.04] rounded-sm p-1 border border-white/[0.06]">
             {(['daily', 'weekly', 'monthly'] as EssenceRange[]).map((r) => (
@@ -188,6 +229,13 @@ export default function AdminEssencePage() {
           </button>
         </div>
       </div>
+
+      {activeContext.id !== null && (
+        <div className="mb-6 px-4 py-3 rounded-sm bg-[#C6A664]/5 border border-[#C6A664]/15 text-sm">
+          <span className="text-[#C6A664] font-medium">{activeContext.label} context</span>
+          <span className="text-white/40"> -- generation and memory below are scoped to this organization, separate from your Personal essence.</span>
+        </div>
+      )}
 
       {/* Generated Essence Board */}
       {dailyItems.length > 0 && (

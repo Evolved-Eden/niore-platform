@@ -26,8 +26,12 @@ function price(key: string): string {
 }
 
 // ── Plan Tiers (Membership Subscriptions) ──────────────────
-// Keys match membership_tier.key in the database.
-// These are the "EE_MEM_*" products.
+// SOURCE OF TRUTH: Supabase `membership_tiers` table, joined with
+// `catalog_pricing` for the live price. This file used to hardcode plan
+// tiers directly, which is how it drifted from the real catalog (see
+// app/api/blueprint/pricing/route.ts history). getPlanTiers() now fetches
+// from Supabase with a short in-memory cache, falling back to the static
+// PLAN_TIERS_FALLBACK map below only if the DB is unreachable.
 export interface PlanTier {
   key: string
   name: string
@@ -38,28 +42,91 @@ export interface PlanTier {
   popular?: boolean
 }
 
-export const PLAN_TIERS: Record<string, PlanTier> = {
-  // ── Client Path ──
+let _planTiersCache: { data: Record<string, PlanTier>; expiresAt: number } | null = null
+const PLAN_TIERS_CACHE_TTL_MS = 5 * 60 * 1000 // 5 min
+
+async function fetchPlanTiersFromSupabase(): Promise<Record<string, PlanTier> | null> {
+  try {
+    // Lazy import so this file stays safe to import from contexts without
+    // the service role key (e.g. edge/client bundles that only use the
+    // static helpers below).
+    const { supabaseAdmin } = await import('@/lib/supabase/admin')
+    const { data, error } = await supabaseAdmin
+      .from('membership_tiers')
+      .select('key, name, tier_type, price_sweet_spot, billing_interval, stripe_price_id, status')
+      .eq('status', 'active')
+
+    if (error || !data) {
+      console.error('[lib/pricing] Supabase fetch failed, using static fallback:', error?.message)
+      return null
+    }
+
+    const result: Record<string, PlanTier> = {}
+    for (const row of data as any[]) {
+      // Custom/negotiated tiers (Enterprise, Concierge) have non-numeric
+      // price_sweet_spot values ("custom", "custom (~$4,500/mo)") -- these
+      // are intentionally excluded from checkout line items and handled via
+      // the consultation/concierge booking flow instead.
+      const numeric = parseFloat(String(row.price_sweet_spot).replace(/[^0-9.]/g, ''))
+      if (!row.price_sweet_spot || isNaN(numeric)) continue
+
+      result[row.key] = {
+        key: row.key,
+        name: row.name,
+        path: row.tier_type,
+        amount: Math.round(numeric * 100),
+        stripePriceId: row.stripe_price_id || price(row.key.toUpperCase()),
+        recurring: row.billing_interval === 'month' || row.billing_interval === 'year',
+      }
+    }
+    return result
+  } catch (err) {
+    console.error('[lib/pricing] Supabase fetch threw, using static fallback:', err)
+    return null
+  }
+}
+
+/** Get all plan tiers, sourced from Supabase (cached ~5min), falling back to static data if the DB is unreachable. */
+export async function getPlanTiers(): Promise<Record<string, PlanTier>> {
+  if (_planTiersCache && _planTiersCache.expiresAt > Date.now()) {
+    return _planTiersCache.data
+  }
+  const fromDb = await fetchPlanTiersFromSupabase()
+  const data = fromDb ?? PLAN_TIERS_FALLBACK
+  _planTiersCache = { data, expiresAt: Date.now() + PLAN_TIERS_CACHE_TTL_MS }
+  return data
+}
+
+// Static fallback only -- not the source of truth. Used when Supabase is
+// unreachable. Update Supabase (membership_tiers) to change real pricing;
+// this map existing is a safety net, not a second place to edit prices.
+export const PLAN_TIERS_FALLBACK: Record<string, PlanTier> = {
+  // ── Client / Business Path ──
+  // Business Essintelligence is now a single tier. The key stays
+  // `client_founder` (not renamed) because ~12 files reference it as the
+  // default/fallback plan key (onboarding, admin UI, dashboards) -- renaming
+  // the key would silently break those call sites. Only name/amount changed.
   client_founder: {
     key: 'client_founder',
-    name: 'Client Founder',
+    name: 'Business Essintelligence',
     path: 'client',
-    amount: 49700,
-    stripePriceId: price('CLIENT_FOUNDER'),
-    recurring: true,
-  },
-  client_groups: {
-    key: 'client_groups',
-    name: 'Client Groups',
-    path: 'client',
-    amount: 250000,
-    stripePriceId: price('CLIENT_GROUPS'),
+    amount: 199700,
+    stripePriceId: price('BUSINESS_ESSINTELLIGENCE'),
     recurring: true,
     popular: true,
   },
+  // client_groups retired -- Groups/multi-org management moved to the new
+  // Collective path (see collective_core/growth/scale below). Not
+  // referenced anywhere else in the codebase, safe to remove outright.
+
+  // client_enterprise kept alive (referenced in admin/dashboard/onboarding
+  // as a selectable "Enterprise" option) but repositioned as the
+  // custom/sales-negotiated escape valve above Business Essintelligence,
+  // not a second standard catalog tier. Amount below is a display anchor
+  // only -- actual enterprise deals are negotiated, not self-serve checkout.
   client_enterprise: {
     key: 'client_enterprise',
-    name: 'Client Enterprise',
+    name: 'Business Essintelligence — Enterprise Custom',
     path: 'client',
     amount: 500000,
     stripePriceId: price('CLIENT_ENTERPRISE'),
@@ -71,7 +138,7 @@ export const PLAN_TIERS: Record<string, PlanTier> = {
     key: 'creator_studio',
     name: 'Creator Studio',
     path: 'creator',
-    amount: 4900,
+    amount: 14900,
     stripePriceId: price('CREATOR_STUDIO'),
     recurring: true,
   },
@@ -79,7 +146,7 @@ export const PLAN_TIERS: Record<string, PlanTier> = {
     key: 'creator_premium',
     name: 'Creator Premium',
     path: 'creator',
-    amount: 29700,
+    amount: 44900,
     stripePriceId: price('CREATOR_PREMIUM'),
     recurring: true,
     popular: true,
@@ -88,7 +155,7 @@ export const PLAN_TIERS: Record<string, PlanTier> = {
     key: 'creator_concierge',
     name: 'Creator Concierge',
     path: 'creator',
-    amount: 400000,
+    amount: 450000,
     stripePriceId: price('CREATOR_CONCIERGE'),
     recurring: true,
   },
@@ -98,7 +165,7 @@ export const PLAN_TIERS: Record<string, PlanTier> = {
     key: 'personal_solo',
     name: 'Personal Solo',
     path: 'personal',
-    amount: 4900,
+    amount: 12900,
     stripePriceId: price('PERSONAL_SOLO'),
     recurring: true,
   },
@@ -106,7 +173,7 @@ export const PLAN_TIERS: Record<string, PlanTier> = {
     key: 'personal_partner',
     name: 'Personal Partner',
     path: 'personal',
-    amount: 7900,
+    amount: 19900,
     stripePriceId: price('PERSONAL_PARTNER'),
     recurring: true,
     popular: true,
@@ -115,7 +182,7 @@ export const PLAN_TIERS: Record<string, PlanTier> = {
     key: 'personal_family',
     name: 'Personal Family',
     path: 'personal',
-    amount: 9900,
+    amount: 24900,
     stripePriceId: price('PERSONAL_FAMILY'),
     recurring: true,
   },
@@ -133,16 +200,44 @@ export const PLAN_TIERS: Record<string, PlanTier> = {
     key: 'affiliate_plug',
     name: 'Affiliate Plug',
     path: 'affiliate',
-    amount: 14900,
+    amount: 17900,
     stripePriceId: price('AFFILIATE_PLUG'),
     recurring: true,
     popular: true,
   },
+
+  // ── Collective Path (new) ──
+  collective_core: {
+    key: 'collective_core',
+    name: 'Collective Core',
+    path: 'collective',
+    amount: 79900,
+    stripePriceId: price('COLLECTIVE_CORE'),
+    recurring: true,
+  },
+  collective_growth: {
+    key: 'collective_growth',
+    name: 'Collective Growth',
+    path: 'collective',
+    amount: 149900,
+    stripePriceId: price('COLLECTIVE_GROWTH'),
+    recurring: true,
+    popular: true,
+  },
+  collective_scale: {
+    key: 'collective_scale',
+    name: 'Collective Scale',
+    path: 'collective',
+    amount: 299900,
+    stripePriceId: price('COLLECTIVE_SCALE'),
+    recurring: true,
+  },
 }
 
-// ── OS Packages ─────────────────────────────────────────────
-// Keys map to catalog_items.slug. These are "EE_OS_*" products.
-export interface OSPackage {
+// ── Essintelligence Modules (formerly "OS Packages") ────────
+// SOURCE OF TRUTH: Supabase `catalog_items` where catalog_type = 'essintelligence_module'.
+// Keys are catalog_items.slug with dashes converted to underscores.
+export interface EssintelligenceModule {
   key: string
   name: string
   amount: number
@@ -151,7 +246,67 @@ export interface OSPackage {
   description?: string
 }
 
-export const OS_PACKAGES: Record<string, OSPackage> = {
+// ── Generic catalog_items-by-type fetcher (shared by OS/Addons/Standalone/Specialty) ──
+async function fetchCatalogItemsByType(typeKey: string): Promise<Array<{
+  slug: string
+  name: string
+  base_price: number | null
+  pricing_type: string
+  description: string | null
+}> | null> {
+  try {
+    const { supabaseAdmin } = await import('@/lib/supabase/admin')
+    const { data, error } = await supabaseAdmin
+      .from('catalog_items')
+      .select('slug, name, base_price, pricing_type, description, catalog_types!inner(type_key)')
+      .eq('catalog_types.type_key', typeKey)
+      .eq('active', true)
+
+    if (error || !data) {
+      console.error(`[lib/pricing] Supabase fetch failed for catalog type "${typeKey}", using static fallback:`, error?.message)
+      return null
+    }
+    return data as any
+  } catch (err) {
+    console.error(`[lib/pricing] Supabase fetch threw for catalog type "${typeKey}", using static fallback:`, err)
+    return null
+  }
+}
+
+let _essintelligenceModulesCache: { data: Record<string, EssintelligenceModule>; expiresAt: number } | null = null
+const CATALOG_CACHE_TTL_MS = 5 * 60 * 1000 // 5 min
+
+async function fetchEssintelligenceModulesFromSupabase(): Promise<Record<string, EssintelligenceModule> | null> {
+  const rows = await fetchCatalogItemsByType('essintelligence_module')
+  if (!rows) return null
+  const result: Record<string, EssintelligenceModule> = {}
+  for (const row of rows) {
+    if (row.base_price == null) continue
+    const key = row.slug.replace(/-/g, '_')
+    result[key] = {
+      key,
+      name: row.name,
+      amount: Math.round(row.base_price * 100),
+      stripePriceId: price(key.toUpperCase()),
+      recurring: row.pricing_type === 'monthly',
+      description: row.description ?? undefined,
+    }
+  }
+  return result
+}
+
+/** Get all OS packages, sourced from Supabase (cached ~5min), falling back to static data if the DB is unreachable. */
+export async function getEssintelligenceModules(): Promise<Record<string, EssintelligenceModule>> {
+  if (_essintelligenceModulesCache && _essintelligenceModulesCache.expiresAt > Date.now()) return _essintelligenceModulesCache.data
+  const fromDb = await fetchEssintelligenceModulesFromSupabase()
+  const data = fromDb ?? ESSINTELLIGENCE_MODULES_FALLBACK
+  _essintelligenceModulesCache = { data, expiresAt: Date.now() + CATALOG_CACHE_TTL_MS }
+  return data
+}
+
+// Static fallback only -- not the source of truth. Update Supabase
+// (catalog_items where catalog_type = 'essintelligence_module') to change real pricing.
+const ESSINTELLIGENCE_MODULES_FALLBACK: Record<string, EssintelligenceModule> = {
   personal_os:       { key: 'personal_os',        name: 'Personal OS',       amount: 4900,  stripePriceId: price('PERSONAL_OS'),        recurring: true },
   affiliate_program_os: { key: 'affiliate_program_os', name: 'Affiliate Program OS', amount: 4900,  stripePriceId: price('AFFILIATE_PROGRAM_OS'), recurring: true },
   wellness_os:       { key: 'wellness_os',        name: 'Wellness OS',       amount: 4900,  stripePriceId: price('WELLNESS_OS'),        recurring: true },
@@ -184,6 +339,16 @@ export const OS_PACKAGES: Record<string, OSPackage> = {
 }
 
 // ── Add-ons (Platform Features + Usage Packs) ──────────────
+// SOURCE OF TRUTH: Supabase `catalog_items` where catalog_type is
+// 'platform_feature' or 'usage_pack'. Keys are catalog_items.slug with
+// dashes converted to underscores (e.g. 'additional-ai-twin' -> 'additional_ai_twin').
+//
+// The old static version of this file also carried a "Legacy add-on IDs"
+// block (additional_agent, additional_swarm, twin_expansion, sdk_api, etc.)
+// that didn't correspond to anything in the real catalog -- those are
+// dropped, not migrated. If something still references those old ids
+// (e.g. app/api/blueprint/pricing/route.ts's ADDON_RECS used to), it needs
+// updating to the canonical ids below.
 export interface Addon {
   id: string
   name: string
@@ -194,8 +359,44 @@ export interface Addon {
   description?: string
 }
 
-export const ADDONS: Record<string, Addon> = {
-  // Platform Features
+let _addonsCache: { data: Record<string, Addon>; expiresAt: number } | null = null
+
+async function fetchAddonsFromSupabase(): Promise<Record<string, Addon> | null> {
+  const [features, usagePacks] = await Promise.all([
+    fetchCatalogItemsByType('platform_feature'),
+    fetchCatalogItemsByType('usage_pack'),
+  ])
+  if (!features || !usagePacks) return null
+
+  const result: Record<string, Addon> = {}
+  for (const row of [...features, ...usagePacks]) {
+    if (row.base_price == null) continue
+    const id = row.slug.replace(/-/g, '_')
+    result[id] = {
+      id,
+      name: row.name,
+      amount: Math.round(row.base_price * 100),
+      stripePriceId: price(id.toUpperCase()),
+      recurring: row.pricing_type === 'monthly',
+      description: row.description ?? undefined,
+    }
+  }
+  return result
+}
+
+/** Get all add-ons (platform features + usage packs), sourced from Supabase (cached ~5min), falling back to static data if the DB is unreachable. */
+export async function getAddons(): Promise<Record<string, Addon>> {
+  if (_addonsCache && _addonsCache.expiresAt > Date.now()) return _addonsCache.data
+  const fromDb = await fetchAddonsFromSupabase()
+  const data = fromDb ?? ADDONS_FALLBACK
+  _addonsCache = { data, expiresAt: Date.now() + CATALOG_CACHE_TTL_MS }
+  return data
+}
+
+// Static fallback only -- not the source of truth. Update Supabase
+// (catalog_items where catalog_type = 'platform_feature'/'usage_pack') to
+// change real pricing.
+const ADDONS_FALLBACK: Record<string, Addon> = {
   voice:                { id: 'voice',                name: 'Voice',                   amount: 25000, stripePriceId: price('VOICE'),                recurring: true, description: 'Voice-based AI interaction' },
   sdk_api_access:       { id: 'sdk_api_access',       name: 'SDK/API Access',          amount: 15000, stripePriceId: price('SDK_API_ACCESS'),        recurring: true, description: 'Programmatic API access' },
   custom_domain:        { id: 'custom_domain',        name: 'Custom Domain',           amount: 900,   stripePriceId: price('CUSTOM_DOMAIN'),         recurring: true, description: 'Bring your own domain' },
@@ -206,8 +407,6 @@ export const ADDONS: Record<string, Addon> = {
   usb_export:           { id: 'usb_export',           name: 'USB Export',              amount: 15000, stripePriceId: price('USB_EXPORT'),            recurring: false, description: 'Export intelligence to USB' },
   custom_subdomain:     { id: 'custom_subdomain',     name: 'Custom Subdomain',        amount: 500,   stripePriceId: price('CUSTOM_SUBDOMAIN'),      recurring: true, description: 'Custom subdomain URL' },
   secret_vault:         { id: 'secret_vault',         name: 'Secret Vault',             amount: 999,   stripePriceId: price('SECRET_VAULT'),          recurring: true, description: 'Secure env var & secret management via Coolify' },
-
-  // Usage Packs
   additional_ai_twin:   { id: 'additional_ai_twin',   name: 'Additional AI Twin',      amount: 19500, stripePriceId: price('ADDITIONAL_AI_TWIN'),    recurring: true, description: 'Add another AI twin' },
   plus_50gb_storage:    { id: 'plus_50gb_storage',    name: '+50GB Storage',           amount: 10000, stripePriceId: price('PLUS_50GB_STORAGE'),     recurring: true, description: 'Extra storage capacity' },
   plus_500_workflow_runs:{ id: 'plus_500_workflow_runs', name: '+500 Workflow Runs',   amount: 9900,  stripePriceId: price('PLUS_500_WORKFLOW_RUNS'), recurring: true, description: 'Additional workflow runs' },
@@ -215,21 +414,13 @@ export const ADDONS: Record<string, Addon> = {
   additional_business:  { id: 'additional_business',  name: 'Additional Business',     amount: 9900,  stripePriceId: price('ADDITIONAL_BUSINESS'),   recurring: true, description: 'Add another business location' },
   additional_member:    { id: 'additional_member',    name: 'Additional Member',       amount: 49900, stripePriceId: price('ADDITIONAL_MEMBER'),     recurring: true, description: 'Add a team member' },
   additional_location:  { id: 'additional_location',  name: 'Additional Location',     amount: 4900,  stripePriceId: price('ADDITIONAL_LOCATION'),   recurring: true, description: 'Add another physical location' },
-
-  // Legacy add-on IDs (for backward compatibility)
-  additional_intelligence: { id: 'additional_intelligence', name: 'Additional Intelligence', amount: 19500, stripePriceId: price('ADDITIONAL_AI_TWIN'), recurring: true, description: 'Add another intelligence instance' },
-  additional_agent:        { id: 'additional_agent',        name: 'Additional Agent',        amount: 15000, stripePriceId: '',                         recurring: true, description: 'Deploy a new specialized agent' },
-  additional_swarm:        { id: 'additional_swarm',        name: 'Additional Swarm',        amount: 30000, stripePriceId: '',                         recurring: true, description: 'Orchestrate a new agent swarm' },
-  additional_memory:       { id: 'additional_memory',       name: 'Additional Memory (50GB)',amount: 10000, stripePriceId: price('PLUS_50GB_STORAGE'),  recurring: true, description: 'Expand memory capacity' },
-  additional_workflow:     { id: 'additional_workflow',     name: 'Additional Workflow',     amount: 7500,  stripePriceId: '',                         recurring: true, description: 'Add deployable customer workflows' },
-  twin_expansion:          { id: 'twin_expansion',          name: 'AI Twin Expansion',        amount: 20000, stripePriceId: '',                         recurring: true, description: 'Upgrade to full AI Twin capabilities' },
-  premium_essence:         { id: 'premium_essence',         name: 'Premium Essence Board',    amount: 10000, stripePriceId: price('PREMIUM_ESSENCEBOARD'), recurring: true, description: 'Enhanced daily intelligence briefs' },
-  sdk_api:                 { id: 'sdk_api',                 name: 'SDK/API Access',           amount: 15000, stripePriceId: price('SDK_API_ACCESS'),       recurring: true, description: 'Programmatic access to the intelligence layer' },
-  white_label_addon:       { id: 'white_label_addon',       name: 'White Label',              amount: 49900, stripePriceId: price('WHITE_LABEL'),          recurring: true, description: 'Rebrand the platform as your own' },
-  voice_systems:           { id: 'voice_systems',           name: 'Voice Systems',            amount: 25000, stripePriceId: price('VOICE'),                recurring: true, description: 'Voice-based interaction with your intelligence' },
 }
 
-// ── Standalone Products (Blueprint upgrades, domain modules) ──
+// ── Standalone Products (Blueprint/Essence Engine upgrades, domain modules) ──
+// SOURCE OF TRUTH: Supabase `catalog_items` where catalog_type = 'blueprint'.
+// (The 6 domain_* modules were only ever hardcoded here and missing from the
+// Supabase catalog -- they've been added to catalog_items so this migration
+// doesn't silently break the routes/pages that reference them.)
 export interface StandaloneProduct {
   id: string
   name: string
@@ -238,7 +429,38 @@ export interface StandaloneProduct {
   recurring: boolean
 }
 
-export const STANDALONE_PRODUCTS: Record<string, StandaloneProduct> = {
+let _standaloneProductsCache: { data: Record<string, StandaloneProduct>; expiresAt: number } | null = null
+
+async function fetchStandaloneProductsFromSupabase(): Promise<Record<string, StandaloneProduct> | null> {
+  const rows = await fetchCatalogItemsByType('blueprint')
+  if (!rows) return null
+  const result: Record<string, StandaloneProduct> = {}
+  for (const row of rows) {
+    if (row.base_price == null) continue
+    const id = row.slug.replace(/-/g, '_')
+    result[id] = {
+      id,
+      name: row.name,
+      amount: Math.round(row.base_price * 100),
+      description: row.description ?? '',
+      recurring: row.pricing_type === 'monthly',
+    }
+  }
+  return result
+}
+
+/** Get all standalone products (blueprint/essence engine assessments + domain modules), sourced from Supabase (cached ~5min), falling back to static data if the DB is unreachable. */
+export async function getStandaloneProducts(): Promise<Record<string, StandaloneProduct>> {
+  if (_standaloneProductsCache && _standaloneProductsCache.expiresAt > Date.now()) return _standaloneProductsCache.data
+  const fromDb = await fetchStandaloneProductsFromSupabase()
+  const data = fromDb ?? STANDALONE_PRODUCTS_FALLBACK
+  _standaloneProductsCache = { data, expiresAt: Date.now() + CATALOG_CACHE_TTL_MS }
+  return data
+}
+
+// Static fallback only -- not the source of truth. Update Supabase
+// (catalog_items where catalog_type = 'blueprint') to change real pricing.
+const STANDALONE_PRODUCTS_FALLBACK: Record<string, StandaloneProduct> = {
   expanded_blueprint: { id: 'expanded_blueprint', name: 'Expanded Blueprint',     amount: 15000, description: 'Full whole-life scan + essence board links + premium suggestions (1 year)', recurring: false },
   enhanced_blueprint: { id: 'enhanced_blueprint', name: 'Enhanced Blueprint',     amount: 3500,  description: 'Deeper intelligence analysis + priority essence board insights + cross-domain pattern recognition', recurring: false },
   domain_relationship:{ id: 'domain_relationship',name: 'Relationship Module',    amount: 5000,  description: 'Relationship intelligence domain assessment', recurring: false },
@@ -247,9 +469,6 @@ export const STANDALONE_PRODUCTS: Record<string, StandaloneProduct> = {
   domain_lifestyle:   { id: 'domain_lifestyle',   name: 'Lifestyle Module',       amount: 5000,  description: 'Lifestyle intelligence domain assessment', recurring: false },
   domain_creativity:  { id: 'domain_creativity',  name: 'Creativity Module',      amount: 5000,  description: 'Creativity intelligence domain assessment', recurring: false },
   domain_legacy:      { id: 'domain_legacy',      name: 'Legacy Module',          amount: 5000,  description: 'Legacy & impact intelligence domain assessment', recurring: false },
-
-  // Blueprint Assessments (one-time purchases, maps to catalog_items of type blueprint)
-  // blueprint_core is included free with every account — not listed here
   essence_profile:            { id: 'essence_profile',            name: 'Essence Profile Blueprint',        amount: 19900, description: 'Emotional, somatic, and relational intelligence blueprint (40 systems)', recurring: false },
   rhythm_state:               { id: 'rhythm_state',               name: 'Rhythm & State Blueprint',         amount: 19900, description: 'Timing, cycles, somatic rhythms, and peak performance blueprint (40 systems)', recurring: false },
   alignment_purpose:          { id: 'alignment_purpose',          name: 'Alignment & Purpose Blueprint',    amount: 14900, description: 'Vocation, purpose, and life direction blueprint (10 systems)', recurring: false },
@@ -258,75 +477,127 @@ export const STANDALONE_PRODUCTS: Record<string, StandaloneProduct> = {
   evolution_intelligence:     { id: 'evolution_intelligence',     name: 'Evolution & Intelligence Blueprint',amount: 19900, description: 'AI-enhanced learning, cognitive, and growth intelligence blueprint (29 systems)', recurring: false },
 }
 
-// ── Vertical Add-On Packs ──────────────────────────────────
-export const VERTICAL_PACKS: Record<string, Addon> = {
-  ecommerce: { id: 'ecommerce', name: 'Ecommerce Pack',   amount: 9900,  stripePriceId: price('VERTICAL_ECOMMERCE'), recurring: true },
-  wealth:    { id: 'wealth',    name: 'Wealth Pack',      amount: 49900, stripePriceId: price('WEALTH_VERTICAL'),   recurring: true },
-  creator:   { id: 'creator',   name: 'Creator Pack',     amount: 9900,  stripePriceId: price('CREATOR_VERTICAL'),  recurring: true },
-  coaching:  { id: 'coaching',  name: 'Coaching Pack',    amount: 9900,  stripePriceId: price('VERTICAL_COACHING'), recurring: true },
-  real_estate:{ id: 'real_estate', name: 'Real Estate Pack', amount: 19900, stripePriceId: price('VERTICAL_REAL_ESTATE'), recurring: true },
-  education: { id: 'education', name: 'Education Pack',   amount: 19900, stripePriceId: price('VERTICAL_EDUCATION'), recurring: true },
-  healthcare:{ id: 'healthcare',name: 'Healthcare Pack',  amount: 49900, stripePriceId: price('VERTICAL_HEALTHCARE'), recurring: true },
-  finance:   { id: 'finance',   name: 'Finance Pack',     amount: 49900, stripePriceId: price('VERTICAL_FINANCE'),   recurring: true },
-  restaurant:{ id: 'restaurant',name: 'Restaurant Pack',  amount: 19900, stripePriceId: price('VERTICAL_RESTAURANT'), recurring: true },
-  legal:     { id: 'legal',     name: 'Legal Pack',       amount: 49900, stripePriceId: price('LEGAL_VERTICAL'),    recurring: true },
+// ── Specialty Add-On Packs ─────────────────────────────────
+// (formerly "Vertical" -- "specialty" is the locked platform term)
+// SOURCE OF TRUTH: Supabase `catalog_items` where catalog_type = 'vertical_pack'
+// (the DB-level type_key itself is a larger rename -- see the standing note
+// on the vertical->specialty migration; the display name was already updated).
+export interface SpecialtyPack {
+  id: string
+  name: string
+  amount: number
+  stripePriceId: string
+  recurring: boolean
+}
+
+let _specialtyPacksCache: { data: Record<string, SpecialtyPack>; expiresAt: number } | null = null
+
+async function fetchSpecialtyPacksFromSupabase(): Promise<Record<string, SpecialtyPack> | null> {
+  const rows = await fetchCatalogItemsByType('vertical_pack')
+  if (!rows) return null
+  const result: Record<string, SpecialtyPack> = {}
+  for (const row of rows) {
+    if (row.base_price == null) continue
+    // Normalize slugs like "vertical-ecommerce" / "wealth-vertical" /
+    // "legal-vertical" down to a clean short id ("ecommerce", "wealth", "legal").
+    const id = row.slug.replace(/-/g, '_').replace(/^vertical_/, '').replace(/_vertical$/, '')
+    result[id] = {
+      id,
+      name: row.name,
+      amount: Math.round(row.base_price * 100),
+      stripePriceId: price(`SPECIALTY_${id.toUpperCase()}`),
+      recurring: row.pricing_type === 'monthly',
+    }
+  }
+  return result
+}
+
+/** Get all specialty packs, sourced from Supabase (cached ~5min), falling back to static data if the DB is unreachable. */
+export async function getSpecialtyPacks(): Promise<Record<string, SpecialtyPack>> {
+  if (_specialtyPacksCache && _specialtyPacksCache.expiresAt > Date.now()) return _specialtyPacksCache.data
+  const fromDb = await fetchSpecialtyPacksFromSupabase()
+  const data = fromDb ?? SPECIALTY_PACKS_FALLBACK
+  _specialtyPacksCache = { data, expiresAt: Date.now() + CATALOG_CACHE_TTL_MS }
+  return data
+}
+
+// Static fallback only -- not the source of truth. Update Supabase
+// (catalog_items where catalog_type = 'vertical_pack') to change real pricing.
+const SPECIALTY_PACKS_FALLBACK: Record<string, SpecialtyPack> = {
+  ecommerce: { id: 'ecommerce', name: 'Ecommerce Pack',   amount: 9900,  stripePriceId: price('SPECIALTY_ECOMMERCE'), recurring: true },
+  wealth:    { id: 'wealth',    name: 'Wealth Pack',      amount: 49900, stripePriceId: price('SPECIALTY_WEALTH'),   recurring: true },
+  creator:   { id: 'creator',   name: 'Creator Pack',     amount: 9900,  stripePriceId: price('SPECIALTY_CREATOR'),  recurring: true },
+  coaching:  { id: 'coaching',  name: 'Coaching Pack',    amount: 9900,  stripePriceId: price('SPECIALTY_COACHING'), recurring: true },
+  real_estate:{ id: 'real_estate', name: 'Real Estate Pack', amount: 19900, stripePriceId: price('SPECIALTY_REAL_ESTATE'), recurring: true },
+  education: { id: 'education', name: 'Education Pack',   amount: 19900, stripePriceId: price('SPECIALTY_EDUCATION'), recurring: true },
+  healthcare:{ id: 'healthcare',name: 'Healthcare Pack',  amount: 49900, stripePriceId: price('SPECIALTY_HEALTHCARE'), recurring: true },
+  finance:   { id: 'finance',   name: 'Finance Pack',     amount: 49900, stripePriceId: price('SPECIALTY_FINANCE'),   recurring: true },
+  restaurant:{ id: 'restaurant',name: 'Restaurant Pack',  amount: 19900, stripePriceId: price('SPECIALTY_RESTAURANT'), recurring: true },
+  legal:     { id: 'legal',     name: 'Legal Pack',       amount: 49900, stripePriceId: price('SPECIALTY_LEGAL'),    recurring: true },
 }
 
 // ── Helper Functions ───────────────────────────────────────
 
-/** Get a plan tier by key, returning null if not found */
-export function getPlanTier(key: string): PlanTier | null {
-  return PLAN_TIERS[key] || null
+/** Get a plan tier by key, returning null if not found. Reads from Supabase (cached), falls back to static data. */
+export async function getPlanTier(key: string): Promise<PlanTier | null> {
+  const tiers = await getPlanTiers()
+  return tiers[key] || null
 }
 
-/** Get an OS package by key */
-export function getOSPackage(key: string): OSPackage | null {
-  return OS_PACKAGES[key] || null
+/** Get an OS package by key. Reads from Supabase (cached), falls back to static data. */
+export async function getEssintelligenceModule(key: string): Promise<EssintelligenceModule | null> {
+  const packages = await getEssintelligenceModules()
+  return packages[key] || null
 }
 
-/** Get an addon by id */
-export function getAddon(id: string): Addon | null {
-  return ADDONS[id] || null
+/** Get an addon by id. Reads from Supabase (cached), falls back to static data. */
+export async function getAddon(id: string): Promise<Addon | null> {
+  const addons = await getAddons()
+  return addons[id] || null
 }
 
-/** Get a standalone product by id */
-export function getStandaloneProduct(id: string): StandaloneProduct | null {
-  return STANDALONE_PRODUCTS[id] || null
+/** Get a standalone product by id. Reads from Supabase (cached), falls back to static data. */
+export async function getStandaloneProduct(id: string): Promise<StandaloneProduct | null> {
+  const products = await getStandaloneProducts()
+  return products[id] || null
+}
+
+/** Get a specialty pack by id. Reads from Supabase (cached), falls back to static data. */
+export async function getSpecialtyPack(id: string): Promise<SpecialtyPack | null> {
+  const packs = await getSpecialtyPacks()
+  return packs[id] || null
 }
 
 /** Resolve a tier key like "client_founder" or "founder_os" to pricing info */
-export function resolveTier(tierKey: string): PlanTier | OSPackage | null {
-  return getPlanTier(tierKey) || getOSPackage(tierKey) || null
+export async function resolveTier(tierKey: string): Promise<PlanTier | EssintelligenceModule | null> {
+  const planTier = await getPlanTier(tierKey)
+  if (planTier) return planTier
+  return getEssintelligenceModule(tierKey)
 }
 
 /** Get price (in cents) for a catalog item by slug */
-export function getPriceBySlug(slug: string): number {
+export async function getPriceBySlug(slug: string): Promise<number> {
   const clean = slug.replace(/-/g, '_').toLowerCase()
-  // Check OS packages
-  for (const os of Object.values(OS_PACKAGES)) {
-    if (os.key === clean) return os.amount
-  }
-  // Check addons
-  for (const addon of Object.values(ADDONS)) {
-    if (addon.id === clean) return addon.amount
-  }
+  const [packages, addons] = await Promise.all([getEssintelligenceModules(), getAddons()])
+  if (packages[clean]) return packages[clean].amount
+  if (addons[clean]) return addons[clean].amount
   return 0
 }
 
 /** Get Stripe price ID for a given plan or OS tier key */
-export function getStripePriceId(tierKey: string): string {
-  const tier = resolveTier(tierKey)
-  if (tier && 'stripePriceId' in tier) return (tier as PlanTier | OSPackage).stripePriceId
+export async function getStripePriceId(tierKey: string): Promise<string> {
+  const tier = await resolveTier(tierKey)
+  if (tier && 'stripePriceId' in tier) return (tier as PlanTier | EssintelligenceModule).stripePriceId
   return ''
 }
 
 /** Build line items array for Stripe Checkout Session */
-export function buildLineItems(params: {
+export async function buildLineItems(params: {
   tier?: string
   addons?: string[]
   products?: string[]
-  verticalPacks?: string[]
-}): Array<{
+  specialtyPacks?: string[]
+}): Promise<Array<{
   price_data: {
     currency: string
     product_data: { name: string; description?: string }
@@ -334,14 +605,14 @@ export function buildLineItems(params: {
     recurring?: { interval: 'month' | 'year' }
   }
   quantity: number
-}> {
+}>> {
   const items: any[] = []
 
   // Add plan tier
   if (params.tier) {
-    const tier = resolveTier(params.tier)
+    const tier = await resolveTier(params.tier)
     if (tier && 'amount' in tier) {
-      const t = tier as PlanTier | OSPackage
+      const t = tier as PlanTier | EssintelligenceModule
       if (t.amount > 0) {
         items.push({
           price_data: {
@@ -359,7 +630,7 @@ export function buildLineItems(params: {
   // Add add-ons
   if (params.addons) {
     for (const addonId of params.addons) {
-      const addon = getAddon(addonId)
+      const addon = await getAddon(addonId)
       if (addon && addon.amount > 0) {
         items.push({
           price_data: {
@@ -377,7 +648,7 @@ export function buildLineItems(params: {
   // Add standalone products
   if (params.products) {
     for (const pid of params.products) {
-      const prod = getStandaloneProduct(pid)
+      const prod = await getStandaloneProduct(pid)
       if (prod && prod.amount > 0) {
         items.push({
           price_data: {
@@ -391,17 +662,17 @@ export function buildLineItems(params: {
     }
   }
 
-  // Add vertical packs
-  if (params.verticalPacks) {
-    for (const vpId of params.verticalPacks) {
-      const vp = VERTICAL_PACKS[vpId]
-      if (vp && vp.amount > 0) {
+  // Add specialty packs
+  if (params.specialtyPacks) {
+    for (const spId of params.specialtyPacks) {
+      const sp = await getSpecialtyPack(spId)
+      if (sp && sp.amount > 0) {
         items.push({
           price_data: {
             currency: 'usd',
-            product_data: { name: vp.name },
-            unit_amount: vp.amount,
-            ...(vp.recurring ? { recurring: { interval: 'month' as const } } : {}),
+            product_data: { name: sp.name },
+            unit_amount: sp.amount,
+            ...(sp.recurring ? { recurring: { interval: 'month' as const } } : {}),
           },
           quantity: 1,
         })

@@ -26,8 +26,8 @@ export async function GET() {
 
     const now = new Date().toISOString()
     const rows = (data ?? []) as any[]
-    const upcoming = rows.filter((c: any) => c.scheduled_at >= now && c.status === 'scheduled')
-    const past = rows.filter((c: any) => c.scheduled_at < now || c.status !== 'scheduled')
+    const upcoming = rows.filter((c: any) => c.scheduled_at >= now && ['pending_approval', 'scheduled'].includes(c.status))
+    const past = rows.filter((c: any) => c.scheduled_at < now || !['pending_approval', 'scheduled'].includes(c.status))
 
     return NextResponse.json({ consultations: [...upcoming, ...past] })
   } catch (err: any) {
@@ -38,7 +38,16 @@ export async function GET() {
 /**
  * POST /api/client/consultations
  * Create a consultation booking
- * Body: { scheduled_at, duration_min, consultation_type, notes, zuri_followup }
+ * Body: { scheduled_at, duration_min, consultation_type, notes, zuri_followup, business_info }
+ *
+ * business_info example: { org_name, org_size, industry, budget_range, biggest_challenge }
+ * -- required for consultation_type 'strategy' (the Enterprise/Concierge routing
+ * path from the blueprint assessment); optional for other types.
+ *
+ * Bookings start as approval_status='pending' with no meeting link or
+ * calendar event. An admin reviews and approves via
+ * PATCH /api/admin/consultations, which is what actually creates the
+ * meeting link / calendar event -- nothing hits the real calendar until then.
  */
 export async function POST(req: NextRequest) {
   try {
@@ -48,7 +57,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { scheduled_at, duration_min, consultation_type, notes, zuri_followup } = await req.json()
+    const { scheduled_at, duration_min, consultation_type, notes, zuri_followup, business_info } = await req.json()
 
     if (!scheduled_at) {
       return NextResponse.json({ error: 'scheduled_at is required' }, { status: 400 })
@@ -65,9 +74,12 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // Generate a meeting link placeholder
-    const shortId = crypto.randomUUID().slice(0, 8)
-    const meeting_link = `https://meet.google.com/consult-${shortId}`
+    if (consultation_type === 'strategy' && (!business_info || !business_info.org_name)) {
+      return NextResponse.json(
+        { error: 'business_info.org_name is required for strategy (Enterprise/Concierge) consultations' },
+        { status: 400 }
+      )
+    }
 
     const { data: booking, error } = await consultations(supabase)
       .insert({
@@ -76,8 +88,10 @@ export async function POST(req: NextRequest) {
         duration_min: duration_min ?? 30,
         consultation_type,
         notes: notes ?? null,
-        meeting_link,
+        business_info: business_info ?? {},
         zuri_followup: zuri_followup ?? true,
+        // status/approval_status default to 'pending_approval'/'pending' at
+        // the DB level -- no meeting_link or calendar_event_id yet.
       })
       .select()
       .single()

@@ -227,7 +227,7 @@ export default function IntakePage() {
 
     if (user) {
       return {
-        path: `/dashboard/${role === 'creator' ? 'creator' : role === 'client' ? 'client' : role === 'affiliate' ? 'affiliate' : 'personal'}`,
+        path: `/dashboard/${role === 'creator' ? 'creator' : role === 'client' ? 'client' : role === 'affiliate' ? 'affiliate' : role === 'collective' ? 'collective' : 'personal'}`,
         label: path,
       }
     }

@@ -311,7 +311,7 @@ export const VERTICALS: Record<string, VerticalData> = {
       ],
     },
     walkthrough: 'Your HR Intelligence deploys five specialized agents as one unified workforce system.\n\nThe Talent Acquisition Agent screens candidates and manages your entire hiring pipeline. The Onboarding Automator ensures every new hire is productive from day one. Your Employee Intelligence Engine tracks engagement, performance, and satisfaction to reduce turnover. The Compliance Sentinel keeps your organization audit-ready at all times. And the Workforce Planner analyzes headcount needs and skill gaps to guide strategic decisions.\n\nThese five collaborate inside the Workforce Intelligence Swarm — powering your entire people operations from hire to retire.\n\nYour daily Essence Board shows: hiring priorities, engagement flags, compliance deadlines, workforce metrics, and Zuri\'s recommended focus.\n\nYour AI Twin reflects your organizational health. Your dashboard gives you a complete people intelligence view.',
-    defaultPlan: 'client_org',
+    defaultPlan: 'client_founder', // Business Essintelligence -- HR is an org use case, not an unknown-fallback case
   },
 
   legal: {

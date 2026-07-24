@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const VALID_PLATFORMS = ['discord', 'whatsapp', 'n8n', 'email']
+    const VALID_PLATFORMS = ['discord', 'whatsapp', 'n8n', 'email', 'google_calendar']
     if (!VALID_PLATFORMS.includes(platform)) {
       return NextResponse.json(
         { error: `Invalid platform. Must be one of: ${VALID_PLATFORMS.join(', ')}` },

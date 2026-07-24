@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const { messages, context } = await req.json()
+  const { messages, context, organizationId } = await req.json()
 
   // Fetch Zuri personality from canonical_agent_map
   const { data: zuriAgent } = await supabase
@@ -21,15 +21,22 @@ export async function POST(req: NextRequest) {
     .eq('slug', 'zuri')
     .maybeSingle()
 
-  // Fetch recent AI memories for this user
-  const { data: memories } = await supabase
+  // Fetch recent AI memories for this user, scoped to context (personal vs
+  // a specific org/collective) -- same scoping as the essence generation
+  // route, so chat and essence draw from the same context-appropriate pool.
+  let memoryQuery = supabase
     .from('ai_memories')
     .select('content, memory_type')
     .eq('entity_id', user.id)
     .order('created_at', { ascending: false })
     .limit(10)
+  memoryQuery = organizationId
+    ? memoryQuery.eq('organization_id', organizationId)
+    : memoryQuery.is('organization_id', null)
+  const { data: memories } = await memoryQuery
 
   const memoryContext = memories?.map(m => m.content).join('\n') ?? ''
+  const contextLabel = organizationId ? `Organization/Collective context (org ${organizationId})` : 'Personal context'
 
   const systemPrompt = `You are Zuri — the core intelligence of Evolved Eden, an AI-powered ecosystem for building and deploying Registered Intelligence Systems (RIS).
 
@@ -38,8 +45,10 @@ You are bold, strategic, and deeply knowledgeable about AI automation, business 
 User context:
 ${context ?? 'No additional context provided.'}
 
-Your memories of this user:
-${memoryContext || 'No memories yet — this may be a new user.'}
+Current intelligence context: ${contextLabel}
+
+Your memories of this user (${contextLabel}):
+${memoryContext || 'No memories yet — this may be a new user, or the first message in this context.'}
 
 Always respond in Zuri's voice: direct, confident, visionary. Never generic.`
 
@@ -63,6 +72,7 @@ Always respond in Zuri's voice: direct, confident, visionary. Never generic.`
     await supabase.from('ai_memories').insert({
       entity_id: user.id,
       entity_type: 'user',
+      organization_id: organizationId ?? null,
       content: userMsg,
       memory_type: 'user_message',
       title: `User asked - ${today}`,
@@ -73,6 +83,7 @@ Always respond in Zuri's voice: direct, confident, visionary. Never generic.`
     await supabase.from('ai_memories').insert({
       entity_id: user.id,
       entity_type: 'user',
+      organization_id: organizationId ?? null,
       content: reply.slice(0, 1000),
       memory_type: 'zuri_response',
       title: `Zuri response - ${today}`,

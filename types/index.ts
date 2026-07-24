@@ -173,7 +173,7 @@ export type SwarmTemplateRow = {
   updated_at?: string
 }
 
-export type UserRole = 'admin' | 'client' | 'creator' | 'personal' | 'affiliate'
+export type UserRole = 'admin' | 'client' | 'creator' | 'personal' | 'affiliate' | 'collective'
 
 /**
  * Derive the dashboard role from a plan tier key.
@@ -184,7 +184,7 @@ export type UserRole = 'admin' | 'client' | 'creator' | 'personal' | 'affiliate'
 export function deriveRoleFromPlanTier(planTierKey: string | null | undefined): UserRole | null {
   if (!planTierKey) return null
   const prefix = planTierKey.split('_')[0] as UserRole
-  const validRoles: UserRole[] = ['client', 'creator', 'personal', 'affiliate']
+  const validRoles: UserRole[] = ['client', 'creator', 'personal', 'affiliate', 'collective']
   return validRoles.includes(prefix) ? prefix : null
 }
 
@@ -321,6 +321,7 @@ export type Client = {
   geographic_profile?: Record<string, unknown> | null
   socioeconomic_profile?: Record<string, unknown> | null
   addons?: Record<string, unknown> | null
+  connector_pack_quantity?: number | null
   additional_plans?: string[] | null
   parent_client_id?: string | null
   preferred_provider_id?: string | null
@@ -677,6 +678,11 @@ export type ClientConsultationRow = {
   meeting_link?: string | null
   zuri_followup?: boolean | null
   status?: string | null
+  business_info?: Record<string, unknown> | null
+  approval_status?: string | null
+  approved_by?: string | null
+  approved_at?: string | null
+  calendar_event_id?: string | null
   created_at?: string
   updated_at?: string
 }
@@ -859,22 +865,6 @@ export type AvatarRow = {
   updated_at?: string
 }
 
-export type ConnectorAccountRow = {
-  id: string
-  organization_id?: string | null
-  business_id?: string | null
-  connector_type: string
-  account_name?: string | null
-  access_token?: string | null
-  refresh_token?: string | null
-  token_expires_at?: string | null
-  external_account_id?: string | null
-  scopes?: string[] | null
-  metadata?: Record<string, unknown> | null
-  created_at?: string
-  updated_at?: string
-}
-
 export type ConnectorCredentialRow = {
   id: string
   connector_id?: string | null
@@ -883,6 +873,53 @@ export type ConnectorCredentialRow = {
   encrypted_credentials: Record<string, unknown>
   created_at?: string
   updated_at?: string
+}
+
+export type ConnectorTypeRow = {
+  id: string
+  key: string
+  name: string
+  description?: string | null
+  category: string
+  icon?: string | null
+  fields: Array<{ key: string; label: string; type: string }>
+  requires_addon?: string | null
+  enabled_for_clients: boolean
+  created_at?: string
+  updated_at?: string
+}
+
+export type CalendarRow = {
+  id: string
+  organization_id?: string | null
+  client_id?: string | null
+  provider?: string | null
+  external_calendar_id?: string | null
+  connector_credential_id?: string | null
+  email_connector_credential_id?: string | null
+  created_at?: string
+}
+
+export type CourseRow = {
+  id: string
+  creator_client_id?: string | null
+  title: string
+  description?: string | null
+  is_published?: boolean | null
+  price?: number | null
+  lesson_count?: number | null
+  catalog_item_id?: string | null
+  created_at?: string
+  updated_at?: string
+}
+
+export type CourseEnrollmentRow = {
+  id: string
+  course_id: string
+  client_id?: string | null
+  enrolled_at?: string
+  completed_at?: string | null
+  progress_percent?: number | null
 }
 
 export type EvolvedEdenAgentRow = {
@@ -947,8 +984,11 @@ export type Database = {
       client_twins: TableWithDefaults<ClientTwin>
       client_zuri_sessions: TableWithDefaults<ClientZuriSessionRow>
       clients: TableWithDefaults<Client>
-      connector_accounts: TableWithDefaults<ConnectorAccountRow>
       connector_credentials: TableWithDefaults<ConnectorCredentialRow>
+      connector_types: TableWithDefaults<ConnectorTypeRow>
+      calendars: TableWithDefaults<CalendarRow>
+      courses: TableWithDefaults<CourseRow>
+      course_enrollments: TableWithDefaults<CourseEnrollmentRow>
       entitlements: TableWithDefaults<Entitlement>
       essence_intelligence: TableWithDefaults<EssenceIntelligenceRow>
       essence_templates: TableWithDefaults<EssenceTemplateRow>

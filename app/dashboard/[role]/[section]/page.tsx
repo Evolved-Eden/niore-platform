@@ -83,6 +83,20 @@ const SECTION_META: Record<UserRole, Record<string, { title: string; description
       description: 'Manage your affiliate profile and payout preferences.',
     },
   },
+  collective: {
+    members: {
+      title: 'Members',
+      description: 'Manage roles, invitations, and permissions across your Collective.',
+    },
+    governance: {
+      title: 'Governance',
+      description: 'Roles, voting, approvals, and decision logs.',
+    },
+    settings: {
+      title: 'Collective Settings',
+      description: 'Manage your Collective profile, workstations, and preferences.',
+    },
+  },
 }
 
 export default async function DashboardSectionPage({ params }: { params: Promise<{ role: string; section: string }> }) {

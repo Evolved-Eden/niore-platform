@@ -16,8 +16,7 @@ const NAV: Record<UserRole, { label: string; href: string }[]> = {
     { label: 'Blueprint',    href: '/dashboard/client/blueprint' },
     { label: 'Assessment',   href: '/dashboard/client/blueprint/assess' },
     { label: 'Essence Intel',href: '/dashboard/client/essence' },
-    { label: 'My Agents',    href: '/dashboard/client/agents' },
-    { label: 'My Teams',     href: '/dashboard/client/swarms' },
+    { label: 'Workforce',    href: '/dashboard/client/workforce' },
     { label: 'My Twin',      href: '/dashboard/client/twin' },
     { label: 'Twin Registry',href: '/dashboard/client/registry' },
     { label: 'Journal',      href: '/dashboard/client/journal' },
@@ -35,8 +34,7 @@ const NAV: Record<UserRole, { label: string; href: string }[]> = {
     { label: 'Assessment',     href: '/dashboard/client/blueprint/assess' },
     { label: 'Essence Intel',  href: '/dashboard/client/essence' },
     { label: 'Intelligences',  href: '/dashboard/creator/intelligences' },
-    { label: 'My Agents',      href: '/dashboard/client/agents' },
-    { label: 'My Swarms',      href: '/dashboard/client/swarms' },
+    { label: 'Workforce',      href: '/dashboard/client/workforce' },
     { label: 'My Twin',        href: '/dashboard/client/twin' },
     { label: 'Analytics',      href: '/dashboard/creator/analytics' },
     { label: 'Payouts',        href: '/dashboard/creator/payouts' },
@@ -48,8 +46,6 @@ const NAV: Record<UserRole, { label: string; href: string }[]> = {
     { label: 'My Blueprint',   href: '/dashboard/admin/blueprint' },
     { label: 'Assessment',     href: '/dashboard/client/blueprint/assess' },
     { label: 'Essence Intel',  href: '/dashboard/admin/essence' },
-    { label: 'My Agents',      href: '/dashboard/admin/my-agents' },
-    { label: 'My Swarms',      href: '/dashboard/admin/my-swarms' },
     { label: 'My Twin',        href: '/dashboard/admin/twin' },
     { label: 'Chat / Prompt',  href: '/dashboard/chat' },
     { label: '── System ──',   href: '#' },
@@ -60,13 +56,13 @@ const NAV: Record<UserRole, { label: string; href: string }[]> = {
     { label: 'Deployments',    href: '/dashboard/admin/deployments' },
     { label: 'Verticals',      href: '/dashboard/admin/verticals' },
     { label: 'Avatars',        href: '/dashboard/admin/avatars' },
-    { label: 'Agent Registry', href: '/dashboard/admin/agent-registry' },
     { label: 'Agents',         href: '/dashboard/admin/agents' },
-    { label: 'Swarms',         href: '/dashboard/admin/swarms' },
+    { label: 'Swarms & Depts', href: '/dashboard/admin/swarms' },
     { label: 'Generators',     href: '/dashboard/admin/generators' },
     { label: 'Archetypes',     href: '/dashboard/admin/archetypes' },
     { label: 'Workflows',      href: '/dashboard/admin/workflows' },
     { label: 'Connectors',     href: '/dashboard/admin/connectors' },
+    { label: 'Connector Access', href: '/dashboard/admin/connector-access' },
     { label: 'Zuri Config',    href: '/dashboard/admin/zuri' },
     { label: 'Templates',      href: '/dashboard/admin/templates' },
     { label: 'Settings',       href: '/dashboard/admin/settings' },
@@ -90,6 +86,17 @@ const NAV: Record<UserRole, { label: string; href: string }[]> = {
     { label: 'Payouts',      href: '/dashboard/affiliate/payouts' },
     { label: 'Settings',     href: '/dashboard/affiliate/settings' },
   ],
+  collective: [
+    { label: 'Overview',     href: '/dashboard/collective' },
+    { label: 'Members',      href: '/dashboard/client/organization' },
+    { label: 'Workstations', href: '/dashboard/collective/workstations' },
+    { label: 'Essence Intel',href: '/dashboard/collective/essence' },
+    { label: 'Workforce',    href: '/dashboard/client/workforce' },
+    { label: 'Governance',   href: '/dashboard/collective/governance' },
+    { label: 'Calendar',     href: '/dashboard/client/calendar' },
+    { label: 'Connectors',   href: '/dashboard/client/connectors' },
+    { label: 'Settings',     href: '/dashboard/client/settings' },
+  ],
 }
 
 const ROLE_COLOR: Record<UserRole, string> = {
@@ -98,6 +105,7 @@ const ROLE_COLOR: Record<UserRole, string> = {
   admin:     '#7A2E32',  // deep wine
   personal:  '#B5764A',  // muted terracotta
   affiliate: '#C9974A',  // muted honey
+  collective:'#8B7AA8',  // muted violet
 }
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {

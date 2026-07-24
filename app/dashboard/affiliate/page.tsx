@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import EssenceBoard from '@/components/EssenceBoard'
+import UpgradePanel from '@/components/UpgradePanel'
 
 export default async function AffiliateDashboard() {
   const supabase = await createClient()
@@ -62,6 +63,10 @@ export default async function AffiliateDashboard() {
           <span className="w-2 h-2 rounded-full bg-[#C9974A] animate-pulse-slow" />
           Affiliate program active — more features coming soon
         </div>
+      </div>
+
+      <div className="mt-8">
+        <UpgradePanel currentRole="affiliate" />
       </div>
     </div>
   )

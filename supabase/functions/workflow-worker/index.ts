@@ -1,6 +1,58 @@
 import { serve } from "https://deno.land/std/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
 
+// connector_accounts (the old table these node executors used to read from)
+// was dropped -- it stored plaintext credentials in a column that didn't
+// even match this code's query (`.select("credentials")` against a table
+// whose real columns were access_token/refresh_token/metadata, so this was
+// already broken before the table was removed). The real store now is
+// `connector_credentials.encrypted_credentials`, written by the client
+// dashboard (/dashboard/client/connectors) and encrypted at rest with
+// AES-256-GCM (see lib/connector-encryption.ts in the Next.js app).
+//
+// Deno can't import that Node `crypto`-based helper directly, so this is a
+// separate but interoperable implementation using Web Crypto (crypto.subtle).
+// It decrypts the exact same payload shape ({iv, authTag, ciphertext}, all
+// base64) produced by the Node encryptor. Requires the SAME
+// CONNECTOR_ENCRYPTION_KEY value set as a secret on this Edge Function
+// (`supabase secrets set CONNECTOR_ENCRYPTION_KEY=...`) as is set in the
+// Next.js app's env -- if the keys differ, decryption will fail with an
+// OperationError, not silently return garbage.
+async function decryptConnectorCredentials(payload: { iv: string; authTag: string; ciphertext: string }): Promise<Record<string, any>> {
+  const keyB64 = Deno.env.get("CONNECTOR_ENCRYPTION_KEY")
+  if (!keyB64) {
+    throw new Error("CONNECTOR_ENCRYPTION_KEY is not set on this Edge Function -- cannot decrypt connector credentials.")
+  }
+
+  const b64ToBytes = (b64: string) => Uint8Array.from(atob(b64), (c) => c.charCodeAt(0))
+  const keyBytes = b64ToBytes(keyB64)
+  const iv = b64ToBytes(payload.iv)
+  const authTag = b64ToBytes(payload.authTag)
+  const ciphertext = b64ToBytes(payload.ciphertext)
+
+  // Node's createCipheriv keeps ciphertext and the GCM auth tag separate;
+  // Web Crypto's AES-GCM expects them concatenated (ciphertext || tag).
+  const combined = new Uint8Array(ciphertext.length + authTag.length)
+  combined.set(ciphertext, 0)
+  combined.set(authTag, ciphertext.length)
+
+  const key = await crypto.subtle.importKey("raw", keyBytes, { name: "AES-GCM" }, false, ["decrypt"])
+  const plaintextBuf = await crypto.subtle.decrypt({ name: "AES-GCM", iv, tagLength: 128 }, key, combined)
+  return JSON.parse(new TextDecoder().decode(plaintextBuf))
+}
+
+/** Fetch and decrypt a connector's credentials by connector_credentials.id */
+async function getConnectorCredentials(supabase: any, connectorCredentialId: string): Promise<Record<string, any>> {
+  const { data, error } = await supabase
+    .from("connector_credentials")
+    .select("encrypted_credentials")
+    .eq("id", connectorCredentialId)
+    .single()
+
+  if (error) throw error
+  return decryptConnectorCredentials(data.encrypted_credentials)
+}
+
 // Fixed this pass: the http executor previously required secrets (auth
 // headers, tokens) to be embedded as literal plaintext in workflow_nodes.config,
 // which is stored in a normal jsonb column readable by anyone with DB access --
@@ -44,6 +96,50 @@ const supabase = createClient(
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
 )
 
+/**
+ * Check + increment a client's DM usage against their tier's included
+ * allotment (tier_entitlements.max_dms_per_month) plus any Connector Packs
+ * they own (clients.connector_pack_quantity), via the atomic Postgres
+ * function. Throws if the limit is reached or the client can't be
+ * resolved -- callers should let that error surface as a failed node run,
+ * not silently skip the send.
+ */
+async function checkDmUsage(clientId: string | undefined): Promise<void> {
+  if (!clientId) {
+    throw new Error("No client_id on this workflow run -- cannot meter DM usage")
+  }
+  const { data, error } = await supabase.rpc("check_and_increment_connector_usage", {
+    p_client_id: clientId,
+    p_metric: "dm",
+  })
+  if (error) throw error
+  if (!data?.allowed) {
+    throw new Error(
+      data?.reason === "limit_reached"
+        ? `DM limit reached for this month (${data.used}/${data.limit}). Buy a Connector Pack for more capacity.`
+        : `DM not sent: ${data?.reason ?? "usage check failed"}`
+    )
+  }
+}
+
+async function checkEmailUsage(clientId: string | undefined): Promise<void> {
+  if (!clientId) {
+    throw new Error("No client_id on this workflow run -- cannot meter email usage")
+  }
+  const { data, error } = await supabase.rpc("check_and_increment_connector_usage", {
+    p_client_id: clientId,
+    p_metric: "email",
+  })
+  if (error) throw error
+  if (!data?.allowed) {
+    throw new Error(
+      data?.reason === "limit_reached"
+        ? `Email limit reached for this month (${data.used}/${data.limit}). Buy a Connector Pack for more capacity.`
+        : `Email not sent: ${data?.reason ?? "usage check failed"}`
+    )
+  }
+}
+
 const registry: Record<string, { execute: (node: any, context?: any) => Promise<any> }> = {
   http: {
     execute: async (node: any, context: any) => {
@@ -82,18 +178,12 @@ const registry: Record<string, { execute: (node: any, context?: any) => Promise<
   },
 
   discord: {
-    execute: async (node: any) => {
-      const connector = await supabase
-        .from("connector_accounts")
-        .select("credentials")
-        .eq("id", node.config.connector_id)
-        .single()
+    execute: async (node: any, context: any) => {
+      await checkDmUsage(context?.clientId)
 
-      if (connector.error) {
-        throw connector.error
-      }
+      const credentials = await getConnectorCredentials(supabase, node.config.connector_id)
 
-      const webhookUrl = connector.data.credentials.webhook_url
+      const webhookUrl = credentials.webhook_url
       const message = node.config.message
 
       const response = await fetch(webhookUrl, {
@@ -111,18 +201,10 @@ const registry: Record<string, { execute: (node: any, context?: any) => Promise<
   },
 
   telegram: {
-    execute: async (node: any) => {
-      const connector = await supabase
-        .from("connector_accounts")
-        .select("credentials")
-        .eq("id", node.config.connector_id)
-        .single()
+    execute: async (node: any, context: any) => {
+      await checkDmUsage(context?.clientId)
 
-      if (connector.error) {
-        throw connector.error
-      }
-
-      const credentials = connector.data.credentials
+      const credentials = await getConnectorCredentials(supabase, node.config.connector_id)
 
       const response = await fetch(`https://api.telegram.org/bot${credentials.bot_token}/sendMessage`, {
         method: "POST",
@@ -137,6 +219,77 @@ const registry: Record<string, { execute: (node: any, context?: any) => Promise<
       }
 
       return { sent: true, channel: "telegram", message_id: result.result.message_id }
+    },
+  },
+
+  gmail: {
+    execute: async (node: any, context: any) => {
+      await checkEmailUsage(context?.clientId)
+
+      const credentials = await getConnectorCredentials(supabase, node.config.connector_id)
+      const { client_id, client_secret, refresh_token } = credentials
+
+      if (!client_id || !client_secret || !refresh_token) {
+        throw new Error("Gmail connector is missing client_id, client_secret, or refresh_token")
+      }
+
+      // Exchange the stored refresh token for a short-lived access token.
+      // Not cached across invocations -- each send does its own exchange,
+      // which is fine at expected send volumes (well under Google's OAuth
+      // token endpoint rate limits) and avoids the complexity of a shared
+      // token cache in a stateless Edge Function.
+      const tokenResponse = await fetch("https://oauth2.googleapis.com/token", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({
+          client_id,
+          client_secret,
+          refresh_token,
+          grant_type: "refresh_token",
+        }),
+      })
+      const tokenData = await tokenResponse.json()
+      if (!tokenResponse.ok || !tokenData.access_token) {
+        throw new Error(`Gmail OAuth token refresh failed: ${tokenData.error_description ?? tokenData.error ?? "unknown error"}`)
+      }
+
+      const to = node.config.to
+      const subject = node.config.subject ?? "(no subject)"
+      const body = node.config.message ?? ""
+
+      if (!to) {
+        throw new Error("Gmail node config is missing 'to'")
+      }
+
+      // Build a minimal RFC 2822 MIME message and base64url-encode it, per
+      // the Gmail API's messages.send format.
+      const mimeMessage =
+        `To: ${to}\r\n` +
+        `Subject: ${subject}\r\n` +
+        `Content-Type: text/plain; charset="UTF-8"\r\n\r\n` +
+        body
+
+      const encoder = new TextEncoder()
+      const bytes = encoder.encode(mimeMessage)
+      let binary = ""
+      for (const b of bytes) binary += String.fromCharCode(b)
+      const raw = btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "")
+
+      const sendResponse = await fetch("https://gmail.googleapis.com/gmail/v1/users/me/messages/send", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${tokenData.access_token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ raw }),
+      })
+
+      const sendResult = await sendResponse.json()
+      if (!sendResponse.ok) {
+        throw new Error(`Gmail send failed: ${sendResult.error?.message ?? "unknown error"}`)
+      }
+
+      return { sent: true, channel: "email", message_id: sendResult.id }
     },
   },
 }
@@ -189,6 +342,7 @@ serve(async () => {
       input: nodeRun.input,
       memory: nodeRun.memory,
       variables: nodeRun.variables,
+      clientId: workflowRun.client_id,
     })
 
     await supabase.from("workflow_run_checkpoints").upsert(

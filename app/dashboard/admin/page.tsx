@@ -96,8 +96,8 @@ export default async function AdminOverview() {
           <HubLink href="/dashboard/admin/essence" label="Essence Intel" icon="⊙" color="#8B7AA8" />
           <HubLink href="/dashboard/admin/twin" label="My Twin" icon="⟐" color="#8B7AA8" />
           <HubLink href="/dashboard/chat" label="Chat / Prompt" icon="☆" color="#B5764A" />
-          <HubLink href="/dashboard/admin/my-agents" label="My Agents" icon="⊕" color="#5E8B84" />
-          <HubLink href="/dashboard/admin/my-swarms" label="My Swarms" icon="⊗" color="#5E8B84" />
+          <HubLink href="/dashboard/admin/agents" label="My Agents" icon="⊕" color="#5E8B84" />
+          <HubLink href="/dashboard/admin/swarms" label="My Swarms" icon="⊗" color="#5E8B84" />
         </div>
       </div>
 

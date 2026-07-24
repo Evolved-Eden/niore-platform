@@ -81,14 +81,14 @@ export async function POST(req: NextRequest) {
     }
 
     // Build line items: first tier, then additional tiers, then addons
-    const lineItems = buildLineItems({
+    const lineItems = await buildLineItems({
       tier: allTiers[0] || undefined,
       addons: Array.from(addonIds),
     })
 
     // Add additional tiers beyond the first
     for (let i = 1; i < allTiers.length; i++) {
-      const extraTier = resolveTier(allTiers[i])
+      const extraTier = await resolveTier(allTiers[i])
       if (extraTier && 'amount' in extraTier) {
         const t = extraTier as any
         if (t.amount > 0) {

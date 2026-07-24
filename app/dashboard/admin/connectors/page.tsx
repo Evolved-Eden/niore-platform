@@ -50,6 +50,10 @@ const PLATFORM_FIELDS: PlatformFields = {
     { key: 'smtp_password', label: 'Password', type: 'password', placeholder: 'SMTP login password' },
     { key: 'from_address', label: 'From Address', type: 'text', placeholder: 'zuri@evolvededen.ai' },
   ],
+  google_calendar: [
+    { key: 'service_account_json', label: 'Service Account JSON', type: 'password', placeholder: 'Paste the full service account key JSON' },
+    { key: 'calendar_id', label: 'Calendar ID', type: 'text', placeholder: 'primary, or a specific calendar email/ID' },
+  ],
 }
 
 const PLATFORM_META: Record<string, { name: string; icon: string; description: string; note: string }> = {
@@ -76,6 +80,12 @@ const PLATFORM_META: Record<string, { name: string; icon: string; description: s
     icon: '@',
     description: 'Send intelligence briefings and alerts via email',
     note: 'Use any SMTP-compatible email service (SendGrid, Mailgun, SES, etc.).',
+  },
+  google_calendar: {
+    name: 'Google Calendar',
+    icon: '◷',
+    description: 'Create real calendar events when an admin approves a consultation booking',
+    note: 'Create a service account in Google Cloud Console, enable the Calendar API, and share your target calendar with the service account email.',
   },
 }
 
@@ -259,7 +269,7 @@ export default function AdminConnectorsPage() {
       const res = await fetch('/api/admin/connectors/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ platform }),
+        body: JSON.stringify({ platform, config_data: formData[platform] ?? {} }),
       })
 
       const data = await res.json()

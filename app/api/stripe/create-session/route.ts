@@ -7,7 +7,7 @@ import {
   buildLineItems,
   getCheckoutMode,
   getPlanTier,
-  STANDALONE_PRODUCTS,
+  getStandaloneProduct,
 } from '@/lib/pricing'
 
 const stripe = lazy(() => new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: STRIPE_API_VERSION }))
@@ -19,13 +19,13 @@ export async function POST(req: NextRequest) {
     const { tier, path, addons = [], email, name, products, coupon } = await req.json()
 
     // Build line items via unified pricing lib
-    const lineItems = buildLineItems({ tier, addons, products })
+    const lineItems = await buildLineItems({ tier, addons, products })
 
     // If standalone products (blueprint upgrades, domain modules) are specified
     // without a tier, validate them
     if (products && products.length > 0 && !tier) {
       for (const pid of products) {
-        if (!STANDALONE_PRODUCTS[pid]) {
+        if (!(await getStandaloneProduct(pid))) {
           return NextResponse.json({ error: `Unknown product: ${pid}` }, { status: 400 })
         }
       }
@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
 
     // If a plan tier is specified, validate it
     if (tier) {
-      const plan = getPlanTier(tier)
+      const plan = await getPlanTier(tier)
       if (!plan) {
         return NextResponse.json({ error: `Unknown tier: ${tier}` }, { status: 400 })
       }

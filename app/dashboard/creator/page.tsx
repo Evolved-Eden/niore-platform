@@ -1,5 +1,7 @@
 import { createAdminClient, createServiceClient } from '@/lib/supabase/server'
 import EssenceBoard from '@/components/EssenceBoard'
+import UpgradePanel from '@/components/UpgradePanel'
+import Link from 'next/link'
 
 // Blueprint data lives in client_twins.metadata.blueprint (set by intake/calculate)
 function extractBlueprint(clientTwin: any) {
@@ -31,19 +33,36 @@ export default async function CreatorDashboard() {
 
   const profile = extractBlueprint(twin)
 
-  const stats = [
-    { label: 'Profile Version', value: profile?.version ?? 1,                color: '#5E8B84' },
-    { label: 'Confidence',      value: profile?.confidence_score ?? '—',     color: '#C6A664' },
-    { label: 'Daily Essence',   value: profile?.daily_essence ? 'Active' : '—', color: '#8B7AA8' },
-    { label: 'Status',          value: profile?.profile_kind ?? '—',         color: '#B5764A' },
-  ]
+  // ── Creator layer: courses, audience, revenue ──
+  // courses/course_enrollments existed in the schema but were never
+  // surfaced on the Creator dashboard -- same pattern as the Business
+  // pipeline last pass. Revenue here is list-price x enrollments (no
+  // payments/payouts table exists yet to pull actual collected revenue --
+  // flagged honestly below rather than shown as if it were real payout data).
+  const { data: courses } = await svc
+    .from('courses')
+    .select('id, title, price, is_published, lesson_count')
+    .eq('creator_client_id', user.id)
 
-  const VERTICAL_COLOR: Record<string, string> = {
-    real_estate: '#B5764A',
-    healthcare:  '#5E8B84',
-    social:      '#8B7AA8',
-    corporate:   '#C6A664',
-  }
+  const courseIds = (courses ?? []).map((c) => c.id)
+  const { data: enrollments } = courseIds.length
+    ? await svc.from('course_enrollments').select('course_id, completed_at').in('course_id', courseIds)
+    : { data: [] }
+
+  const publishedCount = (courses ?? []).filter((c) => c.is_published).length
+  const totalEnrollments = enrollments?.length ?? 0
+  const completions = (enrollments ?? []).filter((e) => e.completed_at).length
+  const estimatedRevenue = (courses ?? []).reduce((sum, c) => {
+    const courseEnrollments = (enrollments ?? []).filter((e) => e.course_id === c.id).length
+    return sum + (Number(c.price) || 0) * courseEnrollments
+  }, 0)
+
+  const stats = [
+    { label: 'Published Courses', value: publishedCount,                          color: '#5E8B84' },
+    { label: 'Total Enrollments', value: totalEnrollments,                        color: '#C6A664' },
+    { label: 'Completion Rate',   value: totalEnrollments ? `${Math.round((completions / totalEnrollments) * 100)}%` : '—', color: '#8B7AA8' },
+    { label: 'Est. Revenue',      value: `$${estimatedRevenue.toLocaleString()}`, color: '#B5764A' },
+  ]
 
   return (
     <div className="max-w-5xl mx-auto animate-fade-in">
@@ -61,7 +80,7 @@ export default async function CreatorDashboard() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-3">
         {stats.map(s => (
           <div key={s.label} className="glass rounded-sm p-5">
             <div className="text-xs text-white/30 tracking-widest uppercase mb-3">{s.label}</div>
@@ -69,9 +88,52 @@ export default async function CreatorDashboard() {
           </div>
         ))}
       </div>
+      <p className="text-[10px] text-white/20 mb-8">
+        Est. Revenue is list price × enrollments -- no payments/payouts table exists yet to show actual collected revenue.
+      </p>
+
+      {/* Courses list */}
+      <div className="glass rounded-sm overflow-hidden mb-8">
+        <div className="px-6 py-4 border-b border-white/[0.06] flex items-center justify-between">
+          <span className="text-xs text-white/30 tracking-widest uppercase">Your Courses</span>
+          <Link href="/dashboard/creator/intelligences" className="text-[11px] text-[#5E8B84] hover:text-white transition-colors">
+            Content Studio →
+          </Link>
+        </div>
+        {courses && courses.length > 0 ? (
+          <div className="divide-y divide-white/[0.04]">
+            {courses.map((c) => {
+              const enrolled = (enrollments ?? []).filter((e) => e.course_id === c.id).length
+              return (
+                <div key={c.id} className="px-6 py-4 flex items-center justify-between">
+                  <div>
+                    <div className="text-sm text-white/80">{c.title}</div>
+                    <div className="text-[11px] text-white/30 mt-0.5">{c.lesson_count ?? 0} lessons · {enrolled} enrolled</div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                      c.is_published ? 'bg-[#5E8B84]/10 text-[#5E8B84] border border-[#5E8B84]/20' : 'bg-white/5 text-white/30 border border-white/10'
+                    }`}>
+                      {c.is_published ? 'Published' : 'Draft'}
+                    </span>
+                    <span className="text-sm text-[#C6A664]">${Number(c.price ?? 0).toLocaleString()}</span>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        ) : (
+          <div className="px-6 py-12 text-center text-white/20 text-sm">
+            No courses yet.{' '}
+            <Link href="/dashboard/creator/intelligences" className="text-[#5E8B84] hover:underline">
+              Build your first course →
+            </Link>
+          </div>
+        )}
+      </div>
 
       {/* Profile section */}
-      <div className="glass rounded-sm overflow-hidden">
+      <div className="glass rounded-sm overflow-hidden mb-8">
         <div className="px-6 py-4 border-b border-white/[0.06] flex items-center justify-between">
           <span className="text-xs text-white/30 tracking-widest uppercase">Your Intelligence Profile</span>
         </div>
@@ -99,6 +161,8 @@ export default async function CreatorDashboard() {
           </div>
         )}
       </div>
+
+      <UpgradePanel currentRole="creator" />
     </div>
   )
 }

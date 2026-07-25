@@ -364,7 +364,7 @@ function EssenceIntelligencePage() {
 
       if (!('id' in executingItem) || isDaily) {
         const insertRes = await (supabase
-          .from('essence_intelligence')
+          .from('essintelligence')
           .insert({
             client_id: user.id,
             type: executingItem.type,
@@ -434,7 +434,7 @@ function EssenceIntelligencePage() {
   async function handleCancelAction(itemId: string) {
     try {
       const cancelRes = await (supabase as any)
-        .from('essence_intelligence')
+        .from('essintelligence')
         .update({ status: 'cancelled' })
         .eq('id', itemId) as { error: any }
       const error = cancelRes?.error

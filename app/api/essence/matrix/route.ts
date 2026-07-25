@@ -60,7 +60,7 @@ export async function GET() {
 
     // Fetch all blueprint templates
     const { data: bps } = await supabase
-      .from('blueprint_templates')
+      .from('essence_engines')
       .select('key, name, description, sections_json, template_json')
       .in('key', BP_KEYS)
 

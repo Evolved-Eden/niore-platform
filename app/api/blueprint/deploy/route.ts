@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
       }
 
       const { data, error } = await supabase
-        .from('blueprint_deployments')
+        .from('essence_engine_deployments')
         .insert({
           organization_id,
           blueprint_template_id,
@@ -125,7 +125,7 @@ export async function POST(req: NextRequest) {
     }
 
     const { data, error } = await supabase
-      .from('blueprint_deployments')
+      .from('essence_engine_deployments')
       .insert(deployment)
       .select()
       .single()
@@ -157,7 +157,7 @@ export async function GET(req: NextRequest) {
     }
 
     const { data, error } = await supabase
-      .from('blueprint_deployments')
+      .from('essence_engine_deployments')
       .select('*')
       .eq('organization_id', organization_id)
       .order('created_at', { ascending: false })

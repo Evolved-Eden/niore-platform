@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
     const vertical_key = req.nextUrl.searchParams.get('vertical_key')
 
     let query = supabase
-      .from('blueprint_templates')
+      .from('essence_engines')
       .select('*', { count: 'exact', head: false })
       .eq('is_active', true)
       .order('name')

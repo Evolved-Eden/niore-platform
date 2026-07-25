@@ -57,7 +57,7 @@ export default async function AdminOverview() {
          blueprintCount, essenceCount, workflowCount, avatarCount, tierCount] = await Promise.all([
     count('users'), count('clients'), count('organizations'),
     count('archetypes'), count('agent_generators'),
-    count('blueprint_templates'), count('essence_templates'), count('workflow_templates'),
+    count('essence_engines'), count('essence_templates'), count('workflow_templates'),
     count('avatars'), count('tier_entitlements'),
   ])
 

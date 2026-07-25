@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
     const auth = await requireAdmin()
     if (auth instanceof NextResponse) return auth
     const { data, error } = await supabaseAdmin
-      .from('verticals')
+      .from('specialties')
       .select('*')
       .order('name', { ascending: true });
 
@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { data, error } = await supabaseAdmin
-      .from('verticals')
+      .from('specialties')
       .insert(body)
       .select()
       .single();

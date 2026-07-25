@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic'
 export default async function AdminVerticalsPage() {
   try {
     const { data } = await supabaseAdmin
-      .from('verticals')
+      .from('specialties')
       .select('*')
       .order('name', { ascending: true })
 

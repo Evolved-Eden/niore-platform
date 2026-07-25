@@ -973,8 +973,8 @@ export type Database = {
       app_config: TableWithDefaults<AppConfigRow>
       archetypes: TableWithDefaults<ArchetypeRow>
       avatars: TableWithDefaults<AvatarRow>
-      blueprint_deployments: TableWithDefaults<BlueprintDeployment>
-      blueprint_templates: TableWithDefaults<BlueprintTemplateRow>
+      essence_engine_deployments: TableWithDefaults<BlueprintDeployment>
+      essence_engines: TableWithDefaults<BlueprintTemplateRow>
       businesses: TableWithDefaults<Business>
       canonical_agent_map: TableWithDefaults<CanonicalAgentMapRow>
       catalogs: TableWithDefaults<{ id: string; key: string; name: string; kind?: string; is_active?: boolean; metadata?: unknown; created_at?: string; updated_at?: string }>
@@ -990,7 +990,7 @@ export type Database = {
       courses: TableWithDefaults<CourseRow>
       course_enrollments: TableWithDefaults<CourseEnrollmentRow>
       entitlements: TableWithDefaults<Entitlement>
-      essence_intelligence: TableWithDefaults<EssenceIntelligenceRow>
+      essintelligence: TableWithDefaults<EssenceIntelligenceRow>
       essence_templates: TableWithDefaults<EssenceTemplateRow>
       evolved_eden_agents: TableWithDefaults<EvolvedEdenAgentRow>
       human_profiles: TableWithDefaults<HumanProfileRow>
@@ -1008,8 +1008,8 @@ export type Database = {
       swarm_templates: TableWithDefaults<SwarmTemplateRow>
       tier_entitlements: TableWithDefaults<TierEntitlement>
       users: TableWithDefaults<User>
-      vertical_subs: TableWithDefaults<VerticalSubRow>
-      verticals: TableWithDefaults<VerticalRow>
+      specialty_subs: TableWithDefaults<VerticalSubRow>
+      specialties: TableWithDefaults<VerticalRow>
       workflow_demos: TableWithDefaults<WorkflowDemoRow>
       workflow_run_logs: TableWithDefaults<WorkflowRunLogRow>
     }

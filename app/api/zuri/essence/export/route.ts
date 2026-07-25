@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
 
   // Fetch essence intelligence items for the user
   const { data: _items } = await supabase
-    .from('essence_intelligence')
+    .from('essintelligence')
     .select('*')
     .eq('client_id', user.id)
     .order('created_at', { ascending: false })

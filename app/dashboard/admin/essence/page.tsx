@@ -86,7 +86,7 @@ export default function AdminEssencePage() {
       setName(identity?.full_name ?? user.email?.split('@')[0] ?? 'Admin')
 
       const { data: essenceRows } = await supabase
-        .from('essence_intelligence')
+        .from('essintelligence')
         .select('*')
         .eq('client_id', user.id)
         .order('created_at', { ascending: false })
@@ -121,7 +121,7 @@ export default function AdminEssencePage() {
     if (!user) return
 
     const { data, error } = await supabase
-      .from('essence_intelligence')
+      .from('essintelligence')
       .insert({
         client_id: user.id,
         type: newItem.type,

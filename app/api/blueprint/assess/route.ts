@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
     }
 
     const { data: template, error } = await supabase
-      .from('blueprint_templates')
+      .from('essence_engines')
       .select('*')
       .eq('key', template_key)
       .single()
@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
 
     // Load the blueprint template
     const { data: template, error } = await supabase
-      .from('blueprint_templates')
+      .from('essence_engines')
       .select('*')
       .eq('key', template_key)
       .single()

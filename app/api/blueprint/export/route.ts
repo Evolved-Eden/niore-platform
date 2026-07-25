@@ -47,7 +47,7 @@ export async function GET(req: NextRequest) {
 
   // Fetch blueprint template
   const { data: blueprint, error: bpError } = await supabase
-    .from('blueprint_templates')
+    .from('essence_engines')
     .select('*')
     .eq('key', templateKey)
     .single()

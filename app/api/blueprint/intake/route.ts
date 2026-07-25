@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
 
     // Fetch available templates to inform recommendations
     const { data: templates } = await supabase
-      .from('blueprint_templates')
+      .from('essence_engines')
       .select('*, template_json')
       .eq('is_active', true)
 

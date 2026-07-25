@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
 
     try {
       let query = supabaseAdmin
-        .from('essence_intelligence')
+        .from('essintelligence')
         .select('*')
         .eq('client_id', targetClientId)
 
@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
         status: 'active',
       })
     } catch (supabaseError: any) {
-      console.error('essence_intelligence fetch failed:', supabaseError)
+      console.error('essintelligence fetch failed:', supabaseError)
       return NextResponse.json({
         items: [],
         status: 'initializing',

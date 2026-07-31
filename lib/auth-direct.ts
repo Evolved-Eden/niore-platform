@@ -95,7 +95,6 @@ export async function createSession(userId: string, email: string) {
   // ── Refresh token ──
   const refreshToken = randomUUID().replace(/-/g, '') + randomUUID().replace(/-/g, '')
   const refreshTokenHash = createHash('sha256').update(refreshToken).digest('hex')
-  const refreshTokenId = randomUUID()
 
   // Create session record
   await query(
@@ -105,12 +104,13 @@ export async function createSession(userId: string, email: string) {
     [sessionId, userId]
   )
 
-  // Create refresh token record
+  // Create refresh token record.
+  // NOTE: auth.refresh_tokens.id is a bigserial (bigint) in Supabase's schema,
+  // NOT a UUID — omit it so Postgres auto-generates the id.
   await query(
-    `INSERT INTO auth.refresh_tokens (instance_id, id, token, user_id, revoked, created_at, updated_at, parent, session_id)
-     VALUES (NULL, $1, $2, $3, FALSE, NOW(), NOW(), NULL, $4)
-     ON CONFLICT (id) DO NOTHING`,
-    [refreshTokenId, refreshTokenHash, userId, sessionId]
+    `INSERT INTO auth.refresh_tokens (instance_id, token, user_id, revoked, created_at, updated_at, parent, session_id)
+     VALUES (NULL, $1, $2, FALSE, NOW(), NOW(), NULL, $3)`,
+    [refreshTokenHash, userId, sessionId]
   )
 
   return { accessToken, refreshToken, expiresAt }

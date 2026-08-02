@@ -7,8 +7,12 @@ services:
       POSTGRES_USER: evolved
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: evolved_eden
+    # Bound to loopback, not 0.0.0.0. Still reachable from the host for
+    # psql/pgadmin and from other containers by service name, but never
+    # exposed to the internet -- even if this file is deployed without
+    # docker-compose.prod.yml (which sets `ports: []`).
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -21,8 +25,9 @@ services:
     image: n8nio/n8n:latest
     container_name: evolved-n8n
     restart: unless-stopped
+    # Loopback only -- reach n8n through the reverse proxy, not directly.
     ports:
-      - "5678:5678"
+      - "127.0.0.1:5678:5678"
     environment:
       - DB_TYPE=postgresdb
       - DB_POSTGRESDB_HOST=postgres

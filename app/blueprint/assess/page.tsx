@@ -23,7 +23,7 @@ const VALID_PATHS: IntakeRole[] = ['client', 'creator', 'personal', 'affiliate']
 // ── Flow step ──
 type Step = 'loading' | 'welcome' | 'core' | 'core_complete' | 'extended' | 'extended_complete' | 'intake_role' | 'intake' | 'complete'
 
-const STORAGE_KEY = 'blueprint_progress_v2'
+const STORAGE_KEY = 'blueprint_progress_v1'
 
 function saveProgress(state: Record<string, any>) {
   try {

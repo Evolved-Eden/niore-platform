@@ -60,7 +60,7 @@ export async function GET() {
 
     // Fetch all blueprint templates
     const { data: bps } = await supabase
-      .from('essence_engines')
+      .from('essintelligence_templates')
       .select('key, name, description, sections_json, template_json')
       .in('key', BP_KEYS)
 
@@ -70,7 +70,7 @@ export async function GET() {
 
     // Fetch all omnigrid intelligence systems
     const { data: allSystems } = await supabase
-      .from('omnigrid_intelligence_system')
+      .from('essence_engines')
       .select('slug, name, tagline, description, domain_key, domain_name, lens_key, system_number')
       .order('domain_key')
       .order('system_number')

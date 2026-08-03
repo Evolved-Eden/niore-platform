@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
 
     if (type === 'all' || type === 'blueprint') {
       const { data, error } = await supabaseAdmin
-        .from('essence_engines')
+        .from('essintelligence_templates')
         .select('*')
         .order('key', { ascending: true });
       if (!error) blueprints = (data || []).map((b: any) => ({ ...b, _template_type: 'blueprint' }));
@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
     }
 
     const { data, error } = await supabaseAdmin
-      .from('essence_engines')
+      .from('essintelligence_templates')
       .insert({
         key: body.key, name: body.name, description: body.description || null,
         vertical_key: body.vertical_key || null, subcategory_key: body.subcategory_key || null,

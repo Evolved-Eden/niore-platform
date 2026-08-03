@@ -29,7 +29,7 @@ const NAV: Record<UserRole, { label: string; href: string }[]> = {
     { label: 'Profile',      href: '/dashboard/client/profile' },
     { label: 'Organization', href: '/dashboard/client/organization' },
     { label: 'Intake',       href: '/intake' },
-    { label: 'Blueprint',    href: '/dashboard/client/essence-profile' },
+    { label: 'Essence Profile', href: '/dashboard/client/essence-profile' },
     { label: 'Assessment',   href: '/dashboard/client/essence-profile/assess' },
     { label: 'Essence Intel',href: '/dashboard/client/essence' },
     { label: 'Workforce',    href: '/dashboard/client/workforce' },
@@ -46,7 +46,7 @@ const NAV: Record<UserRole, { label: string; href: string }[]> = {
   creator: [
     { label: 'Overview',       href: '/dashboard/creator' },
     { label: 'Intake',         href: '/intake' },
-    { label: 'Blueprint',      href: '/dashboard/client/essence-profile' },
+    { label: 'Essence Profile', href: '/dashboard/client/essence-profile' },
     { label: 'Assessment',     href: '/dashboard/client/essence-profile/assess' },
     { label: 'Essence Intel',  href: '/dashboard/client/essence' },
     { label: 'Intelligences',  href: '/dashboard/creator/intelligences' },
@@ -59,7 +59,7 @@ const NAV: Record<UserRole, { label: string; href: string }[]> = {
   admin: [
     { label: 'Overview',       href: '/dashboard/admin' },
     { label: 'Intake',         href: '/intake' },
-    { label: 'My Blueprint',   href: '/dashboard/admin/essence-profile' },
+    { label: 'My Essence Profile', href: '/dashboard/admin/essence-profile' },
     { label: 'Assessment',     href: '/dashboard/client/essence-profile/assess' },
     { label: 'Essence Intel',  href: '/dashboard/admin/essence' },
     { label: 'My Twin',        href: '/dashboard/admin/twin' },
@@ -86,7 +86,7 @@ const NAV: Record<UserRole, { label: string; href: string }[]> = {
   personal: [
     { label: 'My Hub',       href: '/dashboard/personal' },
     { label: 'Intake',       href: '/intake' },
-    { label: 'Blueprint',    href: '/dashboard/client/essence-profile' },
+    { label: 'Essence Profile', href: '/dashboard/client/essence-profile' },
     { label: 'Assessment',   href: '/dashboard/client/essence-profile/assess' },
     { label: 'Essence Intel',href: '/dashboard/client/essence' },
     { label: 'Profile',      href: '/dashboard/personal/profile' },
@@ -95,7 +95,7 @@ const NAV: Record<UserRole, { label: string; href: string }[]> = {
   affiliate: [
     { label: 'Overview (Aff)',href: '/dashboard/affiliate' },
     { label: 'Intake',       href: '/intake' },
-    { label: 'Blueprint',    href: '/dashboard/client/essence-profile' },
+    { label: 'Essence Profile', href: '/dashboard/client/essence-profile' },
     { label: 'Assessment',   href: '/dashboard/client/essence-profile/assess' },
     { label: 'Essence Intel',href: '/dashboard/client/essence' },
     { label: 'Referrals',    href: '/dashboard/affiliate/referrals' },

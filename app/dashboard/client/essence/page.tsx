@@ -606,7 +606,7 @@ function EssenceIntelligencePage() {
               <div className="px-5 py-8 text-center">
                 <p className="text-sm text-white/30 mb-2">No intelligence items yet</p>
                 <p className="text-xs text-white/20 max-w-sm mx-auto">
-                  Run your Blueprint Assessment to activate your intelligence system,
+                  Run your Essence Assessment to activate your intelligence system,
                   then check back for daily suggestions and actionable insights.
                 </p>
               </div>
@@ -681,11 +681,11 @@ function EssenceIntelligencePage() {
             )}
           </div>
 
-          {/* ── B. Blueprint/Assessment Status ── */}
+          {/* ── B. Essence Assessment Status ── */}
           <div className="glass rounded-sm border border-white/[0.06] overflow-hidden">
             <div className="px-5 py-4 border-b border-white/[0.06]">
               <span className="text-xs text-white/30 tracking-widest uppercase">
-                Blueprint &amp; Assessment Status
+                Essence Assessment Status
               </span>
             </div>
             <div className="p-5">
@@ -707,7 +707,7 @@ function EssenceIntelligencePage() {
                       href="/dashboard/client/essence-profile/assess"
                       className="px-5 py-2 bg-[#C6A664] text-black text-xs font-bold rounded-sm hover:bg-white transition-all"
                     >
-                      Run Blueprint Assessment →
+                      Run Essence Assessment →
                     </Link>
                   </div>
                   <p className="text-[10px] text-white/20 mt-3">
@@ -722,7 +722,7 @@ function EssenceIntelligencePage() {
                   <div className="flex items-center justify-between mb-4">
                     <div>
                       <div className="text-xs text-white/30 tracking-widest uppercase mb-1">
-                        Blueprint Score
+                        Essence Score
                       </div>
                       <div className="text-2xl font-bold text-[#C6A664]">
                         {blueprint.overallScore}
@@ -910,11 +910,11 @@ function EssenceIntelligencePage() {
             </div>
           </div>
 
-          {/* Blueprint Link */}
+          {/* Essence Profile Link */}
           <div className="glass rounded-sm border border-white/[0.06] overflow-hidden">
             <div className="px-5 py-4 border-b border-white/[0.06]">
               <span className="text-xs text-white/30 tracking-widest uppercase">
-                Blueprint
+                Essence Profile
               </span>
             </div>
             <div className="p-5 space-y-3">
@@ -936,7 +936,7 @@ function EssenceIntelligencePage() {
                     href="/dashboard/client/essence-profile"
                     className="text-xs text-[#C6A664] hover:opacity-80 transition-all"
                   >
-                    View Full Blueprint →
+                    View Full Essence Profile →
                   </Link>
                 </div>
               )}
@@ -1124,10 +1124,10 @@ function EssenceIntelligencePage() {
                   {!blueprint?.exists && (
                     <div className="p-3 rounded-sm bg-[#B5764A]/[0.08] border border-[#B5764A]/[0.15]">
                       <p className="text-[10px] text-[#B5764A] font-medium mb-1">
-                        No Blueprint Found
+                        No Essence Profile Found
                       </p>
                       <p className="text-[11px] text-white/50">
-                        For best results, run your Blueprint Assessment first. Agent execution will still work without it.
+                        For best results, run your Essence Assessment first. Agent execution will still work without it.
                       </p>
                     </div>
                   )}

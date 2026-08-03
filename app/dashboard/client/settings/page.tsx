@@ -53,7 +53,7 @@ export default async function ClientSettingsPage() {
       <section className="glass rounded-sm p-6 border border-white/[0.06]">
         <h2 className="text-sm font-semibold mb-4">Intake & Design</h2>
         <p className="text-xs text-white/40 mb-4">
-          Your Intelligence Blueprint profile and assessment results. Update your profile at any time.
+          Your Essence Profile and assessment results. Update your profile at any time.
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
           <div>

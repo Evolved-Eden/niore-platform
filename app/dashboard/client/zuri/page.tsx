@@ -11,7 +11,7 @@ type Message = {
 
 const QUICK_ACTIONS = [
   {
-    label: "Start Blueprint",
+    label: "Start Assessment",
     desc: "Assess your business intelligence",
     href: "/dashboard/client/essence-profile/assess",
     icon: "◇",
@@ -68,7 +68,7 @@ export default function ZuriChatPage() {
     {
       role: "assistant",
       content:
-        "I'm Zuri — your personal intelligence concierge.\n\nI can help you start your Blueprint assessment, check your Essence Board, review your Twin, manage your Vault, or answer any questions about your ecosystem.\n\nWhat would you like to do?",
+        "I'm Zuri — your personal intelligence concierge.\n\nI can help you start your Essence Assessment, check your Essence Board, review your Twin, manage your Vault, or answer any questions about your ecosystem.\n\nWhat would you like to do?",
     },
   ]);
   const [input, setInput] = useState("");

@@ -47,7 +47,7 @@ function PricingCreatorPage() {
               </p>
             </div>
             <Link href="/intake?path=creator" className="inline-flex items-center justify-center rounded-full bg-[#5E8B84] px-6 py-3 text-sm font-bold text-black hover:bg-white transition-all">
-              Start Full Assessment Assessment →
+              Start Full Assessment →
             </Link>
           </div>
         </section>

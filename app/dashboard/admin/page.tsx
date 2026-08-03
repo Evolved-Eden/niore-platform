@@ -92,7 +92,7 @@ export default async function AdminOverview() {
           <h2 className="text-xs text-white/30 tracking-widest uppercase">Personal Hub</h2>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
-          <HubLink href="/dashboard/admin/essence-profile" label="My Blueprint" icon="◆" color="#7A2E32" />
+          <HubLink href="/dashboard/admin/essence-profile" label="My Essence Profile" icon="◆" color="#7A2E32" />
           <HubLink href="/dashboard/admin/essence" label="Essence Intel" icon="⊙" color="#8B7AA8" />
           <HubLink href="/dashboard/admin/twin" label="My Twin" icon="⟐" color="#8B7AA8" />
           <HubLink href="/dashboard/chat" label="Chat / Prompt" icon="☆" color="#B5764A" />

@@ -1,0 +1,80 @@
+HOTFIX -- silent role-lookup fallback (the "everyone lands on /pricing" bug)
+════════════════════════════════════════════════════════════════════════
+Verified fresh against your round-34-applied working tree (main bf2d5fc +
+all 8 round 34 patches). Applies with zero conflicts -- confirmed via
+`git apply --check` against a real, separate clone checked out to that
+exact state, then confirmed the applied files byte-match, before this was
+handed to you.
+
+Apply with (from repo root, after round 34 is already applied):
+  git apply HOTFIX_role_lookup_silent_fallback.patch
+
+════════════════════════════════════════════════════════════════════════
+WHAT WAS ACTUALLY BROKEN
+════════════════════════════════════════════════════════════════════════
+Three places in the code look up a user's role from `public.users` and ALL
+THREE discarded the query's `error` and silently fell back to a default
+whenever the lookup failed for any reason (RLS denial, dropped connection,
+self-hosted PostgREST/Kong timeout -- same infra class as the original
+login-hang bug, just never given the same protection):
+
+1. proxy.ts (middleware) -- dashboard role gate. Failure defaulted to
+   role='client', which then fails the payment/plan gate below it and
+   redirects to /pricing?path=client&reason=complete_signup. This is the
+   one Zuri hit -- it doesn't matter which account you're on, a failed
+   lookup makes EVERY account look like an unpaid brand-new signup.
+
+2. proxy.ts (middleware) -- /api/admin/* route gate. Same failure mode,
+   different symptom: a failed lookup read as "not admin" and returned a
+   blanket 403 Forbidden. Not something Zuri had reported yet, but since
+   her plan is to run everything through the admin backend API, this
+   would have blocked that workflow too the moment she tried it. Fixed
+   proactively.
+
+3. app/dashboard/layout.tsx -- the same role/full_name lookup, defense in
+   depth for the (rare) case this layout renders without middleware having
+   already caught it.
+
+════════════════════════════════════════════════════════════════════════
+THE FIX
+════════════════════════════════════════════════════════════════════════
+- New lib/with-timeout.ts: a 3-second timeout guard, same pattern as the
+  existing getUserWithTimeout() in lib/supabase/middleware.ts (which only
+  ever protected supabase.auth.getUser(), not these separate
+  .from('users') PostgREST calls).
+- All three call sites now: (a) time out after 3s instead of hanging,
+  (b) explicitly capture and console.error() the query error instead of
+  discarding it, (c) on a real failure, fail CLOSED but VISIBLY instead of
+  silently guessing a role:
+    - dashboard gate  -> 503 HTML page, "Account verification temporarily
+      unavailable," instead of the misleading /pricing redirect.
+    - /api/admin/* gate -> 503 JSON, instead of a misleading 403 Forbidden.
+    - layout.tsx        -> redirect('/login?error=role_lookup_failed'),
+      which now shows a proper message (added to login page's existing
+      error-message map).
+- Deliberately did NOT change behavior for the case where the query
+  succeeds and genuinely finds zero rows (a brand-new signup race) --
+  that's a different, legitimate scenario and still falls back to
+  'client' as before. Only actual errors/timeouts are now treated as
+  "can't verify," not "definitely not admin."
+
+════════════════════════════════════════════════════════════════════════
+WHAT THIS DOES NOT FIX / WHAT'S STILL UNKNOWN
+════════════════════════════════════════════════════════════════════════
+This makes the failure LOUD and diagnosable instead of silently
+misleading -- it does not fix whatever is causing the underlying
+connectivity problem (if that's what this is). Once this is live, if
+Zuri's admin account STILL can't get in, she'll now see the 503
+"Account verification temporarily unavailable" page/response instead of
+/pricing -- which confirms it really is a backend connectivity issue on
+this specific call, and her server logs will now have an explicit
+`[proxy] users role lookup errored for <user_id> - <message>` line
+telling you exactly why (RLS message, timeout, connection refused, etc.).
+
+If instead her admin account starts working immediately after this
+patch with NO 503 ever appearing, that means the lookup was succeeding
+fine all along and the real issue was something else entirely -- in
+which case this patch is a no-op for her case and we look elsewhere.
+
+Still want, once she can log the actual error text:
+  select id, email, role from public.users where email = '<her admin email>';

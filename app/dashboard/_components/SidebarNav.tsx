@@ -1,6 +1,7 @@
 'use client'
 
-import { usePathname } from 'next/navigation'
+import { useEffect, useRef } from 'react'
+import { usePathname, useRouter } from 'next/navigation'
 import Link from 'next/link'
 
 interface NavItem {
@@ -54,6 +55,26 @@ const NAV_SECTION: Record<string, number> = {
 
 export default function SidebarNav({ nav, color }: { nav: NavItem[]; color: string }) {
   const pathname = usePathname()
+  const router = useRouter()
+  const isFirstRender = useRef(true)
+
+  // The parent dashboard layout (which computes role and builds this `nav`
+  // array) is shared across every role -- Next.js reuses its already-
+  // rendered output on client-side navigation between sibling routes
+  // instead of re-running the role query, so without this, the sidebar can
+  // go stale relative to whatever page you actually navigate to (see
+  // app/dashboard/layout.tsx's force-dynamic comment for the full
+  // explanation). router.refresh() re-runs the server layout for the
+  // current route, keeping role/nav in sync on every navigation. Skipped on
+  // the very first render since the layout has already just run fresh for
+  // that initial load.
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+      return
+    }
+    router.refresh()
+  }, [pathname, router])
 
   return (
     <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">

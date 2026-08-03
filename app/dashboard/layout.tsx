@@ -7,6 +7,22 @@ import { deriveRoleFromPlanTier } from '@/types'
 
 import SidebarNav from './_components/SidebarNav'
 
+// This one layout renders every role's shell (client/admin/creator/personal/
+// affiliate/collective all share it -- there's no per-role nested layout).
+// Next.js's App Router only re-runs a layout's server logic on a hard page
+// load or a layout-segment change; client-side navigation between sibling
+// routes that share this layout (e.g. /dashboard/client/x -> /dashboard/
+// admin/y) normally REUSES the already-rendered layout output instead of
+// re-fetching it, which is what let the sidebar/role badge go stale after
+// the very first render of a session (page content below it still updates
+// fine, since page-level segments always refetch on navigation).
+// force-dynamic stops this layout from ever being served from Next's Full
+// Route Cache -- combined with SidebarNav's router.refresh() on every
+// pathname change (which busts the client Router Cache for this segment),
+// role/nav now gets recomputed fresh on every navigation, not just once
+// per session.
+export const dynamic = 'force-dynamic'
+
 const NAV: Record<UserRole, { label: string; href: string }[]> = {
   client: [
     { label: 'Overview',     href: '/dashboard/client' },

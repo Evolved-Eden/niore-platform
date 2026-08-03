@@ -17,15 +17,8 @@ function ResetPasswordForm() {
   const [success, setSuccess] = useState(false)
 
   useEffect(() => {
-    // Verify user has an active session (auth code was exchanged in callback)
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (!user) {
-        router.replace("/login?error=invalid_reset_link")
-        return
-      }
-      setCheckingSession(false)
-    })
-  }, [supabase, router])
+    setCheckingSession(false)
+  }, [])
 
   async function handleReset() {
     if (!password.trim()) {
@@ -44,10 +37,15 @@ function ResetPasswordForm() {
     setLoading(true)
     setError(null)
 
-    const { error: updateError } = await supabase.auth.updateUser({ password })
+    const res = await fetch('/api/auth/update-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password }),
+    })
+    const result = await res.json()
 
-    if (updateError) {
-      setError(updateError.message)
+    if (!res.ok) {
+      setError(result.error || 'Something went wrong')
       setLoading(false)
       return
     }

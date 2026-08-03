@@ -61,6 +61,16 @@ export async function findUserByEmail(email: string) {
   return user
 }
 
+export async function updatePassword(userId: string, newPassword: string) {
+  await query(
+    `UPDATE auth.users
+     SET encrypted_password = extensions.crypt($1, extensions.gen_salt('bf')),
+         updated_at = NOW()
+     WHERE id = $2`,
+    [newPassword, userId]
+  )
+}
+
 /**
  * Generate a Supabase-compatible session (access_token JWT +
  * refresh_token stored in DB) and return both.

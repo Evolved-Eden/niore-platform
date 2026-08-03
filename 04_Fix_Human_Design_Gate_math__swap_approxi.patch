@@ -1,0 +1,70 @@
+From edaaca8f19731b54dce9b68f8aca2876574bf281 Mon Sep 17 00:00:00 2001
+From: Round33 Handoff <handoff@niore-platform.local>
+Date: Mon, 3 Aug 2026 11:47:51 -0400
+Subject: [PATCH] Fix Human Design/Gate math: swap approximate sunLongitude()
+ for real ephemeris getPlanetLongitude('Sun', date), export getPlanetLongitude
+ from astrology.ts
+
+---
+ app/api/intake/calculate/route.ts | 15 ++++++---------
+ lib/profile/astrology.ts          |  2 +-
+ 2 files changed, 7 insertions(+), 10 deletions(-)
+
+diff --git a/app/api/intake/calculate/route.ts b/app/api/intake/calculate/route.ts
+index b6c9304..8ac8d62 100644
+--- a/app/api/intake/calculate/route.ts
++++ b/app/api/intake/calculate/route.ts
+@@ -1,6 +1,7 @@
+ import { NextRequest, NextResponse } from 'next/server'
+ import { createAdminClient, createServiceClient } from '@/lib/supabase/server'
+ import { getN8nUrl } from '@/lib/config'
++import { getPlanetLongitude } from '@/lib/profile/astrology'
+ 
+ // ── EE Core Engine ─────────────────────────────────────────────
+ // Calculates the user's foundational profile from birth data.
+@@ -76,24 +77,20 @@ const GATES: Record<number, { name: string; hexagram: number; geneKey: string; k
+ 
+ // Approximate sun ecliptic longitude for a given date + time
+ function sunLongitude(date: Date): number {
++  const precise = getPlanetLongitude('Sun', date)
++  if (precise !== null) return precise
++
++  // Fallback: the original approximate formula (kept as a safety net only)
+   const year = date.getUTCFullYear()
+   const month = date.getUTCMonth()
+   const day = date.getUTCDate()
+-
+-  // Fractional day of year (includes time for smoother gate transitions)
+   const monthDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+-  let dayOfYear = day +
+-    date.getUTCHours() / 24 +
+-    date.getUTCMinutes() / 1440
++  let dayOfYear = day + date.getUTCHours() / 24 + date.getUTCMinutes() / 1440
+   for (let i = 0; i < month; i++) dayOfYear += monthDays[i]
+   const isLeap = (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0
+   if (isLeap && month > 1) dayOfYear += 1
+-
+-  // More accurate vernal equinox ~ March 20.5 (noon UTC)
+   const daysSinceEquinox = dayOfYear - 80.5
+   const longitude = daysSinceEquinox * (360 / 365.25)
+-
+-  // Normalize to 0-360
+   return ((longitude % 360) + 360) % 360
+ }
+ 
+diff --git a/lib/profile/astrology.ts b/lib/profile/astrology.ts
+index 6231f9f..663da5e 100644
+--- a/lib/profile/astrology.ts
++++ b/lib/profile/astrology.ts
+@@ -80,7 +80,7 @@ const BODIES: Record<string, any> = {}
+ 
+ // ── Ecliptic Longitude Calculator ───────────────────────
+ 
+-function getPlanetLongitude(bodyName: string, date: Date): number | null {
++export function getPlanetLongitude(bodyName: string, date: Date): number | null {
+   try {
+     // Dynamic require (astronomy-engine)
+     const A = require('astronomy-engine')
+-- 
+2.34.1
+

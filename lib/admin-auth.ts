@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 import type { User } from '@supabase/supabase-js'
 
@@ -15,7 +15,11 @@ export async function requireAdmin(): Promise<
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const { data: profile } = await supabase
+  // Service-role client for the role lookup: the anon-key client can't load a
+  // session from the sign-in cookie (raw JWT), so RLS-gated role queries run
+  // anonymous and return nothing. The service key bypasses RLS deterministically.
+  const adminSupabase = await createAdminClient()
+  const { data: profile } = await adminSupabase
     .from('users')
     .select('role')
     .eq('id', user.id)

@@ -147,7 +147,7 @@ export async function setSessionCookies(
     maxAge: 3600 * 24 * 365, // 1 year
   }
 
-  // Set auth token cookie
+  // Set auth token cookie (raw access token — used by middleware's local JWT verify)
   cookieStore.set(
     getStorageKey(baseUrl, 'auth-token'),
     accessToken,
@@ -158,6 +158,24 @@ export async function setSessionCookies(
   cookieStore.set(
     getStorageKey(baseUrl, 'refresh-token'),
     refreshToken,
+    cookieOptions
+  )
+
+  // Set the session cookie in the format @supabase/gotrue-js reads
+  // (storage key 'supabase.auth.token', base64url-encoded JSON session with
+  // the 'base64-' prefix). Without this, server clients built on the anon key
+  // never load a session from a sign-in cookie, so every RLS-gated query runs
+  // anonymous and role checks (admin gate etc.) fail with 403.
+  const sessionJson = JSON.stringify({
+    access_token: accessToken,
+    refresh_token: refreshToken,
+    expires_in: 3600,
+    expires_at: expiresAt,
+    token_type: 'bearer',
+  })
+  cookieStore.set(
+    'supabase.auth.token',
+    `base64-${Buffer.from(sessionJson).toString('base64url')}`,
     cookieOptions
   )
 }
@@ -171,6 +189,7 @@ export async function clearSessionCookies() {
 
   cookieStore.delete(getStorageKey(baseUrl, 'auth-token'))
   cookieStore.delete(getStorageKey(baseUrl, 'refresh-token'))
+  cookieStore.delete('supabase.auth.token')
 }
 
 /**

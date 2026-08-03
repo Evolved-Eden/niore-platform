@@ -1,8 +1,13 @@
 import { NextResponse, type NextRequest } from 'next/server'
-import { createClient } from '@/lib/supabase/middleware'
+import { createClient, createAdminClient } from '@/lib/supabase/middleware'
 
 export async function proxy(request: NextRequest) {
   const { supabase, response: supabaseResponse } = await createClient(request)
+  // Service-role client for role lookups. The anon-key client cannot reliably
+  // load a session from this app's sign-in cookie (raw JWT in sb-*-auth-token),
+  // so RLS-gated role queries run anonymous and admins get 403. Using the
+  // service key bypasses RLS and returns the role deterministically.
+  const { supabase: adminSupabase } = await createAdminClient(request)
 
   const path = request.nextUrl.pathname
 
@@ -16,7 +21,7 @@ export async function proxy(request: NextRequest) {
         { status: 401 }
       )
     }
-    const { data: profile } = await supabase
+    const { data: profile } = await adminSupabase
       .from('users')
       .select('role')
       .eq('id', user.id)
@@ -68,7 +73,7 @@ export async function proxy(request: NextRequest) {
 
   // Role-based dashboard guards
   if (path.startsWith('/dashboard')) {
-    const { data: identity } = await supabase
+    const { data: identity } = await adminSupabase
       .from('users')
       .select('role')
       .eq('id', user.id)

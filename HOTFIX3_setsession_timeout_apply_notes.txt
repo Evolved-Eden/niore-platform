@@ -1,0 +1,97 @@
+HOTFIX #3 -- fixes the regression HOTFIX #2 caused ("can't login" / "Invalid email or password")
+════════════════════════════════════════════════════════════════════════
+APPLY ON TOP OF HOTFIX #1 AND HOTFIX #2. Verified TWO ways before this was
+handed to you:
+  1. Applied directly against a fresh clone of your current working tree
+     (round 34 + hotfix #1 + hotfix #2 already in place) -- zero
+     conflicts, applied file byte-matches what's described below.
+  2. Applied hotfix #1 -> #2 -> #3 in sequence against a bare
+     round-34-only clone -- same result, byte-identical.
+
+Apply with (from repo root):
+  git apply HOTFIX3_setsession_timeout.patch
+
+════════════════════════════════════════════════════════════════════════
+WHAT HOTFIX #2 ACTUALLY BROKE, AND WHY -- confirmed, not guessed
+════════════════════════════════════════════════════════════════════════
+This is on me -- hotfix #2 introduced a real bug. Here's exactly what
+happened, confirmed by installing @supabase/auth-js@ (the version your
+package.json pins) in an isolated scratch dir and reading its actual
+GoTrueClient.js source directly:
+
+  async _setSession(currentSession) {
+    ...
+    if (hasExpired) {
+      const { data: refreshedSession, error } = await this._callRefreshToken(...)
+      ...
+    } else {
+      const { data, error } = await this._getUser(currentSession.access_token)
+      ...
+    }
+  }
+
+setSession() does NOT just decode the token locally. If the token hasn't
+expired yet (ours never has -- it's freshly minted with a 1-hour expiry
+every login), it calls this._getUser(access_token) -- which is a LIVE
+network request to the self-hosted Supabase Auth API (Kong) to validate
+the token and populate session.user.
+
+That is the EXACT SAME live endpoint that's unreliable/hangs in this
+environment -- the one that originally motivated your entire local-JWT
+verification bypass (wrapGetUser + getUserWithTimeout, see
+login_hang_fix.patch). Hotfix #2's establishSupabaseSession() called
+setSession() with NO timeout protection, so it reintroduced that exact
+hang on every single login.
+
+This explains BOTH reported symptoms as one cascading failure:
+  1. First: "can't even login" -- the signin request hangs indefinitely
+     waiting on the live Auth API call and never completes.
+  2. Then: "Invalid email or password" on retry, across 3 different
+     accounts, even in incognito -- ruling out a browser/cache issue.
+     verifyPassword() itself was NOT touched by any of these hotfixes and
+     is confirmed byte-identical to before (checked the full diff --
+     nothing in it changed). The only way that exact string gets returned
+     is if verifyPassword()'s direct Postgres query genuinely finds no
+     matching row/password -- consistent with earlier hung requests
+     (stuck waiting on the live Auth API call, each still holding
+     whatever DB connections/resources they'd already opened) exhausting
+     a limited connection pool or worker concurrency, causing a
+     LATER request's own DB query to fail or time out and get
+     misinterpreted as "no match" rather than "couldn't check."
+  Both trace back to the same unprotected call -- this fix removes it.
+
+════════════════════════════════════════════════════════════════════════
+THE FIX
+════════════════════════════════════════════════════════════════════════
+Wrapped the setSession() call in establishSupabaseSession()
+(lib/auth-direct.ts) with the SAME withTimeout() guard hotfix #1 already
+added (lib/with-timeout.ts -- no new file needed, already in your repo
+from hotfix #1). Capped at 3 seconds, matching the convention already
+used everywhere else in this codebase for calls to this same live Auth
+API. On timeout or error, it's caught and logged loudly -- login
+completes successfully regardless, exactly as before hotfix #2 was ever
+applied. The only thing that's best-effort now is the RLS-session
+hydration itself (which is the whole point of hotfix #2) -- it either
+succeeds within 3 seconds or gets logged and skipped, but it can never
+again hang the login route.
+
+════════════════════════════════════════════════════════════════════════
+HOW TO CONFIRM
+════════════════════════════════════════════════════════════════════════
+Log in immediately after applying. Should succeed quickly (no multi-
+second hang) regardless of account. Then check whether it lands on the
+correct dashboard (the original goal) -- if the live Auth API is
+reachable at all, the session hydration should complete well within 3s
+and RLS-scoped reads should work; if that endpoint is truly unreachable
+in this environment, you'll see the new console.error log line
+(`[auth] @supabase/ssr setSession failed or timed out...`) but login
+itself will no longer be affected either way.
+
+If Kong/the Auth API turns out to be UNREACHABLE consistently (not just
+occasionally slow), that's worth flagging back -- it would mean the RLS-
+session-hydration approach in hotfix #2 can never fully succeed in this
+environment no matter the timeout value, and a different fix (writing a
+locally-constructed session cookie in the exact format @supabase/ssr
+expects, with no live validation call at all) would be the more durable
+path. Recommend confirming login works again first, then deciding if
+that deeper fix is worth doing.

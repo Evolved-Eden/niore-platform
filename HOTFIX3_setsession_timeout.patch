@@ -1,0 +1,60 @@
+diff --git a/lib/auth-direct.ts b/lib/auth-direct.ts
+index 5dda23f..3273cdd 100644
+--- a/lib/auth-direct.ts
++++ b/lib/auth-direct.ts
+@@ -3,6 +3,7 @@ import { query, queryOne } from './db'
+ import { randomUUID, createHash } from 'crypto'
+ import { cookies } from 'next/headers'
+ import { createServerClient } from '@supabase/ssr'
++import { withTimeout } from './with-timeout'
+ 
+ // ═══════════════════════════════════════════════════════════
+ // Direct Postgres auth — bypasses Kong entirely
+@@ -221,13 +222,42 @@ export async function establishSupabaseSession(accessToken: string, refreshToken
+   )
+ 
+   try {
+-    await ssrClient.auth.setSession({
+-      access_token: accessToken,
+-      refresh_token: refreshToken,
+-    })
++    // CRITICAL (this is the cause of the "can't even login anymore" /
++    // "Invalid email or password" regression HOTFIX2 introduced): confirmed
++    // by reading the installed @supabase/auth-js source directly
++    // (GoTrueClient.js, _setSession()) -- when the access token passed to
++    // setSession() has NOT yet expired (ours never has; it's freshly
++    // minted with a 1-hour expiry), it does NOT just decode it locally. It
++    // calls this._getUser(access_token), which is a LIVE network request
++    // to the self-hosted Supabase Auth API (Kong) to validate the token
++    // and populate session.user.
++    //
++    // That is the EXACT SAME live endpoint that hangs/is unreliable in
++    // this environment and originally motivated the entire local-JWT
++    // verification bypass this codebase already relies on everywhere else
++    // (wrapGetUser, getUserWithTimeout -- see login_hang_fix.patch). This
++    // call was the one place that reintroduced an unprotected dependency
++    // on that same flaky endpoint, ON EVERY SINGLE LOGIN. When it hangs,
++    // the request never completes; retries pile up, each still holding
++    // whatever DB connections verifyPassword()/createSession() already
++    // opened, which is consistent with subsequent login attempts starting
++    // to fail their own DB query (and misreport as "Invalid email or
++    // password") once enough hung requests accumulate.
++    //
++    // Timeout-guard it exactly like every other live-Auth-API call in this
++    // codebase already is. This call is best-effort (RLS-scoped reads
++    // working); it must never be allowed to block login itself.
++    await withTimeout(
++      ssrClient.auth.setSession({
++        access_token: accessToken,
++        refresh_token: refreshToken,
++      }),
++      3000,
++      'establishSupabaseSession: setSession (live Auth API validation)'
++    )
+   } catch (err) {
+     console.error(
+-      '[auth] @supabase/ssr setSession failed -- RLS-scoped reads will silently return empty rows instead of erroring:',
++      '[auth] @supabase/ssr setSession failed or timed out -- RLS-scoped reads may silently return empty rows instead of erroring, but login itself is unaffected:',
+       (err as Error).message
+     )
+   }

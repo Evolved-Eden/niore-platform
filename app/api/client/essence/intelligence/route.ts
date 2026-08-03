@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
 
     try {
       let query = supabaseAdmin
-        .from('essintelligence')
+        .from('essintelligence_items')
         .select('*')
         .eq('client_id', targetClientId)
 

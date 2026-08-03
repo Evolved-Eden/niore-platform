@@ -845,7 +845,7 @@ export async function POST(req: NextRequest) {
         // Pending essence intelligence tasks (up to 3)
         try {
           const { data: tasksRows, error: tasksErr } = await supabaseAdmin
-            .from('essintelligence')
+            .from('essintelligence_items')
             .select('content, type')
             .eq('client_id', userId)
             .eq('status', 'pending')

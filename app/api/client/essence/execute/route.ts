@@ -94,7 +94,7 @@ export async function POST(req: NextRequest) {
     // 3. Update the essence intelligence item status (skip for mock IDs)
     if (!isMockId) {
       const { error: updateError } = await supabaseAdmin
-        .from('essintelligence')
+        .from('essintelligence_items')
         .update({
           status: finalStatus === 'completed' ? 'active' : finalStatus,
           ...(agentId ? { linked_agent_id: agentId } : {}),

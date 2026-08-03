@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
     // Delete from related tables first (CASCADE should handle this, but be safe)
     for (const uid of toDelete) {
       await supabase.from('client_twins').delete().eq('client_id', uid)
-      await supabase.from('essintelligence').delete().eq('client_id', uid)
+      await supabase.from('essintelligence_items').delete().eq('client_id', uid)
       await supabase.from('knowledge_base').delete().eq('organization_id' as any, uid)
       await supabase.from('organizations').delete().eq('id', uid)
       await supabase.from('clients').delete().eq('id', uid)

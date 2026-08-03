@@ -1,0 +1,91 @@
+Login "blinks and stays" with no error (correct password) -- handoff patch
+Files: lib/supabase/server.ts, lib/supabase/middleware.ts
+(re-cloned fresh from https://github.com/Evolvededen/niore-platform -- confirmed
+current, includes the recent "login" / "pass reset supa update" / "update
+postgres" commits already)
+
+SYMPTOM REPORTED: typing the correct password causes the page to blink and sit
+there with no error message. A wrong password DOES show an error correctly.
+
+WHAT'S CONFIRMED WORKING (ruled out):
+- app/(auth)/login/page.tsx's handleLogin() POSTs to /api/auth/signin, which
+  is the direct-Postgres path (verifyPassword against auth.users, custom JWT,
+  cookies set directly in the response) -- no live Supabase Auth API call here
+  at all. This is why a WRONG password correctly errors fast: verifyPassword()
+  returns null immediately, no network dependency. Confirmed no bug here.
+- On success, the page does router.push('/dashboard') -- straightforward,
+  no bug in the client code itself.
+- app/dashboard/layout.tsx's own "plan guard" redirect logic (onboarding/
+  pricing redirect for non-admin, non-paid accounts) is a fast, synchronous
+  redirect() call -- not something that would hang or blink silently.
+
+ROOT CAUSE, CONFIRMED BY CODE STRUCTURE (best explanation available without
+runtime/server log access, which this session doesn't have):
+Both lib/supabase/server.ts's createClient() and lib/supabase/middleware.ts's
+createClient() wrap supabase.auth.getUser() like this:
+
+    const originalGetUser = supabase.auth.getUser.bind(supabase.auth)
+    supabase.auth.getUser = async (jwt?) => {
+      const result = await originalGetUser(jwt)   // <-- ALWAYS tried first
+      if (!result.error) return result
+      // ...falls back to local JWT verification only if the above errored
+    }
+
+That first call is a real network request to NEXT_PUBLIC_SUPABASE_URL's Auth
+API -- the exact API this codebase's own comments describe elsewhere as
+broken/bypassed everywhere else (signin, signup, password reset all
+explicitly route around it). The fallback only helps if that call FAILS FAST
+with an error. If it instead hangs -- unreachable endpoint, DNS not resolving
+from inside the Docker container, a firewalled self-hosted Supabase host, etc.
+-- there's no timeout anywhere in this code, so the request just sits there
+indefinitely with nothing ever throwing. That matches "blinks and stays, no
+error" exactly: the login POST already succeeded and set real cookies, but the
+very next page (dashboard, which requires this same getUser() check) never
+resolves.
+
+This can't be 100% confirmed without server-side network/runtime logs (outside
+this session's access), but it fits every piece of evidence: the working
+direct-Postgres calls that don't hit this API succeed instantly either way
+(correct password: signs in; wrong password: errors fast); only the
+GoTrue-dependent path hangs.
+
+RECOMMENDED FIX (requires push access this session does not have):
+Stop attempting the live API call at all -- this codebase has already proven
+(via signin/signup/password-reset) that the local-JWT-verification path is the
+reliable one. In both lib/supabase/server.ts's wrapGetUser() and
+lib/supabase/middleware.ts's wrapGetUser(), replace the "try live API first,
+fall back to local" order with local-only verification:
+
+    supabase.auth.getUser = async (jwt?: string) => {
+      const token = jwt || extractAuthTokenFromCookies(cookieStore)  // (or
+                                                                       // extractTokenFromRequest
+                                                                       // in middleware.ts)
+      if (token) {
+        const payload = verifyToken(token)
+        if (payload) {
+          return { data: { user: { /* same mapping already in the code */ } }, error: null }
+        }
+      }
+      // Only fall back to the live API call if there's no local token at all
+      // (e.g. truly logged out) -- and wrap it with a short timeout so it
+      // can never hang the page again:
+      return await originalGetUser(jwt)
+    }
+
+This removes the hang risk entirely for anyone with a valid session cookie
+(the common case), while keeping the live-API call only as a last resort for
+edge cases with no cookie present at all.
+
+SEPARATE, LOWER PRIORITY: if you want the live API call kept as the
+first-choice path for any reason, at minimum wrap it in an AbortController
+with a 2-3 second timeout so it fails fast into the fallback instead of
+hanging indefinitely. The reorder above is the simpler, more consistent fix
+given how the rest of this codebase already treats that API as unreliable.
+
+ALSO WORTH CHECKING (infra-side, not code): confirm NEXT_PUBLIC_SUPABASE_URL
+in the Coolify/Docker deployment's environment actually resolves and is
+reachable FROM INSIDE the container the Next.js app runs in -- if the
+self-hosted migration is partway done, it's possible this points at a host
+that's fine from your browser/laptop but not reachable from the container's
+network, which would produce exactly this hang. This session has no access to
+check the running container's environment or network directly.

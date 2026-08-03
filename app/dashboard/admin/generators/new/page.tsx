@@ -49,7 +49,7 @@ export default function CreateGeneratorPage() {
           </div>
           <div>
             <label className="block text-sm font-medium text-white/70 mb-1">Name <span className="text-red-400">*</span></label>
-            <input type="text" required placeholder="Blueprint Scoring Engine" value={form.generator_name} onChange={(e) => setForm({ ...form, generator_name: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-sm px-3 py-2 text-sm text-white/70 placeholder-white/30" />
+            <input type="text" required placeholder="Essence Scoring Engine" value={form.generator_name} onChange={(e) => setForm({ ...form, generator_name: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-sm px-3 py-2 text-sm text-white/70 placeholder-white/30" />
           </div>
         </div>
 

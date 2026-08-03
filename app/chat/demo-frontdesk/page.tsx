@@ -104,8 +104,8 @@ function DemoContent() {
       chips.push({ label: "📊 Agent limits", question: "How many agents can I have?" });
     }
     if (lastMsg.toLowerCase().includes("blueprint") || lastMsg.toLowerCase().includes("assess")) {
-      chips.push({ label: "📝 What's Blueprint?", question: "What is the Blueprint Assessment?" });
-      chips.push({ label: "🔄 Retake", question: "Can I retake the Blueprint?" });
+      chips.push({ label: "📝 What's the Assessment?", question: "What is the Essence Assessment?" });
+      chips.push({ label: "🔄 Retake", question: "Can I retake the Assessment?" });
     }
     if (lastMsg.toLowerCase().includes("vertical") || lastMsg.toLowerCase().includes("industry") || lastMsg.toLowerCase().includes("demo")) {
       chips.push({ label: "🏢 What verticals?", question: "What verticals do you support?" });
@@ -132,7 +132,7 @@ function DemoContent() {
       const greeting: Message = hasIntake
         ? {
             role: "assistant",
-            content: `${name} — welcome back. I see your Intelligence Blueprint. A ${archetypeParam} with an ${energyType} energy type.\n\nLet me ask you a few quick questions so I can tailor your demo. What's your email address?`,
+            content: `${name} — welcome back. I see your Essence Profile. A ${archetypeParam} with an ${energyType} energy type.\n\nLet me ask you a few quick questions so I can tailor your demo. What's your email address?`,
           }
         : DEFAULT_GREETING;
       setMessages([greeting]);

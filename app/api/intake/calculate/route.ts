@@ -481,7 +481,7 @@ export async function POST(req: NextRequest) {
       }
 
       // 4. Create/update the client_twin with blueprint data
-      // NOTE: client_twins has no 'name' column, only metadata/blueprint fields
+      // NOTE: client_twins has no 'name' column, only metadata/lenses fields
       const { data: existingTwin } = await svc
         .from('client_twins')
         .select('id, metadata')
@@ -508,6 +508,16 @@ export async function POST(req: NextRequest) {
       }
 
       const lensData = multiLensResult?.core || {}
+
+      // Compute overall score once, up front, so it can live directly on the
+      // humanDesign lens instead of a separate parallel "blueprint" metadata
+      // structure (Round 32 item 2 — consolidate: one storage location for
+      // computed results, not a second ad-hoc profile-storage mechanism).
+      const overallScore = Math.round(
+        Object.values(result.blueprint.scores).reduce((a: number, b: number) => a + b, 0) /
+        Math.max(Object.keys(result.blueprint.scores).length, 1)
+      )
+
       const lenses: Record<string, any> = {
         ...(twinMeta.lenses || {}),
         humanDesign: {
@@ -518,23 +528,19 @@ export async function POST(req: NextRequest) {
             gates: result.blueprint.gates,
             foundation: result.blueprint.foundation,
             summary: result.blueprint.summary,
+            overallScore,
+            recommended_agents: [],
           },
           calculatedAt: new Date().toISOString(),
         },
       }
 
-      const lensSystems = ['astrology', 'vedicAstrology', 'numerology', 'chineseZodiac', 'biorhythms', 'elementalArchetype', 'lifeTheme', 'soulProfile']
+      const lensSystems = ['astrology', 'vedicAstrology', 'numerology', 'chineseZodiac', 'biorhythms', 'elementalArchetype', 'lifeTheme', 'soulProfile', 'chaldeanNumerology', 'matrixOfDestiny', 'mayanTzolkin', 'kabbalah', 'soulContract', 'tarotOracle'] // Round 32: added 6 new calc engines
       for (const key of lensSystems) {
         if ((lensData as any)[key]) {
           lenses[key] = { status: 'calculated', data: (lensData as any)[key], calculatedAt: new Date().toISOString() }
         }
       }
-
-      // Compute overall score for both metadata and top-level columns
-      const overallScore = Math.round(
-        Object.values(result.blueprint.scores).reduce((a: number, b: number) => a + b, 0) /
-        Math.max(Object.keys(result.blueprint.scores).length, 1)
-      )
 
       const { error: twinErr } = await svc
         .from('client_twins')
@@ -542,24 +548,16 @@ export async function POST(req: NextRequest) {
           id: existingTwin?.id ?? undefined,
           client_id: user.id,
           twin_status: 'active',
-          blueprint_score: overallScore,
+          essence_score: overallScore,
           intelligence_score: +(overallScore / 100).toFixed(2),
           engagement_score: +(overallScore / 100).toFixed(2),
           metadata: {
             ...twinMeta,
             lenses,
-            blueprint: {
-              core: {
-                overallScore,
-                archetype: result.blueprint.archetype,
-                scores: result.blueprint.scores,
-                summary: result.blueprint.summary,
-                recommended_agents: [],
-              },
-              intake: {
-                role: result.recommendation.suggestedPath?.toLowerCase() || 'client',
-              },
-            },
+            // Single top-level key, not nested under a separate "blueprint"
+            // profile-storage structure — the assessment's recommended
+            // account path, alongside the assessment results in `lenses`.
+            intake_role: result.recommendation.suggestedPath?.toLowerCase() || 'client',
           },
         } as any, { onConflict: 'id' })
 

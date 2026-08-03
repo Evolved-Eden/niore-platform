@@ -14,7 +14,7 @@ export default async function TwinRegistryPage() {
       .eq('client_id', user.id),
     supabaseAdmin
       .from('client_twins')
-      .select('id, listing_headline, listing_skills, listing_visibility, blueprint_score, intelligence_score, organizations:organization_id(name)')
+      .select('id, listing_headline, listing_skills, listing_visibility, essence_score, intelligence_score, organizations:organization_id(name)')
       .eq('is_listed', true)
       .order('listed_at', { ascending: false })
       .limit(30),
@@ -54,7 +54,7 @@ export default async function TwinRegistryPage() {
     id: t.id,
     headline: t.listing_headline,
     skills: t.listing_skills || [],
-    blueprintScore: t.blueprint_score,
+    blueprintScore: t.essence_score,
     intelligenceScore: t.intelligence_score,
     trainedAt: t.listing_visibility === 'named' ? t.organizations?.name ?? null : null,
     isMine: myTwinIds.has(t.id),

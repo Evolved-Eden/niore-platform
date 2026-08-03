@@ -555,9 +555,9 @@ export default function IntakePage() {
               <p className="text-sm text-white/50">{profile.recommendation.reason}</p>
             </div>
 
-            {/* Blueprint Scores */}
+            {/* Essence Scores */}
             <div className="glass rounded-sm p-5 mb-6">
-              <div className="text-xs text-white/30 tracking-widest uppercase mb-4">Blueprint Scores</div>
+              <div className="text-xs text-white/30 tracking-widest uppercase mb-4">Essence Scores</div>
               <div className="space-y-3">
                 {Object.entries(profile.blueprint.scores)
                   .sort(([,a], [,b]) => b - a)
@@ -616,7 +616,7 @@ export default function IntakePage() {
 
             {/* Summary */}
             <div className="glass rounded-sm p-5 mb-8 border border-white/[0.06]">
-              <div className="text-xs text-white/30 tracking-widest uppercase mb-2">Blueprint Summary</div>
+              <div className="text-xs text-white/30 tracking-widest uppercase mb-2">Essence Summary</div>
               <p className="text-sm text-white/50 leading-relaxed">{profile.blueprint.summary}</p>
             </div>
 
@@ -651,7 +651,7 @@ export default function IntakePage() {
             <div className="glass rounded-sm p-6 mb-8 text-left max-w-sm mx-auto space-y-3">
               {[
                 'Intelligence profile calculated',
-                'Blueprint data saved',
+                'Essence data saved',
                 'Zuri essence being generated',
                 'Dashboard access activated',
               ].map(item => (

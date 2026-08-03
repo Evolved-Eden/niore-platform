@@ -51,12 +51,12 @@ export const FAQ_CATEGORIES: FaqCategory[] = [
       },
       {
         q: "Can I customize agents for my specific business?",
-        a: "Yes. Every agent is configurable — you set their behavior, knowledge sources, communication style, automation level, and integration points. Our blueprint assessment recommends the right agents for your vertical, and you can fine-tune them from your dashboard.",
+        a: "Yes. Every agent is configurable — you set their behavior, knowledge sources, communication style, automation level, and integration points. Our essence assessment recommends the right agents for your vertical, and you can fine-tune them from your dashboard.",
         tags: ["customize", "configure", "custom"],
       },
       {
         q: "What verticals do you support?",
-        a: "We currently have demos and agent packs for: Luxury Med Spa, Luxury Hotel, Luxury Real Estate, Corporate HR, and Legal Practice. Our blueprint assessment maps your needs to the right agents regardless of industry — we can build custom verticals for Enterprise clients.",
+        a: "We currently have demos and agent packs for: Luxury Med Spa, Luxury Hotel, Luxury Real Estate, Corporate HR, and Legal Practice. Our essence assessment maps your needs to the right agents regardless of industry — we can build custom verticals for Enterprise clients.",
         tags: ["verticals", "industries", "demos"],
       },
     ],
@@ -83,34 +83,34 @@ export const FAQ_CATEGORIES: FaqCategory[] = [
       },
       {
         q: "What is Business OS?",
-        a: "Business OS is our enterprise-grade tier for organizations requiring dedicated deployment, multi-vertical orchestration, white-label capabilities, and full governance. It includes custom agent, swarm, and memory scale, plus a dedicated intelligence architect. Custom pricing -- available when your blueprint score is 85+ or you need Enterprise scale.",
+        a: "Business OS is our enterprise-grade tier for organizations requiring dedicated deployment, multi-vertical orchestration, white-label capabilities, and full governance. It includes custom agent, swarm, and memory scale, plus a dedicated intelligence architect. Custom pricing -- available when your essence score is 85+ or you need Enterprise scale.",
         tags: ["business os", "enterprise", "custom"],
       },
     ],
   },
   {
-    id: "blueprint",
-    label: "Blueprint Assessment",
+    id: "essence-assessment",
+    label: "Essence Assessment",
     icon: "⊙",
     questions: [
       {
-        q: "What is the Blueprint Assessment?",
-        a: "The Blueprint is a 40+ question intelligence mapping layer that discovers your identity, patterns, constraints, and trajectory. It generates a Blueprint Score, identifies your Archetype (Visionary Architect, Ground Operator, etc.), recommends agents and swarms, and determines your optimal plan. It takes about 10 minutes and feeds directly into your AI Twin configuration.",
-        tags: ["blueprint", "assessment", "what is"],
+        q: "What is the Essence Assessment?",
+        a: "The Essence Assessment is a 40+ question intelligence mapping layer that discovers your identity, patterns, constraints, and trajectory. It generates an Essence Score, identifies your Archetype (Visionary Architect, Ground Operator, etc.), recommends agents and swarms, and determines your optimal plan. It takes about 10 minutes and feeds directly into your AI Twin configuration.",
+        tags: ["essence assessment", "assessment", "what is"],
       },
       {
-        q: "Is the Blueprint required?",
-        a: "It's strongly recommended. The Blueprint ensures your intelligence system is configured for YOUR specific needs, not a generic template. Without it, you'll miss out on personalized agent recommendations, the correct plan tier, and your Archetype-based optimizations. You can skip to deployment intake if you already know what you need.",
+        q: "Is the Essence Assessment required?",
+        a: "It's strongly recommended. The Essence Assessment ensures your intelligence system is configured for YOUR specific needs, not a generic template. Without it, you'll miss out on personalized agent recommendations, the correct plan tier, and your Archetype-based optimizations. You can skip to deployment intake if you already know what you need.",
         tags: ["required", "skip", "optional"],
       },
       {
         q: "What is an Archetype?",
-        a: "Your Archetype is determined by the Blueprint based on your strongest dimension. Archetypes include: Visionary Architect (high identity), Ground Operator (high reality awareness), Future Navigator (high vision), Empire Builder (high business), System Weaver (high digital), and Sovereign Commander (high preferences). Each Archetype unlocks different optimizations in your intelligence system.",
+        a: "Your Archetype is determined by the Essence Assessment based on your strongest dimension. Archetypes include: Visionary Architect (high identity), Ground Operator (high reality awareness), Future Navigator (high vision), Empire Builder (high business), System Weaver (high digital), and Sovereign Commander (high preferences). Each Archetype unlocks different optimizations in your intelligence system.",
         tags: ["archetype", "type", "personality"],
       },
       {
-        q: "Can I retake the Blueprint?",
-        a: "Yes, you can retake the Blueprint as many times as you want. Your results evolve as you do. Each completed assessment is saved to your profile and can be referenced from your dashboard.",
+        q: "Can I retake the Essence Assessment?",
+        a: "Yes, you can retake the Essence Assessment as many times as you want. Your results evolve as you do. Each completed assessment is saved to your profile and can be referenced from your dashboard.",
         tags: ["retake", "redo", "again"],
       },
     ],
@@ -122,7 +122,7 @@ export const FAQ_CATEGORIES: FaqCategory[] = [
     questions: [
       {
         q: "How do I get started?",
-        a: "Explore a demo to see agents in action, take the Blueprint Assessment to map your intelligence needs, choose a plan that fits, and register to deploy. Your dashboard, AI Twin, agents, and Essence Board are ready immediately after registration.",
+        a: "Explore a demo to see agents in action, take the Essence Assessment to map your intelligence needs, choose a plan that fits, and register to deploy. Your dashboard, AI Twin, agents, and Essence Board are ready immediately after registration.",
         tags: ["start", "getting started", "begin"],
       },
       {

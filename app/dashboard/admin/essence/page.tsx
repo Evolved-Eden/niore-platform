@@ -162,7 +162,7 @@ export default function AdminEssencePage() {
         setPostingTime(data.postingTime ?? null)
         setBusinessMove(data.businessMove ?? null)
         setPersonality(data.personality ?? '')
-        setBlueprintTile(data.blueprint ?? null)
+        setBlueprintTile(data.essenceProfile ?? null)
         setDomainTiles(data.domainTiles ?? [])
       }
     } catch (e) {
@@ -349,12 +349,12 @@ export default function AdminEssencePage() {
         </div>
       )}
 
-      {/* Blueprint tile */}
+      {/* Assessment tile */}
       {blueprintTile && (
         <div className="mb-6 glass rounded-sm border border-white/[0.06] p-4">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
-              <span className="text-[10px] uppercase tracking-widest text-[#7A2E32] font-medium">Blueprint</span>
+              <span className="text-[10px] uppercase tracking-widest text-[#7A2E32] font-medium">Assessment</span>
               <span className="text-[9px] px-2 py-0.5 rounded-full bg-white/10 text-white/50 uppercase">{blueprintTile.tier}</span>
             </div>
             {blueprintTile.agentsUsed?.length > 0 && (
@@ -363,7 +363,7 @@ export default function AdminEssencePage() {
           </div>
           <p className="text-sm text-white/70 whitespace-pre-line">{blueprintTile.content}</p>
           {blueprintTile.upgradeMessage && (
-            <Link href="/dashboard/client/blueprint?upgrade=expanded" className="inline-block mt-3 text-xs font-medium text-[#7A2E32] hover:underline">
+            <Link href="/dashboard/client/essence-profile?upgrade=expanded" className="inline-block mt-3 text-xs font-medium text-[#7A2E32] hover:underline">
               {blueprintTile.upgradeMessage} →
             </Link>
           )}

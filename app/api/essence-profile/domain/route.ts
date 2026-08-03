@@ -56,7 +56,7 @@ export async function GET(req: NextRequest) {
         {
           error: 'Domain module not purchased',
           message: `${DOMAIN_LABELS[domain]} is a $50 add-on module.`,
-          purchase_url: '/dashboard/client/blueprint',
+          purchase_url: '/dashboard/client/essence-profile',
           product_id: domain,
         },
         { status: 402 }
@@ -97,7 +97,7 @@ export async function POST(req: NextRequest) {
         {
           error: 'Domain module not purchased',
           message: `${DOMAIN_LABELS[domain]} is a $50 add-on module.`,
-          purchase_url: '/dashboard/client/blueprint',
+          purchase_url: '/dashboard/client/essence-profile',
           product_id: domain,
         },
         { status: 402 }

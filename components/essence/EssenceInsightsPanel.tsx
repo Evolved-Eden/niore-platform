@@ -127,7 +127,7 @@ export default function EssenceInsightsPanel({ extras }: { extras: EssenceExtras
           <p className="text-sm text-white/70 whitespace-pre-line">{extras.blueprintTile.content}</p>
           {extras.blueprintTile.upgradeMessage && (
             <Link
-              href="/dashboard/client/blueprint?upgrade=expanded"
+              href="/dashboard/client/essence-profile?upgrade=expanded"
               className="inline-block mt-3 text-xs font-medium text-[#C6A664] hover:underline"
             >
               {extras.blueprintTile.upgradeMessage} →

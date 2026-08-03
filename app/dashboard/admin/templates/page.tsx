@@ -49,7 +49,7 @@ export default function TemplatesPage() {
       <div className="flex gap-2">
         {[
           { key: 'all', label: 'All' },
-          { key: 'blueprint', label: 'Blueprints' },
+          { key: 'blueprint', label: 'Assessments' },
           { key: 'essence', label: 'Essences' },
           { key: 'workflow', label: 'Workflows' },
         ].map((f) => (
@@ -88,7 +88,7 @@ export default function TemplatesPage() {
                       ? 'bg-green-500/10 text-green-400 border-green-500/20'
                       : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
                   }`}>
-                    {tpl._template_type === 'blueprint' ? 'Blueprint' : tpl._template_type === 'workflow' ? 'Workflow' : 'Essence'}
+                    {tpl._template_type === 'blueprint' ? 'Assessment' : tpl._template_type === 'workflow' ? 'Workflow' : 'Essence'}
                   </span>
                   <span className={`px-2 py-0.5 rounded text-xs font-medium border ${
                     tpl.is_active ? 'bg-green-500/10 text-green-400 border-green-500/20' : 'bg-white/5 text-white/40 border-white/10'

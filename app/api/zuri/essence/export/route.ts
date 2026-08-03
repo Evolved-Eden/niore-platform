@@ -27,14 +27,14 @@ export async function GET(req: NextRequest) {
     .limit(20)
   const items = (_items || []) as any[]
 
-  // Fetch user profile / blueprint info
+  // Fetch user profile / essence assessment info
   const { data: twin } = await supabase
     .from('client_twins')
     .select('metadata')
     .eq('client_id', user.id)
     .maybeSingle()
 
-  const blueprintMeta = (twin?.metadata as any)?.blueprint?.core
+  const blueprintMeta = (twin?.metadata as any)?.lenses?.humanDesign?.data
   const archetype = blueprintMeta?.archetype || 'Unknown'
   const overallScore = blueprintMeta?.overallScore || 0
 
@@ -52,7 +52,7 @@ export async function GET(req: NextRequest) {
     text += `${'═'.repeat(55)}\n\n`
 
     if (!items || items.length === 0) {
-      text += `No essence intelligence items yet. Complete your blueprint\n`
+      text += `No essence intelligence items yet. Complete your essence assessment\n`
       text += `assessment to generate personalized intelligence.\n`
     } else {
       text += `INTELLIGENCE ITEMS (${items.length}):\n`
@@ -95,7 +95,7 @@ export async function GET(req: NextRequest) {
     doc.moveDown(0.5)
 
     if (!items || items.length === 0) {
-      doc.fontSize(11).text('No essence intelligence items yet. Complete your blueprint assessment to generate personalized intelligence.')
+      doc.fontSize(11).text('No essence intelligence items yet. Complete your essence assessment to generate personalized intelligence.')
     } else {
       for (const item of items) {
         if (doc.y > 700) doc.addPage()

@@ -2,79 +2,13 @@
 // Core Types — Evolved Eden
 // ============================================================
 
-// ── Blueprint System ─────────────────────────────────────────
-export type BlueprintQuestionType = 'select' | 'multi_select' | 'scale' | 'text' | 'boolean'
-
-export type BlueprintQuestionOption = {
-  value: string
-  label: string
-  description?: string
-  weight?: number
-  followUpSection?: string
-}
-
-export type BlueprintQuestion = {
-  key: string
-  type: BlueprintQuestionType
-  label: string
-  description?: string
-  required?: boolean
-  options?: BlueprintQuestionOption[]
-  dependency?: { questionKey: string; operator: 'equals' | 'not_equals' | 'contains' | 'gte' | 'lte'; value: unknown }
-  domain?: string
-  weight?: number
-  scaleMin?: number
-  scaleMax?: number
-}
-
-export type BlueprintSection = {
-  key: string
-  title: string
-  description?: string
-  order: number
-  questions: BlueprintQuestion[]
-}
-
-export type ScoringDomain = {
-  key: string
-  name: string
-  weight: number
-  thresholds: { min: number; label?: string; agents?: string[]; swarms?: string[] }[]
-}
-
-export type BlueprintTemplateContent = {
-  version: string
-  sections: BlueprintSection[]
-  scoring: { domains: ScoringDomain[] }
-  recommendations: {
-    agents: string[]
-    swarms: string[]
-    essenceTemplate?: string
-    risTemplate?: string
-  }
-}
-
-export type BlueprintDeployment = {
-  id: string
-  organization_id: string
-  client_id?: string | null
-  blueprint_template_id: string
-  vertical_key: string
-  subcategory_key?: string | null
-  status: string
-  assessment_scores: Record<string, number>
-  assessment_answers: Record<string, unknown>
-  selected_agents: string[]
-  selected_swarms: string[]
-  blueprint_summary?: string | null
-  n8n_workflow_id?: string | null
-  created_at: string
-  updated_at: string
-  deployed_at?: string | null
-}
+// (Round 32: removed 6 unused types here -- BlueprintQuestionType/Option/Question/
+// Section/ScoringDomain/TemplateContent -- confirmed zero references anywhere in
+// app/ or lib/. Matched the shape of the now-deleted orphaned /blueprint/assess
+// quiz system; dead type-only code, not worth renaming, just removing.)
 
 // ── Schema-backed types for generic query support ────────────
-export type BlueprintTemplateRow = {
+export type EssenceEngineRow = {
   id: string
   key: string
   name?: string | null
@@ -468,7 +402,7 @@ export type ClientTwin = {
   confidence_score?: number | null
   twin_status?: string | null
   version?: number
-  blueprint_score?: number | null
+  essence_score?: number | null
   ai_summary?: string | null
   predicted_needs?: unknown[] | null
   relationship_graph?: Record<string, unknown> | null
@@ -486,7 +420,6 @@ export type ClientTwin = {
   mas_state?: Record<string, unknown> | null
   metadata?: Record<string, unknown> | null
   life_model?: Record<string, unknown> | null
-  blueprint?: Record<string, unknown> | null
   updated_at?: string
   deleted_at?: string | null
 }
@@ -973,8 +906,7 @@ export type Database = {
       app_config: TableWithDefaults<AppConfigRow>
       archetypes: TableWithDefaults<ArchetypeRow>
       avatars: TableWithDefaults<AvatarRow>
-      essence_engine_deployments: TableWithDefaults<BlueprintDeployment>
-      essence_engines: TableWithDefaults<BlueprintTemplateRow>
+      essence_engines: TableWithDefaults<EssenceEngineRow>
       businesses: TableWithDefaults<Business>
       canonical_agent_map: TableWithDefaults<CanonicalAgentMapRow>
       catalogs: TableWithDefaults<{ id: string; key: string; name: string; kind?: string; is_active?: boolean; metadata?: unknown; created_at?: string; updated_at?: string }>

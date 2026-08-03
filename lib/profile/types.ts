@@ -288,6 +288,13 @@ export interface ProfileLevel {
   elementalArchetype?: ElementalArchetypeProfile
   lifeTheme?: LifeThemeProfile
   soulProfile?: SoulProfile
+  // Round 32 -- new real-calculation engines
+  chaldeanNumerology?: import('./chaldean-numerology').ChaldeanNumerologyProfile
+  matrixOfDestiny?: import('./matrix-of-destiny').MatrixOfDestinyProfile
+  mayanTzolkin?: import('./mayan-tzolkin').MayanTzolkinProfile
+  kabbalah?: import('./kabbalah-tree').KabbalahProfile
+  soulContract?: import('./soul-contract').SoulContractProfile
+  tarotOracle?: import('./tarot-oracle').TarotOracleProfile
 }
 
 export interface ProfileResult {

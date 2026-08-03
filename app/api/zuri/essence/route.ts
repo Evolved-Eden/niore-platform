@@ -27,7 +27,7 @@ const FALLBACK = {
   postingTime: null,
   businessMove: null,
   personality: 'Complete your Blueprint Assessment to unlock your personality read.',
-  blueprint: { tier: 'base' as const, agentsUsed: [] as string[], content: 'Complete your Blueprint Assessment to unlock this tile.' },
+  essenceProfile: { tier: 'base' as const, agentsUsed: [] as string[], content: 'Complete your Essence Assessment to unlock this tile.' },
 }
 
 // ── Gate-based suggestion templates ───────────────────────────────
@@ -341,10 +341,10 @@ function computeLensExtras(
  * the Strategist and the Soul Blueprint Agent (AGT-212), with Enhanced
  * limited to a shorter combined read and Expanded getting the full output. */
 async function generateBlueprintTile(meta: any, range: 'daily' | 'weekly' | 'monthly') {
-  const enhanced = !!meta?.blueprint_enhanced
-  const expanded = !!meta?.blueprint_expanded
+  const enhanced = !!meta?.essence_assessment_enhanced
+  const expanded = !!meta?.essence_assessment_expanded
   const tier: 'base' | 'enhanced' | 'expanded' = expanded ? 'expanded' : enhanced ? 'enhanced' : 'base'
-  const core = meta?.blueprint?.core
+  const core = meta?.lenses?.humanDesign?.data
 
   const horizon = range === 'monthly' ? 'this month' : range === 'weekly' ? 'this week' : 'today'
   const inputPrompt = `Give the user one focused, specific, actionable blueprint insight for ${horizon}, grounded in their profile — not generic advice. Archetype: ${core?.archetype || 'unknown'}. Overall score: ${core?.overallScore ?? 'n/a'}. Section scores: ${core?.scores ? JSON.stringify(core.scores) : 'n/a'}. Keep it to 2-4 sentences.`
@@ -747,10 +747,10 @@ export async function POST(req: NextRequest) {
         const meta = twinRow?.metadata as any
         twinMeta = meta
 
-        // Legacy blueprint data
-        if (meta?.blueprint?.core?.scores) {
-          scores = meta.blueprint.core.scores
-          archetypeName = meta.blueprint.core.archetype
+        // Human Design lens data (consolidated storage -- Round 32 item 2)
+        if (meta?.lenses?.humanDesign?.data?.scores) {
+          scores = meta.lenses.humanDesign.data.scores
+          archetypeName = meta.lenses.humanDesign.data.archetype
         }
 
         // New multi-lens data
@@ -981,7 +981,7 @@ ${userId ? `\nUser ID: ${userId}` : ''}${memoryBlock}`
       range,
       topFive,
       ...extras,
-      blueprint: blueprintTile,
+      essenceProfile: blueprintTile,
       domainTiles,
     })
   } catch {

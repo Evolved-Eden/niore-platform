@@ -4,7 +4,7 @@ import { createAdminClient } from '@/lib/supabase/server'
 /**
  * POST /api/admin/backfill-intelligence-profiles
  * Admin-only: creates user-level intelligence_profiles for existing users
- * who completed intake (have client_twins.metadata.blueprint) but lack
+ * who completed intake (have client_twins.metadata.lenses.humanDesign) but lack
  * the profile record that the creator dashboard depends on.
  */
 export async function POST(req: NextRequest) {
@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
     }
 
-    // Find users who have blueprint data but no user-level intelligence profile
+    // Find users who have essence assessment data but no user-level intelligence profile
     const { data: twins, error: fetchErr } = await supabase
       .from('client_twins')
       .select('client_id, metadata')
@@ -43,9 +43,9 @@ export async function POST(req: NextRequest) {
       if (!clientId) { skipped++; continue }
 
       const meta = twin.metadata as Record<string, any> | null
-      const blueprint = meta?.blueprint
-      if (!blueprint?.scores) {
-        results.push({ client_id: clientId, status: 'skipped', error: 'No blueprint scores' })
+      const humanDesign = meta?.lenses?.humanDesign?.data
+      if (!humanDesign?.scores) {
+        results.push({ client_id: clientId, status: 'skipped', error: 'No essence assessment scores' })
         skipped++
         continue
       }
@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
       }
 
       // Compute overall score
-      const scores = blueprint.scores as Record<string, number>
+      const scores = humanDesign.scores as Record<string, number>
       const scoreValues = Object.values(scores)
       const overallScore = scoreValues.reduce((a, b) => a + b, 0) / scoreValues.length
 
@@ -76,13 +76,13 @@ export async function POST(req: NextRequest) {
           entity_id: clientId,
           organization_id: clientId,
           profile_kind: 'business_intelligence',
-          identity_summary: blueprint.summary ?? 'Intelligence profile from intake blueprint',
+          identity_summary: humanDesign.summary ?? 'Intelligence profile from intake essence assessment',
           personality_traits: Object.fromEntries(
             Object.entries(scores).map(([k, v]) => [k, +(v / 100).toFixed(2)])
           ),
           profile_type: 'intake_backfill',
           confidence_score: +(overallScore / 100).toFixed(2),
-          daily_essence: blueprint.archetype ?? null,
+          daily_essence: humanDesign.archetype ?? null,
           version: 1,
         } as any)
 

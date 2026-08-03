@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
       .select(
         `
         id, listing_headline, listing_skills, listing_visibility, listed_at, metadata,
-        blueprint_score, intelligence_score,
+        essence_score, intelligence_score,
         organizations:organization_id ( name )
         `,
         { count: 'exact' }
@@ -56,7 +56,7 @@ export async function GET(req: NextRequest) {
       id: t.id,
       headline: t.listing_headline,
       skills: t.listing_skills || [],
-      blueprintScore: t.blueprint_score,
+      blueprintScore: t.essence_score,
       intelligenceScore: t.intelligence_score,
       listedAt: t.listed_at,
       trainedAt:

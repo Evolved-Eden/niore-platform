@@ -3,9 +3,9 @@ import EssenceBoard from '@/components/EssenceBoard'
 import UpgradePanel from '@/components/UpgradePanel'
 import Link from 'next/link'
 
-// Blueprint data lives in client_twins.metadata.blueprint (set by intake/calculate)
-function extractBlueprint(clientTwin: any) {
-  const blueprint = clientTwin?.metadata?.blueprint?.core ?? null
+// Essence profile data lives in client_twins.metadata.lenses.humanDesign (set by intake/calculate)
+function extractEssenceProfile(clientTwin: any) {
+  const blueprint = clientTwin?.metadata?.lenses?.humanDesign?.data ?? null
   if (!blueprint) return null
   return {
     version: 1,
@@ -31,7 +31,7 @@ export default async function CreatorDashboard() {
     .eq('client_id', user.id)
     .maybeSingle()
 
-  const profile = extractBlueprint(twin)
+  const profile = extractEssenceProfile(twin)
 
   // ── Creator layer: courses, audience, revenue ──
   // courses/course_enrollments existed in the schema but were never

@@ -35,7 +35,9 @@ export default function AdminBlueprintPage() {
         .single()
       setName(identity?.full_name ?? user.email?.split('@')[0] ?? 'Admin')
 
-      // Load blueprint from client_twins metadata
+      // Load essence profile from client_twins.metadata.lenses.humanDesign --
+      // the single consolidated storage location (Round 32 item 2: one
+      // assessments structure, not several parallel profile-storage spots).
       let foundBlueprint: BlueprintData | null = null
       const { data: twin } = await supabase
         .from('client_twins')
@@ -44,20 +46,22 @@ export default function AdminBlueprintPage() {
         .maybeSingle()
       if (twin) {
         const meta = (twin.metadata as Record<string, any>) ?? {}
-        const bp = meta.blueprint
-        if (bp?.core) {
+        const hd = meta.lenses?.humanDesign?.data
+        if (hd) {
           foundBlueprint = {
-            overallScore: bp.core.overallScore ?? 0,
-            archetype: bp.core.archetype ?? 'Integrator',
-            scores: bp.core.scores ?? {},
-            summary: bp.core.summary ?? '',
-            recommended_agents: bp.core.recommended_agents ?? [],
-            intake_role: bp.intake?.role ?? '',
+            overallScore: hd.overallScore ?? 0,
+            archetype: hd.archetype ?? 'Integrator',
+            scores: hd.scores ?? {},
+            summary: hd.summary ?? '',
+            recommended_agents: hd.recommended_agents ?? [],
+            intake_role: meta.intake_role ?? '',
           }
         }
       }
 
-      // Check intake & fallback to intake blueprint data
+      // Check intake completion (still read from clients.metadata.intake --
+      // that's the assessment's own response record, distinct from the
+      // computed profile above)
       const { data: clientRec } = await supabase
         .from('clients')
         .select('metadata')
@@ -65,22 +69,6 @@ export default function AdminBlueprintPage() {
         .maybeSingle()
       const intakeMeta = clientRec?.metadata as Record<string, any> | undefined
       setHasIntake(!!intakeMeta?.intake)
-
-      // Fallback: use intake results if twin blueprint not found
-      if (!foundBlueprint && intakeMeta?.intake?.sections?.results?.blueprint) {
-        const bp = intakeMeta.intake.sections.results.blueprint
-        const scores = bp.scores || {}
-        foundBlueprint = {
-          overallScore: Object.values(scores).length > 0
-            ? Math.round(Object.values(scores).reduce((a: number, b: any) => a + b, 0) / Object.keys(scores).length)
-            : 0,
-          archetype: bp.archetype || 'Integrator',
-          scores,
-          summary: bp.summary || '',
-          recommended_agents: [],
-          intake_role: '',
-        }
-      }
 
       if (foundBlueprint) {
         setBlueprint(foundBlueprint)
@@ -188,13 +176,13 @@ export default function AdminBlueprintPage() {
             ) : (
               <div className="px-6 py-8 text-center space-y-4">
                 <div className="text-3xl mb-3 opacity-30">◆</div>
-                <p className="text-white/30 text-sm">No blueprint profile yet</p>
+                <p className="text-white/30 text-sm">No essence profile yet</p>
                 <div className="flex flex-wrap justify-center gap-3">
                   <Link
-                    href="/blueprint/assess"
+                    href="/intake"
                     className="inline-flex px-5 py-2.5 rounded-sm text-sm font-bold bg-[#7A2E32] text-white hover:bg-[#7A2E32]/80 transition-colors"
                   >
-                    Take Blueprint Assessment →
+                    Take Essence Assessment →
                   </Link>
                   {!hasIntake && (
                     <Link
@@ -214,7 +202,7 @@ export default function AdminBlueprintPage() {
         <div className="space-y-4">
           {blueprint && (
             <Link
-              href="/blueprint/assess"
+              href="/intake"
               className="block p-4 rounded-sm glass-hover border border-[#7A2E32]/20 hover:border-[#7A2E32]/40 transition-colors"
             >
               <div className="text-xs text-[#7A2E32] tracking-widest uppercase mb-1">Re-Assess</div>

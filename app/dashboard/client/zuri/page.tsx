@@ -13,7 +13,7 @@ const QUICK_ACTIONS = [
   {
     label: "Start Blueprint",
     desc: "Assess your business intelligence",
-    href: "/dashboard/client/blueprint/assess",
+    href: "/dashboard/client/essence-profile/assess",
     icon: "◇",
     color: "#C6A664",
   },

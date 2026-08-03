@@ -11,6 +11,12 @@ import { calculateVedicAstrology } from './vedic-astrology'
 import { calculateBiorhythms } from './biorhythms'
 import { calculateElementalArchetype } from './elemental-archetype'
 import { synthesizeLifeTheme, synthesizeSoulProfile } from './life-theme'
+import { calculateChaldeanNumerology } from './chaldean-numerology'
+import { calculateMatrixOfDestiny } from './matrix-of-destiny'
+import { calculateMayanTzolkin } from './mayan-tzolkin'
+import { calculateKabbalahTree } from './kabbalah-tree'
+import { calculateSoulContract } from './soul-contract'
+import { drawTarotOracleCard } from './tarot-oracle'
 
 export type { IntakeData, ProfileResult, ProfileLevel }
 export * from './types'
@@ -21,6 +27,12 @@ export * from './vedic-astrology'
 export * from './biorhythms'
 export * from './elemental-archetype'
 export * from './life-theme'
+export * from './chaldean-numerology'
+export * from './matrix-of-destiny'
+export * from './mayan-tzolkin'
+export * from './kabbalah-tree'
+export * from './soul-contract'
+export * from './tarot-oracle'
 
 /**
  * Run all lens calculations on raw intake data.
@@ -128,6 +140,54 @@ export async function calculateFullProfile(intake: IntakeData): Promise<ProfileR
     profile.soulProfile = sp
   } catch (err) {
     console.error('Life Theme calc failed:', err)
+  }
+
+  // ── 8. Chaldean Numerology (Round 32) ──
+  try {
+    const fullName = [intake.firstName, intake.middleName, intake.lastName]
+      .filter(Boolean)
+      .join(' ')
+    profile.chaldeanNumerology = calculateChaldeanNumerology(fullName, intake.birthDate)
+  } catch (err) {
+    console.error('Chaldean Numerology calc failed:', err)
+  }
+
+  // ── 9. Matrix of Destiny (Round 32) ──
+  try {
+    profile.matrixOfDestiny = calculateMatrixOfDestiny(intake.birthDate)
+  } catch (err) {
+    console.error('Matrix of Destiny calc failed:', err)
+  }
+
+  // ── 10. Mayan Tzolkin (Round 32) ──
+  try {
+    profile.mayanTzolkin = calculateMayanTzolkin(intake.birthDate)
+  } catch (err) {
+    console.error('Mayan Tzolkin calc failed:', err)
+  }
+
+  // ── 11. Kabbalah Tree of Life (Round 32) ──
+  try {
+    profile.kabbalah = calculateKabbalahTree(intake.birthDate)
+  } catch (err) {
+    console.error('Kabbalah calc failed:', err)
+  }
+
+  // ── 12. Soul Contract Reading (Round 32) ──
+  try {
+    const fullNameForContract = [intake.firstName, intake.middleName, intake.lastName]
+      .filter(Boolean)
+      .join(' ')
+    profile.soulContract = calculateSoulContract(fullNameForContract, intake.birthDate)
+  } catch (err) {
+    console.error('Soul Contract calc failed:', err)
+  }
+
+  // ── 13. Tarot / Oracle daily draw (Round 32) ──
+  try {
+    profile.tarotOracle = drawTarotOracleCard(intake.birthDate)
+  } catch (err) {
+    console.error('Tarot/Oracle draw failed:', err)
   }
 
   return {

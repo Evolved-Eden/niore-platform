@@ -173,15 +173,12 @@ export default function ClientTwinPage() {
         setTrainings(meta.trainings ?? [])
       }
 
-      // Fetch intake / EE profile
-      const { data: clientRec } = await supabase
-        .from('clients')
-        .select('metadata')
-        .eq('id', user.id)
-        .maybeSingle()
-      const intakeMeta = (clientRec?.metadata as Record<string, any>)?.intake?.sections
-      setBlueprintProfile(intakeMeta?.results?.blueprint ?? null)
-      setEssenceProfile(intakeMeta?.results?.essence ?? null)
+      // Essence profile -- read from the single consolidated location,
+      // client_twins.metadata.lenses.humanDesign (Round 32 item 2), not a
+      // separate clients.metadata.intake lookup
+      const twinMetaForProfile = (twinRecord as any)?.metadata as Record<string, any> | undefined
+      setBlueprintProfile(twinMetaForProfile?.lenses?.humanDesign?.data ?? null)
+      setEssenceProfile(twinMetaForProfile?.lenses?.lifeTheme?.data ?? null)
 
       setLoading(false)
     }
@@ -681,7 +678,7 @@ export default function ClientTwinPage() {
                 <p className="text-[11px] text-white/40">Talk to your twin</p>
               </Link>
               <Link
-                href="/dashboard/client/blueprint"
+                href="/dashboard/client/essence-profile"
                 className="glass rounded-sm p-4 border border-white/[0.06] hover:border-[#C6A664]/30 transition-all group"
               >
                 <div className="text-xs text-[#C6A664] tracking-widest uppercase mb-1">Blueprint</div>

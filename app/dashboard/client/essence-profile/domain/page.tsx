@@ -67,7 +67,7 @@ function DomainAssessmentInner() {
   async function handleSubmit() {
     setSubmitting(true)
     try {
-      const res = await fetch('/api/blueprint/domain', {
+      const res = await fetch('/api/essence-profile/domain', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ domain, answers }),
@@ -107,7 +107,7 @@ function DomainAssessmentInner() {
         <h1 className="text-lg font-semibold mb-2">{label || 'Domain Module'}</h1>
         <p className="text-sm text-white/50 mb-6">{error.message}</p>
         <Link
-          href={error.purchaseUrl || '/dashboard/client/blueprint'}
+          href={error.purchaseUrl || '/dashboard/client/essence-profile'}
           className="inline-block px-5 py-2 bg-[#C6A664] text-black text-xs font-bold rounded-sm hover:bg-white transition-all"
         >
           Go to Blueprint
@@ -145,7 +145,7 @@ function DomainAssessmentInner() {
 
   return (
     <div className="max-w-2xl mx-auto py-10 animate-fade-in">
-      <button onClick={() => router.push('/dashboard/client/blueprint')} className="text-xs text-white/30 hover:text-white/60 mb-6">
+      <button onClick={() => router.push('/dashboard/client/essence-profile')} className="text-xs text-white/30 hover:text-white/60 mb-6">
         ← Back to Blueprint
       </button>
       <h1 className="font-display text-xl font-bold mb-1">

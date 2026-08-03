@@ -171,7 +171,7 @@ function EssenceIntelligencePage() {
           postingTime: essenceData.postingTime ?? null,
           businessMove: essenceData.businessMove ?? null,
           personality: essenceData.personality ?? '',
-          blueprintTile: essenceData.blueprint ?? null,
+          blueprintTile: essenceData.essenceProfile ?? null,
           domainTiles: essenceData.domainTiles ?? [],
         })
       }
@@ -294,13 +294,13 @@ function EssenceIntelligencePage() {
             const twin = twinData.twin
             if (twin) {
               const meta: any = twin.metadata || {}
-              const bp = meta.blueprint
-              if (bp?.core) {
+              const hd = meta.lenses?.humanDesign?.data
+              if (hd) {
                 setBlueprint({
-                  overallScore: bp.core.overallScore ?? 0,
-                  archetype: bp.core.archetype ?? 'Custom',
-                  scores: bp.core.scores ?? {},
-                  summary: bp.core.summary ?? '',
+                  overallScore: hd.overallScore ?? 0,
+                  archetype: hd.archetype ?? 'Custom',
+                  scores: hd.scores ?? {},
+                  summary: hd.summary ?? '',
                   exists: true,
                 })
               } else {
@@ -704,7 +704,7 @@ function EssenceIntelligencePage() {
                       Review Your Intake \u2190
                     </Link>
                     <Link
-                      href="/dashboard/client/blueprint/assess"
+                      href="/dashboard/client/essence-profile/assess"
                       className="px-5 py-2 bg-[#C6A664] text-black text-xs font-bold rounded-sm hover:bg-white transition-all"
                     >
                       Run Blueprint Assessment →
@@ -712,7 +712,7 @@ function EssenceIntelligencePage() {
                   </div>
                   <p className="text-[10px] text-white/20 mt-3">
                     Already have a blueprint?{' '}
-                    <Link href="/dashboard/client/blueprint" className="text-white/40 hover:text-white/60 underline">
+                    <Link href="/dashboard/client/essence-profile" className="text-white/40 hover:text-white/60 underline">
                       View it here
                     </Link>
                   </p>
@@ -933,7 +933,7 @@ function EssenceIntelligencePage() {
               {blueprint?.exists && (
                 <div className="pt-2 border-t border-white/[0.06]">
                   <Link
-                    href="/dashboard/client/blueprint"
+                    href="/dashboard/client/essence-profile"
                     className="text-xs text-[#C6A664] hover:opacity-80 transition-all"
                   >
                     View Full Blueprint →
@@ -953,14 +953,14 @@ function EssenceIntelligencePage() {
             <div className="p-5 space-y-2">
               {!blueprint?.exists ? (
                 <Link
-                  href="/dashboard/client/blueprint/assess"
+                  href="/dashboard/client/essence-profile/assess"
                   className="block w-full px-4 py-2 bg-[#C6A664] text-black text-xs font-bold rounded-sm hover:bg-white transition-all text-center"
                 >
                   Run Assessment
                 </Link>
               ) : (
                 <Link
-                  href="/dashboard/client/blueprint/assess"
+                  href="/dashboard/client/essence-profile/assess"
                   className="block w-full px-4 py-2 border border-white/10 text-white/50 text-xs font-bold rounded-sm hover:bg-white/[0.04] hover:text-white/70 transition-all text-center"
                 >
                   Re-run Assessment

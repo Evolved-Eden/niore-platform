@@ -872,7 +872,7 @@ export default function AdminTwinPage() {
                     value={instructions}
                     onChange={e => setInstructions(e.target.value)}
                     rows={6}
-                    placeholder="e.g. Always consider the user's Blueprint archetype when tailoring responses..."
+                    placeholder="e.g. Always consider the user's Essence Profile archetype when tailoring responses..."
                     className="w-full px-3 py-2.5 bg-white/[0.04] border border-white/10 rounded-sm text-sm text-white/70 focus:outline-none focus:border-[#7A2E32]/40 resize-none"
                   />
                   <div className="flex justify-end mt-3">

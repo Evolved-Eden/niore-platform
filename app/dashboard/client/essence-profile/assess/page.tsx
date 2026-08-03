@@ -3,12 +3,15 @@
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 
-export default function DashboardBlueprintAssess() {
+export default function DashboardEssenceProfileAssess() {
   const router = useRouter()
 
   useEffect(() => {
-    // Redirect to the full assessment — results auto-save to DB on completion
-    router.replace('/blueprint/assess?return=/dashboard/client/blueprint')
+    // The old standalone /blueprint/assess quiz (Round 31 finding: orphaned,
+    // admin-only-linked, no real signup path reached it) has been retired.
+    // The real, live assessment is /intake — results auto-save to DB on
+    // completion via /api/intake/calculate.
+    router.replace('/intake')
   }, [router])
 
   return (

@@ -416,7 +416,7 @@ const ADDONS_FALLBACK: Record<string, Addon> = {
   additional_location:  { id: 'additional_location',  name: 'Additional Location',     amount: 4900,  stripePriceId: price('ADDITIONAL_LOCATION'),   recurring: true, description: 'Add another physical location' },
 }
 
-// ── Standalone Products (Blueprint/Essence Engine upgrades, domain modules) ──
+// ── Standalone Products (Essence Assessment/Essence Engine upgrades, domain modules) ──
 // SOURCE OF TRUTH: Supabase `catalog_items` where catalog_type = 'blueprint'.
 // (The 6 domain_* modules were only ever hardcoded here and missing from the
 // Supabase catalog -- they've been added to catalog_items so this migration
@@ -461,20 +461,20 @@ export async function getStandaloneProducts(): Promise<Record<string, Standalone
 // Static fallback only -- not the source of truth. Update Supabase
 // (catalog_items where catalog_type = 'blueprint') to change real pricing.
 const STANDALONE_PRODUCTS_FALLBACK: Record<string, StandaloneProduct> = {
-  expanded_blueprint: { id: 'expanded_blueprint', name: 'Expanded Blueprint',     amount: 15000, description: 'Full whole-life scan + essence board links + premium suggestions (1 year)', recurring: false },
-  enhanced_blueprint: { id: 'enhanced_blueprint', name: 'Enhanced Blueprint',     amount: 3500,  description: 'Deeper intelligence analysis + priority essence board insights + cross-domain pattern recognition', recurring: false },
+  expanded_blueprint: { id: 'expanded_blueprint', name: 'Expanded Essence Assessment',     amount: 15000, description: 'Full whole-life scan + essence board links + premium suggestions (1 year)', recurring: false },
+  enhanced_blueprint: { id: 'enhanced_blueprint', name: 'Enhanced Essence Assessment',     amount: 3500,  description: 'Deeper intelligence analysis + priority essence board insights + cross-domain pattern recognition', recurring: false },
   domain_relationship:{ id: 'domain_relationship',name: 'Relationship Module',    amount: 5000,  description: 'Relationship intelligence domain assessment', recurring: false },
   domain_personal:    { id: 'domain_personal',    name: 'Personal Module',        amount: 5000,  description: 'Personal development intelligence domain', recurring: false },
   domain_spiritual:   { id: 'domain_spiritual',   name: 'Spiritual Module',       amount: 5000,  description: 'Spiritual intelligence domain assessment', recurring: false },
   domain_lifestyle:   { id: 'domain_lifestyle',   name: 'Lifestyle Module',       amount: 5000,  description: 'Lifestyle intelligence domain assessment', recurring: false },
   domain_creativity:  { id: 'domain_creativity',  name: 'Creativity Module',      amount: 5000,  description: 'Creativity intelligence domain assessment', recurring: false },
   domain_legacy:      { id: 'domain_legacy',      name: 'Legacy Module',          amount: 5000,  description: 'Legacy & impact intelligence domain assessment', recurring: false },
-  essence_profile:            { id: 'essence_profile',            name: 'Essence Profile Blueprint',        amount: 19900, description: 'Emotional, somatic, and relational intelligence blueprint (40 systems)', recurring: false },
-  rhythm_state:               { id: 'rhythm_state',               name: 'Rhythm & State Blueprint',         amount: 19900, description: 'Timing, cycles, somatic rhythms, and peak performance blueprint (40 systems)', recurring: false },
-  alignment_purpose:          { id: 'alignment_purpose',          name: 'Alignment & Purpose Blueprint',    amount: 14900, description: 'Vocation, purpose, and life direction blueprint (10 systems)', recurring: false },
-  momentum_execution:         { id: 'momentum_execution',         name: 'Momentum & Execution Blueprint',   amount: 14900, description: 'Financial abundance and execution intelligence blueprint (14 systems)', recurring: false },
-  connections_relationships:  { id: 'connections_relationships',  name: 'Connections & Relationships Blueprint', amount: 9900, description: 'Social, relational, and influence intelligence blueprint (4 systems)', recurring: false },
-  evolution_intelligence:     { id: 'evolution_intelligence',     name: 'Evolution & Intelligence Blueprint',amount: 19900, description: 'AI-enhanced learning, cognitive, and growth intelligence blueprint (29 systems)', recurring: false },
+  essence_profile:            { id: 'essence_profile',            name: 'Essence Profile Assessment',        amount: 19900, description: 'Emotional, somatic, and relational intelligence assessment (40 systems)', recurring: false },
+  rhythm_state:               { id: 'rhythm_state',               name: 'Rhythm & State Assessment',         amount: 19900, description: 'Timing, cycles, somatic rhythms, and peak performance assessment (40 systems)', recurring: false },
+  alignment_purpose:          { id: 'alignment_purpose',          name: 'Alignment & Purpose Assessment',    amount: 14900, description: 'Vocation, purpose, and life direction assessment (10 systems)', recurring: false },
+  momentum_execution:         { id: 'momentum_execution',         name: 'Momentum & Execution Assessment',   amount: 14900, description: 'Financial abundance and execution intelligence assessment (14 systems)', recurring: false },
+  connections_relationships:  { id: 'connections_relationships',  name: 'Connections & Relationships Assessment', amount: 9900, description: 'Social, relational, and influence intelligence assessment (4 systems)', recurring: false },
+  evolution_intelligence:     { id: 'evolution_intelligence',     name: 'Evolution & Intelligence Assessment',amount: 19900, description: 'AI-enhanced learning, cognitive, and growth intelligence assessment (29 systems)', recurring: false },
 }
 
 // ── Specialty Add-On Packs ─────────────────────────────────

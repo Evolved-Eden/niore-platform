@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
       customer_email: user?.email || email,
       metadata,
       success_url: `${origin}/dashboard?checkout=success${tier ? `&tier=${tier}` : ''}${path ? `&path=${path}` : ''}${products?.length ? `&products=${encodeURIComponent(JSON.stringify(products))}` : ''}`,
-      cancel_url: `${origin}/dashboard/client/blueprint`,
+      cancel_url: `${origin}/dashboard/client/essence-profile`,
     }
 
     // Apply coupon/promotion code if provided

@@ -10,7 +10,7 @@ const SECTION_META: Record<UserRole, Record<string, { title: string; description
       title: 'My Twin',
       description: 'View and tune your AI-synthesized digital intelligence.',
     },
-    blueprint: {
+    'essence-profile': {
       title: 'Blueprint',
       description: 'Review assessment results, recommendations, and deployment modules.',
     },

@@ -82,15 +82,15 @@ export default async function ClientDashboard() {
 
   // Fall back to metadata for existing users without top-level columns
   const meta = twin?.metadata as Record<string, any> | null
-  const metaBpScore = meta?.blueprint?.core?.overallScore
-  const bpScore = typeof twin?.blueprint_score === 'number'
-    ? twin.blueprint_score
+  const metaBpScore = meta?.lenses?.humanDesign?.data?.overallScore
+  const bpScore = typeof twin?.essence_score === 'number'
+    ? twin.essence_score
     : typeof metaBpScore === 'number'
       ? metaBpScore
       : null
   const blueprintScore = bpScore !== null ? `${bpScore}%` : twin ? 'Processing' : '—'
 
-  const metaEngScore = meta?.blueprint?.core?.overallScore
+  const metaEngScore = meta?.lenses?.humanDesign?.data?.overallScore
   const engagementScore = typeof twin?.engagement_score === 'number'
     ? twin.engagement_score
     : typeof metaEngScore === 'number'
@@ -230,7 +230,7 @@ export default async function ClientDashboard() {
                 </div>
                 {!twin && (
                   <Link
-                    href="/dashboard/client/blueprint/assess"
+                    href="/dashboard/client/essence-profile/assess"
                     className="px-5 py-2 bg-[#C6A664] text-black text-xs font-bold rounded-sm hover:bg-white transition-all shrink-0 glow-acid"
                   >
                     Run Blueprint →
@@ -258,7 +258,7 @@ export default async function ClientDashboard() {
               {' '}Unlock autonomous intelligence agents through your blueprint.
             </div>
             <Link
-              href="/dashboard/client/blueprint"
+              href="/dashboard/client/essence-profile"
               className="inline-block mt-3 text-xs text-[#C6A664] hover:text-white transition-colors"
             >
               Deploy new agent →
@@ -272,7 +272,7 @@ export default async function ClientDashboard() {
                 <span className="text-[#8B7AA8]">◆</span> Blueprint Progress
               </div>
               <Link
-                href="/dashboard/client/blueprint"
+                href="/dashboard/client/essence-profile"
                 className="text-[10px] text-white/20 hover:text-white/50 transition-colors tracking-wider uppercase"
               >
                 View full →
@@ -303,7 +303,7 @@ export default async function ClientDashboard() {
             )}
             {!twin && (
               <Link
-                href="/dashboard/client/blueprint/assess"
+                href="/dashboard/client/essence-profile/assess"
                 className="inline-block mt-4 px-5 py-2 bg-[#C6A664] text-black text-xs font-bold rounded-sm hover:bg-white transition-all glow-acid"
               >
                 Start Assessment →

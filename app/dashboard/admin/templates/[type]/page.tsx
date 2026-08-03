@@ -38,7 +38,7 @@ export default function TemplateManager({ params }: { params: Promise<{ type: st
       let parsed;
       try { parsed = JSON.parse(sectionsJson); } catch { throw new Error('Invalid JSON'); }
 
-      const endpoint = template._template_type === 'essence' ? 'essence_templates' : 'blueprint_templates';
+      const endpoint = template._template_type === 'essence' ? 'essence_templates' : 'essence_engines'; // this var is only used to pick _template_type in the POST body below, not a real table name
 
       const res = await fetch('/api/admin/templates', {
         method: 'POST',
@@ -75,7 +75,7 @@ export default function TemplateManager({ params }: { params: Promise<{ type: st
                 ? 'bg-blue-500/10 text-blue-400 border-blue-500/20'
                 : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
             }`}>
-              {template._template_type === 'blueprint' ? 'Blueprint' : 'Essence'}
+              {template._template_type === 'blueprint' ? 'Assessment' : 'Essence'}
             </span>
           </p>
         </div>

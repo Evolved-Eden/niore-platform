@@ -550,32 +550,20 @@ export default function ClientBlueprintPage() {
         }
       } catch {}
 
-      // Check intake data
+      // Check intake completion (clients.metadata.intake is the assessment's
+      // own response record -- used only for the "has this person done the
+      // assessment" flag here, not as a second source of computed results)
       const { data: clientRec } = await supabase
         .from('clients')
         .select('metadata')
         .eq('id', u.id)
         .maybeSingle()
-      let intakeSections: any = null
-      if (clientRec) {
-        const meta = (clientRec.metadata as Record<string, any>) ?? {}
-        intakeSections = meta.intake?.sections
-        if (intakeSections?.results?.blueprint) {
-          const bp = intakeSections.results.blueprint
-          const es = intakeSections.results.essence
-          setIntake({
-            hasIntake: true,
-            archetype: bp.archetype,
-            coreArch: bp.foundation?.coreArch,
-            energyType: bp.foundation?.energyType,
-            naturalGift: bp.foundation?.naturalGift,
-            growthEdge: bp.foundation?.growthEdge,
-            mindArchitecture: es?.mindArchitecture,
-          })
-        }
-      }
+      const hasIntakeRecord = !!(clientRec?.metadata as Record<string, any>)?.intake
 
-      // Check if twin exists and read blueprint from DB
+      // Check if twin exists and read the essence profile from the single
+      // consolidated location: client_twins.metadata.lenses.humanDesign
+      // (Round 32 item 2 -- one assessments structure, not several parallel
+      // profile-storage mechanisms)
       let foundBlueprint: BlueprintData | null = null
       const { data: twin } = await supabase
         .from('client_twins')
@@ -586,17 +574,30 @@ export default function ClientBlueprintPage() {
       if (twin) {
         setTwinExists(true)
         const meta = (twin as any).metadata || {}
+        const hd = meta.lenses?.humanDesign?.data
 
-        // Read blueprint from DB (saved by /api/blueprint/save)
-        const bp = meta.blueprint
-        if (bp?.core) {
+        if (hd) {
+          setIntake({
+            hasIntake: hasIntakeRecord,
+            archetype: hd.archetype,
+            coreArch: hd.foundation?.coreArch,
+            energyType: hd.foundation?.energyType,
+            naturalGift: hd.foundation?.naturalGift,
+            growthEdge: hd.foundation?.growthEdge,
+            mindArchitecture: meta.lenses?.lifeTheme?.data?.mindArchitecture,
+          })
+        } else {
+          setIntake({ hasIntake: hasIntakeRecord })
+        }
+
+        if (hd) {
           foundBlueprint = {
-            overallScore: bp.core.overallScore ?? 0,
-            archetype: bp.core.archetype ?? 'Custom',
-            scores: bp.core.scores ?? {},
-            summary: bp.core.summary ?? '',
-            recommended_agents: bp.core.recommended_agents ?? [],
-            intake_role: bp.intake?.role ?? 'client',
+            overallScore: hd.overallScore ?? 0,
+            archetype: hd.archetype ?? 'Custom',
+            scores: hd.scores ?? {},
+            summary: hd.summary ?? '',
+            recommended_agents: hd.recommended_agents ?? [],
+            intake_role: meta.intake_role ?? 'client',
           }
         } else {
           // Fallback: try sessionStorage (legacy)
@@ -622,26 +623,9 @@ export default function ClientBlueprintPage() {
         }
 
         // Check purchases in metadata
-        if (meta.blueprint_expanded) setPurchasedExpanded(true)
-        if (meta.blueprint_enhanced) setPurchasedEnhanced(true)
+        if (meta.essence_assessment_expanded) setPurchasedExpanded(true)
+        if (meta.essence_assessment_enhanced) setPurchasedEnhanced(true)
         if (meta.purchased_domains) setPurchasedDomains(new Set(meta.purchased_domains))
-      }
-
-      // Fallback: use intake results as blueprint data if no twin blueprint exists
-      if (!foundBlueprint && intakeSections?.results?.blueprint) {
-        const bp = intakeSections.results.blueprint
-        const scores = bp.scores || {}
-        const overallScore = Object.values(scores).length > 0
-          ? Math.round(Object.values(scores).reduce((a: number, b: any) => a + b, 0) / Object.keys(scores).length)
-          : 0
-        foundBlueprint = {
-          overallScore,
-          archetype: bp.archetype || 'Custom',
-          scores,
-          summary: bp.summary || '',
-          recommended_agents: [],
-          intake_role: intakeSections.results?.essence?.mindArchitecture || 'client',
-        }
       }
 
       if (foundBlueprint) {
@@ -796,7 +780,7 @@ export default function ClientBlueprintPage() {
               )}
 
               <Link
-                href="/dashboard/client/blueprint/assess"
+                href="/dashboard/client/essence-profile/assess"
                 className="inline-block px-6 py-3 bg-[#C6A664] text-black text-sm font-bold rounded-sm hover:bg-white transition-all"
               >
                 {intake.hasIntake ? 'Complete Full Blueprint Assessment →' : 'Start Blueprint Assessment →'}
@@ -817,7 +801,7 @@ export default function ClientBlueprintPage() {
                       <div className="text-sm text-white/70 mt-1">{blueprint.archetype}</div>
                     </div>
                     <Link
-                      href="/dashboard/client/blueprint/assess"
+                      href="/dashboard/client/essence-profile/assess"
                       className="text-[10px] font-bold px-3 py-1.5 rounded-sm border border-[#C6A664]/40 text-[#C6A664] hover:bg-[#C6A664]/10 transition-all"
                     >
                       Edit Blueprint →
@@ -1053,7 +1037,7 @@ export default function ClientBlueprintPage() {
             )}
             {purchasedEnhanced && !purchasedExpanded && (
               <p className="mt-3 text-xs text-[#5E8B84]/60 text-center">
-                Add the Expanded Blueprint for full whole-life intelligence scan → <Link href="/dashboard/client/blueprint/assess" className="underline hover:text-[#5E8B84]">Go to Assessment</Link>
+                Add the Expanded Blueprint for full whole-life intelligence scan → <Link href="/dashboard/client/essence-profile/assess" className="underline hover:text-[#5E8B84]">Go to Assessment</Link>
               </p>
             )}
           </div>
@@ -1097,7 +1081,7 @@ export default function ClientBlueprintPage() {
                         )}
                         {owned && (
                           <Link
-                            href={`/dashboard/client/blueprint/domain?key=${mod.id}`}
+                            href={`/dashboard/client/essence-profile/domain?key=${mod.id}`}
                             className="px-3 py-1.5 text-[10px] font-bold rounded-sm border border-[#C6A664]/40 text-[#C6A664] hover:bg-[#C6A664]/10 transition-all"
                           >
                             Answer Questions
@@ -1160,7 +1144,7 @@ export default function ClientBlueprintPage() {
             <Link href="/dashboard/client/zuri" className="block text-xs text-white/40 hover:text-white/70 transition-colors">
               → Ask Zuri
             </Link>
-            <Link href="/dashboard/client/blueprint/assess" className="block text-xs text-white/40 hover:text-white/70 transition-colors">
+            <Link href="/dashboard/client/essence-profile/assess" className="block text-xs text-white/40 hover:text-white/70 transition-colors">
               → Edit / Re-take Assessment
             </Link>
             <Link href="/intake" className="block text-xs text-white/40 hover:text-white/70 transition-colors">

@@ -177,7 +177,7 @@ export default async function ClientProfilePage() {
   const name = identity.full_name ?? user.email?.split('@')[0] ?? 'User'
   const role: string = identity.role ?? 'client'
   const roleColor = ROLE_COLORS[role] ?? '#C6A664'
-  const hasBlueprint = !!((twin as any)?.metadata?.blueprint)
+  const hasBlueprint = !!((twin as any)?.metadata?.lenses?.humanDesign?.data)
   const completePct = profileComplete(identity, client, hasBlueprint)
 
   // Twin scores
@@ -391,18 +391,18 @@ export default async function ClientProfilePage() {
                 <div className="flex items-center justify-between mb-4">
                   <div>
                     <div className="text-3xl font-bold text-[#C6A664]">
-                      {(twin as any)?.metadata?.blueprint?.core?.overallScore ?? '—'}
+                      {(twin as any)?.metadata?.lenses?.humanDesign?.data?.overallScore ?? '—'}
                     </div>
                     <div className="text-[10px] text-white/30 tracking-widest uppercase mt-1">Overall Score</div>
                   </div>
                   <div className="text-right">
-                    <div className="text-sm text-white/70">{(twin as any)?.metadata?.blueprint?.core?.archetype ?? '—'}</div>
+                    <div className="text-sm text-white/70">{(twin as any)?.metadata?.lenses?.humanDesign?.data?.archetype ?? '—'}</div>
                     <div className="text-[10px] text-white/30 tracking-widest uppercase mt-0.5">Archetype</div>
                   </div>
                 </div>
                 {/* Dimension scores */}
                 {(() => {
-                  const scores: Record<string, number> | undefined = (twin as any)?.metadata?.blueprint?.core?.scores
+                  const scores: Record<string, number> | undefined = (twin as any)?.metadata?.lenses?.humanDesign?.data?.scores
                   if (!scores || Object.keys(scores).length === 0) return null
                   return (
                     <div className="space-y-2.5 mb-4">
@@ -418,13 +418,13 @@ export default async function ClientProfilePage() {
                   )
                 })()}
                 {/* Summary */}
-                {(twin as any)?.metadata?.blueprint?.core?.summary && (
+                {(twin as any)?.metadata?.lenses?.humanDesign?.data?.summary && (
                   <p className="text-sm text-white/50 leading-relaxed mt-4 pt-4 border-t border-white/[0.06]">
-                    {(twin as any).metadata.blueprint.core.summary}
+                    {(twin as any).metadata.lenses.humanDesign.data.summary}
                   </p>
                 )}
                 <Link
-                  href="/dashboard/client/blueprint"
+                  href="/dashboard/client/essence-profile"
                   className="inline-block mt-4 text-xs text-[#C6A664]/60 hover:text-[#C6A664] transition-colors"
                 >
                   View full blueprint →
@@ -438,7 +438,7 @@ export default async function ClientProfilePage() {
                 <p className="text-sm text-white/40 mb-1">No blueprint yet</p>
                 <p className="text-xs text-white/20 mb-4">Complete the assessment to unlock your intelligence foundation</p>
                 <Link
-                  href="/dashboard/client/blueprint/assess"
+                  href="/dashboard/client/essence-profile/assess"
                   className="inline-block px-5 py-2.5 bg-[#C6A664] text-black text-xs font-bold rounded-sm hover:bg-white transition-all"
                 >
                   Take Assessment →
@@ -486,7 +486,7 @@ export default async function ClientProfilePage() {
                 <p className="text-sm text-white/40 mb-1">No AI twin deployed</p>
                 <p className="text-xs text-white/20 mb-4">Complete your blueprint to generate your twin</p>
                 <Link
-                  href="/dashboard/client/blueprint/assess"
+                  href="/dashboard/client/essence-profile/assess"
                   className="inline-block px-5 py-2.5 bg-[#C6A664] text-black text-xs font-bold rounded-sm hover:bg-white transition-all"
                 >
                   Deploy Twin →
@@ -572,7 +572,7 @@ export default async function ClientProfilePage() {
           </Link>
 
           {/* ─── 7. AGENT DEPLOYMENTS ─────────────────────────── */}
-          <Link href="/dashboard/client/blueprint" className="block glass rounded-sm p-5 border border-white/[0.06] hover:border-white/[0.12] transition-all group">
+          <Link href="/dashboard/client/essence-profile" className="block glass rounded-sm p-5 border border-white/[0.06] hover:border-white/[0.12] transition-all group">
             <div className="flex items-center justify-between mb-3">
               <div className="text-xs text-white/30 tracking-widest uppercase">Agents</div>
               <div className="w-8 h-8 rounded-full bg-white/[0.04] flex items-center justify-center group-hover:bg-white/[0.08] transition-colors">
@@ -631,7 +631,7 @@ export default async function ClientProfilePage() {
             <div className="text-xs text-white/30 tracking-widest uppercase mb-3">Quick Links</div>
             {[
               { href: '/dashboard/client/twin', label: 'View AI Twin' },
-              { href: '/dashboard/client/blueprint', label: 'Blueprint Details' },
+              { href: '/dashboard/client/essence-profile', label: 'Blueprint Details' },
               { href: '/dashboard/client/vault', label: 'Intelligence Vault' },
               { href: '/dashboard/client/zuri', label: 'Ask Zuri' },
               { href: '/dashboard/client/settings', label: 'Account Settings' },

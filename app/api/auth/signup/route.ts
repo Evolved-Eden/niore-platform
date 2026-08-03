@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { createServerClient } from '@supabase/ssr'
+import { supabaseAdmin } from '@/lib/supabase/admin'
 
 /**
  * POST /api/auth/signup
@@ -39,6 +40,46 @@ export async function POST(req: NextRequest) {
     const user = result.user || result.id
     if (!user) {
       return NextResponse.json({ error: 'Failed to create user' }, { status: 500 })
+    }
+
+    // Referral attribution: if this browser came through an affiliate link
+    // (GET /api/r/[code] sets this cookie), record it on the new user's
+    // metadata now. The stripe webhook reads it back at purchase time to
+    // create the conversion event + commission accrual.
+    try {
+      const cookieStore = await cookies()
+      const refCode = cookieStore.get('niore_ref')?.value
+      if (refCode) {
+        const { data: link } = await supabaseAdmin
+          .from('affiliate_links')
+          .select('id, owner_user_id')
+          .eq('code', refCode)
+          .maybeSingle()
+
+        if (link) {
+          const newUserId = user.id || user
+          const visitorId = cookieStore.get('niore_visitor_id')?.value || null
+
+          await supabaseAdmin
+            .from('users')
+            .update({
+              metadata: {
+                referred_by_affiliate_link_id: link.id,
+                referred_by_affiliate_code: refCode,
+              },
+            })
+            .eq('id', newUserId)
+
+          await supabaseAdmin.from('affiliate_link_events').insert({
+            affiliate_link_id: link.id,
+            event_type: 'signup',
+            visitor_id: visitorId,
+            converted_user_id: newUserId,
+          })
+        }
+      }
+    } catch (refErr) {
+      console.error('Affiliate referral capture failed (non-fatal):', refErr)
     }
 
     // Try to sign in immediately (in case auto-confirm is on)

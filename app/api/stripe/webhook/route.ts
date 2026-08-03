@@ -122,6 +122,89 @@ async function getOrCreateOrg(userId: string, userName: string, tierKey: string)
 // Removed. upsertClientTwin() + createZuriAgent() below are the real
 // Base Twin / Core Agent provisioning steps per the Eden Core System model.
 
+async function recordAffiliateConversion({
+  userId,
+  purchaseId,
+  purchaseAmount,
+  tierKey,
+}: {
+  userId: string
+  purchaseId: string
+  purchaseAmount: number
+  tierKey?: string | null
+}) {
+  try {
+    const { data: userRow } = await supabaseAdmin
+      .from('users')
+      .select('metadata')
+      .eq('id', userId)
+      .maybeSingle()
+
+    const linkId = (userRow?.metadata as Record<string, unknown> | null)?.referred_by_affiliate_link_id as string | undefined
+    if (!linkId) return
+
+    const { data: link } = await supabaseAdmin
+      .from('affiliate_links')
+      .select('id, owner_user_id, owner_organization_id, conversions_count')
+      .eq('id', linkId)
+      .maybeSingle()
+    if (!link) return
+
+    const { data: affiliateClient } = await supabaseAdmin
+      .from('clients')
+      .select('plan_tier_key')
+      .eq('id', link.owner_user_id)
+      .maybeSingle()
+
+    let commissionRate = 0
+    if (affiliateClient?.plan_tier_key) {
+      const { data: tier } = await supabaseAdmin
+        .from('membership_tiers')
+        .select('commission_rate')
+        .eq('key', affiliateClient.plan_tier_key)
+        .maybeSingle()
+      commissionRate = Number(tier?.commission_rate ?? 0)
+    }
+    if (commissionRate <= 0) return
+
+    const { data: event } = await supabaseAdmin
+      .from('affiliate_link_events')
+      .insert({
+        affiliate_link_id: link.id,
+        event_type: 'conversion',
+        converted_user_id: userId,
+        converted_purchase_id: purchaseId,
+      })
+      .select('id')
+      .single()
+
+    await supabaseAdmin
+      .from('affiliate_links')
+      .update({ conversions_count: (link.conversions_count ?? 0) + 1 })
+      .eq('id', link.id)
+
+    const commissionAmount = Number(purchaseAmount) * commissionRate
+    const payoutDelayDays = 30
+
+    await supabaseAdmin.from('affiliate_commission_accruals').insert({
+      affiliate_link_event_id: event?.id,
+      affiliate_link_id: link.id,
+      affiliate_user_id: link.owner_user_id,
+      affiliate_organization_id: link.owner_organization_id,
+      membership_tier_key: affiliateClient?.plan_tier_key,
+      commission_rate_applied: commissionRate,
+      purchase_amount: purchaseAmount,
+      commission_amount: commissionAmount,
+      currency: 'usd',
+      status: 'pending',
+      payout_delay_days: payoutDelayDays,
+      eligible_for_payout_at: new Date(Date.now() + payoutDelayDays * 24 * 60 * 60 * 1000).toISOString(),
+    })
+  } catch (err) {
+    console.error('recordAffiliateConversion failed (non-fatal):', err)
+  }
+}
+
 // Activates (or upgrades) an OS package for an organization -- the
 // canonical record of "this org/human currently has X active," which
 // supports multiple concurrent OS's on one org (personal_os + family_os +
@@ -295,8 +378,16 @@ export async function POST(req: Request) {
         .from("catalog_purchases")
         .update({ status: "succeeded", updated_at: new Date().toISOString() })
         .eq("stripe_payment_intent_id", paymentIntent.id)
-        .select("id, seller_net_amount, currency")
+        .select("id, seller_net_amount, currency, buyer_user_id")
         .single()
+
+      if (purchase?.buyer_user_id) {
+        await recordAffiliateConversion({
+          userId: purchase.buyer_user_id,
+          purchaseId: paymentIntent.id,
+          purchaseAmount: Number(paymentIntent.amount) / 100,
+        })
+      }
 
       if (purchase && sellerOrgId) {
         const { data: wallet } = await supabaseAdmin
@@ -378,6 +469,13 @@ export async function POST(req: Request) {
         addons,
         stripeCustomerId: typeof session.customer === "string" ? session.customer : null,
         stripeSubscriptionId: typeof session.subscription === "string" ? session.subscription : null,
+      })
+
+      await recordAffiliateConversion({
+        userId,
+        purchaseId: session.id,
+        purchaseAmount: (session.amount_total ?? 0) / 100,
+        tierKey: tier,
       })
 
       // Save Stripe customer/subscription reference

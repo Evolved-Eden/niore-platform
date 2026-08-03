@@ -6,7 +6,6 @@ import UpgradePanel from '@/components/UpgradePanel'
 export default async function AffiliateDashboard() {
   const supabase = await createClient()
   const { data: { user: _user } } = await supabase.auth.getUser()
-  // Guaranteed non-null by root middleware
   const user = _user!
 
   const { data: profile } = await supabase
@@ -14,6 +13,31 @@ export default async function AffiliateDashboard() {
     .select('full_name, role')
     .eq('id', user.id)
     .single()
+
+  const { data: myLinks } = await supabase
+    .from('affiliate_links')
+    .select('id')
+    .eq('owner_user_id', user.id)
+
+  const linkIds = (myLinks || []).map(l => l.id)
+
+  const { count: activeReferrals } = linkIds.length
+    ? await supabase
+        .from('affiliate_link_events')
+        .select('id', { count: 'exact', head: true })
+        .in('affiliate_link_id', linkIds)
+        .eq('event_type', 'conversion')
+    : { count: 0 }
+
+  const { data: accruals } = linkIds.length
+    ? await supabase
+        .from('affiliate_commission_accruals')
+        .select('commission_amount, status')
+        .in('affiliate_link_id', linkIds)
+        .in('status', ['approved', 'paid'])
+    : { data: [] }
+
+  const commissionEarned = (accruals || []).reduce((sum, a) => sum + Number(a.commission_amount || 0), 0)
 
   const name = profile?.full_name ?? user.email?.split('@')[0] ?? 'Partner'
 
@@ -26,7 +50,6 @@ export default async function AffiliateDashboard() {
         <p className="text-white/30 text-sm">Welcome back, {name}</p>
       </div>
 
-      {/* Essence Board — center stage, same as every other dashboard */}
       <div className="mb-8">
         <div className="text-xs text-[#C9974A] tracking-widest uppercase font-medium mb-3">
           Zuri's Direction For You
@@ -36,8 +59,8 @@ export default async function AffiliateDashboard() {
 
       <div className="grid grid-cols-3 gap-4 mb-8">
         {[
-          { label: 'Active Referrals', value: '—', color: '#C9974A' },
-          { label: 'Commission Earned', value: '$—', color: '#C6A664' },
+          { label: 'Active Referrals', value: String(activeReferrals ?? 0), color: '#C9974A' },
+          { label: 'Commission Earned', value: `$${commissionEarned.toFixed(2)}`, color: '#C6A664' },
           { label: 'Partner Rank', value: 'Active', color: '#8B7AA8' },
         ].map(s => (
           <div key={s.label} className="glass rounded-sm p-5">

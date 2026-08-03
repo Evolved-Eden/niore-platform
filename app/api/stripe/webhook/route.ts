@@ -238,7 +238,7 @@ async function createZuriAgent(userId: string, orgId: string) {
 
 async function lookupAgentRegistry(agentIds: string[]) {
   const { data: agents } = await supabaseAdmin
-    .from('agent_registry')
+    .from('agent_catalog')
     .select('*')
     .in('agent_id', agentIds)
 

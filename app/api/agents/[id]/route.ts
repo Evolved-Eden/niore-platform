@@ -9,7 +9,7 @@ export async function GET(
   const supabase = await createAdminClient()
 
   const { data, error } = await supabase
-    .from('agent_registry')
+    .from('agent_catalog')
     .select('*')
     .eq('agent_id', id)
     .single()

@@ -1,0 +1,129 @@
+diff --git a/app/api/auth/exchange-recovery-token/route.ts b/app/api/auth/exchange-recovery-token/route.ts
+index 2c1fe3d..bfb08eb 100644
+--- a/app/api/auth/exchange-recovery-token/route.ts
++++ b/app/api/auth/exchange-recovery-token/route.ts
+@@ -1,6 +1,6 @@
+ import { NextRequest, NextResponse } from "next/server"
+ import { queryOne } from "@/lib/db"
+-import { createSession, setSessionCookies } from "@/lib/auth-direct"
++import { createSession, setSessionCookies, establishSupabaseSession } from "@/lib/auth-direct"
+ 
+ /**
+  * POST /api/auth/exchange-recovery-token
+@@ -64,6 +64,11 @@ export async function POST(req: NextRequest) {
+       session.expiresAt
+     )
+ 
++    // HOTFIX: same gap as signin -- without a real @supabase/ssr session,
++    // RLS-scoped reads silently return empty for the rest of this session.
++    // See establishSupabaseSession()'s doc comment in lib/auth-direct.ts.
++    await establishSupabaseSession(session.accessToken, session.refreshToken)
++
+     return NextResponse.json({
+       success: true,
+       user: { id: user.id, email: user.email },
+diff --git a/app/api/auth/signin/route.ts b/app/api/auth/signin/route.ts
+index 8282e81..6cfab31 100644
+--- a/app/api/auth/signin/route.ts
++++ b/app/api/auth/signin/route.ts
+@@ -1,5 +1,5 @@
+ import { NextRequest, NextResponse } from 'next/server'
+-import { verifyPassword, createSession, setSessionCookies } from '@/lib/auth-direct'
++import { verifyPassword, createSession, setSessionCookies, establishSupabaseSession } from '@/lib/auth-direct'
+ 
+ /**
+  * POST /api/auth/signin
+@@ -31,6 +31,14 @@ export async function POST(req: NextRequest) {
+       session.expiresAt
+     )
+ 
++    // 4. HOTFIX: also hydrate a real @supabase/ssr session. Without this,
++    // every RLS-scoped .from() call for the rest of this session silently
++    // runs as the anon Postgres role and RLS filters rows out with no
++    // error -- see establishSupabaseSession()'s doc comment for the full
++    // incident writeup. This was the actual cause of every account
++    // (including real admins) landing on /pricing after login.
++    await establishSupabaseSession(session.accessToken, session.refreshToken)
++
+     return NextResponse.json({
+       success: true,
+       user: {
+diff --git a/lib/auth-direct.ts b/lib/auth-direct.ts
+index 40af054..5dda23f 100644
+--- a/lib/auth-direct.ts
++++ b/lib/auth-direct.ts
+@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken'
+ import { query, queryOne } from './db'
+ import { randomUUID, createHash } from 'crypto'
+ import { cookies } from 'next/headers'
++import { createServerClient } from '@supabase/ssr'
+ 
+ // ═══════════════════════════════════════════════════════════
+ // Direct Postgres auth — bypasses Kong entirely
+@@ -172,6 +173,66 @@ export async function setSessionCookies(
+   )
+ }
+ 
++/**
++ * HOTFIX (role-lookup-silent-RLS-filter incident): setSessionCookies() above
++ * writes the raw signed JWT into a custom-named cookie. That's enough for
++ * wrapGetUser() (lib/supabase/middleware.ts, lib/supabase/server.ts) to
++ * verify the session locally and avoid the original login-hang bug -- but
++ * it is NOT the session envelope @supabase/ssr's createServerClient expects
++ * to parse back out of a cookie. Without a real @supabase/ssr session, the
++ * underlying PostgREST client has no Authorization header to attach on
++ * .from() calls and silently executes them as the anon Postgres role. Any
++ * RLS policy scoped to auth.uid() (e.g. "Users can read own record" on
++ * public.users, USING (auth.uid() = id)) then filters out the row with
++ * ZERO error -- not a thrown exception, just an empty result -- which is
++ * what silently demoted every account, including real admins, to
++ * role='client' and bounced them to /pricing.
++ *
++ * app/api/auth/signup/route.ts already does this correctly (calls
++ * .auth.setSession() on an @supabase/ssr client right after getting a real
++ * access/refresh token pair). This is the same fix, extracted so every
++ * session-establishing entry point (signin, password-reset recovery
++ * exchange) can call it identically instead of drifting apart.
++ *
++ * Deliberately additive, not a replacement: setSessionCookies()'s raw-JWT
++ * cookie stays in place for wrapGetUser()'s local-verification shortcut.
++ * This just also gives the real @supabase/ssr client something valid to
++ * work with, via its own setAll() cookie writer.
++ */
++export async function establishSupabaseSession(accessToken: string, refreshToken: string) {
++  const cookieStore = await cookies()
++  const ssrClient = createServerClient(
++    process.env.NEXT_PUBLIC_SUPABASE_URL!,
++    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
++    {
++      cookies: {
++        getAll() {
++          return cookieStore.getAll()
++        },
++        setAll(cookiesToSet) {
++          cookiesToSet.forEach(({ name, value, options }) => {
++            try {
++              cookieStore.set(name, value, options)
++            } catch {}
++          })
++        },
++      },
++    }
++  )
++
++  try {
++    await ssrClient.auth.setSession({
++      access_token: accessToken,
++      refresh_token: refreshToken,
++    })
++  } catch (err) {
++    console.error(
++      '[auth] @supabase/ssr setSession failed -- RLS-scoped reads will silently return empty rows instead of erroring:',
++      (err as Error).message
++    )
++  }
++}
++
+ /**
+  * Remove session cookies (sign-out).
+  */

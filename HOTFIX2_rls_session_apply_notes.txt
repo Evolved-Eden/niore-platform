@@ -1,0 +1,95 @@
+HOTFIX #2 -- the ACTUAL fix (silent RLS row-filtering on every login)
+════════════════════════════════════════════════════════════════════════
+APPLY THIS ON TOP OF HOTFIX #1 (HOTFIX_role_lookup_silent_fallback.patch).
+Both are needed -- #1 makes real failures loud instead of misleading, #2
+fixes the actual bug that was causing this specific incident. Verified
+TWO ways before this was handed to you:
+  1. Applied directly against your current working tree (round 34 +
+     hotfix #1 already in place) in a fresh, separate clone -- zero
+     conflicts, applied files byte-match what's described below.
+  2. Applied hotfix #1 then hotfix #2 in sequence against a bare
+     round-34-only clone -- same result, byte-identical. So this is safe
+     whether you're applying both fresh or you already have #1 in.
+
+Apply with (from repo root):
+  git apply HOTFIX2_rls_session_fix.patch
+
+════════════════════════════════════════════════════════════════════════
+WHAT WAS ACTUALLY BROKEN (confirmed, not just theorized)
+════════════════════════════════════════════════════════════════════════
+Hotfix #1 added a timeout + explicit error logging to the role lookup.
+Zuri applied it and got NO 503 and NO new error log line -- which ruled
+out a thrown error/timeout and pointed at something quieter: the query
+succeeding but returning zero rows, which Postgrest/Supabase does NOT
+treat as an error.
+
+Confirmed the exact mechanism:
+
+1. public.users has this RLS policy (supabase/migrations/
+   00003_fix_rls_recursion.sql):
+     CREATE POLICY "Users can read own record" ON public.users
+       FOR SELECT USING (auth.uid() = id);
+   No `TO` clause, so it applies to every role including anon. If the
+   request isn't recognized as an authenticated user, auth.uid() is NULL,
+   NULL = id is never true, and the row is silently filtered out. Zero
+   rows, zero error -- exactly what was observed.
+
+2. Why the request wasn't recognized as authenticated: your regular
+   sign-in flow (app/api/auth/signin/route.ts) verifies the password
+   directly against Postgres and writes the session via
+   setSessionCookies() in lib/auth-direct.ts, which stores the raw signed
+   JWT string in a custom-named cookie. That's enough for the
+   wrapGetUser() overrides (lib/supabase/middleware.ts,
+   lib/supabase/server.ts) to verify the session locally -- which is why
+   supabase.auth.getUser() correctly showed a logged-in user the whole
+   time. But it is NOT the session envelope @supabase/ssr's
+   createServerClient expects to parse back out of a cookie. Without that,
+   the underlying PostgREST client has no Authorization header to attach
+   on .from() calls, so those calls go out as the anon Postgres role --
+   invisible to code, and invisible to the timeout/error handling hotfix
+   #1 added, because nothing throws.
+
+3. The proof this was fixable this way: app/api/auth/signup/route.ts
+   ALREADY does this correctly -- right after getting a real access
+   token it calls .auth.setSession() on an @supabase/ssr client, so a
+   signed-up-and-auto-confirmed session works fine. Regular sign-in
+   never had that call. Neither did the password-reset recovery-token
+   exchange (app/api/auth/exchange-recovery-token/route.ts), which has
+   the identical pattern and identical gap -- fixed here too.
+
+Checked and did NOT need changes: app/api/auth/update-password/route.ts
+(round 34's new route) only calls getUser() and writes via direct SQL,
+not the RLS-scoped client -- no gap there. app/auth/callback/page.tsx
+already calls setSession() correctly (OAuth-style flow, unaffected).
+
+════════════════════════════════════════════════════════════════════════
+THE FIX
+════════════════════════════════════════════════════════════════════════
+- New lib/auth-direct.ts export: establishSupabaseSession(accessToken,
+  refreshToken). Creates an @supabase/ssr client scoped to the current
+  request/cookies and calls .auth.setSession() on it -- the exact same
+  call signup already proves works, extracted so every session-
+  establishing entry point can share one implementation instead of
+  drifting apart.
+- Wired into app/api/auth/signin/route.ts (the main login path) and
+  app/api/auth/exchange-recovery-token/route.ts (password reset), each
+  right after their existing setSessionCookies() call.
+- Purely additive: the raw-JWT cookie write stays exactly as-is, so
+  wrapGetUser()'s local-verification shortcut (the original login-hang
+  fix) is untouched. This just ALSO gives the real @supabase/ssr client
+  something valid, via its own setAll() cookie writer.
+- If setSession() itself fails for some reason, it's caught and logged
+  loudly (console.error) rather than silently swallowed -- won't repeat
+  the same mistake this whole incident started from.
+
+════════════════════════════════════════════════════════════════════════
+HOW TO CONFIRM IT WORKED
+════════════════════════════════════════════════════════════════════════
+Log in on the admin account after applying. You should land on
+/dashboard/admin, not /pricing. If you still land on /pricing, hotfix #1
+will now show whether it's a real error (503 page/JSON, log line) or
+still silent (meaning there's a second cookie-name mismatch or an ID
+mismatch between auth.users and public.users worth checking directly):
+  select id, email, role from public.users where email = '<admin email>';
+  select id, email from auth.users where email = '<admin email>';
+those two `id` values must match.

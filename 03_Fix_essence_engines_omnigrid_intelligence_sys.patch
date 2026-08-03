@@ -1,0 +1,58 @@
+From 9f066c1fdee3d6b6dec63dfeebb89cc69c1d4aaf Mon Sep 17 00:00:00 2001
+From: Round33 Handoff <handoff@niore-platform.local>
+Date: Mon, 3 Aug 2026 13:42:36 -0400
+Subject: [PATCH] Fix essence_engines/omnigrid_intelligence_system table
+ collision (matrix.ts + admin/templates.ts blueprint branch)
+
+---
+ app/api/admin/templates/route.ts | 4 ++--
+ app/api/essence/matrix/route.ts  | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/app/api/admin/templates/route.ts b/app/api/admin/templates/route.ts
+index 8d1c7a1..f3d51b8 100644
+--- a/app/api/admin/templates/route.ts
++++ b/app/api/admin/templates/route.ts
+@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
+ 
+     if (type === 'all' || type === 'blueprint') {
+       const { data, error } = await supabaseAdmin
+-        .from('essence_engines')
++        .from('essintelligence_templates')
+         .select('*')
+         .order('key', { ascending: true });
+       if (!error) blueprints = (data || []).map((b: any) => ({ ...b, _template_type: 'blueprint' }));
+@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
+     }
+ 
+     const { data, error } = await supabaseAdmin
+-      .from('essence_engines')
++      .from('essintelligence_templates')
+       .insert({
+         key: body.key, name: body.name, description: body.description || null,
+         vertical_key: body.vertical_key || null, subcategory_key: body.subcategory_key || null,
+diff --git a/app/api/essence/matrix/route.ts b/app/api/essence/matrix/route.ts
+index f0772d5..c2e15ca 100644
+--- a/app/api/essence/matrix/route.ts
++++ b/app/api/essence/matrix/route.ts
+@@ -60,7 +60,7 @@ export async function GET() {
+ 
+     // Fetch all blueprint templates
+     const { data: bps } = await supabase
+-      .from('essence_engines')
++      .from('essintelligence_templates')
+       .select('key, name, description, sections_json, template_json')
+       .in('key', BP_KEYS)
+ 
+@@ -70,7 +70,7 @@ export async function GET() {
+ 
+     // Fetch all omnigrid intelligence systems
+     const { data: allSystems } = await supabase
+-      .from('omnigrid_intelligence_system')
++      .from('essence_engines')
+       .select('slug, name, tagline, description, domain_key, domain_name, lens_key, system_number')
+       .order('domain_key')
+       .order('system_number')
+-- 
+2.34.1
+

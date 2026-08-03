@@ -1,0 +1,82 @@
+From 482d3206287b1143dd867f25e53b374d96ea9968 Mon Sep 17 00:00:00 2001
+From: Round33 Handoff <handoff@niore-platform.local>
+Date: Mon, 3 Aug 2026 13:41:48 -0400
+Subject: [PATCH] Fix stale dashboard nav: force-dynamic on shared layout +
+ router.refresh() on nav pathname change, so role/nav recompute on every
+ navigation instead of freezing at first render
+
+---
+ app/dashboard/_components/SidebarNav.tsx | 23 ++++++++++++++++++++++-
+ app/dashboard/layout.tsx                 | 16 ++++++++++++++++
+ 2 files changed, 38 insertions(+), 1 deletion(-)
+
+diff --git a/app/dashboard/_components/SidebarNav.tsx b/app/dashboard/_components/SidebarNav.tsx
+index 55bacfb..5925893 100644
+--- a/app/dashboard/_components/SidebarNav.tsx
++++ b/app/dashboard/_components/SidebarNav.tsx
+@@ -1,6 +1,7 @@
+ 'use client'
+ 
+-import { usePathname } from 'next/navigation'
++import { useEffect, useRef } from 'react'
++import { usePathname, useRouter } from 'next/navigation'
+ import Link from 'next/link'
+ 
+ interface NavItem {
+@@ -54,6 +55,26 @@ const NAV_SECTION: Record<string, number> = {
+ 
+ export default function SidebarNav({ nav, color }: { nav: NavItem[]; color: string }) {
+   const pathname = usePathname()
++  const router = useRouter()
++  const isFirstRender = useRef(true)
++
++  // The parent dashboard layout (which computes role and builds this `nav`
++  // array) is shared across every role -- Next.js reuses its already-
++  // rendered output on client-side navigation between sibling routes
++  // instead of re-running the role query, so without this, the sidebar can
++  // go stale relative to whatever page you actually navigate to (see
++  // app/dashboard/layout.tsx's force-dynamic comment for the full
++  // explanation). router.refresh() re-runs the server layout for the
++  // current route, keeping role/nav in sync on every navigation. Skipped on
++  // the very first render since the layout has already just run fresh for
++  // that initial load.
++  useEffect(() => {
++    if (isFirstRender.current) {
++      isFirstRender.current = false
++      return
++    }
++    router.refresh()
++  }, [pathname, router])
+ 
+   return (
+     <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
+diff --git a/app/dashboard/layout.tsx b/app/dashboard/layout.tsx
+index e3e7216..19dc6e0 100644
+--- a/app/dashboard/layout.tsx
++++ b/app/dashboard/layout.tsx
+@@ -7,6 +7,22 @@ import { deriveRoleFromPlanTier } from '@/types'
+ 
+ import SidebarNav from './_components/SidebarNav'
+ 
++// This one layout renders every role's shell (client/admin/creator/personal/
++// affiliate/collective all share it -- there's no per-role nested layout).
++// Next.js's App Router only re-runs a layout's server logic on a hard page
++// load or a layout-segment change; client-side navigation between sibling
++// routes that share this layout (e.g. /dashboard/client/x -> /dashboard/
++// admin/y) normally REUSES the already-rendered layout output instead of
++// re-fetching it, which is what let the sidebar/role badge go stale after
++// the very first render of a session (page content below it still updates
++// fine, since page-level segments always refetch on navigation).
++// force-dynamic stops this layout from ever being served from Next's Full
++// Route Cache -- combined with SidebarNav's router.refresh() on every
++// pathname change (which busts the client Router Cache for this segment),
++// role/nav now gets recomputed fresh on every navigation, not just once
++// per session.
++export const dynamic = 'force-dynamic'
++
+ const NAV: Record<UserRole, { label: string; href: string }[]> = {
+   client: [
+     { label: 'Overview',     href: '/dashboard/client' },
+-- 
+2.34.1
+

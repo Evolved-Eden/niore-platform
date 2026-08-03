@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient, createServiceClient } from '@/lib/supabase/server'
 import { getN8nUrl } from '@/lib/config'
+import { getPlanetLongitude } from '@/lib/profile/astrology'
 
 // ── EE Core Engine ─────────────────────────────────────────────
 // Calculates the user's foundational profile from birth data.
@@ -76,24 +77,20 @@ const GATES: Record<number, { name: string; hexagram: number; geneKey: string; k
 
 // Approximate sun ecliptic longitude for a given date + time
 function sunLongitude(date: Date): number {
+  const precise = getPlanetLongitude('Sun', date)
+  if (precise !== null) return precise
+
+  // Fallback: the original approximate formula (kept as a safety net only)
   const year = date.getUTCFullYear()
   const month = date.getUTCMonth()
   const day = date.getUTCDate()
-
-  // Fractional day of year (includes time for smoother gate transitions)
   const monthDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
-  let dayOfYear = day +
-    date.getUTCHours() / 24 +
-    date.getUTCMinutes() / 1440
+  let dayOfYear = day + date.getUTCHours() / 24 + date.getUTCMinutes() / 1440
   for (let i = 0; i < month; i++) dayOfYear += monthDays[i]
   const isLeap = (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0
   if (isLeap && month > 1) dayOfYear += 1
-
-  // More accurate vernal equinox ~ March 20.5 (noon UTC)
   const daysSinceEquinox = dayOfYear - 80.5
   const longitude = daysSinceEquinox * (360 / 365.25)
-
-  // Normalize to 0-360
   return ((longitude % 360) + 360) % 360
 }
 

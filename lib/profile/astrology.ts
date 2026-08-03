@@ -80,7 +80,7 @@ const BODIES: Record<string, any> = {}
 
 // ── Ecliptic Longitude Calculator ───────────────────────
 
-function getPlanetLongitude(bodyName: string, date: Date): number | null {
+export function getPlanetLongitude(bodyName: string, date: Date): number | null {
   try {
     // Dynamic require (astronomy-engine)
     const A = require('astronomy-engine')

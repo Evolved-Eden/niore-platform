@@ -1,4 +1,4 @@
-export const STRIPE_API_VERSION = '2026-05-27.dahlia' as const
+export const STRIPE_API_VERSION = '2026-07-29.dahlia' as const
 
 export const APP_URL = () => process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
 

@@ -8,7 +8,7 @@ import AdminDepartmentsTab from './DepartmentsTab'
 type Tab = 'swarms' | 'my_swarms' | 'departments'
 
 const TABS: { key: Tab; label: string }[] = [
-  { key: 'swarms', label: 'Swarms' },
+  { key: 'swarms', label: 'Teams' },
   { key: 'my_swarms', label: 'My Deployments' },
   { key: 'departments', label: 'Departments' },
 ]
@@ -26,8 +26,8 @@ export default function AdminSwarmsConsolidatedPage() {
   return (
     <div className="max-w-6xl mx-auto animate-fade-in">
       <div className="mb-6">
-        <h1 className="font-display text-2xl font-bold tracking-tight text-white">Swarms &amp; Departments</h1>
-        <p className="text-white/40 text-sm mt-1">Swarm templates, your own deployments, and cross-client department oversight</p>
+        <h1 className="font-display text-2xl font-bold tracking-tight text-white">Teams &amp; Departments</h1>
+        <p className="text-white/40 text-sm mt-1">Team templates, your own deployments, and cross-client department oversight</p>
       </div>
 
       <div className="flex gap-1 mb-8 border-b border-white/[0.06]">

@@ -8,7 +8,7 @@ import AdminMyAgentsPage from '../my-agents/page'
 type Tab = 'all' | 'registry' | 'my_agents'
 
 const TABS: { key: Tab; label: string }[] = [
-  { key: 'all', label: 'All Agents' },
+  { key: 'all', label: 'All Essential Employees' },
   { key: 'registry', label: 'Registry' },
   { key: 'my_agents', label: 'My Deployments' },
 ]
@@ -26,7 +26,7 @@ export default function AdminAgentsConsolidatedPage() {
   return (
     <div className="max-w-6xl mx-auto animate-fade-in">
       <div className="mb-6">
-        <h1 className="font-display text-2xl font-bold tracking-tight text-white">Agents</h1>
+        <h1 className="font-display text-2xl font-bold tracking-tight text-white">Essential Employees</h1>
         <p className="text-white/40 text-sm mt-1">Full catalog, registry, and your own deployments</p>
       </div>
 

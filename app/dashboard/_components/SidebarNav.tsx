@@ -19,7 +19,7 @@ const NAV_ICONS: Record<string, string> = {
   Workstations:   '⊞',
   Governance:     '⚖',
   Workforce:      '⊕',
-  'Swarms & Depts': '⊗',
+  'Teams & Depts': '⊗',
   'My Twin':      '⟐',
   Vault:          '▣',
   Connectors:     '⊡',

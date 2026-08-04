@@ -1,0 +1,156 @@
+diff --git a/lib/constants.ts b/lib/constants.ts
+index 7b85c94..4111be6 100644
+--- a/lib/constants.ts
++++ b/lib/constants.ts
+@@ -1,4 +1,4 @@
+-export const STRIPE_API_VERSION = '2026-05-27.dahlia' as const
++export const STRIPE_API_VERSION = '2026-07-29.dahlia' as const
+
+ export const APP_URL = () => process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+
+diff --git a/scripts/archive/create-stripe-products.ts b/scripts/archive/create-stripe-products.ts
+index baef001..76fd30e 100644
+--- a/scripts/archive/create-stripe-products.ts
++++ b/scripts/archive/create-stripe-products.ts
+@@ -10,7 +10,7 @@
+ import Stripe from 'stripe'
+
+ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+-  apiVersion: '2026-05-27.dahlia',
++  apiVersion: '2026-07-29.dahlia',
+ })
+
+ async function run() {
+diff --git a/types/index.ts b/types/index.ts
+index a3ed88a..c18f6fa 100644
+--- a/types/index.ts
++++ b/types/index.ts
+@@ -9,16 +9,113 @@
+
+ // ── Schema-backed types for generic query support ────────────
+ export type EssenceEngineRow = {
++  id: string
++  slug: string
++  name?: string | null
++  tagline?: string | null
++  description?: string | null
++  domain_key?: string | null
++  domain_name?: string | null
++  lens_key?: string | null
++  lens_name?: string | null
++  system_number?: number | null
++  system_version?: string | null
++  agent_id?: string | null
++  is_active?: boolean | null
++  is_deprecated?: boolean | null
++  adapts?: boolean | null
++  biological?: boolean | null
++  computes?: boolean | null
++  interprets?: boolean | null
++  predicts?: boolean | null
++  symbolic?: boolean | null
++  eminence?: string | null
++  ethos?: string | null
++  exchange?: string | null
++  created_at?: string
++  updated_at?: string
++}
++
++// essintelligence_templates -- distinct from essence_templates (both are real,
++// separate live tables). Verified directly against the live schema via the
++// Supabase MCP (information_schema.columns) rather than assumed.
++export type EssIntelligenceTemplateRow = {
+   id: string
+   key: string
+   name?: string | null
+   description?: string | null
+-  vertical_id?: string | null
+-  vertical_key?: string | null
+-  subcategory_key?: string | null
+   is_active?: boolean | null
+   sections_json?: unknown
+   template_json?: unknown
++  specialty_key?: string | null
++  subcategory_key?: string | null
++  essence_json?: unknown
++  config_key?: string | null
++  mas_category?: string | null
++  mas_priority?: string | null
++  specialty_id?: string | null
++  created_at?: string
++  updated_at?: string
++}
++
++export type EssIntelligenceItemRow = {
++  id: string
++  client_id?: string | null
++  content?: string | null
++  type?: string | null
++  status?: string | null
++  priority?: string | null
++  linked_agent_id?: string | null
++  linked_swarm_id?: string | null
++  created_at?: string
++  updated_at?: string
++}
++
++export type AffiliateLinkRow = {
++  id: string
++  code?: string | null
++  owner_user_id?: string | null
++  owner_organization_id?: string | null
++  target_catalog_item_id?: string | null
++  target_url?: string | null
++  label?: string | null
++  status?: string | null
++  clicks_count?: number | null
++  conversions_count?: number | null
++  created_at?: string
++  updated_at?: string
++}
++
++export type AffiliateLinkEventRow = {
++  id: string
++  affiliate_link_id?: string | null
++  event_type?: string | null
++  occurred_at?: string | null
++  visitor_id?: string | null
++  referrer_url?: string | null
++  landing_url?: string | null
++  converted_user_id?: string | null
++  converted_organization_id?: string | null
++  converted_purchase_id?: string | null
++  metadata?: unknown
++}
++
++export type AffiliateCommissionAccrualRow = {
++  id: string
++  affiliate_link_event_id?: string | null
++  affiliate_link_id?: string | null
++  affiliate_user_id?: string | null
++  affiliate_organization_id?: string | null
++  membership_tier_key?: string | null
++  commission_rate_applied?: number | null
++  purchase_amount?: number | null
++  commission_amount?: number | null
++  currency?: string | null
++  status?: string | null
++  payout_delay_days?: number | null
++  eligible_for_payout_at?: string | null
++  paid_at?: string | null
++  notes?: string | null
+   created_at?: string
+   updated_at?: string
+ }
+@@ -907,6 +1004,11 @@ export type Database = {
+       archetypes: TableWithDefaults<ArchetypeRow>
+       avatars: TableWithDefaults<AvatarRow>
+       essence_engines: TableWithDefaults<EssenceEngineRow>
++      essintelligence_templates: TableWithDefaults<EssIntelligenceTemplateRow>
++      essintelligence_items: TableWithDefaults<EssIntelligenceItemRow>
++      affiliate_links: TableWithDefaults<AffiliateLinkRow>
++      affiliate_link_events: TableWithDefaults<AffiliateLinkEventRow>
++      affiliate_commission_accruals: TableWithDefaults<AffiliateCommissionAccrualRow>
+       businesses: TableWithDefaults<Business>
+       canonical_agent_map: TableWithDefaults<CanonicalAgentMapRow>
+       catalogs: TableWithDefaults<{ id: string; key: string; name: string; kind?: string; is_active?: boolean; metadata?: unknown; created_at?: string; updated_at?: string }>

@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -147,11 +147,27 @@ export default async function DashboardLayout({ children }: { children: React.Re
     redirect('/login')
   }
 
-  const { data: identity } = await supabase
+  // Service-role client for role/plan lookups. The anon-key client cannot
+  // reliably load a session from this app's sign-in cookie (raw JWT in
+  // sb-*-auth-token), so RLS-gated queries on `users`/`clients` run
+  // anonymous, get silently blocked by RLS, and this layout used to fall
+  // back to 'client' -- overriding the already-correct role that proxy.ts's
+  // middleware just computed with its own service-role client (see
+  // proxy.ts / lib/supabase/middleware.ts createAdminClient). That
+  // disagreement is what caused the flash-dashboard-then-bounce-to-pricing
+  // behavior: middleware lets the request through, then this layout's own
+  // broken check immediately redirected it back out.
+  const serviceClient = createServiceClient()
+
+  const { data: identity, error: identityError } = await serviceClient
     .from('users')
     .select('role, full_name')
     .eq('id', user.id)
     .single()
+
+  if (identityError) {
+    console.warn('Dashboard layout role lookup failed:', identityError.message)
+  }
 
   const userRole = (identity?.role as UserRole) ?? 'client'
   const name = identity?.full_name ?? user.email?.split('@')[0] ?? 'User'
@@ -161,7 +177,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
   let clientRecord: any = null
   let rlsError = false
   try {
-    const { data, error } = await supabase
+    const { data, error } = await serviceClient
       .from('clients')
       .select('plan_tier_key, additional_plans, addons, status, metadata')
       .eq('id', user.id)

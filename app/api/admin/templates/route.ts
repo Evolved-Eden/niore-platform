@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
 
     if (type === 'all' || type === 'essence') {
       const { data, error } = await supabaseAdmin
-        .from('essence_templates')
+        .from('essintelligence_templates')
         .select('*')
         .order('key', { ascending: true });
       if (!error) essences = (data || []).map((e: any) => ({ ...e, _template_type: 'essence' }));
@@ -73,13 +73,13 @@ export async function POST(request: NextRequest) {
 
     if (templateType === 'essence') {
       const { data, error } = await supabaseAdmin
-        .from('essence_templates')
+        .from('essintelligence_templates')
         .insert({
           key: body.key, name: body.name, description: body.description || null,
-          vertical_key: body.vertical_key || null, subcategory_key: body.subcategory_key || null,
+          specialty_key: body.vertical_key || null, subcategory_key: body.subcategory_key || null,
           is_active: body.is_active ?? true, sections_json: body.sections_json || [],
           template_json: body.template_json || {}, essence_json: body.essence_json || null,
-          blueprint_key: body.blueprint_key || null, mas_category: body.mas_category || null,
+          config_key: body.blueprint_key || null, mas_category: body.mas_category || null,
           mas_priority: body.mas_priority || null,
         })
         .select()

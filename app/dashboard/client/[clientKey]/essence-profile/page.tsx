@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { useClientView } from '@/lib/client-view'
 import Link from 'next/link'
 
 type IntakeInfo = {

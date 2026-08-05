@@ -1,13 +1,15 @@
 import { supabaseAdmin } from '@/lib/supabase/admin'
+import { decryptCredentials, type EncryptedPayload } from '@/lib/connector-encryption'
 
 /**
  * Real Google Calendar integration, backed by the admin-configured
  * connector (see /dashboard/admin/connectors -> Google Calendar card,
- * writes to `connector_configs` where platform='google_calendar').
+ * stored as a `google_calendar` connector_type credential in
+ * `connector_credentials`, client_id NULL = platform-global).
  *
- * Reads a service account JSON + target calendar_id from that connector
- * config, not env vars -- so an admin can add/change/rotate credentials
- * from the dashboard without a code deploy.
+ * Reads a service account JSON + target calendar_id from that credential
+ * (encrypted at rest), not env vars — so an admin can add/change/rotate
+ * credentials from the dashboard without a code deploy.
  *
  * If no connector is configured (or it's inactive), returns null so
  * callers can fall back to a placeholder rather than throwing.
@@ -19,16 +21,30 @@ interface GoogleCalendarConfig {
 }
 
 async function getGoogleCalendarConfig(): Promise<GoogleCalendarConfig | null> {
+  const { data: typeRow } = await supabaseAdmin
+    .from('connector_types')
+    .select('id')
+    .eq('key', 'google_calendar')
+    .maybeSingle()
+
+  if (!typeRow) return null
+
   const { data, error } = await supabaseAdmin
-    .from('connector_configs')
-    .select('config_data, is_active')
-    .eq('platform', 'google_calendar')
-    .eq('is_active', true)
+    .from('connector_credentials')
+    .select('encrypted_credentials')
+    .is('client_id', null)
+    .eq('connector_id', typeRow.id)
     .maybeSingle()
 
   if (error || !data) return null
 
-  const raw = data.config_data as Record<string, unknown>
+  let raw: Record<string, unknown>
+  try {
+    raw = decryptCredentials(data.encrypted_credentials as EncryptedPayload) ?? {}
+  } catch {
+    return null
+  }
+
   const serviceAccountRaw = raw?.service_account_json
   const calendarId = (raw?.calendar_id as string) || 'primary'
 

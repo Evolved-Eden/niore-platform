@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { requireAdmin } from '@/lib/admin-auth'
+import { decryptCredentials, type EncryptedPayload } from '@/lib/connector-encryption'
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,14 +17,31 @@ export async function POST(request: NextRequest) {
 
     // Fall back to the saved config if the caller didn't send form data
     // (e.g. testing a connector that was configured previously and hasn't
-    // been re-entered in the form this session).
+    // been re-entered in the form this session). Reads the real admin-level
+    // credential from connector_credentials (client_id NULL).
     if (!config_data || Object.keys(config_data).length === 0) {
-      const { data: saved } = await supabaseAdmin
-        .from('connector_configs')
-        .select('config_data')
-        .eq('platform', platform)
+      const { data: typeRow } = await supabaseAdmin
+        .from('connector_types')
+        .select('id')
+        .eq('key', platform)
         .maybeSingle()
-      config_data = saved?.config_data ?? {}
+
+      if (typeRow) {
+        const { data: saved } = await supabaseAdmin
+          .from('connector_credentials')
+          .select('encrypted_credentials')
+          .is('client_id', null)
+          .eq('connector_id', typeRow.id)
+          .maybeSingle()
+        if (saved) {
+          try {
+            config_data = decryptCredentials(saved.encrypted_credentials as EncryptedPayload) ?? {}
+          } catch {
+            config_data = {}
+          }
+        }
+      }
+      config_data = config_data ?? {}
     }
 
     const results: Record<string, any> = {}

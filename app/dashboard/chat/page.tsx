@@ -165,6 +165,11 @@ export default function AdminChatPage() {
         body: JSON.stringify({
           messages: updated.map((m) => ({ role: m.role, content: m.content })),
           context,
+          // Zuri is the primary/base agent — every other agent routes
+          // through her. Send the selected entity so she can route.
+          entity: selectedEntity
+            ? { id: selectedEntity.id, key: selectedEntity.key, name: selectedEntity.name, type: selectedEntity.type }
+            : { id: "zuri", key: "zuri", name: "Zuri", type: "zuri" },
         }),
       });
       if (!res.ok) throw new Error("Failed to reach Zuri");

@@ -656,7 +656,15 @@ export type CanonicalAgentMapRow = {
   is_master?: boolean | null
   is_bridge?: boolean | null
   agent_type_key?: string | null
+  role_type?: string | null
+  tagline?: string | null
+  description?: string | null
+  system_prompt?: string | null
+  capabilities?: unknown
+  model?: string | null
+  is_active?: boolean | null
   created_at?: string
+  updated_at?: string
 }
 
 export type WorkflowDemoRow = {

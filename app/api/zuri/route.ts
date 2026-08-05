@@ -4,7 +4,27 @@ import { supabaseAdmin } from '@/lib/supabase/admin'
 import { OpenAI } from 'openai'
 import { lazy } from '@/lib/lazy-client'
 
-const openai = lazy(() => new OpenAI({ apiKey: process.env.OPENAI_API_KEY || '' }))
+// Provider resolution mirrors the essence route: OpenRouter first (if its key
+// exists), then OpenAI. If neither key is configured the route degrades
+// gracefully instead of throwing a credentials error.
+const useOpenRouter = !!process.env.OPENROUTER_API_KEY
+const useOpenAI = !!process.env.OPENAI_API_KEY
+
+// Map canonical model names (stored in canonical_agent_map) to OpenRouter
+// slugs when OpenRouter is the active provider.
+function resolveModel(model: string): string {
+  if (useOpenRouter) {
+    if (model.startsWith('openrouter/')) return model.replace('openrouter/', '')
+    if (model.startsWith('openai/') || model.startsWith('anthropic/')) return model
+    return `openai/${model}`
+  }
+  return model
+}
+
+const openai = lazy(() => new OpenAI({
+  apiKey: useOpenRouter ? (process.env.OPENROUTER_API_KEY || '') : (process.env.OPENAI_API_KEY || ''),
+  ...(useOpenRouter ? { baseURL: process.env.OPENROUTER_BASE_URL || 'https://openrouter.ai/api/v1' } : {}),
+}))
 
 // Fallback Zuri system prompt — used only if canonical_agent_map has no
 // Zuri row (e.g. before the DB seed ran). The DB version is authoritative.
@@ -115,16 +135,25 @@ ${routedAgentOutput}`
   // Zuri is the base agent: even when a request is routed through another
   // agent, she is the one who delivers the final answer in her voice. The
   // routed output (if any) is already injected into `systemPrompt` above.
-  const completion = await openai.chat.completions.create({
-    model: zuri.model,
-    messages: [
-      { role: 'system', content: systemPrompt },
-      ...messages,
-    ],
-    max_tokens: 1000,
-    stream: false,
-  })
-  const reply = completion.choices[0].message.content ?? ''
+  let reply: string
+  if (!useOpenRouter && !useOpenAI) {
+    // No AI provider configured (env keys absent) — degrade gracefully rather
+    // than 500. Deterministic response so the chat UI stays functional.
+    reply = routedAgentOutput
+      ? `${routedAgentOutput}`
+      : 'Zuri is warming up — the AI provider for this deployment is not configured yet. Ask an admin to set OPENROUTER_API_KEY or OPENAI_API_KEY.'
+  } else {
+    const completion = await openai.chat.completions.create({
+      model: resolveModel(zuri.model),
+      messages: [
+        { role: 'system', content: systemPrompt },
+        ...messages,
+      ],
+      max_tokens: 1000,
+      stream: false,
+    })
+    reply = completion.choices[0].message.content ?? ''
+  }
 
   // Save both sides of the conversation as separate memory entries
   const userMsg = lastUserMessage.slice(0, 500)

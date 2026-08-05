@@ -41,6 +41,43 @@ async function getUserWithTimeout(
   }
 }
 
+// setSession() internally calls GoTrueClient's private _getUser() (to
+// validate a non-expired token) or _callRefreshToken() (for an expired one)
+// -- both hit the LIVE Supabase Auth REST API (Kong/GoTrue at
+// NEXT_PUBLIC_SUPABASE_URL) over the network. This is a completely separate
+// code path from supabase.auth.getUser(), so the local-JWT-first bypass in
+// wrapGetUser() above does NOT protect it -- if the self-hosted Kong/GoTrue
+// endpoint is unreachable or slow from inside this container (same class of
+// issue documented above for getUser()), setSession() hangs or fails with an
+// opaque "Failed to establish session" and the real cause never surfaces.
+// This wrapper adds a timeout and logs the underlying error so it's visible
+// in server logs instead of swallowed.
+export async function setSessionWithTimeout(
+  supabase: { auth: { setSession: (args: { access_token: string; refresh_token: string }) => Promise<{ data: any; error: any }> } },
+  tokens: { access_token: string; refresh_token: string },
+  ms = 5000
+) {
+  let timer: ReturnType<typeof setTimeout> | undefined
+  try {
+    return await Promise.race([
+      supabase.auth.setSession(tokens),
+      new Promise<{ data: null; error: { message: string; name: string } }>((_, reject) => {
+        timer = setTimeout(
+          () =>
+            reject(
+              new Error(
+                `supabase.auth.setSession timed out after ${ms}ms -- likely can't reach ${process.env.NEXT_PUBLIC_SUPABASE_URL}/auth/v1 from inside this container (DNS, firewall, or Kong/GoTrue routing)`
+              )
+            ),
+          ms
+        )
+      }),
+    ])
+  } finally {
+    if (timer) clearTimeout(timer)
+  }
+}
+
 function wrapGetUser(
   supabase: ReturnType<typeof createServerClient<Database>>,
   cookieStore: Awaited<ReturnType<typeof cookies>>

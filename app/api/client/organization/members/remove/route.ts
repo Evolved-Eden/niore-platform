@@ -24,9 +24,10 @@ const stripe = lazy(() => new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersio
 export async function POST(request: NextRequest) {
   try {
     const ctx = await resolveApiClient(request)
-    if (!ctx) {
+    if (!ctx || !ctx.viewerId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
+    const viewerId = ctx.viewerId
 
     const { memberId, action } = (await request.json()) as {
       memberId?: string
@@ -52,7 +53,7 @@ export async function POST(request: NextRequest) {
       .from('organization_members')
       .select('role')
       .eq('organization_id', targetMember.organization_id)
-      .eq('user_id', ctx.viewerId)
+      .eq('user_id', viewerId)
       .maybeSingle()
 
     const requesterRole = requesterMembership?.role
@@ -70,7 +71,7 @@ export async function POST(request: NextRequest) {
       // Org keeps everything org-scoped. Twin just loses the org's grant.
       const { error: memberError } = await ctx.svc
         .from('organization_members')
-        .update({ status: 'removed', left_at: now, removed_by: ctx.viewerId })
+        .update({ status: 'removed', left_at: now, removed_by: viewerId })
         .eq('id', memberId)
       if (memberError) throw memberError
 
@@ -109,7 +110,7 @@ export async function POST(request: NextRequest) {
     // Stripe confirms payment (see the webhook's twin_transfer handling).
     const { error: memberError } = await ctx.svc
       .from('organization_members')
-      .update({ status: 'removed', left_at: now, removed_by: ctx.viewerId })
+      .update({ status: 'removed', left_at: now, removed_by: viewerId })
       .eq('id', memberId)
     if (memberError) throw memberError
 

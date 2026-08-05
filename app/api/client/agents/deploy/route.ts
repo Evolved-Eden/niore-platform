@@ -1,23 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
-import { supabaseAdmin } from '@/lib/supabase/admin'
+import { resolveApiClient } from '@/lib/client-api'
 import crypto from 'crypto'
 
 export const dynamic = 'force-dynamic'
 
-// ── GET: List user's deployed agents ──────────────────────
-export async function GET() {
+// ── GET: List the target client's deployed agents ──────────
+export async function GET(req: NextRequest) {
   try {
-    const supabase = await createClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
+    const ctx = await resolveApiClient(req)
+    if (!ctx) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { data: agents, error: fetchError } = await supabaseAdmin
+    const { data: agents, error: fetchError } = await ctx.svc
       .from('client_deployed_agents')
       .select('*')
-      .eq('client_id', user.id)
+      .eq('client_id', ctx.clientId)
       .order('created_at', { ascending: false })
 
     if (fetchError) throw fetchError
@@ -32,9 +30,8 @@ export async function GET() {
 // ── POST: Deploy a new agent ──────────────────────────────
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
+    const ctx = await resolveApiClient(request)
+    if (!ctx) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -56,9 +53,9 @@ export async function POST(request: NextRequest) {
 
     // Insert the deployed agent record.
     // An "employee" (agent) can optionally belong to a "team" (swarm) and carry a title.
-    const { error: insertError } = await supabaseAdmin.from('client_deployed_agents').insert({
+    const { error: insertError } = await ctx.svc.from('client_deployed_agents').insert({
       id,
-      client_id: user.id,
+      client_id: ctx.clientId,
       agent_id: agentId,
       agent_name: agentName,
       role_type: roleType || null,
@@ -77,21 +74,21 @@ export async function POST(request: NextRequest) {
     if (insertError) throw insertError
 
     // Increment the agent_deployments counter on the client record
-    const { data: clientData } = await supabaseAdmin
+    const { data: clientData } = await ctx.svc
       .from('clients')
       .select('agent_deployments')
-      .eq('id', user.id)
+      .eq('id', ctx.clientId)
       .single()
 
-    const { error: updateClientError } = await supabaseAdmin
+    const { error: updateClientError } = await ctx.svc
       .from('clients')
       .update({ agent_deployments: (clientData?.agent_deployments ?? 0) + 1 })
-      .eq('id', user.id)
+      .eq('id', ctx.clientId)
 
     if (updateClientError) throw updateClientError
 
     // Fetch back the inserted record
-    const { data: inserted, error: fetchBackError } = await supabaseAdmin
+    const { data: inserted, error: fetchBackError } = await ctx.svc
       .from('client_deployed_agents')
       .select('*')
       .eq('id', id)
@@ -112,9 +109,8 @@ export async function POST(request: NextRequest) {
 // ── PATCH: Update deployed agent (status, prompt, etc.) ────
 export async function PATCH(request: NextRequest) {
   try {
-    const supabase = await createClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
+    const ctx = await resolveApiClient(request)
+    if (!ctx) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -126,11 +122,11 @@ export async function PATCH(request: NextRequest) {
     }
 
     // Verify ownership
-    const { data: existing, error: checkError } = await supabaseAdmin
+    const { data: existing, error: checkError } = await ctx.svc
       .from('client_deployed_agents')
       .select('id')
       .eq('id', id)
-      .eq('client_id', user.id)
+      .eq('client_id', ctx.clientId)
       .maybeSingle()
 
     if (checkError) throw checkError
@@ -146,31 +142,31 @@ export async function PATCH(request: NextRequest) {
     if (titleKey !== undefined) updateData.title_key = titleKey || null
     if (customTitle !== undefined) updateData.custom_title = customTitle || null
 
-    const { error: updateError } = await supabaseAdmin
+    const { error: updateError } = await ctx.svc
       .from('client_deployed_agents')
       .update(updateData)
       .eq('id', id)
-      .eq('client_id', user.id)
+      .eq('client_id', ctx.clientId)
 
     if (updateError) throw updateError
 
     // If undeployed, decrement the counter
     if (status === 'undeployed') {
-      const { data: clientData } = await supabaseAdmin
+      const { data: clientData } = await ctx.svc
         .from('clients')
         .select('agent_deployments')
-        .eq('id', user.id)
+        .eq('id', ctx.clientId)
         .single()
 
-      const { error: decError } = await supabaseAdmin
+      const { error: decError } = await ctx.svc
         .from('clients')
         .update({ agent_deployments: Math.max((clientData?.agent_deployments ?? 1) - 1, 0) })
-        .eq('id', user.id)
+        .eq('id', ctx.clientId)
 
       if (decError) throw decError
     }
 
-    const { data: updatedAgent, error: fetchError } = await supabaseAdmin
+    const { data: updatedAgent, error: fetchError } = await ctx.svc
       .from('client_deployed_agents')
       .select('*')
       .eq('id', id)

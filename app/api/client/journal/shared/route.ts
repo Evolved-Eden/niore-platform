@@ -1,20 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { resolveApiClient } from '@/lib/client-api'
 
 export const dynamic = 'force-dynamic'
 
-// Read-only. RLS ("Users can read journal entries shared with them") is
-// what actually enforces this — this route just queries with the
-// authenticated client and lets that policy do its job.
+// Entries shared with the TARGET client (the journal page renders for
+// whoever's dashboard is open; access to that client is enforced by
+// resolveApiClient, and entries are filtered to ones explicitly shared
+// with that client's user id).
 export async function GET(request: NextRequest) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const ctx = await resolveApiClient(request)
+  if (!ctx) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { data, error } = await supabase
+  const { data, error } = await ctx.svc
     .from('journal_entries')
     .select('id, user_id, title, content, mood, created_at, users:user_id(full_name)')
-    .contains('shared_with', [user.id])
+    .contains('shared_with', [ctx.clientId])
     .order('created_at', { ascending: false })
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })

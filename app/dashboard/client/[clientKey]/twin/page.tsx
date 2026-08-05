@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
+import { useClientView } from '@/lib/client-view'
 
 // ── Types ────────────────────────────────────────────────────────
 
@@ -80,6 +81,7 @@ const AUTONOMY_LEVELS = ['guided', 'semi_autonomous', 'autonomous'] as const
 export default function ClientTwinPage() {
   const router = useRouter()
   const supabase = createClient()
+  const { targetClientId, prefix } = useClientView()
 
   // Auth
   const [userId, setUserId] = useState<string | null>(null)
@@ -141,11 +143,13 @@ export default function ClientTwinPage() {
       setUserId(user.id)
       setUserName(user.email?.split('@')[0] ?? 'User')
 
-      // Fetch identity
+      // Fetch identity — the target client's display name (for a self-view
+      // this is the viewer; for admin/org cross-views the anon client is
+      // RLS-limited so this gracefully falls back to the email prefix).
       const { data: identity } = await supabase
         .from('users')
         .select('full_name')
-        .eq('id', user.id)
+        .eq('id', targetClientId || user.id)
         .maybeSingle()
       if (identity?.full_name) setUserName(identity.full_name)
 
@@ -153,7 +157,7 @@ export default function ClientTwinPage() {
       const { data: twinRecord } = await supabase
         .from('client_twins')
         .select('*')
-        .eq('client_id', user.id)
+        .eq('client_id', targetClientId || user.id)
         .maybeSingle()
 
       if (twinRecord) {
@@ -268,7 +272,7 @@ export default function ClientTwinPage() {
       .from('client_twins')
       .update(updates as any)
       .eq('id', twin.id)
-      .eq('client_id', userId)
+      .eq('client_id', targetClientId)
 
     if (error) throw error
 
@@ -678,21 +682,21 @@ export default function ClientTwinPage() {
                 <p className="text-[11px] text-white/40">Talk to your twin</p>
               </Link>
               <Link
-                href="/dashboard/client/essence-profile"
+                href={`${prefix}/essence-profile`}
                 className="glass rounded-sm p-4 border border-white/[0.06] hover:border-[#C6A664]/30 transition-all group"
               >
                 <div className="text-xs text-[#C6A664] tracking-widest uppercase mb-1">Blueprint</div>
                 <p className="text-[11px] text-white/40">View full blueprint</p>
               </Link>
               <Link
-                href="/dashboard/client/twin/configure"
+                href={`${prefix}/twin/configure`}
                 className="glass rounded-sm p-4 border border-white/[0.06] hover:border-[#B5764A]/30 transition-all group"
               >
                 <div className="text-xs text-[#B5764A] tracking-widest uppercase mb-1">Configure</div>
                 <p className="text-[11px] text-white/40">Advanced settings</p>
               </Link>
               <Link
-                href="/dashboard/client/essence"
+                href={`${prefix}/essence`}
                 className="glass rounded-sm p-4 border border-white/[0.06] hover:border-[#C6A664]/30 transition-all group"
               >
                 <div className="text-xs text-[#C6A664] tracking-widest uppercase mb-1">Essence</div>
@@ -749,7 +753,7 @@ export default function ClientTwinPage() {
             </div>
 
             <Link
-              href="/dashboard/client/twin/configure"
+              href={`${prefix}/twin/configure`}
               className="block w-full px-4 py-2.5 bg-[#B5764A] text-black text-xs font-bold rounded-sm hover:bg-white transition-all text-center"
             >
               Configure Twin &rarr;

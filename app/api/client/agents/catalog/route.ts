@@ -1,20 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
-import { supabaseAdmin } from '@/lib/supabase/admin'
+import { resolveApiClient } from '@/lib/client-api'
 
 export const dynamic = 'force-dynamic'
 
 // ── GET: List published agents with deployment status ──────
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
-    const supabase = await createClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
+    const ctx = await resolveApiClient(req)
+    if (!ctx) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     // Fetch published agents from catalog view
-    const { data: catalog, error: catalogError } = await supabaseAdmin
+    const { data: catalog, error: catalogError } = await ctx.svc
       .from('agent_catalog')
       .select('*')
       .eq('is_published', true)
@@ -22,11 +20,11 @@ export async function GET() {
 
     if (catalogError) throw catalogError
 
-    // Fetch agent_ids the current user has already deployed
-    const { data: deployedRows } = await supabaseAdmin
+    // Fetch agent_ids the target client has already deployed
+    const { data: deployedRows } = await ctx.svc
       .from('client_deployed_agents')
       .select('agent_id')
-      .eq('client_id', user.id)
+      .eq('client_id', ctx.clientId)
       .neq('status', 'undeployed')
 
     const deployedAgentIds = new Set((deployedRows || []).map(r => r.agent_id))

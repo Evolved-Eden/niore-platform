@@ -1,22 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
-import { supabaseAdmin } from '@/lib/supabase/admin'
+import { resolveApiClient } from '@/lib/client-api'
 
 export const dynamic = 'force-dynamic'
 
 export async function GET(req: NextRequest) {
   try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
+    const ctx = await resolveApiClient(req)
+    if (!ctx) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Use service client to bypass RLS on client_twins
-    const { data: twin, error } = await supabaseAdmin
+    // Service client bypasses RLS on client_twins, scoped to the target client
+    const { data: twin, error } = await ctx.svc
       .from('client_twins')
       .select('id, metadata')
-      .eq('client_id', user.id)
+      .eq('client_id', ctx.clientId)
       .maybeSingle()
 
     if (error) {

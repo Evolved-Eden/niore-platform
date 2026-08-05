@@ -1,9 +1,5 @@
-import { createClient } from '@/lib/supabase/server'
+import { resolveApiClient } from '@/lib/client-api'
 import { NextRequest, NextResponse } from 'next/server'
-
-function sessionsTable(supabase: Awaited<ReturnType<typeof createClient>>) {
-  return supabase.from('client_zuri_sessions')
-}
 
 /**
  * POST /api/client/zuri-connect
@@ -14,9 +10,8 @@ function sessionsTable(supabase: Awaited<ReturnType<typeof createClient>>) {
  */
 export async function POST(req: NextRequest) {
   try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
+    const ctx = await resolveApiClient(req)
+    if (!ctx) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -29,10 +24,11 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // Check if user already has a session for this platform
-    const { data: existing } = await sessionsTable(supabase)
+    // Check if the target client already has a session for this platform
+    const { data: existing } = await ctx.svc
+      .from('client_zuri_sessions')
       .select('id, session_status')
-      .eq('client_id', user.id)
+      .eq('client_id', ctx.clientId)
       .eq('platform', platform)
       .maybeSingle()
 
@@ -41,7 +37,8 @@ export async function POST(req: NextRequest) {
     if (platform_id) {
       // ── Connect ──
       if (existing) {
-        const { data, error } = await sessionsTable(supabase)
+        const { data, error } = await ctx.svc
+          .from('client_zuri_sessions')
           .update({
             platform_id,
             session_status: 'active',
@@ -54,9 +51,10 @@ export async function POST(req: NextRequest) {
         if (error) throw error
         session = data
       } else {
-        const { data, error } = await sessionsTable(supabase)
+        const { data, error } = await ctx.svc
+          .from('client_zuri_sessions')
           .insert({
-            client_id: user.id,
+            client_id: ctx.clientId,
             platform,
             platform_id,
             session_status: 'active',
@@ -70,10 +68,10 @@ export async function POST(req: NextRequest) {
 
       // Update client flags
       const updateField = platform === 'discord' ? 'zuri_discord_connected' : 'zuri_whatsapp_connected'
-      await supabase
+      await ctx.svc
         .from('clients')
         .update({ [updateField]: true, zuri_connected: true } as any)
-        .eq('id', user.id)
+        .eq('id', ctx.clientId)
 
       return NextResponse.json({
         success: true,
@@ -84,7 +82,8 @@ export async function POST(req: NextRequest) {
     } else {
       // ── Disconnect ──
       if (existing) {
-        const { data, error } = await sessionsTable(supabase)
+        const { data, error } = await ctx.svc
+          .from('client_zuri_sessions')
           .update({
             session_status: 'inactive',
             updated_at: new Date().toISOString(),
@@ -98,23 +97,23 @@ export async function POST(req: NextRequest) {
 
       // Update client flags
       const updateField = platform === 'discord' ? 'zuri_discord_connected' : 'zuri_whatsapp_connected'
-      await supabase
+      await ctx.svc
         .from('clients')
         .update({ [updateField]: false } as any)
-        .eq('id', user.id)
+        .eq('id', ctx.clientId)
 
       // Check if both are disconnected — if so, set zuri_connected to false
-      const { data: client } = await supabase
+      const { data: client } = await ctx.svc
         .from('clients')
         .select('zuri_discord_connected, zuri_whatsapp_connected')
-        .eq('id', user.id)
+        .eq('id', ctx.clientId)
         .single()
 
       if (client && !(client as any).zuri_discord_connected && !(client as any).zuri_whatsapp_connected) {
-        await supabase
+        await ctx.svc
           .from('clients')
           .update({ zuri_connected: false })
-          .eq('id', user.id)
+          .eq('id', ctx.clientId)
       }
 
       return NextResponse.json({

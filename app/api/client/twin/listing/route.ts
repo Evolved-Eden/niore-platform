@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
-import { supabaseAdmin } from '@/lib/supabase/admin'
+import { resolveApiClient } from '@/lib/client-api'
 
 export const dynamic = 'force-dynamic'
 
@@ -16,11 +15,11 @@ export const dynamic = 'force-dynamic'
 // org-governed one out from under the org.
 export async function PATCH(request: NextRequest) {
   try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
+    const ctx = await resolveApiClient(request)
+    if (!ctx) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
+    const requesterId = ctx.viewerId ?? ctx.clientId
 
     const body = await request.json()
     const { twinId, isListed, visibility, headline, skills } = body as {
@@ -31,10 +30,10 @@ export async function PATCH(request: NextRequest) {
       skills?: string[]
     }
 
-    let twinQuery = supabaseAdmin
+    let twinQuery = ctx.svc
       .from('client_twins')
       .select('id, organization_id, metadata, is_independent')
-      .eq('client_id', user.id)
+      .eq('client_id', ctx.clientId)
 
     twinQuery = twinId ? twinQuery.eq('id', twinId) : twinQuery
     const { data: twins } = await twinQuery
@@ -56,13 +55,13 @@ export async function PATCH(request: NextRequest) {
     let orgAllowsListing = false
     if (orgIdForGate) {
       const [{ data: membership }, { data: org }] = await Promise.all([
-        supabaseAdmin
+        ctx.svc
           .from('organization_members')
           .select('role')
           .eq('organization_id', orgIdForGate)
-          .eq('user_id', user.id)
+          .eq('user_id', requesterId)
           .maybeSingle(),
-        supabaseAdmin
+        ctx.svc
           .from('organizations')
           .select('allow_member_registry_listing')
           .eq('id', orgIdForGate)
@@ -85,7 +84,7 @@ export async function PATCH(request: NextRequest) {
     // ── Naming policy: does the relevant org allow being named? ──
     const orgToName = orgIdForGate || (twin.metadata as any)?.transferred_from_org || null
     if (isListed && visibility === 'named' && orgToName) {
-      const { data: org } = await supabaseAdmin
+      const { data: org } = await ctx.svc
         .from('organizations')
         .select('id, name, twin_registry_naming_policy, owner_id')
         .eq('id', orgToName)
@@ -98,17 +97,17 @@ export async function PATCH(request: NextRequest) {
         )
       }
 
-      if (org?.twin_registry_naming_policy === 'notify' && org.owner_id) {
+    if (org?.twin_registry_naming_policy === 'notify' && org.owner_id) {
         try {
-          const { data: owner } = await supabaseAdmin
+          const { data: owner } = await ctx.svc
             .from('users')
             .select('email, full_name')
             .eq('id', org.owner_id)
             .maybeSingle()
-          const { data: listingUser } = await supabaseAdmin
+          const { data: listingUser } = await ctx.svc
             .from('users')
             .select('full_name, email')
-            .eq('id', user.id)
+            .eq('id', requesterId)
             .maybeSingle()
           if (owner?.email) {
             const { sendEmail } = await import('@/lib/email')
@@ -133,7 +132,7 @@ export async function PATCH(request: NextRequest) {
     if (headline !== undefined) update.listing_headline = headline
     if (skills !== undefined) update.listing_skills = skills
 
-    const { error } = await supabaseAdmin
+    const { error } = await ctx.svc
       .from('client_twins')
       .update(update)
       .eq('id', twin.id)

@@ -1,6 +1,5 @@
-import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase/admin'
+import { resolveApiClient } from '@/lib/client-api'
 
 const DEFAULT_PREFS = {
   discord_briefings: true,
@@ -9,16 +8,15 @@ const DEFAULT_PREFS = {
 }
 
 // GET /api/client/notification-prefs
-export async function GET() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+export async function GET(req: NextRequest) {
+  const ctx = await resolveApiClient(req)
+  if (!ctx) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   try {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await ctx.svc
       .from('client_notification_prefs')
       .select('*')
-      .eq('client_id', user.id)
+      .eq('client_id', ctx.clientId)
       .maybeSingle()
 
     if (error) throw error
@@ -35,9 +33,8 @@ export async function GET() {
 
 // POST /api/client/notification-prefs
 export async function POST(req: NextRequest) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const ctx = await resolveApiClient(req)
+  if (!ctx) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   let body: Record<string, boolean>
   try {
@@ -60,9 +57,9 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await ctx.svc
       .from('client_notification_prefs')
-      .upsert({ client_id: user.id, ...updates }, { onConflict: 'client_id' })
+      .upsert({ client_id: ctx.clientId, ...updates }, { onConflict: 'client_id' })
       .select()
       .single()
 

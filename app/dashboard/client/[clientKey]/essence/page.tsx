@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
+import { useClientView } from '@/lib/client-view'
 import ErrorBoundary from '@/components/ErrorBoundary'
 import EssenceMatrix from '@/components/EssenceMatrix'
 import EssenceInsightsPanel, { type EssenceExtras, type EssenceRange } from '@/components/essence/EssenceInsightsPanel'
@@ -109,6 +110,8 @@ const ACTION_TYPE_ICON: Record<string, string> = {
 function EssenceIntelligencePage() {
   const router = useRouter()
   const supabase = createClient()
+  const { targetClientId, prefix } = useClientView()
+  const clientIdParam = targetClientId ? `?clientId=${encodeURIComponent(targetClientId)}` : ''
 
   // Auth & data
   const [user, setUser] = useState<any>(null)
@@ -188,7 +191,7 @@ function EssenceIntelligencePage() {
       return
     }
     setRange(r)
-    await fetchEssenceBoard(user.id, r)
+    await fetchEssenceBoard(targetClientId || user.id, r)
   }
 
   useEffect(() => {
@@ -249,13 +252,13 @@ function EssenceIntelligencePage() {
         // 1. Fetch essence board (daily by default; tab switches re-fetch with a
         // different range so weekly/monthly show genuinely different content,
         // not just a history log of past daily items)
-        await fetchEssenceBoard(u.id, 'daily', intakeContext)
+        await fetchEssenceBoard(targetClientId || u.id, 'daily', intakeContext)
 
         // 2. Fetch stored intelligence
         const intelRes = await fetch('/api/client/essence/intelligence', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ clientId: u.id }),
+          body: JSON.stringify({ clientId: targetClientId || u.id }),
         })
         if (intelRes.ok) {
           const intelData = await intelRes.json()
@@ -277,7 +280,7 @@ function EssenceIntelligencePage() {
 
         // 3b. Fetch recent execution history
         try {
-          const actionsRes = await fetch('/api/client/essence/execute')
+          const actionsRes = await fetch(`/api/client/essence/execute${clientIdParam}`)
           if (actionsRes.ok) {
             const actionsData = await actionsRes.json()
             setRecentActions(actionsData.actions ?? [])
@@ -288,7 +291,7 @@ function EssenceIntelligencePage() {
 
         // 4. Fetch blueprint info from twin metadata (via API to bypass RLS)
         try {
-          const twinRes = await fetch('/api/client/twin')
+          const twinRes = await fetch(`/api/client/twin${clientIdParam}`)
           if (twinRes.ok) {
             const twinData = await twinRes.json()
             const twin = twinData.twin
@@ -366,7 +369,7 @@ function EssenceIntelligencePage() {
         const insertRes = await (supabase
           .from('essintelligence_items')
           .insert({
-            client_id: user.id,
+            client_id: targetClientId || user.id,
             type: executingItem.type,
             content: promptText || executingItem.content,
             priority: executingItem.priority,
@@ -388,6 +391,7 @@ function EssenceIntelligencePage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          clientId: targetClientId || user.id,
           essenceItemId,
           actionType: 'agent_deploy',
           prompt: promptText,
@@ -402,7 +406,7 @@ function EssenceIntelligencePage() {
       const intelRes = await fetch('/api/client/essence/intelligence', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ clientId: user.id }),
+        body: JSON.stringify({ clientId: targetClientId || user.id }),
       })
       if (intelRes.ok) {
         const intelData = await intelRes.json()
@@ -421,7 +425,7 @@ function EssenceIntelligencePage() {
 
   async function loadRecentActions() {
     try {
-      const res = await fetch('/api/client/essence/execute')
+      const res = await fetch(`/api/client/essence/execute${clientIdParam}`)
       if (res.ok) {
         const data = await res.json()
         setRecentActions(data.actions ?? [])
@@ -704,7 +708,7 @@ function EssenceIntelligencePage() {
                       Review Your Intake \u2190
                     </Link>
                     <Link
-                      href="/dashboard/client/essence-profile/assess"
+                      href={`${prefix}/essence-profile/assess`}
                       className="px-5 py-2 bg-[#C6A664] text-black text-xs font-bold rounded-sm hover:bg-white transition-all"
                     >
                       Run Essence Assessment →
@@ -712,7 +716,7 @@ function EssenceIntelligencePage() {
                   </div>
                   <p className="text-[10px] text-white/20 mt-3">
                     Already have a blueprint?{' '}
-                    <Link href="/dashboard/client/essence-profile" className="text-white/40 hover:text-white/60 underline">
+                    <Link href={`${prefix}/essence-profile`} className="text-white/40 hover:text-white/60 underline">
                       View it here
                     </Link>
                   </p>
@@ -933,7 +937,7 @@ function EssenceIntelligencePage() {
               {blueprint?.exists && (
                 <div className="pt-2 border-t border-white/[0.06]">
                   <Link
-                    href="/dashboard/client/essence-profile"
+                    href={`${prefix}/essence-profile`}
                     className="text-xs text-[#C6A664] hover:opacity-80 transition-all"
                   >
                     View Full Essence Profile →
@@ -953,27 +957,27 @@ function EssenceIntelligencePage() {
             <div className="p-5 space-y-2">
               {!blueprint?.exists ? (
                 <Link
-                  href="/dashboard/client/essence-profile/assess"
+                  href={`${prefix}/essence-profile/assess`}
                   className="block w-full px-4 py-2 bg-[#C6A664] text-black text-xs font-bold rounded-sm hover:bg-white transition-all text-center"
                 >
                   Run Assessment
                 </Link>
               ) : (
                 <Link
-                  href="/dashboard/client/essence-profile/assess"
+                  href={`${prefix}/essence-profile/assess`}
                   className="block w-full px-4 py-2 border border-white/10 text-white/50 text-xs font-bold rounded-sm hover:bg-white/[0.04] hover:text-white/70 transition-all text-center"
                 >
                   Re-run Assessment
                 </Link>
               )}
               <Link
-                href="/dashboard/client/zuri"
+                href={`${prefix}/zuri`}
                 className="block w-full px-4 py-2 border border-white/10 text-white/50 text-xs font-bold rounded-sm hover:bg-white/[0.04] hover:text-white/70 transition-all text-center"
               >
                 View Agents
               </Link>
               <Link
-                href="/dashboard/client/zuri"
+                href={`${prefix}/zuri`}
                 className="block w-full px-4 py-2 border border-white/10 text-white/50 text-xs font-bold rounded-sm hover:bg-white/[0.04] hover:text-white/70 transition-all text-center"
               >
                 Book Consultation

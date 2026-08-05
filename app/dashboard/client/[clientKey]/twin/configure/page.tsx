@@ -3,9 +3,11 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { useClientView } from "@/lib/client-view";
 
 export default function TwinConfigurePage() {
   const router = useRouter();
+  const { targetClientId, prefix } = useClientView();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [twinId, setTwinId] = useState<string | null>(null);
@@ -28,7 +30,7 @@ export default function TwinConfigurePage() {
       const { data: twin } = await supabase
         .from("client_twins")
         .select("id, metadata, personality_summary")
-        .eq("client_id", user.id)
+        .eq("client_id", targetClientId || user.id)
         .maybeSingle();
 
       if (twin) {
@@ -70,7 +72,7 @@ export default function TwinConfigurePage() {
           metadata: meta,
         } as any)
         .eq("id", twinId as string)
-        .eq("client_id", user.id);
+        .eq("client_id", targetClientId || user.id);
 
       if (error) throw error;
       setMessage({ type: "success", text: "Twin configuration saved successfully." });
@@ -198,7 +200,7 @@ export default function TwinConfigurePage() {
             )}
           </button>
           <button
-            onClick={() => router.push("/dashboard/client/twin")}
+            onClick={() => router.push(`${prefix}/twin`)}
             className="px-5 py-2.5 border border-white/10 text-white/30 text-xs font-bold rounded-sm hover:text-white/50 transition-all"
           >
             Cancel

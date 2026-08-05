@@ -1,27 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
-import { supabaseAdmin } from '@/lib/supabase/admin'
+import { resolveApiClient } from '@/lib/client-api'
 
 export const dynamic = 'force-dynamic'
 
 export async function POST(req: NextRequest) {
   try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
+    const ctx = await resolveApiClient(req)
+    if (!ctx) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { clientId, type, limit, status } = await req.json()
+    const { type, limit, status } = await req.json()
 
-    // Client ID must match authenticated user
-    const targetClientId = clientId || user.id
-    if (targetClientId !== user.id) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-    }
+    // resolveApiClient already derived the target client id (explicit
+    // clientId body/query, or session fallback) AND verified the viewer
+    // has access to it, so we can scope straight to ctx.clientId.
+    const targetClientId = ctx.clientId
 
     try {
-      let query = supabaseAdmin
+      let query = ctx.svc
         .from('essintelligence_items')
         .select('*')
         .eq('client_id', targetClientId)

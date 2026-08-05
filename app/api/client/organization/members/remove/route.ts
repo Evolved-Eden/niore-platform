@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
-import { createClient } from '@/lib/supabase/server'
-import { supabaseAdmin } from '@/lib/supabase/admin'
+import { resolveApiClient } from '@/lib/client-api'
 import { STRIPE_API_VERSION } from '@/lib/constants'
 
 export const dynamic = 'force-dynamic'
@@ -24,9 +23,8 @@ const stripe = lazy(() => new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersio
 // per the model, org things always stay with the org.
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
+    const ctx = await resolveApiClient(request)
+    if (!ctx) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -40,7 +38,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Confirm the requester is an owner/admin of the member's organization.
-    const { data: targetMember } = await supabaseAdmin
+    const { data: targetMember } = await ctx.svc
       .from('organization_members')
       .select('id, organization_id, user_id, status')
       .eq('id', memberId)
@@ -50,11 +48,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Member not found' }, { status: 404 })
     }
 
-    const { data: requesterMembership } = await supabaseAdmin
+    const { data: requesterMembership } = await ctx.svc
       .from('organization_members')
       .select('role')
       .eq('organization_id', targetMember.organization_id)
-      .eq('user_id', user.id)
+      .eq('user_id', ctx.viewerId)
       .maybeSingle()
 
     const requesterRole = requesterMembership?.role
@@ -70,13 +68,13 @@ export async function POST(request: NextRequest) {
 
     if (action === 'detach') {
       // Org keeps everything org-scoped. Twin just loses the org's grant.
-      const { error: memberError } = await supabaseAdmin
+      const { error: memberError } = await ctx.svc
         .from('organization_members')
-        .update({ status: 'removed', left_at: now, removed_by: user.id })
+        .update({ status: 'removed', left_at: now, removed_by: ctx.viewerId })
         .eq('id', memberId)
       if (memberError) throw memberError
 
-      const { data: twin } = await supabaseAdmin
+      const { data: twin } = await ctx.svc
         .from('client_twins')
         .select('id, metadata')
         .eq('client_id', targetMember.user_id)
@@ -87,7 +85,7 @@ export async function POST(request: NextRequest) {
         const meta = { ...(twin.metadata || {}) } as Record<string, any>
         delete meta.org_entitlements
         meta.detached_from_org_at = now
-        await supabaseAdmin
+        await ctx.svc
           .from('client_twins')
           .update({ organization_id: null, metadata: meta })
           .eq('id', twin.id)
@@ -97,7 +95,7 @@ export async function POST(request: NextRequest) {
     }
 
     // action === 'transfer' — the member pays personally to keep what they have.
-    const { data: memberUser } = await supabaseAdmin
+    const { data: memberUser } = await ctx.svc
       .from('users')
       .select('id, email, full_name')
       .eq('id', targetMember.user_id)
@@ -109,9 +107,9 @@ export async function POST(request: NextRequest) {
 
     // Mark them as leaving now; the twin's organization_id only clears once
     // Stripe confirms payment (see the webhook's twin_transfer handling).
-    const { error: memberError } = await supabaseAdmin
+    const { error: memberError } = await ctx.svc
       .from('organization_members')
-      .update({ status: 'removed', left_at: now, removed_by: user.id })
+      .update({ status: 'removed', left_at: now, removed_by: ctx.viewerId })
       .eq('id', memberId)
     if (memberError) throw memberError
 

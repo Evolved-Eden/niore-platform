@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { useClientView } from '@/lib/client-view'
 import { toast } from 'sonner'
 
 type VaultEntry = {
@@ -15,6 +16,7 @@ type VaultEntry = {
 
 export default function ClientVault() {
   const supabase = createClient()
+  const { targetClientId } = useClientView()
   const [entries, setEntries] = useState<VaultEntry[]>([])
   const [search, setSearch] = useState('')
   const [loading, setLoading] = useState(true)
@@ -37,7 +39,7 @@ export default function ClientVault() {
     const { data, error } = await supabase
       .from('knowledge_base')
       .select('id, title, content, source_type, created_at, metadata')
-      .eq('organization_id' as any, user.id)
+      .eq('organization_id' as any, targetClientId || user.id)
       .order('created_at', { ascending: false })
       .limit(50)
 
@@ -65,7 +67,7 @@ export default function ClientVault() {
     }
 
     const { error } = await supabase.from('knowledge_base').insert({
-      organization_id: user.id,
+      organization_id: targetClientId || user.id,
       title: noteTitle.trim(),
       content: noteContent.trim() || null,
       source_type: 'vault_note',
@@ -99,7 +101,7 @@ export default function ClientVault() {
     let uploaded = 0
 
     for (const file of Array.from(files)) {
-      const path = `vault/${user.id}/${Date.now()}_${file.name}`
+      const path = `vault/${targetClientId || user.id}/${Date.now()}_${file.name}`
 
       const { error: uploadError } = await supabase.storage
         .from('onboarding') // reuse existing bucket
@@ -112,7 +114,7 @@ export default function ClientVault() {
 
       // Log to knowledge_base
       const { error: dbError } = await supabase.from('knowledge_base').insert({
-        organization_id: user.id,
+        organization_id: targetClientId || user.id,
         title: file.name,
         content: `Uploaded file: ${file.name}`,
         source_type: 'vault_upload',
@@ -147,7 +149,7 @@ export default function ClientVault() {
       .from('knowledge_base')
       .delete()
       .eq('id', id)
-      .eq('organization_id' as any, user.id)
+      .eq('organization_id' as any, targetClientId || user.id)
 
     if (error) {
       toast.error('Failed to delete')

@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
-import WrappedEssencePage from '../../client/essence/page'
+import WrappedEssencePage from '../../client/[clientKey]/essence/page'
 
 /**
  * Collective's Essence Intel page. Reuses the full Essence Intelligence

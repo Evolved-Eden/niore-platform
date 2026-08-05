@@ -1,27 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { resolveApiClient } from '@/lib/client-api'
 
 /**
  * GET /api/client/calendar
- * Get the client's own calendar setup -- which of their connected
+ * Get the target client's own calendar setup -- which of their connected
  * connector_credentials (Calendar category) is active, and which Email
  * connector (if any) is linked to it for booking confirmations.
+ * Accepts ?clientId= to scope to a specific client (platform admin / org view).
  */
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
+    const ctx = await resolveApiClient(req)
+    if (!ctx) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { data: calendar, error } = await supabase
+    const { data: calendar, error } = await ctx.svc
       .from('calendars')
       .select(`
         id, provider, external_calendar_id,
         connector_credential_id, email_connector_credential_id
       `)
-      .eq('client_id', user.id)
+      .eq('client_id', ctx.clientId)
       .maybeSingle()
 
     if (error) throw error
@@ -45,9 +45,8 @@ export async function GET() {
  */
 export async function POST(req: NextRequest) {
   try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
+    const ctx = await resolveApiClient(req)
+    if (!ctx) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -58,11 +57,11 @@ export async function POST(req: NextRequest) {
 
     // Verify calendar_connector_id belongs to this client and is a
     // calendar-category type they've actually connected.
-    const { data: calConn, error: calConnError } = await supabase
+    const { data: calConn, error: calConnError } = await ctx.svc
       .from('connector_credentials')
       .select('id, connector_id, connector_types:connector_id(category)')
       .eq('id', calendar_connector_id)
-      .eq('client_id', user.id)
+      .eq('client_id', ctx.clientId)
       .single()
 
     if (calConnError || !calConn) {
@@ -74,11 +73,11 @@ export async function POST(req: NextRequest) {
 
     // Same check for the email connector, if provided.
     if (email_connector_id) {
-      const { data: emailConn, error: emailConnError } = await supabase
+      const { data: emailConn, error: emailConnError } = await ctx.svc
         .from('connector_credentials')
         .select('id, connector_id, connector_types:connector_id(category)')
         .eq('id', email_connector_id)
-        .eq('client_id', user.id)
+        .eq('client_id', ctx.clientId)
         .single()
 
       if (emailConnError || !emailConn) {
@@ -89,21 +88,21 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    const { data: orgRow } = await supabase
+    const { data: orgRow } = await ctx.svc
       .from('clients')
       .select('organization_id')
-      .eq('id', user.id)
+      .eq('id', ctx.clientId)
       .maybeSingle()
 
-    const { data: existing } = await supabase
+    const { data: existing } = await ctx.svc
       .from('calendars')
       .select('id')
-      .eq('client_id', user.id)
+      .eq('client_id', ctx.clientId)
       .maybeSingle()
 
     let result
     if (existing) {
-      const { data, error } = await supabase
+      const { data, error } = await ctx.svc
         .from('calendars')
         .update({
           connector_credential_id: calendar_connector_id,
@@ -115,10 +114,10 @@ export async function POST(req: NextRequest) {
       if (error) throw error
       result = data
     } else {
-      const { data, error } = await supabase
+      const { data, error } = await ctx.svc
         .from('calendars')
         .insert({
-          client_id: user.id,
+          client_id: ctx.clientId,
           organization_id: orgRow?.organization_id ?? null,
           provider: 'google', // only provider available today; revisit if more calendar types are added
           connector_credential_id: calendar_connector_id,

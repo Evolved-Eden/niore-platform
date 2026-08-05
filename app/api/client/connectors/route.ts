@@ -1,30 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { resolveApiClient } from '@/lib/client-api'
 import { encryptCredentials } from '@/lib/connector-encryption'
 
 /**
  * GET /api/client/connectors
- * List connector types available to this client (enabled_for_clients=true,
+ * List connector types available to the target client (enabled_for_clients=true,
  * and requires_addon satisfied if set), each with the client's own saved
  * connection status. Credential values are never returned, only masked
  * placeholders + whether a value exists.
+ * Accepts ?clientId= to scope to a specific client (platform admin / org view).
  */
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
+    const ctx = await resolveApiClient(req)
+    if (!ctx) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { data: clientRow } = await supabase
+    const { data: clientRow } = await ctx.svc
       .from('clients')
       .select('addons')
-      .eq('id', user.id)
+      .eq('id', ctx.clientId)
       .maybeSingle()
     const ownedAddons = (clientRow?.addons ?? {}) as Record<string, boolean>
 
-    const { data: types, error: typesError } = await supabase
+    const { data: types, error: typesError } = await ctx.svc
       .from('connector_types')
       .select('id, key, name, description, category, icon, fields, requires_addon')
       .eq('enabled_for_clients', true)
@@ -32,10 +32,10 @@ export async function GET() {
 
     if (typesError) throw typesError
 
-    const { data: creds, error: credsError } = await supabase
+    const { data: creds, error: credsError } = await ctx.svc
       .from('connector_credentials')
       .select('id, connector_id, updated_at')
-      .eq('client_id', user.id)
+      .eq('client_id', ctx.clientId)
 
     if (credsError) throw credsError
 
@@ -75,9 +75,8 @@ export async function GET() {
  */
 export async function POST(req: NextRequest) {
   try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
+    const ctx = await resolveApiClient(req)
+    if (!ctx) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -90,7 +89,7 @@ export async function POST(req: NextRequest) {
     // applicable) before accepting credentials for it -- a client shouldn't
     // be able to save credentials for a type an admin has turned off, even
     // if they know its id.
-    const { data: connectorType, error: typeError } = await supabase
+    const { data: connectorType, error: typeError } = await ctx.svc
       .from('connector_types')
       .select('id, requires_addon, enabled_for_clients')
       .eq('id', connector_type_id)
@@ -101,10 +100,10 @@ export async function POST(req: NextRequest) {
     }
 
     if (connectorType.requires_addon) {
-      const { data: clientRow } = await supabase
+      const { data: clientRow } = await ctx.svc
         .from('clients')
         .select('addons')
-        .eq('id', user.id)
+        .eq('id', ctx.clientId)
         .maybeSingle()
       const ownedAddons = (clientRow?.addons ?? {}) as Record<string, boolean>
       if (ownedAddons[connectorType.requires_addon] !== true) {
@@ -115,24 +114,24 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    const { data: orgRow } = await supabase
+    const { data: orgRow } = await ctx.svc
       .from('clients')
       .select('organization_id')
-      .eq('id', user.id)
+      .eq('id', ctx.clientId)
       .maybeSingle()
 
     const encrypted = encryptCredentials(credentials)
 
-    const { data: existing } = await supabase
+    const { data: existing } = await ctx.svc
       .from('connector_credentials')
       .select('id')
-      .eq('client_id', user.id)
+      .eq('client_id', ctx.clientId)
       .eq('connector_id', connector_type_id)
       .maybeSingle()
 
     let result
     if (existing) {
-      const { data, error } = await supabase
+      const { data, error } = await ctx.svc
         .from('connector_credentials')
         .update({ encrypted_credentials: encrypted, updated_at: new Date().toISOString() })
         .eq('id', existing.id)
@@ -141,11 +140,11 @@ export async function POST(req: NextRequest) {
       if (error) throw error
       result = data
     } else {
-      const { data, error } = await supabase
+      const { data, error } = await ctx.svc
         .from('connector_credentials')
         .insert({
           connector_id: connector_type_id,
-          client_id: user.id,
+          client_id: ctx.clientId,
           organization_id: orgRow?.organization_id ?? null,
           encrypted_credentials: encrypted,
         })
@@ -168,9 +167,8 @@ export async function POST(req: NextRequest) {
  */
 export async function DELETE(req: NextRequest) {
   try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
+    const ctx = await resolveApiClient(req)
+    if (!ctx) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -179,10 +177,10 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: 'connector_type_id is required' }, { status: 400 })
     }
 
-    const { error } = await supabase
+    const { error } = await ctx.svc
       .from('connector_credentials')
       .delete()
-      .eq('client_id', user.id)
+      .eq('client_id', ctx.clientId)
       .eq('connector_id', connector_type_id)
 
     if (error) throw error

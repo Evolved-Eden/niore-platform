@@ -1,15 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
-import { supabaseAdmin } from '@/lib/supabase/admin'
+import { resolveApiClient } from '@/lib/client-api'
 import { runAgentByAgentId } from '@/lib/agents'
 
 export const dynamic = 'force-dynamic'
 
 export async function POST(req: NextRequest) {
   try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
+    const ctx = await resolveApiClient(req)
+    if (!ctx) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -26,11 +24,11 @@ export async function POST(req: NextRequest) {
     const isMockId = String(essenceItemId).startsWith('mock_')
 
     // 1. Create the action record
-    const { data: actionRow, error: actionError } = await supabaseAdmin
+    const { data: actionRow, error: actionError } = await ctx.svc
       .from('client_essence_actions')
       .insert({
         essence_item_id: essenceItemId,
-        client_id: user.id,
+        client_id: ctx.clientId,
         action_type: actionType,
         prompt: prompt || null,
         agent_id: agentId || null,
@@ -76,7 +74,7 @@ export async function POST(req: NextRequest) {
         finalStatus = 'failed'
       }
 
-      const { error: updateActionError } = await supabaseAdmin
+      const { error: updateActionError } = await ctx.svc
         .from('client_essence_actions')
         .update({
           status: finalStatus,
@@ -93,7 +91,7 @@ export async function POST(req: NextRequest) {
 
     // 3. Update the essence intelligence item status (skip for mock IDs)
     if (!isMockId) {
-      const { error: updateError } = await supabaseAdmin
+      const { error: updateError } = await ctx.svc
         .from('essintelligence_items')
         .update({
           status: finalStatus === 'completed' ? 'active' : finalStatus,
@@ -132,16 +130,15 @@ export async function POST(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
   try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
+    const ctx = await resolveApiClient(req)
+    if (!ctx) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { data: rows, error } = await supabaseAdmin
+    const { data: rows, error } = await ctx.svc
       .from('client_essence_actions')
       .select('id, essence_item_id, action_type, prompt, agent_id, status, result_summary, started_at, completed_at, created_at')
-      .eq('client_id', user.id)
+      .eq('client_id', ctx.clientId)
       .order('created_at', { ascending: false })
       .limit(25)
 

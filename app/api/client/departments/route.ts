@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
-import { supabaseAdmin } from '@/lib/supabase/admin'
+import { resolveApiClient } from '@/lib/client-api'
 import crypto from 'crypto'
 
 export const dynamic = 'force-dynamic'
@@ -9,27 +8,26 @@ export const dynamic = 'force-dynamic'
 // swarms=teams, team-of-swarms=department). Scoped per client, same pattern
 // as /api/client/agents/deploy and /api/client/swarms/deploy.
 
-// ── GET: List the client's departments, with team (swarm) counts ─────────
-export async function GET() {
+// ── GET: List the target client's departments, with team (swarm) counts ──
+export async function GET(req: NextRequest) {
   try {
-    const supabase = await createClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
+    const ctx = await resolveApiClient(req)
+    if (!ctx) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { data: departments, error: fetchError } = await supabaseAdmin
+    const { data: departments, error: fetchError } = await ctx.svc
       .from('departments')
       .select('*')
-      .eq('client_id', user.id)
+      .eq('client_id', ctx.clientId)
       .order('created_at', { ascending: false })
 
     if (fetchError) throw fetchError
 
-    const { data: swarms, error: swarmsError } = await supabaseAdmin
+    const { data: swarms, error: swarmsError } = await ctx.svc
       .from('client_deployed_swarms')
       .select('id, department_id')
-      .eq('client_id', user.id)
+      .eq('client_id', ctx.clientId)
 
     if (swarmsError) throw swarmsError
 
@@ -54,9 +52,8 @@ export async function GET() {
 // ── POST: Create a new department ─────────────────────────
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
+    const ctx = await resolveApiClient(request)
+    if (!ctx) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -70,9 +67,9 @@ export async function POST(request: NextRequest) {
     const id = crypto.randomUUID()
     const now = new Date().toISOString()
 
-    const { error: insertError } = await supabaseAdmin.from('departments').insert({
+    const { error: insertError } = await ctx.svc.from('departments').insert({
       id,
-      client_id: user.id,
+      client_id: ctx.clientId,
       organization_id: organizationId || null,
       name,
       description: description || null,
@@ -84,7 +81,7 @@ export async function POST(request: NextRequest) {
 
     if (insertError) throw insertError
 
-    const { data: inserted, error: fetchBackError } = await supabaseAdmin
+    const { data: inserted, error: fetchBackError } = await ctx.svc
       .from('departments')
       .select('*')
       .eq('id', id)
@@ -102,9 +99,8 @@ export async function POST(request: NextRequest) {
 // ── PATCH: Rename, edit, or archive a department ──────────
 export async function PATCH(request: NextRequest) {
   try {
-    const supabase = await createClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
+    const ctx = await resolveApiClient(request)
+    if (!ctx) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -115,11 +111,11 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: 'id is required' }, { status: 400 })
     }
 
-    const { data: existing, error: checkError } = await supabaseAdmin
+    const { data: existing, error: checkError } = await ctx.svc
       .from('departments')
       .select('id')
       .eq('id', id)
-      .eq('client_id', user.id)
+      .eq('client_id', ctx.clientId)
       .maybeSingle()
 
     if (checkError) throw checkError
@@ -134,15 +130,15 @@ export async function PATCH(request: NextRequest) {
     if (departmentType !== undefined) updateData.department_type = departmentType
     if (status !== undefined) updateData.status = status
 
-    const { error: updateError } = await supabaseAdmin
+    const { error: updateError } = await ctx.svc
       .from('departments')
       .update(updateData)
       .eq('id', id)
-      .eq('client_id', user.id)
+      .eq('client_id', ctx.clientId)
 
     if (updateError) throw updateError
 
-    const { data: updated, error: fetchError } = await supabaseAdmin
+    const { data: updated, error: fetchError } = await ctx.svc
       .from('departments')
       .select('*')
       .eq('id', id)

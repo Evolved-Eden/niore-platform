@@ -1,14 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
-import { supabaseAdmin } from '@/lib/supabase/admin'
+import { resolveApiClient } from '@/lib/client-api'
 
 export const dynamic = 'force-dynamic'
 
 export async function PATCH(request: NextRequest) {
   try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
+    const ctx = await resolveApiClient(request)
+    if (!ctx) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -21,11 +19,12 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: 'organizationId is required' }, { status: 400 })
     }
 
-    const { data: membership } = await supabaseAdmin
+    // Only the org's own owner/admin (the acting viewer) can change this.
+    const { data: membership } = await ctx.svc
       .from('organization_members')
       .select('role')
       .eq('organization_id', organizationId)
-      .eq('user_id', user.id)
+      .eq('user_id', ctx.viewerId)
       .maybeSingle()
 
     if (membership?.role !== 'owner' && membership?.role !== 'admin') {
@@ -35,7 +34,7 @@ export async function PATCH(request: NextRequest) {
     const update: Record<string, unknown> = {}
     if (allowMemberRegistryListing !== undefined) update.allow_member_registry_listing = allowMemberRegistryListing
 
-    const { error } = await supabaseAdmin
+    const { error } = await ctx.svc
       .from('organizations')
       .update(update)
       .eq('id', organizationId)

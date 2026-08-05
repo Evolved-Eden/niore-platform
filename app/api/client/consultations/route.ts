@@ -1,25 +1,22 @@
-import { createClient } from '@/lib/supabase/server'
+import { resolveApiClient } from '@/lib/client-api'
 import { NextRequest, NextResponse } from 'next/server'
-
-function consultations(supabase: Awaited<ReturnType<typeof createClient>>) {
-  return supabase.from('client_consultations')
-}
 
 /**
  * GET /api/client/consultations
- * List the authenticated user's consultations (upcoming first, then past)
+ * List the target client's consultations (upcoming first, then past).
+ * Accepts ?clientId= to scope to a specific client (platform admin / org view).
  */
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
+    const ctx = await resolveApiClient(req)
+    if (!ctx) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { data, error } = await consultations(supabase)
+    const { data, error } = await ctx.svc
+      .from('client_consultations')
       .select('*')
-      .eq('client_id', user.id)
+      .eq('client_id', ctx.clientId)
       .order('scheduled_at', { ascending: true })
 
     if (error) throw error
@@ -51,9 +48,8 @@ export async function GET() {
  */
 export async function POST(req: NextRequest) {
   try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
+    const ctx = await resolveApiClient(req)
+    if (!ctx) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -81,9 +77,10 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const { data: booking, error } = await consultations(supabase)
+    const { data: booking, error } = await ctx.svc
+      .from('client_consultations')
       .insert({
-        client_id: user.id,
+        client_id: ctx.clientId,
         scheduled_at,
         duration_min: duration_min ?? 30,
         consultation_type,
@@ -99,10 +96,10 @@ export async function POST(req: NextRequest) {
     if (error) throw error
 
     // Update client's consultation_booked timestamp
-    await supabase
+    await ctx.svc
       .from('clients')
       .update({ consultation_booked: new Date().toISOString() })
-      .eq('id', user.id)
+      .eq('id', ctx.clientId)
 
     return NextResponse.json({ consultation: booking })
   } catch (err: any) {
@@ -117,9 +114,8 @@ export async function POST(req: NextRequest) {
  */
 export async function DELETE(req: NextRequest) {
   try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
+    const ctx = await resolveApiClient(req)
+    if (!ctx) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -128,10 +124,11 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: 'Consultation id is required' }, { status: 400 })
     }
 
-    const { data, error } = await consultations(supabase)
+    const { data, error } = await ctx.svc
+      .from('client_consultations')
       .update({ status: 'cancelled', updated_at: new Date().toISOString() })
       .eq('id', id)
-      .eq('client_id', user.id)
+      .eq('client_id', ctx.clientId)
       .select()
       .single()
 

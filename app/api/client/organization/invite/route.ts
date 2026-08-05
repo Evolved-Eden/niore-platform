@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
-import { supabaseAdmin } from '@/lib/supabase/admin'
+import { resolveApiClient } from '@/lib/client-api'
 import crypto from 'crypto'
 
 export const dynamic = 'force-dynamic'
 
-// Invites a human onto the current user's Organization. This is entirely
+// Invites a human onto the target client's Organization. This is entirely
 // separate from Team (AI Team/Swarm) deployment — see /api/client/swarms/deploy
 // for that. An Organization is people; a Team is deployed intelligence.
 //
@@ -14,9 +13,8 @@ export const dynamic = 'force-dynamic'
 // follow-up — would wire through Resend, which is already connected.
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
+    const ctx = await resolveApiClient(request)
+    if (!ctx) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -53,10 +51,10 @@ export async function POST(request: NextRequest) {
       }
       const newOrgId = crypto.randomUUID()
       const slug = `${orgName.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase()}_${newOrgId.slice(0, 8)}`
-      const { error: orgInsertError } = await supabaseAdmin.from('organizations').insert({
+      const { error: orgInsertError } = await ctx.svc.from('organizations').insert({
         id: newOrgId,
         name: orgName,
-        owner_id: user.id,
+        owner_id: ctx.clientId,
         slug,
         status: 'active',
         created_at: now,
@@ -64,10 +62,10 @@ export async function POST(request: NextRequest) {
       } as any)
       if (orgInsertError) throw orgInsertError
 
-      const { error: ownerInsertError } = await supabaseAdmin.from('organization_members').upsert(
+      const { error: ownerInsertError } = await ctx.svc.from('organization_members').upsert(
         {
           organization_id: newOrgId,
-          user_id: user.id,
+          user_id: ctx.clientId,
           role: 'owner',
           status: 'active',
           is_paid_member: true,
@@ -82,7 +80,7 @@ export async function POST(request: NextRequest) {
 
     // Look up the invited person by whichever identifier was given — v1
     // requires an existing account.
-    const { data: foundUsers, error: lookupError } = await supabaseAdmin
+    const { data: foundUsers, error: lookupError } = await ctx.svc
       .from('users')
       .select('id, full_name, email')
       .eq(identifier.field, identifier.value)
@@ -99,7 +97,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Don't double-invite.
-    const { data: existingMembership } = await supabaseAdmin
+    const { data: existingMembership } = await ctx.svc
       .from('organization_members')
       .select('id, status')
       .eq('organization_id', orgId)
@@ -113,13 +111,13 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { error: memberInsertError } = await supabaseAdmin.from('organization_members').upsert(
+    const { error: memberInsertError } = await ctx.svc.from('organization_members').upsert(
       {
         organization_id: orgId,
         user_id: invitedUser.id,
         role: role || 'member',
         status: 'invited',
-        invited_by: user.id,
+        invited_by: ctx.clientId,
         invited_at: now,
       } as any,
       { onConflict: 'organization_id,user_id' } as any

@@ -400,6 +400,7 @@ const DOMAIN_MODULES = [
 
 export default function ClientBlueprintPage() {
   const router = useRouter()
+  const { prefix } = useClientView()
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState<any>(null)
   const [blueprint, setBlueprint] = useState<BlueprintData | null>(null)

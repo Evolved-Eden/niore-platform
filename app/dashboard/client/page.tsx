@@ -15,7 +15,7 @@ export default async function ClientIndex() {
   const svc = createServiceClient()
   const { data: client } = await svc
     .from('clients')
-    .select('id, business_name, full_name, display_name')
+    .select('id, business_name, full_name')
     .eq('id', user.id)
     .maybeSingle()
 

@@ -83,7 +83,7 @@ export async function resolveClientAccess(clientKey: string): Promise<ResolvedCl
   const svc = createServiceClient()
   const { data: client } = await svc
     .from('clients')
-    .select('id, business_name, full_name, display_name, organization_id, status, plan_tier_key')
+    .select('id, business_name, full_name, organization_id, status, plan_tier_key')
     .eq('id', parsed.clientId)
     .maybeSingle()
 

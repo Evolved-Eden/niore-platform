@@ -285,6 +285,12 @@ export type OrganizationMember = {
   invited_at?: string | null
   accepted_at?: string | null
   joined_at?: string | null
+  // See supabase/migrations/20260714000000_org_governed_twins_and_offboarding.sql
+  left_at?: string | null
+  removed_by?: string | null
+  // See supabase/migrations/20260712120000_employee_team_department_titles.sql
+  title_key?: string | null
+  custom_title?: string | null
   created_at?: string
   updated_at?: string
 }

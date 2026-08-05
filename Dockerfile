@@ -54,7 +54,7 @@ ENV RESEND_API_KEY=$RESEND_API_KEY
 # "JavaScript heap out of memory" / SIGABRT during `npm run build` --
 # not a code error, a memory ceiling. Confirmed locally: the exact same
 # OOM happened running `tsc --noEmit` directly until the heap was raised.
-ENV NODE_OPTIONS="--max-old-space-size=4096"
+ENV NODE_OPTIONS="--max-old-space-size=6144"
 
 RUN npm run build
 

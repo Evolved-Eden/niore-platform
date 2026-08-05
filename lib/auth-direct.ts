@@ -1,14 +1,31 @@
 import jwt from 'jsonwebtoken'
 import { query, queryOne } from './db'
 import { randomUUID, createHash } from 'crypto'
-import { cookies } from 'next/headers'
 
 // ═══════════════════════════════════════════════════════════
 // Direct Postgres auth — bypasses Kong entirely
 // ═══════════════════════════════════════════════════════════
-// Self-hosted Supabase means we have direct DB access +
-// the JWT secret. We can verify passwords ourselves and
-// generate proper Supabase-compatible sessions.
+// FIX APPLIED: this file used to also hand-write the Supabase session
+// cookies (setSessionCookies / getStorageKey / clearSessionCookies). That
+// broke RLS-gated queries: @supabase/ssr's createServerClient computes its
+// own cookie name (derived from the project URL's hostname) and expects the
+// cookie value to be the JSON-encoded session object -- not a raw JWT
+// string under a hand-computed base64url(url) cookie name. Because those
+// never matched, @supabase/ssr never loaded a session for .from() queries,
+// so every RLS-gated query ran as `anon` regardless of who was logged in.
+// `supabase.auth.getUser()` still "worked" because wrapGetUser() in
+// lib/supabase/server.ts / middleware.ts bypasses @supabase/ssr entirely
+// with its own cookie-scanning + local verifyToken() -- a parallel path
+// that never fed the real session into @supabase/ssr's client.
+//
+// Fix: call supabase.auth.setSession({ access_token, refresh_token }) from
+// the login route right after createSession() succeeds. @supabase/ssr's own
+// setSession() writes the cookie under the correct name, in the correct
+// shape, with correct chunking if the session is large -- all the stuff
+// this file used to try to replicate by hand. Updated call sites:
+// app/api/auth/signin/route.ts and app/api/auth/exchange-recovery-token/route.ts.
+// clearSessionCookies had no call sites (app/api/auth/signout/route.ts
+// already used supabase.auth.signOut() correctly) so it was just removed.
 // ═══════════════════════════════════════════════════════════
 
 const JWT_SECRET = process.env.SUPABASE_JWT_SECRET || process.env.SUPABASE_SECRET_KEY
@@ -74,13 +91,19 @@ export async function updatePassword(userId: string, newPassword: string) {
 /**
  * Generate a Supabase-compatible session (access_token JWT +
  * refresh_token stored in DB) and return both.
+ *
+ * IMPORTANT: this only creates the tokens and the DB-side session/refresh
+ * rows. It does NOT set any cookies -- the caller must hand the result to
+ * supabase.auth.setSession() so @supabase/ssr writes its own, correctly
+ * shaped cookie. See app/api/auth/signin/route.ts for the pattern.
  */
 export async function createSession(userId: string, email: string) {
   if (!JWT_SECRET) throw new Error('SUPABASE_JWT_SECRET is required for direct auth')
 
   const sessionId = randomUUID()
   const now = Math.floor(Date.now() / 1000)
-  const expiresAt = now + 3600 // 1 hour
+  const expiresIn = 3600
+  const expiresAt = now + expiresIn
 
   // ── Access token JWT (matches Supabase's format) ──
   const accessToken = jwt.sign(
@@ -123,83 +146,7 @@ export async function createSession(userId: string, email: string) {
     [refreshTokenHash, userId, sessionId]
   )
 
-  return { accessToken, refreshToken, expiresAt }
-}
-
-/**
- * Derive the Supabase cookie storage key from the URL.
- * Matches what @supabase/gotrue-js does internally:
- *   sb-{base64url(url)}-auth-token
- */
-function getStorageKey(url: string, suffix: string = 'auth-token'): string {
-  // Simple base64url hash of the URL (matching gotrue-js behavior)
-  const hash = Buffer.from(url).toString('base64url')
-  return `sb-${hash}-${suffix}`
-}
-
-/**
- * Set Supabase session cookies directly (bypasses setSession API call).
- */
-export async function setSessionCookies(
-  accessToken: string,
-  refreshToken: string,
-  expiresAt: number
-) {
-  const cookieStore = await cookies()
-  const baseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co'
-  const maxAge = expiresAt - Math.floor(Date.now() / 1000)
-
-  const cookieOptions = {
-    httpOnly: true,
-    secure: process.env.NEXT_PUBLIC_APP_URL?.startsWith('https') ?? false,
-    sameSite: 'lax' as const,
-    path: '/',
-    maxAge: 3600 * 24 * 365, // 1 year
-  }
-
-  // Set auth token cookie (raw access token — used by middleware's local JWT verify)
-  cookieStore.set(
-    getStorageKey(baseUrl, 'auth-token'),
-    accessToken,
-    cookieOptions
-  )
-
-  // Set refresh token cookie
-  cookieStore.set(
-    getStorageKey(baseUrl, 'refresh-token'),
-    refreshToken,
-    cookieOptions
-  )
-
-  // Set the session cookie in the format @supabase/gotrue-js reads
-  // (storage key 'supabase.auth.token', base64url-encoded JSON session with
-  // the 'base64-' prefix). Without this, server clients built on the anon key
-  // never load a session from a sign-in cookie, so every RLS-gated query runs
-  // anonymous and role checks (admin gate etc.) fail with 403.
-  const sessionJson = JSON.stringify({
-    access_token: accessToken,
-    refresh_token: refreshToken,
-    expires_in: 3600,
-    expires_at: expiresAt,
-    token_type: 'bearer',
-  })
-  cookieStore.set(
-    'supabase.auth.token',
-    `base64-${Buffer.from(sessionJson).toString('base64url')}`,
-    cookieOptions
-  )
-}
-
-/**
- * Remove session cookies (sign-out).
- */
-export async function clearSessionCookies() {
-  const cookieStore = await cookies()
-  const baseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co'
-
-  cookieStore.delete(getStorageKey(baseUrl, 'auth-token'))
-  cookieStore.delete(getStorageKey(baseUrl, 'refresh-token'))
-  cookieStore.delete('supabase.auth.token')
+  return { accessToken, refreshToken, expiresAt, expiresIn }
 }
 
 /**

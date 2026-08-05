@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { verifyPassword, createSession, setSessionCookies } from '@/lib/auth-direct'
+import { verifyPassword, createSession } from '@/lib/auth-direct'
+import { createClient } from '@/lib/supabase/server'
 
 /**
  * POST /api/auth/signin
@@ -24,12 +25,18 @@ export async function POST(req: NextRequest) {
     // 2. Create a proper Supabase-compatible session
     const session = await createSession(user.id, user.email)
 
-    // 3. Set session cookies directly (no API call needed)
-    await setSessionCookies(
-      session.accessToken,
-      session.refreshToken,
-      session.expiresAt
-    )
+    // 3. Hand the tokens to @supabase/ssr so it writes its own,
+    // correctly-shaped session cookie (fixes RLS-gated queries running as
+    // anon — see the comment block at the top of lib/auth-direct.ts).
+    const supabase = await createClient()
+    const { error: setSessionError } = await supabase.auth.setSession({
+      access_token: session.accessToken,
+      refresh_token: session.refreshToken,
+    })
+    if (setSessionError) {
+      console.error('setSession failed after sign-in:', setSessionError)
+      return NextResponse.json({ error: 'Failed to establish session' }, { status: 500 })
+    }
 
     return NextResponse.json({
       success: true,

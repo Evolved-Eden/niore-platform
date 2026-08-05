@@ -1,26 +1,27 @@
-import { createClient } from '@/lib/supabase/server'
+import { requireClientView } from '@/lib/client-dashboard'
+import { createServiceClient } from '@/lib/supabase/server'
 import JournalClient from './JournalClient'
 
-export default async function JournalPage() {
-  const supabase = await createClient()
-  const { data: { user: _user } } = await supabase.auth.getUser()
-  const user = _user!
+export default async function JournalPage({ params }: { params: Promise<{ clientKey: string }> }) {
+  const { clientKey } = await params
+  const { targetClientId } = await requireClientView(clientKey)
+  const svc = createServiceClient()
 
   const [mineRes, sharedRes, orgsRes] = await Promise.all([
-    supabase
+    svc
       .from('journal_entries')
       .select('id, title, content, mood, shared_with, created_at, updated_at')
-      .eq('user_id', user.id)
+      .eq('user_id', targetClientId)
       .order('created_at', { ascending: false }),
-    supabase
+    svc
       .from('journal_entries')
       .select('id, user_id, title, content, mood, created_at, users:user_id(full_name)')
-      .contains('shared_with', [user.id])
+      .contains('shared_with', [targetClientId])
       .order('created_at', { ascending: false }),
-    supabase
+    svc
       .from('organization_members')
       .select('organization_id, organizations(id, name)')
-      .eq('user_id', user.id)
+      .eq('user_id', targetClientId)
       .eq('status', 'active'),
   ])
 

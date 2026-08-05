@@ -1,22 +1,22 @@
-import { createClient } from '@/lib/supabase/server'
+import { requireClientView } from '@/lib/client-dashboard'
+import { createServiceClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 
-export default async function ClientSettingsPage() {
-  const supabase = await createClient()
-  const { data: { user: _user } } = await supabase.auth.getUser()
-  // Guaranteed non-null by root middleware
-  const user = _user!
+export default async function ClientSettingsPage({ params }: { params: Promise<{ clientKey: string }> }) {
+  const { clientKey } = await params
+  const { targetClientId, access } = await requireClientView(clientKey)
+  const svc = createServiceClient()
 
-  const { data: profile } = await supabase
+  const { data: profile } = await svc
     .from('users')
     .select('*')
-    .eq('id', user.id)
+    .eq('id', targetClientId)
     .single()
 
-  const { data: client } = await supabase
+  const { data: client } = await svc
     .from('clients')
     .select('*')
-    .eq('id', user.id)
+    .eq('id', targetClientId)
     .single()
 
   return (
@@ -32,11 +32,11 @@ export default async function ClientSettingsPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
           <div>
             <span className="text-xs text-white/30 block mb-1">Name</span>
-            <span className="text-white/80">{profile?.full_name || user.email?.split('@')[0] || '—'}</span>
+            <span className="text-white/80">{profile?.full_name || '—'}</span>
           </div>
           <div>
             <span className="text-xs text-white/30 block mb-1">Email</span>
-            <span className="text-white/80">{user.email}</span>
+            <span className="text-white/80">{profile?.email || '—'}</span>
           </div>
           <div>
             <span className="text-xs text-white/30 block mb-1">Role</span>
@@ -44,7 +44,7 @@ export default async function ClientSettingsPage() {
           </div>
           <div>
             <span className="text-xs text-white/30 block mb-1">Member Since</span>
-            <span className="text-white/80">{user.created_at ? new Date(user.created_at).toLocaleDateString() : '—'}</span>
+            <span className="text-white/80">{profile?.created_at ? new Date(profile.created_at).toLocaleDateString() : '—'}</span>
           </div>
         </div>
       </section>
@@ -73,12 +73,14 @@ export default async function ClientSettingsPage() {
             <span className="text-white/80">{(client as any)?.archetype || '—'}</span>
           </div>
         </div>
-        <Link
-          href="/intake"
-          className="inline-block mt-4 text-xs text-[#C6A664]/60 hover:text-[#C6A664] transition-colors"
-        >
-          Update intake →
-        </Link>
+        {access === 'self' && (
+          <Link
+            href="/intake"
+            className="inline-block mt-4 text-xs text-[#C6A664]/60 hover:text-[#C6A664] transition-colors"
+          >
+            Update intake →
+          </Link>
+        )}
       </section>
 
       {/* Plan */}
@@ -108,7 +110,7 @@ export default async function ClientSettingsPage() {
           )}
         </div>
         <Link
-          href="/dashboard/client/profile"
+          href={`/dashboard/client/${clientKey}/profile`}
           className="inline-block mt-4 text-xs text-[#C6A664]/60 hover:text-[#C6A664] transition-colors"
         >
           View profile & plan details →

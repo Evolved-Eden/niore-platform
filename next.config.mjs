@@ -6,13 +6,10 @@ import { withSentryConfig } from '@sentry/nextjs'
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'standalone',
-  async redirects() {
-    return [
-      // Redirect old /admin/* to /dashboard/admin/*
-      { source: '/admin', destination: '/dashboard/admin', permanent: true },
-      { source: '/admin/:path*', destination: '/dashboard/admin/:path*', permanent: true },
-    ];
-  },
+  // The /admin -> /dashboard/admin redirect used to be duplicated here AND
+  // in proxy.ts. proxy.ts runs before Next.js's config-level redirects, so
+  // this block never actually fired for /admin paths -- removed to keep the
+  // redirect logic in exactly one place (see proxy.ts).
 };
 
 export default withSentryConfig(nextConfig)

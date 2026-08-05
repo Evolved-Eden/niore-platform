@@ -1,18 +1,18 @@
-import { createClient } from '@/lib/supabase/server'
-import { supabaseAdmin } from '@/lib/supabase/admin'
+import { requireClientView } from '@/lib/client-dashboard'
+import { createServiceClient } from '@/lib/supabase/server'
 import ListingForm from './ListingForm'
 
-export default async function TwinRegistryPage() {
-  const supabase = await createClient()
-  const { data: { user: _user } } = await supabase.auth.getUser()
-  const user = _user!
+export default async function TwinRegistryPage({ params }: { params: Promise<{ clientKey: string }> }) {
+  const { clientKey } = await params
+  const { targetClientId } = await requireClientView(clientKey)
+  const svc = createServiceClient()
 
   const [myTwinsRes, listingsRes] = await Promise.all([
-    supabaseAdmin
+    svc
       .from('client_twins')
       .select('id, organization_id, is_independent, is_listed, listing_visibility, listing_headline, listing_skills, metadata')
-      .eq('client_id', user.id),
-    supabaseAdmin
+      .eq('client_id', targetClientId),
+    svc
       .from('client_twins')
       .select('id, listing_headline, listing_skills, listing_visibility, essence_score, intelligence_score, organizations:organization_id(name)')
       .eq('is_listed', true)
@@ -29,13 +29,13 @@ export default async function TwinRegistryPage() {
     myTwins.map(async (t) => {
       if (!t.organization_id) return { ...t, eligible: true, reason: null as string | null }
       const [{ data: membership }, { data: org }] = await Promise.all([
-        supabaseAdmin
+        svc
           .from('organization_members')
           .select('role')
           .eq('organization_id', t.organization_id)
-          .eq('user_id', user.id)
+          .eq('user_id', targetClientId)
           .maybeSingle(),
-        supabaseAdmin
+        svc
           .from('organizations')
           .select('allow_member_registry_listing')
           .eq('id', t.organization_id)
@@ -86,6 +86,7 @@ export default async function TwinRegistryPage() {
               {t.eligible ? (
                 <ListingForm
                   twinId={t.id}
+                  clientId={targetClientId}
                   initial={{
                     isListed: t.is_listed,
                     visibility: (t.listing_visibility || 'anonymous') as 'anonymous' | 'named',

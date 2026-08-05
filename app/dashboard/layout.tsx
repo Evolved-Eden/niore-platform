@@ -4,6 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import type { UserRole } from '@/types'
 import { deriveRoleFromPlanTier } from '@/types'
+import { buildClientKey } from '@/lib/client-dashboard'
 
 import SidebarNav from './_components/SidebarNav'
 
@@ -202,6 +203,21 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const planRole = deriveRoleFromPlanTier(clientRecord?.plan_tier_key)
   const role: UserRole = userRole === 'admin' ? 'admin' : (planRole ?? userRole)
 
+  // Per-client dashboard URLs: rewrite any nav link under /dashboard/client/*
+  // to the viewer's OWN keyed dashboard (each client's sections now live at
+  // /dashboard/client/{slug}--{id}/...). Admins/org-members viewing another
+  // client keep their own nav shell; the page content targets the viewed client.
+  const ownClientKey = clientRecord ? buildClientKey(clientRecord) : ''
+  const keyedNav = NAV[role].map((item) => {
+    if (item.href === '/dashboard/client' && ownClientKey) {
+      return { ...item, href: `/dashboard/client/${ownClientKey}` }
+    }
+    if (item.href.startsWith('/dashboard/client/') && ownClientKey) {
+      return { ...item, href: item.href.replace('/dashboard/client/', `/dashboard/client/${ownClientKey}/`) }
+    }
+    return item
+  })
+
   // Plan guard: non-admin dashboard access requires at least one active plan.
   if (role !== 'admin') {
     if (!rlsError) {
@@ -227,7 +243,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
     }
   }
   const color = ROLE_COLOR[role]
-  const nav = NAV[role]
+  const nav = keyedNav
 
   return (
     <div className="flex min-h-screen bg-[#0A0A0B]">

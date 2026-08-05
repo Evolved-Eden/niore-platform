@@ -10,7 +10,7 @@ type Initial = {
   skills: string[]
 }
 
-export default function ListingForm({ twinId, initial }: { twinId: string; initial: Initial }) {
+export default function ListingForm({ twinId, initial, clientId }: { twinId: string; initial: Initial; clientId: string }) {
   const router = useRouter()
   const [isListed, setIsListed] = useState(initial.isListed)
   const [visibility, setVisibility] = useState(initial.visibility)
@@ -24,6 +24,7 @@ export default function ListingForm({ twinId, initial }: { twinId: string; initi
     setMessage(null)
     try {
       const payload = {
+        clientId,
         twinId,
         isListed: overrides.isListed ?? isListed,
         visibility: overrides.visibility ?? visibility,

@@ -131,7 +131,10 @@ export async function POST(req: NextRequest) {
   // Fetch recent AI memories for this user, scoped to context (personal vs
   // a specific org/collective) -- same scoping as the essence generation
   // route, so chat and essence draw from the same context-appropriate pool.
-  let memoryQuery = supabase
+  // Service-role client (RLS bypass) — same pattern as the essence route.
+  const { createServiceClient } = await import('@/lib/supabase/server')
+  const svc = createServiceClient()
+  let memoryQuery = svc
     .from('ai_memories')
     .select('content, memory_type')
     .eq('entity_id', user.id)
@@ -191,12 +194,15 @@ ${routedAgentOutput}`
     }
   }
 
-  // Save both sides of the conversation as separate memory entries
+  // Save both sides of the conversation as separate memory entries.
+  // Uses the service-role client (RLS bypass) — same pattern as the intake and
+  // essence routes — so writes succeed regardless of the caller's anon-key
+  // cookie session state.
   const userMsg = lastUserMessage.slice(0, 500)
   const today = new Date().toISOString().split('T')[0]
 
   if (userMsg) {
-    await supabase.from('ai_memories').insert({
+    const { error } = await svc.from('ai_memories').insert({
       entity_id: user.id,
       entity_type: 'user',
       organization_id: organizationId ?? null,
@@ -204,10 +210,11 @@ ${routedAgentOutput}`
       memory_type: 'user_message',
       title: `User asked - ${today}`,
     })
+    if (error) console.error('Zuri: user_message memory insert failed:', error)
   }
 
   if (reply) {
-    await supabase.from('ai_memories').insert({
+    const { error } = await svc.from('ai_memories').insert({
       entity_id: user.id,
       entity_type: 'user',
       organization_id: organizationId ?? null,
@@ -215,6 +222,7 @@ ${routedAgentOutput}`
       memory_type: routedAgentName ? 'zuri_routed_response' : 'zuri_response',
       title: `${routedAgentName ? `${routedAgentName} via ` : ''}Zuri response - ${today}`,
     })
+    if (error) console.error('Zuri: response memory insert failed:', error)
   }
 
   return NextResponse.json({ reply, routed: routedAgentName, zuri: zuri.found })

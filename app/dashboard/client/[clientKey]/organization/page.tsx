@@ -1,19 +1,20 @@
-import { createClient } from '@/lib/supabase/server'
+import { requireClientView } from '@/lib/client-dashboard'
+import { createServiceClient } from '@/lib/supabase/server'
 import InviteMemberForm from './InviteMemberForm'
 import MemberActions from './MemberActions'
 import RegistryPermissionToggle from './RegistryPermissionToggle'
 
 // Human org members. Not to be confused with "My Teams" (AI Teams/Swarms) —
 // this page is people, that one is deployed intelligence.
-export default async function OrganizationPage() {
-  const supabase = await createClient()
-  const { data: { user: _user } } = await supabase.auth.getUser()
-  const user = _user!
+export default async function OrganizationPage({ params }: { params: Promise<{ clientKey: string }> }) {
+  const { clientKey } = await params
+  const { targetClientId } = await requireClientView(clientKey)
+  const svc = createServiceClient()
 
-  const { data: myMembership } = await supabase
+  const { data: myMembership } = await svc
     .from('organization_members')
     .select('organization_id, role, organizations(id, name, allow_member_registry_listing)')
-    .eq('user_id', user.id)
+    .eq('user_id', targetClientId)
     .maybeSingle()
 
   const organizationId = (myMembership as any)?.organization_id ?? null
@@ -23,7 +24,7 @@ export default async function OrganizationPage() {
 
   let members: Array<Record<string, any>> = []
   if (organizationId) {
-    const { data } = await supabase
+    const { data } = await svc
       .from('organization_members')
       .select('id, user_id, role, status, title_key, custom_title, invited_at, joined_at, users(full_name, email, avatar_url), titles(label)')
       .eq('organization_id', organizationId)
@@ -81,7 +82,7 @@ export default async function OrganizationPage() {
                       >
                         {m.status || 'active'}
                       </span>
-                      {(myRole === 'owner' || myRole === 'admin') && m.user_id !== user.id && (
+                      {(myRole === 'owner' || myRole === 'admin') && m.user_id !== targetClientId && (
                         <MemberActions memberId={m.id} memberName={name} />
                       )}
                     </div>

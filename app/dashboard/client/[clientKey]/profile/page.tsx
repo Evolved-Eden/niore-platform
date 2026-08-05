@@ -1,4 +1,5 @@
-import { createClient } from '@/lib/supabase/server'
+import { requireClientView } from '@/lib/client-dashboard'
+import { createServiceClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 
 // ─── Role color map ───────────────────────────────────────────
@@ -155,18 +156,17 @@ function StatCell({ label, value, color }: { label: string; value: string | numb
 // ================================================================
 // PAGE
 // ================================================================
-export default async function ClientProfilePage() {
-  const supabase = await createClient()
-  const { data: { user: _user } } = await supabase.auth.getUser()
-  // Guaranteed non-null by root middleware
-  const user = _user!
+export default async function ClientProfilePage({ params }: { params: Promise<{ clientKey: string }> }) {
+  const { clientKey } = await params
+  const { targetClientId, access } = await requireClientView(clientKey)
+  const svc = createServiceClient()
 
   // ── Fetch all data in parallel ──────────────────────────────
   const [userRes, clientRes, twinRes, vaultRes] = await Promise.all([
-    supabase.from('users').select('*').eq('id', user.id).maybeSingle(),
-    supabase.from('clients').select('*').eq('id', user.id).maybeSingle(),
-    supabase.from('client_twins').select('*').eq('client_id', user.id).maybeSingle(),
-    supabase.from('knowledge_base').select('id', { count: 'exact', head: true }).eq('organization_id' as any, user.id),
+    svc.from('users').select('*').eq('id', targetClientId).maybeSingle(),
+    svc.from('clients').select('*').eq('id', targetClientId).maybeSingle(),
+    svc.from('client_twins').select('*').eq('client_id', targetClientId).maybeSingle(),
+    svc.from('knowledge_base').select('id', { count: 'exact', head: true }).eq('organization_id' as any, targetClientId),
   ])
 
   const identity = (userRes.data ?? {}) as Record<string, any>
@@ -174,7 +174,7 @@ export default async function ClientProfilePage() {
   const twin = twinRes.data ?? null
   const vaultCount = vaultRes.count ?? 0
 
-  const name = identity.full_name ?? user.email?.split('@')[0] ?? 'User'
+  const name = identity.full_name ?? identity.email?.split('@')[0] ?? 'User'
   const role: string = identity.role ?? 'client'
   const roleColor = ROLE_COLORS[role] ?? '#C6A664'
   const hasBlueprint = !!((twin as any)?.metadata?.lenses?.humanDesign?.data)
@@ -206,7 +206,7 @@ export default async function ClientProfilePage() {
       const res = await fetch(`${appUrl}/api/zuri/essence`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: user.id, userRole: role }),
+        body: JSON.stringify({ userId: targetClientId, userRole: role }),
         cache: 'no-store',
       })
       if (res.ok) {
@@ -241,6 +241,8 @@ export default async function ClientProfilePage() {
     action: { label: 'Action', color: '#C9974A' },
   }
 
+  const prefix = `/dashboard/client/${clientKey}`
+
   return (
     <div className="max-w-5xl mx-auto animate-fade-in">
       {/* ═══ Header ═══ */}
@@ -274,11 +276,11 @@ export default async function ClientProfilePage() {
               </div>
               <div className="flex-1 min-w-0">
                 <h2 className="font-display text-xl font-semibold truncate">{name}</h2>
-                <p className="text-sm text-white/40 truncate">{user.email}</p>
+                <p className="text-sm text-white/40 truncate">{identity.email}</p>
                 <div className="flex items-center gap-2 mt-1.5">
                   <Badge label={ROLE_LABELS[role] ?? role} color={roleColor} />
                   <span className="text-xs text-white/30">
-                    Member since {formatDate(user.created_at)}
+                    Member since {formatDate(identity.created_at)}
                   </span>
                 </div>
               </div>
@@ -299,26 +301,28 @@ export default async function ClientProfilePage() {
                   }}
                 />
               </div>
-              <div className="flex items-center justify-between mt-3">
-                <Link
-                  href="/dashboard/client/settings"
-                  className="text-xs text-white/30 hover:text-white/60 transition-colors inline-flex items-center gap-1.5"
-                >
-                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
-                  </svg>
-                  Edit profile
-                </Link>
-                <Link
-                  href="/intake"
-                  className="text-xs text-white/30 hover:text-white/60 transition-colors inline-flex items-center gap-1.5"
-                >
-                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
-                  </svg>
-                  Update intake
-                </Link>
-              </div>
+              {access === 'self' && (
+                <div className="flex items-center justify-between mt-3">
+                  <Link
+                    href={`${prefix}/settings`}
+                    className="text-xs text-white/30 hover:text-white/60 transition-colors inline-flex items-center gap-1.5"
+                  >
+                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                    </svg>
+                    Edit profile
+                  </Link>
+                  <Link
+                    href="/intake"
+                    className="text-xs text-white/30 hover:text-white/60 transition-colors inline-flex items-center gap-1.5"
+                  >
+                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                    </svg>
+                    Update intake
+                  </Link>
+                </div>
+              )}
             </div>
 
             {/* Quick stat row */}
@@ -333,7 +337,7 @@ export default async function ClientProfilePage() {
           <div className="glass rounded-sm p-6">
             <SectionHeader
               title="Intelligence Profile"
-              action={
+              action={access === 'self' ? (
                 <Link
                   href="/intake"
                   className="text-xs text-white/20 hover:text-white/50 transition-colors inline-flex items-center gap-1"
@@ -343,7 +347,7 @@ export default async function ClientProfilePage() {
                   </svg>
                   Edit
                 </Link>
-              }
+              ) : undefined}
             />
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {[
@@ -360,18 +364,20 @@ export default async function ClientProfilePage() {
                       {field.value}
                     </div>
                   </div>
-                  <Link
-                    href="/intake"
-                    className="text-white/10 hover:text-white/40 transition-colors shrink-0 ml-3"
-                  >
-                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" />
-                    </svg>
-                  </Link>
+                  {access === 'self' && (
+                    <Link
+                      href="/intake"
+                      className="text-white/10 hover:text-white/40 transition-colors shrink-0 ml-3"
+                    >
+                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" />
+                      </svg>
+                    </Link>
+                  )}
                 </div>
               ))}
             </div>
-            {(!energyType && !dob && !archetype) && (
+            {(!energyType && !dob && !archetype) && access === 'self' && (
               <div className="mt-5 pt-4 border-t border-white/[0.06]">
                 <Link
                   href="/intake"
@@ -424,7 +430,7 @@ export default async function ClientProfilePage() {
                   </p>
                 )}
                 <Link
-                  href="/dashboard/client/essence-profile"
+                  href={`${prefix}/essence-profile`}
                   className="inline-block mt-4 text-xs text-[#C6A664]/60 hover:text-[#C6A664] transition-colors"
                 >
                   View full blueprint →
@@ -437,12 +443,14 @@ export default async function ClientProfilePage() {
                 </div>
                 <p className="text-sm text-white/40 mb-1">No blueprint yet</p>
                 <p className="text-xs text-white/20 mb-4">Complete the assessment to unlock your intelligence foundation</p>
-                <Link
-                  href="/dashboard/client/essence-profile/assess"
-                  className="inline-block px-5 py-2.5 bg-[#C6A664] text-black text-xs font-bold rounded-sm hover:bg-white transition-all"
-                >
-                  Take Assessment →
-                </Link>
+                {access === 'self' && (
+                  <Link
+                    href={`${prefix}/essence-profile/assess`}
+                    className="inline-block px-5 py-2.5 bg-[#C6A664] text-black text-xs font-bold rounded-sm hover:bg-white transition-all"
+                  >
+                    Take Assessment →
+                  </Link>
+                )}
               </div>
             )}
           </div>
@@ -453,7 +461,7 @@ export default async function ClientProfilePage() {
               title="AI Twin Status"
               action={
                 <Link
-                  href="/dashboard/client/twin"
+                  href={`${prefix}/twin`}
                   className="text-xs text-white/20 hover:text-white/50 transition-colors"
                 >
                   View twin →
@@ -485,12 +493,14 @@ export default async function ClientProfilePage() {
                 </div>
                 <p className="text-sm text-white/40 mb-1">No AI twin deployed</p>
                 <p className="text-xs text-white/20 mb-4">Complete your blueprint to generate your twin</p>
-                <Link
-                  href="/dashboard/client/essence-profile/assess"
-                  className="inline-block px-5 py-2.5 bg-[#C6A664] text-black text-xs font-bold rounded-sm hover:bg-white transition-all"
-                >
-                  Deploy Twin →
-                </Link>
+                {access === 'self' && (
+                  <Link
+                    href={`${prefix}/essence-profile/assess`}
+                    className="inline-block px-5 py-2.5 bg-[#C6A664] text-black text-xs font-bold rounded-sm hover:bg-white transition-all"
+                  >
+                    Deploy Twin →
+                  </Link>
+                )}
               </div>
             )}
           </div>
@@ -546,7 +556,7 @@ export default async function ClientProfilePage() {
             </div>
             <div className="px-5 py-3 bg-white/[0.02] border-t border-white/[0.06]">
               <Link
-                href="/dashboard/client"
+                href={prefix}
                 className="text-[10px] text-white/30 hover:text-white/60 transition-colors"
               >
                 View full Essence Board →
@@ -555,7 +565,7 @@ export default async function ClientProfilePage() {
           </div>
 
           {/* ─── 6. VAULT SUMMARY ─────────────────────────────── */}
-          <Link href="/dashboard/client/vault" className="block glass rounded-sm p-5 border border-white/[0.06] hover:border-white/[0.12] transition-all group">
+          <Link href={`${prefix}/vault`} className="block glass rounded-sm p-5 border border-white/[0.06] hover:border-white/[0.12] transition-all group">
             <div className="flex items-center justify-between mb-3">
               <div className="text-xs text-white/30 tracking-widest uppercase">Vault</div>
               <div className="w-8 h-8 rounded-full bg-white/[0.04] flex items-center justify-center group-hover:bg-white/[0.08] transition-colors">
@@ -572,7 +582,7 @@ export default async function ClientProfilePage() {
           </Link>
 
           {/* ─── 7. AGENT DEPLOYMENTS ─────────────────────────── */}
-          <Link href="/dashboard/client/essence-profile" className="block glass rounded-sm p-5 border border-white/[0.06] hover:border-white/[0.12] transition-all group">
+          <Link href={`${prefix}/essence-profile`} className="block glass rounded-sm p-5 border border-white/[0.06] hover:border-white/[0.12] transition-all group">
             <div className="flex items-center justify-between mb-3">
               <div className="text-xs text-white/30 tracking-widest uppercase">Agents</div>
               <div className="w-8 h-8 rounded-full bg-white/[0.04] flex items-center justify-center group-hover:bg-white/[0.08] transition-colors">
@@ -619,7 +629,7 @@ export default async function ClientProfilePage() {
               </div>
             </div>
             <Link
-              href="/dashboard/client/plan"
+              href={`${prefix}/plan`}
               className="inline-block mt-4 text-xs text-[#C6A664]/60 hover:text-[#C6A664] transition-colors"
             >
               View plan details →
@@ -630,11 +640,11 @@ export default async function ClientProfilePage() {
           <div className="glass rounded-sm p-5 border border-white/[0.06] space-y-2.5">
             <div className="text-xs text-white/30 tracking-widest uppercase mb-3">Quick Links</div>
             {[
-              { href: '/dashboard/client/twin', label: 'View AI Twin' },
-              { href: '/dashboard/client/essence-profile', label: 'Blueprint Details' },
-              { href: '/dashboard/client/vault', label: 'Intelligence Vault' },
-              { href: '/dashboard/client/zuri', label: 'Ask Zuri' },
-              { href: '/dashboard/client/settings', label: 'Account Settings' },
+              { href: `${prefix}/twin`, label: 'View AI Twin' },
+              { href: `${prefix}/essence-profile`, label: 'Blueprint Details' },
+              { href: `${prefix}/vault`, label: 'Intelligence Vault' },
+              { href: `${prefix}/zuri`, label: 'Ask Zuri' },
+              { href: `${prefix}/settings`, label: 'Account Settings' },
               { href: '/intake', label: 'Update Intake' },
             ].map((link) => (
               <Link

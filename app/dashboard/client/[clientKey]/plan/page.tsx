@@ -1,4 +1,5 @@
-import { createClient } from '@/lib/supabase/server'
+import { requireClientView } from '@/lib/client-dashboard'
+import { createServiceClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 
 // ─── Plan tier definitions ──────────────────────────────────────
@@ -138,18 +139,18 @@ function SectionHeader({ title }: { title: string }) {
 // ================================================================
 // PAGE
 // ================================================================
-export default async function ClientPlanPage() {
-  const supabase = await createClient()
-  const { data: { user: _user } } = await supabase.auth.getUser()
-  const user = _user!
+export default async function ClientPlanPage({ params }: { params: Promise<{ clientKey: string }> }) {
+  const { clientKey } = await params
+  const { targetClientId, access } = await requireClientView(clientKey)
+  const svc = createServiceClient()
 
   // Fetch client data + organization + membership
   const [clientRes, userRes, orgMembershipsRes] = await Promise.all([
-    supabase.from('clients').select('*').eq('id', user.id).maybeSingle(),
-    supabase.from('users').select('*').eq('id', user.id).maybeSingle(),
-    supabase.from('organization_members')
+    svc.from('clients').select('*').eq('id', targetClientId).maybeSingle(),
+    svc.from('users').select('*').eq('id', targetClientId).maybeSingle(),
+    svc.from('organization_members')
       .select('organization_id, role, status, organizations(name, subscription_plan)')
-      .eq('user_id', user.id)
+      .eq('user_id', targetClientId)
       .maybeSingle(),
   ])
 
@@ -202,7 +203,7 @@ export default async function ClientPlanPage() {
               </div>
               <div className="bg-white/[0.03] rounded-sm p-4 border border-white/[0.06]">
                 <div className="text-[10px] text-white/30 tracking-widest uppercase mb-1">Client ID</div>
-                <code className="text-xs text-white/40 font-mono break-all">{user.id.slice(0, 16)}...</code>
+                <code className="text-xs text-white/40 font-mono break-all">{targetClientId.slice(0, 16)}...</code>
               </div>
             </div>
 
@@ -374,18 +375,22 @@ export default async function ClientPlanPage() {
             <p className="text-xs text-white/40 leading-relaxed">
               Plan changes, add-on adjustments, and upgrades are managed by your administrator.
             </p>
-            <Link
-              href="/dashboard/client/profile"
-              className="block text-center w-full px-4 py-2.5 bg-[#C6A664]/10 border border-[#C6A664]/25 text-[#C6A664] text-xs font-semibold rounded-sm hover:bg-[#C6A664]/20 transition-all"
-            >
-              View Profile →
-            </Link>
-            <Link
-              href="/dashboard/client/settings"
-              className="block text-center w-full px-4 py-2.5 bg-white/[0.04] border border-white/[0.08] text-white/50 text-xs rounded-sm hover:bg-white/[0.08] transition-all"
-            >
-              Account Settings →
-            </Link>
+            {access === 'self' && (
+              <>
+                <Link
+                  href={`/dashboard/client/${clientKey}/profile`}
+                  className="block text-center w-full px-4 py-2.5 bg-[#C6A664]/10 border border-[#C6A664]/25 text-[#C6A664] text-xs font-semibold rounded-sm hover:bg-[#C6A664]/20 transition-all"
+                >
+                  View Profile →
+                </Link>
+                <Link
+                  href={`/dashboard/client/${clientKey}/settings`}
+                  className="block text-center w-full px-4 py-2.5 bg-white/[0.04] border border-white/[0.08] text-white/50 text-xs rounded-sm hover:bg-white/[0.08] transition-all"
+                >
+                  Account Settings →
+                </Link>
+              </>
+            )}
           </div>
 
           {/* ─── Org Note ──────────────────────────────────────── */}

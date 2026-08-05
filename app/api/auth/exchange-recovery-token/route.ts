@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { queryOne } from "@/lib/db"
-import { createSession, setSessionCookies } from "@/lib/auth-direct"
+import { createSession } from "@/lib/auth-direct"
+import { createClient } from "@/lib/supabase/server"
 
 /**
  * POST /api/auth/exchange-recovery-token
@@ -57,12 +58,18 @@ export async function POST(req: NextRequest) {
     // Create a session for the user
     const session = await createSession(user.id, user.email)
 
-    // Set session cookies
-    await setSessionCookies(
-      session.accessToken,
-      session.refreshToken,
-      session.expiresAt
-    )
+    // Hand the tokens to @supabase/ssr so it writes its own,
+    // correctly-shaped session cookie (fixes RLS-gated queries running as
+    // anon — see the comment block at the top of lib/auth-direct.ts).
+    const supabase = await createClient()
+    const { error: setSessionError } = await supabase.auth.setSession({
+      access_token: session.accessToken,
+      refresh_token: session.refreshToken,
+    })
+    if (setSessionError) {
+      console.error('setSession failed after recovery-token exchange:', setSessionError)
+      return NextResponse.json({ error: "Failed to establish session" }, { status: 500 })
+    }
 
     return NextResponse.json({
       success: true,

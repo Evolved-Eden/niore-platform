@@ -264,6 +264,8 @@ export type Organization = {
   billing_email?: string | null
   phone?: string | null
   tax_id?: string | null
+  // See supabase/migrations/20260714030000_org_wide_registry_permission.sql
+  allow_member_registry_listing?: boolean
   created_at?: string
   updated_at?: string
   deleted_at?: string | null

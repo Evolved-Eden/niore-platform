@@ -1,14 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { resolveApiClient } from '@/lib/client-api'
+import type { Organization } from '@/types'
 
 export const dynamic = 'force-dynamic'
 
 export async function PATCH(request: NextRequest) {
   try {
     const ctx = await resolveApiClient(request)
-    if (!ctx) {
+    if (!ctx || !ctx.viewerId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
+    const viewerId = ctx.viewerId
 
     const { organizationId, allowMemberRegistryListing } = (await request.json()) as {
       organizationId?: string
@@ -24,14 +26,14 @@ export async function PATCH(request: NextRequest) {
       .from('organization_members')
       .select('role')
       .eq('organization_id', organizationId)
-      .eq('user_id', ctx.viewerId)
+      .eq('user_id', viewerId)
       .maybeSingle()
 
     if (membership?.role !== 'owner' && membership?.role !== 'admin') {
       return NextResponse.json({ error: 'Only an org owner or admin can change this' }, { status: 403 })
     }
 
-    const update: Record<string, unknown> = {}
+    const update: Partial<Organization> = {}
     if (allowMemberRegistryListing !== undefined) update.allow_member_registry_listing = allowMemberRegistryListing
 
     const { error } = await ctx.svc

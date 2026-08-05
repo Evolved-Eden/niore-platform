@@ -841,6 +841,29 @@ export type AgentRegistryRow = {
   updated_at?: string
 }
 
+// `agent_catalog` is a DB view over `agents` (published, filterable listing) --
+// not a table. Field names here match what the view actually exposes, per
+// existing untyped (supabaseAdmin) callers: app/api/agents/route.ts,
+// app/api/agents/[id]/route.ts, app/api/admin/agent-catalog-list/route.ts,
+// app/api/internal/agents/catalog-health-check/route.ts.
+export type AgentCatalogRow = {
+  id: string
+  agent_id: string
+  name: string
+  tagline?: string | null
+  description?: string | null
+  icon?: string | null
+  capabilities?: string[] | null
+  agent_type?: string | null
+  category?: string | null
+  vertical?: string | null
+  role_type?: string | null
+  is_active?: boolean | null
+  is_published?: boolean | null
+  created_at?: string
+  updated_at?: string
+}
+
 export type AgentSwarmRow = {
   agent_swarm_id: string
   organization_id?: string | null
@@ -1055,7 +1078,12 @@ export type Database = {
       workflow_demos: TableWithDefaults<WorkflowDemoRow>
       workflow_run_logs: TableWithDefaults<WorkflowRunLogRow>
     }
-    Views: Record<string, never>
+    Views: {
+      agent_catalog: {
+        Row: AgentCatalogRow
+        Relationships: []
+      }
+    }
     Functions: {
       is_org_member: { Args: { org_id: string }; Returns: boolean }
       is_org_owner: { Args: { org_id: string }; Returns: boolean }

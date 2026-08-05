@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { resolveApiClient } from '@/lib/client-api'
+import type { ClientTwin } from '@/types'
 
 export const dynamic = 'force-dynamic'
 
@@ -123,7 +124,7 @@ export async function PATCH(request: NextRequest) {
       }
     }
 
-    const update: Record<string, unknown> = {}
+    const update: Partial<ClientTwin> = {}
     if (isListed !== undefined) {
       update.is_listed = isListed
       if (isListed) update.listed_at = new Date().toISOString()

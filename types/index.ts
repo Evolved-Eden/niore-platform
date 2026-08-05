@@ -266,6 +266,8 @@ export type Organization = {
   tax_id?: string | null
   // See supabase/migrations/20260714030000_org_wide_registry_permission.sql
   allow_member_registry_listing?: boolean
+  // See supabase/migrations/20260714020000_twin_registry_naming_policy_and_independent_twins.sql
+  twin_registry_naming_policy?: string
   created_at?: string
   updated_at?: string
   deleted_at?: string | null
@@ -528,6 +530,14 @@ export type ClientTwin = {
   mas_state?: Record<string, unknown> | null
   metadata?: Record<string, unknown> | null
   life_model?: Record<string, unknown> | null
+  // Twin Registry -- see supabase/migrations/20260714010000_twin_registry.sql
+  // and 20260714020000_twin_registry_naming_policy_and_independent_twins.sql
+  is_listed?: boolean
+  listing_visibility?: string | null
+  listing_headline?: string | null
+  listing_skills?: string[] | null
+  listed_at?: string | null
+  is_independent?: boolean
   updated_at?: string
   deleted_at?: string | null
 }

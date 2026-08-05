@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
       role_type: roleType || null,
       vertical: vertical || null,
       prompt: prompt || null,
-      intelligence_docs: intelligenceDocs ? JSON.stringify(intelligenceDocs) : null,
+      intelligence_docs: intelligenceDocs || null,
       profile_image: profileImage || null,
       swarm_id: swarmId || null,
       title_key: titleKey || null,

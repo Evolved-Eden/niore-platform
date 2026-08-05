@@ -628,11 +628,16 @@ export type ClientDeployedAgentRow = {
   role_type?: string | null
   vertical?: string | null
   prompt?: string | null
-  intelligence_docs?: Record<string, unknown> | null
+  intelligence_docs?: Record<string, unknown>[] | null
   profile_image?: string | null
   deployment_status?: string | null
   metadata?: Record<string, unknown> | null
   status?: string | null
+  // "Employee" (agent) can belong to a "team" (swarm) and carry a title --
+  // see supabase/migrations/20260712120000_employee_team_department_titles.sql
+  swarm_id?: string | null
+  title_key?: string | null
+  custom_title?: string | null
   created_at?: string
   updated_at?: string
 }

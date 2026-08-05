@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { resolveApiClient } from '@/lib/client-api'
 import crypto from 'crypto'
+import type { ClientDeployedAgentRow } from '@/types'
 
 export const dynamic = 'force-dynamic'
 
@@ -135,7 +136,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     const now = new Date().toISOString()
-    const updateData: Record<string, unknown> = { updated_at: now }
+    const updateData: Partial<ClientDeployedAgentRow> = { updated_at: now }
     if (status) updateData.status = status
     if (prompt !== undefined) updateData.prompt = prompt
     if (swarmId !== undefined) updateData.swarm_id = swarmId || null

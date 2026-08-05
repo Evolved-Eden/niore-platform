@@ -110,10 +110,11 @@ export async function resolveClientAccess(clientKey: string): Promise<ResolvedCl
 
     // org member of the target client's org
     if (client.organization_id) {
+      const orgId = client.organization_id
       const { data: membership } = await svc
         .from('organization_members')
         .select('id')
-        .eq('organization_id', client.organization_id)
+        .eq('organization_id', orgId)
         .eq('user_id', viewerId)
         .eq('is_active', true)
         .maybeSingle()

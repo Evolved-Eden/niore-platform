@@ -2,18 +2,20 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { OpenAI } from 'openai'
+import type { ChatCompletionMessageParam } from 'openai/resources/chat/completions'
 import { lazy } from '@/lib/lazy-client'
 
-// Provider resolution mirrors the essence route: OpenRouter first (if its key
-// exists), then OpenAI. If neither key is configured the route degrades
+// Provider chain: OpenRouter first (if its key exists), then OpenAI. A failing
+// provider falls back to the next one so a dead/expired key can't take the
+// route down. If no provider is configured at all the route degrades
 // gracefully instead of throwing a credentials error.
 const useOpenRouter = !!process.env.OPENROUTER_API_KEY
 const useOpenAI = !!process.env.OPENAI_API_KEY
 
 // Map canonical model names (stored in canonical_agent_map) to OpenRouter
-// slugs when OpenRouter is the active provider.
-function resolveModel(model: string): string {
-  if (useOpenRouter) {
+// slugs when the call goes through OpenRouter.
+function resolveModel(model: string, viaOpenRouter: boolean): string {
+  if (viaOpenRouter) {
     if (model.startsWith('openrouter/')) return model.replace('openrouter/', '')
     if (model.startsWith('openai/') || model.startsWith('anthropic/')) return model
     return `openai/${model}`
@@ -21,10 +23,42 @@ function resolveModel(model: string): string {
   return model
 }
 
-const openai = lazy(() => new OpenAI({
-  apiKey: useOpenRouter ? (process.env.OPENROUTER_API_KEY || '') : (process.env.OPENAI_API_KEY || ''),
-  ...(useOpenRouter ? { baseURL: process.env.OPENROUTER_BASE_URL || 'https://openrouter.ai/api/v1' } : {}),
+const openrouterClient = lazy(() => new OpenAI({
+  apiKey: process.env.OPENROUTER_API_KEY || '',
+  baseURL: process.env.OPENROUTER_BASE_URL || 'https://openrouter.ai/api/v1',
 }))
+
+const openaiClient = lazy(() => new OpenAI({ apiKey: process.env.OPENAI_API_KEY || '' }))
+
+/** Try providers in order (OpenRouter → OpenAI) until one succeeds. */
+async function completeWithFallback(
+  model: string,
+  messages: ChatCompletionMessageParam[],
+  maxTokens: number
+): Promise<string> {
+  const attempts: { client: OpenAI; viaOpenRouter: boolean }[] = []
+  if (useOpenRouter) attempts.push({ client: openrouterClient, viaOpenRouter: true })
+  if (useOpenAI) attempts.push({ client: openaiClient, viaOpenRouter: false })
+
+  let lastError: unknown = null
+  for (const attempt of attempts) {
+    try {
+      const completion = await attempt.client.chat.completions.create({
+        model: resolveModel(model, attempt.viaOpenRouter),
+        messages,
+        max_tokens: maxTokens,
+        stream: false,
+      })
+      return completion.choices[0].message.content ?? ''
+    } catch (e) {
+      console.error(`Zuri: provider (${attempt.viaOpenRouter ? 'openrouter' : 'openai'}) failed:`, e)
+      lastError = e
+    }
+  }
+
+  if (lastError) throw lastError
+  throw new Error('No AI provider configured (set OPENROUTER_API_KEY or OPENAI_API_KEY)')
+}
 
 // Fallback Zuri system prompt — used only if canonical_agent_map has no
 // Zuri row (e.g. before the DB seed ran). The DB version is authoritative.
@@ -143,16 +177,18 @@ ${routedAgentOutput}`
       ? `${routedAgentOutput}`
       : 'Zuri is warming up — the AI provider for this deployment is not configured yet. Ask an admin to set OPENROUTER_API_KEY or OPENAI_API_KEY.'
   } else {
-    const completion = await openai.chat.completions.create({
-      model: resolveModel(zuri.model),
-      messages: [
+    try {
+      reply = await completeWithFallback(zuri.model, [
         { role: 'system', content: systemPrompt },
         ...messages,
-      ],
-      max_tokens: 1000,
-      stream: false,
-    })
-    reply = completion.choices[0].message.content ?? ''
+      ], 1000)
+    } catch {
+      // All configured providers failed — return routed output if present,
+      // otherwise a graceful message so the chat UI never 500s.
+      reply = routedAgentOutput
+        ? `${routedAgentOutput}`
+        : 'Zuri is temporarily unavailable — all configured AI providers failed. Check the server logs.'
+    }
   }
 
   // Save both sides of the conversation as separate memory entries

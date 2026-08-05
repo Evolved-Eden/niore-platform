@@ -88,7 +88,7 @@ export default async function TwinRegistryPage({ params }: { params: Promise<{ c
                   twinId={t.id}
                   clientId={targetClientId}
                   initial={{
-                    isListed: t.is_listed,
+                    isListed: t.is_listed ?? false,
                     visibility: (t.listing_visibility || 'anonymous') as 'anonymous' | 'named',
                     headline: t.listing_headline || '',
                     skills: t.listing_skills || [],

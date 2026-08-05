@@ -7,11 +7,13 @@ import { createClient } from '@/lib/supabase/client'
 interface SwarmTemplate {
   swarm_key: string | null
   name: string | null
-  swarm_name: string | null
+  // swarm_catalog view doesn't project a `swarm_name` column (only `name`) --
+  // optional here so callers' `t.swarm_name || t.name` fallback still works.
+  swarm_name?: string | null
   description: string | null
   vertical_key: string | null
-  member_agents: string[]
-  is_active: boolean
+  member_agents: string[] | null
+  is_active: boolean | null
 }
 
 interface DeployedSwarm {

@@ -323,6 +323,7 @@ export type Client = {
   primary_vertical?: string | null
   birthday?: string | null
   agent_deployments?: number | null
+  swarm_deployments?: number | null
   consultation_booked?: string | null
   zuri_discord_connected?: boolean | null
   zuri_whatsapp_connected?: boolean | null
@@ -422,6 +423,8 @@ export type TierEntitlement = {
   max_api_calls_monthly?: number
   max_storage_gb?: number
   max_memory_gbs?: number
+  max_dms_per_month?: number | null
+  max_emails_per_month?: number | null
   can_use_legal_addon?: boolean
   can_use_wealth_addon?: boolean
   can_use_luxury_hospitality_addon?: boolean
@@ -642,6 +645,39 @@ export type ClientDeployedAgentRow = {
   updated_at?: string
 }
 
+// public.client_deployed_swarms -- per-client swarm deployments ("teams" in the
+// employee/team/department vocabulary). See supabase/migrations/00020_create_missing_tables.sql
+// and 20260712120000_employee_team_department_titles.sql (adds department_id).
+export type ClientDeployedSwarmRow = {
+  id: string
+  client_id?: string | null
+  swarm_id: string
+  swarm_name: string
+  vertical?: string | null
+  member_agent_ids?: string[] | null
+  configuration?: Record<string, unknown> | null
+  status?: string | null
+  deployment_status?: string | null
+  metadata?: Record<string, unknown> | null
+  department_id?: string | null
+  created_at?: string
+  updated_at?: string
+}
+
+// public.departments -- "a team of swarms" per client/org. See
+// supabase/migrations/20260712120000_employee_team_department_titles.sql
+export type DepartmentRow = {
+  id: string
+  client_id: string
+  organization_id?: string | null
+  name: string
+  description?: string | null
+  department_type?: string | null
+  status?: string | null
+  created_at?: string
+  updated_at?: string
+}
+
 export type EssenceIntelligenceRow = {
   id: string
   client_id?: string | null
@@ -737,6 +773,41 @@ export type ClientZuriSessionRow = {
   platform_id?: string | null
   session_status?: string | null
   last_interaction?: string | null
+  created_at?: string
+  updated_at?: string
+}
+
+// public.client_notification_prefs -- one row per client, PK is client_id
+// (not id). See public_dump.sql for the live schema.
+export type ClientNotificationPrefsRow = {
+  client_id: string
+  discord_briefings?: boolean | null
+  whatsapp_reminders?: boolean | null
+  daily_digest?: boolean | null
+  created_at?: string
+  updated_at?: string
+}
+
+// public.client_essence_actions -- logs an agent execution triggered from an
+// EssenceBoard item. Written by app/api/client/essence/execute/route.ts and
+// app/api/internal/verticals/run-agent/route.ts. Field names here match what
+// those callers actually read/write (action_type/prompt/status/etc.), not
+// the older action/input_data/output_data columns from the initial
+// 00028_essence_text_columns.sql create -- the table has evidently grown
+// past that migration. retry_count added by
+// 20260712090000_add_retry_count_essence_actions.sql.
+export type ClientEssenceActionRow = {
+  id: string
+  essence_item_id?: string | null
+  client_id?: string | null
+  action_type?: string | null
+  prompt?: string | null
+  agent_id?: string | null
+  status?: string | null
+  result_summary?: string | null
+  started_at?: string | null
+  completed_at?: string | null
+  retry_count?: number | null
   created_at?: string
   updated_at?: string
 }
@@ -869,6 +940,26 @@ export type AgentCatalogRow = {
   updated_at?: string
 }
 
+// `swarm_catalog` is a DB view over `swarm_templates` (standardized listing) --
+// see supabase/migrations/00021_schema_consolidation.sql /
+// 00027_complete_schema.sql for the canonical `CREATE OR REPLACE VIEW`. Note
+// it projects `name`, not `swarm_name`.
+export type SwarmCatalogRow = {
+  id: string
+  swarm_key?: string | null
+  name?: string | null
+  description?: string | null
+  vertical_key?: string | null
+  member_agents?: string[] | null
+  is_active?: boolean | null
+  template_type?: string | null
+  version?: string | null
+  tags?: string[] | null
+  metadata?: Record<string, unknown> | null
+  created_at?: string
+  updated_at?: string
+}
+
 export type AgentSwarmRow = {
   agent_swarm_id: string
   organization_id?: string | null
@@ -966,6 +1057,49 @@ export type CalendarRow = {
   created_at?: string
 }
 
+// public.crm_deals / public.crm_leads -- lightweight in-house CRM, scoped by
+// organization_id. See public_dump.sql for the live schema (crm_pipelines
+// and crm_stages also exist but aren't queried via a typed client yet).
+export type CrmDealRow = {
+  id: string
+  organization_id: string
+  crm_lead_id?: string | null
+  crm_contact_id?: string | null
+  crm_pipeline_id?: string | null
+  crm_stage_id?: string | null
+  name?: string | null
+  value?: number | null
+  status?: string | null
+  closed_at?: string | null
+  created_at?: string
+  updated_at?: string
+}
+
+export type CrmLeadRow = {
+  id: string
+  organization_id: string
+  crm_contact_id?: string | null
+  crm_company_id?: string | null
+  source?: string | null
+  status?: string | null
+  created_at?: string
+  updated_at?: string
+}
+
+// public.connector_usage_counters -- per-client monthly usage counts against
+// entitlement caps (dm/email sends etc). Read defensively in
+// app/dashboard/client/[clientKey]/page.tsx -- not confirmed live in
+// public_dump.sql, columns inferred from that read site.
+export type ConnectorUsageCounterRow = {
+  id: string
+  client_id?: string | null
+  period_month?: string | null
+  metric?: string | null
+  count?: number | null
+  created_at?: string
+  updated_at?: string
+}
+
 export type CourseRow = {
   id: string
   creator_client_id?: string | null
@@ -1050,15 +1184,22 @@ export type Database = {
       catalogs: TableWithDefaults<{ id: string; key: string; name: string; kind?: string; is_active?: boolean; metadata?: unknown; created_at?: string; updated_at?: string }>
       client_consultations: TableWithDefaults<ClientConsultationRow>
       client_deployed_agents: TableWithDefaults<ClientDeployedAgentRow>
+      client_deployed_swarms: TableWithDefaults<ClientDeployedSwarmRow>
+      client_essence_actions: TableWithDefaults<ClientEssenceActionRow>
       client_intelligence_memories: TableWithDefaults<AIMemory>
+      client_notification_prefs: TableWithDefaults<ClientNotificationPrefsRow>
       client_twins: TableWithDefaults<ClientTwin>
       client_zuri_sessions: TableWithDefaults<ClientZuriSessionRow>
       clients: TableWithDefaults<Client>
       connector_credentials: TableWithDefaults<ConnectorCredentialRow>
       connector_types: TableWithDefaults<ConnectorTypeRow>
+      connector_usage_counters: TableWithDefaults<ConnectorUsageCounterRow>
       calendars: TableWithDefaults<CalendarRow>
       courses: TableWithDefaults<CourseRow>
       course_enrollments: TableWithDefaults<CourseEnrollmentRow>
+      crm_deals: TableWithDefaults<CrmDealRow>
+      crm_leads: TableWithDefaults<CrmLeadRow>
+      departments: TableWithDefaults<DepartmentRow>
       entitlements: TableWithDefaults<Entitlement>
       essintelligence: TableWithDefaults<EssenceIntelligenceRow>
       essence_templates: TableWithDefaults<EssenceTemplateRow>
@@ -1086,6 +1227,10 @@ export type Database = {
     Views: {
       agent_catalog: {
         Row: AgentCatalogRow
+        Relationships: []
+      }
+      swarm_catalog: {
+        Row: SwarmCatalogRow
         Relationships: []
       }
     }

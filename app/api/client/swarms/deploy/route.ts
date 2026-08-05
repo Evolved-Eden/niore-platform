@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { resolveApiClient } from '@/lib/client-api'
 import crypto from 'crypto'
+import type { ClientDeployedSwarmRow } from '@/types'
 
 export const dynamic = 'force-dynamic'
 
@@ -56,8 +57,8 @@ export async function POST(request: NextRequest) {
       swarm_id: swarmId,
       swarm_name: swarmName,
       vertical: vertical || null,
-      member_agent_ids: memberAgentIds ? JSON.stringify(memberAgentIds) : '[]',
-      configuration: configuration ? JSON.stringify(configuration) : null,
+      member_agent_ids: memberAgentIds || [],
+      configuration: configuration || null,
       department_id: departmentId || null,
       status: 'active',
       created_at: now,
@@ -128,10 +129,10 @@ export async function PATCH(request: NextRequest) {
     }
 
     const now = new Date().toISOString()
-    const updateData: Record<string, unknown> = { updated_at: now }
+    const updateData: Partial<ClientDeployedSwarmRow> = { updated_at: now }
     if (status) updateData.status = status
     if (configuration !== undefined) {
-      updateData.configuration = typeof configuration === 'string' ? configuration : JSON.stringify(configuration)
+      updateData.configuration = configuration
     }
     if (departmentId !== undefined) updateData.department_id = departmentId || null
 

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { resolveApiClient } from '@/lib/client-api'
 import crypto from 'crypto'
+import type { DepartmentRow } from '@/types'
 
 export const dynamic = 'force-dynamic'
 
@@ -124,7 +125,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     const now = new Date().toISOString()
-    const updateData: Record<string, unknown> = { updated_at: now }
+    const updateData: Partial<DepartmentRow> = { updated_at: now }
     if (name !== undefined) updateData.name = name
     if (description !== undefined) updateData.description = description
     if (departmentType !== undefined) updateData.department_type = departmentType

@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient, createServiceClient } from '@/lib/supabase/server'
 import { getN8nUrl } from '@/lib/config'
 import { getPlanetLongitude } from '@/lib/profile/astrology'
+import { calculateHumanDesign } from '@/lib/profile'
+import type { HDProfile } from '@/lib/profile/types'
 
 /**
  * Resolve birth place text ("Queens, NY") to coordinates via OpenStreetMap
@@ -198,28 +200,38 @@ function getAuthority(type: string): string {
   return authorities[type] ?? authorities['Generator']
 }
 
+// Canonical profile rows (line-combination names + descriptions). Shared by
+// the legacy compound fallback and the real-engine profile lookup.
+const PROFILES = [
+  { profile: '1/3', name: 'Investigative Martyr', desc: 'You learn through deep research and trial & error. Trust your process of experimentation.' },
+  { profile: '1/4', name: 'Investigative Opportunist', desc: 'You research deeply and share with your network. Your curiosity builds community.' },
+  { profile: '2/4', name: 'Hermit Opportunist', desc: 'You need solitude to recharge but thrive when sharing your gifts. Natural teacher.' },
+  { profile: '2/5', name: 'Hermit Heretic', desc: 'You have natural gifts that, when shared, can be profoundly influential. Lead by example.' },
+  { profile: '3/5', name: 'Martyr Heretic', desc: 'You learn through trial & error and have a practical wisdom that others need. Keep experimenting.' },
+  { profile: '3/6', name: 'Martyr Role Model', desc: 'You learn through experience and eventually become a wise elder others look up to.' },
+  { profile: '4/6', name: 'Opportunist Role Model', desc: 'You build networks and eventually become an authority figure. Your reputation precedes you.' },
+  { profile: '4/1', name: 'Opportunist Investigator', desc: 'You seize opportunities and dig deep to verify your instincts.' },
+  { profile: '5/1', name: 'Heretic Investigator', desc: 'You have practical solutions that others need, backed by deep research. Trust your findings.' },
+  { profile: '5/2', name: 'Heretic Hermit', desc: 'Your solutions are needed by others, but only after you recharge in solitude.' },
+  { profile: '6/2', name: 'Role Model Hermit', desc: 'You\'re here to eventually become a wise leader. In the meantime, honor your need for solitude.' },
+  { profile: '6/3', name: 'Role Model Martyr', desc: 'Your wisdom comes from lived experience. You\'ll make mistakes, but they\'ll become your greatest teachings.' },
+]
+
+/** Canonical name/desc for a real engine profile string (e.g. "4/6"). */
+function getProfileInfo(profile: string): { name: string; desc: string } {
+  const entry = PROFILES.find(p => p.profile === profile)
+  if (entry) return { name: entry.name, desc: entry.desc }
+  return { name: `Profile ${profile}`, desc: `Your ${profile} profile shapes how you move through the world.` }
+}
+
 function getProfile(sunGate: number, designGate: number): { profile: string; name: string; desc: string } {
-  // Profile from BOTH gates for more unique combinations (12 lines × 12 cols = 144 combos)
-  const profiles = [
-    { profile: '1/3', name: 'Investigative Martyr', desc: 'You learn through deep research and trial & error. Trust your process of experimentation.' },
-    { profile: '1/4', name: 'Investigative Opportunist', desc: 'You research deeply and share with your network. Your curiosity builds community.' },
-    { profile: '2/4', name: 'Hermit Opportunist', desc: 'You need solitude to recharge but thrive when sharing your gifts. Natural teacher.' },
-    { profile: '2/5', name: 'Hermit Heretic', desc: 'You have natural gifts that, when shared, can be profoundly influential. Lead by example.' },
-    { profile: '3/5', name: 'Martyr Heretic', desc: 'You learn through trial & error and have a practical wisdom that others need. Keep experimenting.' },
-    { profile: '3/6', name: 'Martyr Role Model', desc: 'You learn through experience and eventually become a wise elder others look up to.' },
-    { profile: '4/6', name: 'Opportunist Role Model', desc: 'You build networks and eventually become an authority figure. Your reputation precedes you.' },
-    { profile: '4/1', name: 'Opportunist Investigator', desc: 'You seize opportunities and dig deep to verify your instincts.' },
-    { profile: '5/1', name: 'Heretic Investigator', desc: 'You have practical solutions that others need, backed by deep research. Trust your findings.' },
-    { profile: '5/2', name: 'Heretic Hermit', desc: 'Your solutions are needed by others, but only after you recharge in solitude.' },
-    { profile: '6/2', name: 'Role Model Hermit', desc: 'You\'re here to eventually become a wise leader. In the meantime, honor your need for solitude.' },
-    { profile: '6/3', name: 'Role Model Martyr', desc: 'Your wisdom comes from lived experience. You\'ll make mistakes, but they\'ll become your greatest teachings.' },
-  ]
-  // Use both gates to index into a 2D profile space
-  const row = (sunGate - 1) % profiles.length
-  const col = (designGate - 1) % profiles.length
+  // Legacy fallback (only used if the real engine returns null): gate-based
+  // compound profile from BOTH gates (12 lines × 12 cols = 144 combos).
+  const row = (sunGate - 1) % PROFILES.length
+  const col = (designGate - 1) % PROFILES.length
   // Mix them for compound profiles
-  const p1 = profiles[row]
-  const p2 = profiles[col]
+  const p1 = PROFILES[row]
+  const p2 = PROFILES[col]
   return {
     profile: `${p1.profile}/${p2.profile}`,
     name: `${p1.name.split(' ').pop()} ${p2.name.split(' ').pop()}`,
@@ -304,30 +316,36 @@ export async function POST(req: NextRequest) {
     // Parse birth date
     const birthDate = new Date(dob + 'T' + (birthTime || '12:00') + ':00' + (birthTimezone || '+00:00'))
 
-    // Calculate sun gate (conscious/personality)
-    const sunLon = sunLongitude(birthDate)
-    const sunGate = gateFromLongitude(sunLon)
+    // ── Real Human Design engine ──
+    // Resolve birth place to coordinates once — feeds the engine's Ascendant
+    // and is persisted so later /api/profile/calculate re-runs keep the same
+    // location.
+    const coords = await geocodePlace(birthLocation)
 
-    // Calculate design gate (unconscious — 88 days before birth)
-    const designDate = getDesignDate(birthDate)
-    const designLon = sunLongitude(designDate)
-    const designGate = gateFromLongitude(designLon)
+    // Real bodygraph calculation (Rave Mandala gates + lines, design instant,
+    // active channels, defined centers, canonical type/authority/definition/
+    // profile/incarnation cross). Falls back to the legacy approximate math
+    // below only if the engine returns null (should not happen for a valid
+    // birth date).
+    const hd = calculateHumanDesign({
+      birthDate,
+      latitude: coords?.latitude,
+      longitude: coords?.longitude,
+    })
 
-    // Determine type
-    const type = determineType(sunGate, designGate)
+    const sunGate = hd?.personalitySun?.gate ?? gateFromLongitude(sunLongitude(birthDate))
+    const designGate = hd?.designSun?.gate ?? gateFromLongitude(sunLongitude(getDesignDate(birthDate)))
+    const type = hd?.type ?? determineType(sunGate, designGate)
+    const strategy = hd?.strategy ?? getStrategy(type)
+    const authority = hd?.authority ?? getAuthority(type)
+    const profile = hd ? { profile: hd.profile, ...getProfileInfo(hd.profile) } : getProfile(sunGate, designGate)
+    const nodeGate = hd?.personalityPlanets?.['North Node']?.gate ?? gateFromLongitude(lunarNodeLongitude(birthDate))
 
-    // Get additional layered insights
+    // Additional layered insights
     const sunGateInfo = GATES[sunGate]
     const designGateInfo = GATES[designGate]
-    const strategy = getStrategy(type)
-    const authority = getAuthority(type)
-    const profile = getProfile(sunGate, designGate)
     const archetype = getArchetypeRecommendation(sunGate, designGate)
     const birthMonthInsight = getBirthMonthInsight(birthDate.getUTCMonth() + 1)
-
-    // ── Calculate lunar node ──
-    const nodeLon = lunarNodeLongitude(birthDate)
-    const nodeGate = gateFromLongitude(nodeLon)
     const nodeGateInfo = GATES[nodeGate]
 
     // ── Calculate EE domain scores from gate data (using time-fractional precision) ──
@@ -373,6 +391,23 @@ export async function POST(req: NextRequest) {
         gateInsights: getGateInsights(sunGate),
         designGateInsights: getGateInsights(designGate),
         summary,
+        // Real Human Design bodygraph (canonical engine output). Null only if
+        // the engine failed for a malformed birth date.
+        humanDesign: hd ? {
+          type: hd.type,
+          profile: hd.profile,
+          strategy: hd.strategy,
+          authority: hd.authority,
+          definition: hd.definition,
+          incarnationCross: hd.incarnationCross,
+          signature: hd.signature,
+          notSelf: hd.notSelf,
+          personalitySun: hd.personalitySun,
+          designSun: hd.designSun,
+          gates: hd.gates,
+          channels: hd.channels ?? [],
+          centers: hd.centers ?? [],
+        } : null,
       },
       essence: {
         mindArchitecture: profile.name,
@@ -429,10 +464,9 @@ export async function POST(req: NextRequest) {
 
       const svc = createServiceClient()
 
-      // Resolve birth location to coordinates once; used for the lens
-      // calculations AND persisted so later /api/profile/calculate re-runs
-      // (which only read sections) keep the same location.
-      const coords = await geocodePlace(birthLocation)
+      // Coordinates were resolved up top (used by the Human Design engine);
+      // persisted here so later /api/profile/calculate re-runs (which only
+      // read sections) keep the same location.
 
       // 1. Get existing client record
       const { data: existing } = await svc

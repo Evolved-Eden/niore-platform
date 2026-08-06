@@ -128,7 +128,7 @@ function getPlanetDistanceAU(bodyName: string, date: Date): number | null {
  * birth moment and interpolate (the node moves ~1.6°/month retrograde).
  * (The old code used the Moon's own position 14 days before birth, which is
  * NOT the node and could be anywhere in the zodiac.) */
-function calcLunarNodes(date: Date): { north: number; south: number } | null {
+export function calcLunarNodes(date: Date): { north: number; south: number } | null {
   try {
     const A = require('astronomy-engine')
     const ms = date.getTime()
@@ -165,7 +165,7 @@ function calcLunarNodes(date: Date): { north: number; south: number } | null {
 
 // ── Ascendant / Rising Sign ────────────────────────────
 
-function calcAscendant(date: Date, latitude: number, longitude: number): number {
+export function calcAscendant(date: Date, latitude: number, longitude: number): number {
   const A = require('astronomy-engine')
   // astronomy-engine has no JulianDay() export — MakeTime().ut is days since
   // J2000.0 (JD 2451545.0), so add that epoch offset to get the true JD.

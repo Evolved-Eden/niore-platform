@@ -17,6 +17,7 @@ import { calculateMayanTzolkin } from './mayan-tzolkin'
 import { calculateKabbalahTree } from './kabbalah-tree'
 import { calculateSoulContract } from './soul-contract'
 import { drawTarotOracleCard } from './tarot-oracle'
+import { calculateHumanDesign } from './human-design'
 
 export type { IntakeData, ProfileResult, ProfileLevel }
 export * from './types'
@@ -33,6 +34,7 @@ export * from './mayan-tzolkin'
 export * from './kabbalah-tree'
 export * from './soul-contract'
 export * from './tarot-oracle'
+export * from './human-design'
 
 /**
  * Resolve the true UTC birth instant from a civil birth date, local wall-clock
@@ -119,6 +121,20 @@ export async function calculateFullProfile(intake: IntakeData): Promise<ProfileR
     }
   } catch (err) {
     console.error('Vedic calc failed:', err)
+  }
+
+  // ── 2.5 Human Design (real bodygraph engine) ──
+  try {
+    const hd = calculateHumanDesign({
+      birthDate,
+      latitude: intake.latitude,
+      longitude: intake.longitude,
+    })
+    if (hd) {
+      profile.humanDesign = hd
+    }
+  } catch (err) {
+    console.error('Human Design calc failed:', err)
   }
 
   // ── 3. Numerology ──

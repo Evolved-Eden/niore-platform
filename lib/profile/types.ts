@@ -295,6 +295,8 @@ export interface ProfileLevel {
   kabbalah?: import('./kabbalah-tree').KabbalahProfile
   soulContract?: import('./soul-contract').SoulContractProfile
   tarotOracle?: import('./tarot-oracle').TarotOracleProfile
+  // EE archetype layer — grounded naming synthesized across the lenses above.
+  eeArchetype?: EEArchetypeResult
 }
 
 export interface ProfileResult {
@@ -311,4 +313,22 @@ export interface LensSystem {
   type: 'core' | 'extended' | 'enhanced'
   status: 'calculated' | 'pending' | 'failed'
   data: any
+}
+
+// ── EE Archetype Layer ─────────────────────────────────────────────
+
+export interface EEArchetypeSignal {
+  system: string       // 'humanDesign' | 'elementalArchetype' | 'numerology' | 'astrology'
+  value: string        // e.g. 'Generator', '4/6', 'fire', 'Life Path 8'
+  weight: number
+  archetype: string
+}
+
+export interface EEArchetypeResult {
+  archetype: string    // canonical "The X" name
+  superLayer: string   // one of the six super-layers
+  confidence: number   // 0-1, top signal share of total weight
+  signals: EEArchetypeSignal[]
+  rationale: string[]  // grounded "why" lines
+  summary: string      // one-line blueprint wording
 }

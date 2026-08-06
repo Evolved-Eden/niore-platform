@@ -18,6 +18,7 @@ import { calculateKabbalahTree } from './kabbalah-tree'
 import { calculateSoulContract } from './soul-contract'
 import { drawTarotOracleCard } from './tarot-oracle'
 import { calculateHumanDesign } from './human-design'
+import { synthesizeEEArchetype } from './ee-archetype'
 
 export type { IntakeData, ProfileResult, ProfileLevel }
 export * from './types'
@@ -35,6 +36,7 @@ export * from './kabbalah-tree'
 export * from './soul-contract'
 export * from './tarot-oracle'
 export * from './human-design'
+export * from './ee-archetype'
 
 /**
  * Resolve the true UTC birth instant from a civil birth date, local wall-clock
@@ -176,9 +178,19 @@ export async function calculateFullProfile(intake: IntakeData): Promise<ProfileR
     console.error('Elemental Archetype calc failed:', err)
   }
 
+  // ── 6.5 EE Archetype (grounded naming across HD + elemental +
+  // numerology + astrology). Runs before life-theme so the synthesized
+  // name feeds the life theme / soul profile wording. ──
+  try {
+    const ee = synthesizeEEArchetype(profile)
+    if (ee) profile.eeArchetype = ee
+  } catch (err) {
+    console.error('EE Archetype synthesis failed:', err)
+  }
+
   // ── 7. Life Theme / Soul Profile (aggregates all lenses) ──
   try {
-    const archetypeName = '' // Would come from HD blueprint
+    const archetypeName = profile.eeArchetype?.archetype ?? '' // Real archetype (was hardcoded '')
     const lt = synthesizeLifeTheme(
       archetypeName,
       profile.numerology,

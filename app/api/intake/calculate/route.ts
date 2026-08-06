@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient, createServiceClient } from '@/lib/supabase/server'
 import { getN8nUrl } from '@/lib/config'
 import { getPlanetLongitude } from '@/lib/profile/astrology'
-import { calculateHumanDesign } from '@/lib/profile'
+import { calculateHumanDesign, synthesizeEEArchetype } from '@/lib/profile'
 import type { HDProfile } from '@/lib/profile/types'
 
 /**
@@ -287,22 +287,44 @@ function getBirthMonthInsight(month: number): string {
   return birthInsights[month] ?? 'You are uniquely positioned to bring something new into the world.'
 }
 
-function getArchetypeRecommendation(sunGate: number, designGate: number): string {
-  // 16 unique archetypes × combined sun+design gate weighting = 256+ unique outcomes
-  const archetypes = [
-    'Innovator', 'Builder', 'Mentor', 'Explorer',
-    'Catalyst', 'Strategist', 'Architect', 'Navigator',
-    'Alchemist', 'Weaver', 'Pioneer', 'Oracle',
-    'Artisan', 'Harmonizer', 'Visionary', 'Sage',
-  ]
-  // Use both gates to create 4 archetype "layers"
-  const baseIdx = (sunGate - 1) % 16
-  const influenceIdx = (designGate - 1) % 16
-  // Blend: primary from sun, modifier from design gate parity
-  const primary = archetypes[baseIdx]
-  const modifierIdx = (sunGate + designGate) % 8
-  const modifiers = ['Primal', 'Evolved', 'Awakened', 'Luminous', 'Dynamic', 'Resonant', 'Sovereign', 'Cosmic']
-  return `${modifiers[modifierIdx]} ${primary}`
+// ── Real EE archetype synthesis (grounded, HD-led) ──
+// Feeds the same synthesizer used by calculateFullProfile. Builds a partial
+// input from the real HD engine plus cheaply-derived life path + sun sign
+// (the multi-lens block below later re-runs the full synthesis with all
+// signals; this keeps the intake response itself real, not fabricated).
+
+const ZODIAC_SIGNS = ['Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo', 'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces']
+
+function signFromLongitude(lon: number): string | undefined {
+  const norm = ((lon % 360) + 360) % 360
+  return ZODIAC_SIGNS[Math.floor(norm / 30)]
+}
+
+function lifePathFromDOB(dob: string): number | undefined {
+  const digits = (dob.replace(/\D/g, '') || '').split('').map(Number)
+  if (digits.length < 4) return undefined
+  const reduce = (n: number): number => (n > 9 && n !== 11 && n !== 22 && n !== 33 ? reduce(String(n).split('').reduce((s, d) => s + Number(d), 0)) : n)
+  const total = digits.reduce((s, d) => s + d, 0)
+  return reduce(total)
+}
+
+function synthesizeIntakeArchetype(
+  hd: HDProfile | null,
+  birthDate: Date,
+  dob: string,
+): { name: string; eeArchetype: import('@/lib/profile/types').EEArchetypeResult | null } {
+  const sunLon = getPlanetLongitude('Sun', birthDate)
+  const sunSign = sunLon != null ? signFromLongitude(sunLon) : undefined
+  const lifePath = lifePathFromDOB(dob)
+  const eeArchetype = synthesizeEEArchetype({
+    humanDesign: hd ?? undefined,
+    astrology: sunSign ? { sunSign } : undefined,
+    numerology: lifePath != null ? { lifePath: { value: lifePath } } : undefined,
+  })
+  return {
+    name: eeArchetype?.archetype ?? 'The Seeker',
+    eeArchetype,
+  }
 }
 
 export async function POST(req: NextRequest) {
@@ -344,7 +366,8 @@ export async function POST(req: NextRequest) {
     // Additional layered insights
     const sunGateInfo = GATES[sunGate]
     const designGateInfo = GATES[designGate]
-    const archetype = getArchetypeRecommendation(sunGate, designGate)
+    // Real EE archetype (HD-led synthesis) — replaces fabricated gate mod-math.
+    const { name: archetype, eeArchetype } = synthesizeIntakeArchetype(hd, birthDate, dob)
     const birthMonthInsight = getBirthMonthInsight(birthDate.getUTCMonth() + 1)
     const nodeGateInfo = GATES[nodeGate]
 
@@ -361,7 +384,7 @@ export async function POST(req: NextRequest) {
     const leadingScore     = Math.min(100, Math.max(10, Math.round(50 + ((sunGate + designGate) * 0.4) + (nodeGate % 8))))
     const creatingScore    = Math.min(100, Math.max(10, Math.round(55 + ((64 - designGate) * 0.6) + (timeFraction * 8))))
 
-    const summary = `Your profile reveals a ${profile.name} operating pattern with a natural gift for ${sunGateInfo.keyword}. Your growth edge lies in ${designGateInfo.name}. Your lunar north node activates the ${nodeGateInfo.keyword} archetype — this is your karmic direction. As a ${archetype}, you thrive when you honor your ${type.toLowerCase()} energy rhythm.`
+    const summary = `Your profile reveals a ${profile.name} operating pattern with a natural gift for ${sunGateInfo.keyword}. Your growth edge lies in ${designGateInfo.name}. Your lunar north node activates the ${nodeGateInfo.keyword} archetype — this is your karmic direction. As ${archetype}, you thrive when you honor your ${type.toLowerCase()} energy rhythm.`
 
     const result = {
       blueprint: {
@@ -407,6 +430,17 @@ export async function POST(req: NextRequest) {
           gates: hd.gates,
           channels: hd.channels ?? [],
           centers: hd.centers ?? [],
+        } : null,
+        // Real EE archetype synthesis (HD-led, grounded — replaces the
+        // fabricated gate mod-math archetype names). Null only if no signal
+        // was available to synthesize from.
+        eeArchetype: eeArchetype ? {
+          archetype: eeArchetype.archetype,
+          superLayer: eeArchetype.superLayer,
+          confidence: eeArchetype.confidence,
+          signals: eeArchetype.signals,
+          rationale: eeArchetype.rationale,
+          summary: eeArchetype.summary,
         } : null,
       },
       essence: {
@@ -586,6 +620,7 @@ export async function POST(req: NextRequest) {
           status: 'calculated',
           data: {
             archetype: result.blueprint.archetype,
+            ...(result.blueprint.eeArchetype ? { eeArchetype: result.blueprint.eeArchetype } : {}),
             scores: result.blueprint.scores,
             gates: result.blueprint.gates,
             foundation: result.blueprint.foundation,
@@ -597,7 +632,7 @@ export async function POST(req: NextRequest) {
         },
       }
 
-      const lensSystems = ['astrology', 'vedicAstrology', 'numerology', 'chineseZodiac', 'biorhythms', 'elementalArchetype', 'lifeTheme', 'soulProfile', 'chaldeanNumerology', 'matrixOfDestiny', 'mayanTzolkin', 'kabbalah', 'soulContract', 'tarotOracle'] // Round 32: added 6 new calc engines
+      const lensSystems = ['astrology', 'vedicAstrology', 'numerology', 'chineseZodiac', 'biorhythms', 'elementalArchetype', 'lifeTheme', 'soulProfile', 'chaldeanNumerology', 'matrixOfDestiny', 'mayanTzolkin', 'kabbalah', 'soulContract', 'tarotOracle', 'eeArchetype'] // Round 32: added 6 new calc engines; EE archetype super-layer synthesis persisted alongside
       for (const key of lensSystems) {
         if ((lensData as any)[key]) {
           lenses[key] = { status: 'calculated', data: (lensData as any)[key], calculatedAt: new Date().toISOString() }

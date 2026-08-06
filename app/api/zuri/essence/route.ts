@@ -389,6 +389,36 @@ async function generateWithAnthropic(prompt: string): Promise<{ items: EssenceIt
 }
 
 // â”€â”€ Local / DB-driven generator â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// The EE engine produces "<Modifier> <Primary>" archetype names (e.g.
+// "Primal Explorer", "Luminous Sage") from 16 fixed primaries. Map each
+// primary to the closest daily-question set so every client -- not just the
+// handful whose exact archetype name collides with an ARCHETYPE_QUESTIONS key
+// -- gets a real daily question from their Human Design data.
+const ARCHETYPE_QUESTION_KEY_BY_PRIMARY: Record<string, string> = {
+  Innovator: 'The Alchemist',
+  Builder: 'The Architect',
+  Mentor: 'The Sage',
+  Explorer: 'The Seeker',
+  Catalyst: 'The Catalyst',
+  Strategist: 'The Strategist',
+  Architect: 'The Architect',
+  Navigator: 'The Navigator',
+  Alchemist: 'The Alchemist',
+  Weaver: 'The Weaver',
+  Pioneer: 'The Pioneer',
+  Oracle: 'The Visionary',
+  Artisan: 'The Artisan',
+  Harmonizer: 'The Harmonizer',
+  Visionary: 'The Visionary',
+  Sage: 'The Sage',
+}
+
+function resolveArchetypeQuestionKey(archetype: string): string | undefined {
+  if (ARCHETYPE_QUESTIONS[archetype]) return archetype
+  const primary = archetype.trim().split(/\s+/).pop() || ''
+  return primary ? ARCHETYPE_QUESTION_KEY_BY_PRIMARY[primary] : undefined
+}
+
 function generateLocal(
   userRole: string,
   context: string,
@@ -526,9 +556,12 @@ function generateLocal(
 
   // 6. Daily question â€” only when we have real profile data; otherwise empty.
   let dailyQuestion = ''
-  if (archetype && ARCHETYPE_QUESTIONS[archetype]) {
-    const qs = ARCHETYPE_QUESTIONS[archetype]
-    dailyQuestion = qs[Math.abs(seedNum) % qs.length]
+  if (archetype) {
+    const qKey = resolveArchetypeQuestionKey(archetype)
+    if (qKey) {
+      const qs = ARCHETYPE_QUESTIONS[qKey]
+      dailyQuestion = qs[Math.abs(seedNum) % qs.length]
+    }
   }
 
   return {

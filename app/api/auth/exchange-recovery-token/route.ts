@@ -45,10 +45,16 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Clear the recovery token (one-time use)
+    // Clear the recovery token (one-time use). Must be '' not NULL --
+    // GoTrue's Go models scan auth.users token columns (recovery_token,
+    // confirmation_token, etc.) as non-nullable strings. A NULL here breaks
+    // every subsequent GoTrue call that reads this row (e.g. the /user
+    // lookup that supabase.auth.setSession() makes internally), which is
+    // what caused "Failed to establish session" on every future login for
+    // anyone who'd ever used password reset. See recovery_token backfill.
     await queryOne(
       `UPDATE auth.users
-       SET recovery_token = NULL,
+       SET recovery_token = '',
            recovery_sent_at = NULL,
            updated_at = NOW()
        WHERE id = $1`,

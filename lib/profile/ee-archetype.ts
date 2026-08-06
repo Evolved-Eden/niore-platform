@@ -16,7 +16,7 @@
 //   behavior naming (daily engine) is deliberately separate.
 // ───────────────────────────────────────────────────────
 
-import { EEArchetypeResult, EEArchetypeSignal } from './types'
+import { EEArchetypeResult, EEArchetypeSignal, ProfileLevel } from './types'
 
 /** Minimal input the synthesis reads — satisfied by full ProfileLevel or a
  * partial (e.g. intake builds { humanDesign, astrology: {sunSign},

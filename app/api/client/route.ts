@@ -10,7 +10,8 @@ export const dynamic = 'force-dynamic'
  *
  * Consumers:
  *  - connectors page: client.zuri_connected / zuri_discord_connected / zuri_whatsapp_connected
- *  - consulting page: client.consultation_eligible / zuri_discord_connected / zuri_whatsapp_connected
+ *  - consulting page: client.zuri_discord_connected / zuri_whatsapp_connected
+ *  - useSelfClientKey() (cross-surface links): client.id + name for the viewer's own key
  */
 export async function GET(req: NextRequest) {
   try {
@@ -22,7 +23,7 @@ export async function GET(req: NextRequest) {
     const { data: client, error } = await ctx.svc
       .from('clients')
       .select(
-        'id, status, plan_tier_key, consultation_eligible, zuri_connected, zuri_discord_connected, zuri_whatsapp_connected'
+        'id, business_name, full_name, status, plan_tier_key, zuri_connected, zuri_discord_connected, zuri_whatsapp_connected'
       )
       .eq('id', ctx.clientId)
       .maybeSingle()

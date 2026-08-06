@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import EssenceBoard from '@/components/EssenceBoard'
 import UpgradePanel from '@/components/UpgradePanel'
+import { buildClientKey } from '@/lib/client-dashboard'
 
 const MOOD_COLOR: Record<string, string> = {
   great: '#5E8B84', good: '#8B7AA8', neutral: '#B5764A', low: '#7A2E32', struggling: '#7A2E32',
@@ -48,6 +49,14 @@ export default async function PersonalDashboard() {
     .eq('client_id', user.id)
     .maybeSingle()
 
+  // Own client row (self-access) → keyed client dashboard links
+  const { data: ownClient } = await supabase
+    .from('clients')
+    .select('id, business_name, full_name')
+    .eq('id', user.id)
+    .maybeSingle()
+  const clientPrefix = buildClientKey(ownClient) ? `/dashboard/client/${buildClientKey(ownClient)}` : ''
+
   const stats = [
     { label: 'Journal This Week', value: entriesThisWeek, color: '#B5764A' },
     { label: 'Deployed Agents',   value: agentCount ?? 0,  color: '#C6A664' },
@@ -84,18 +93,24 @@ export default async function PersonalDashboard() {
 
       {/* Quick actions */}
       <div className="grid grid-cols-2 gap-4 mb-8">
-        <Link href="/dashboard/client/zuri" className="glass rounded-sm p-5 border border-white/[0.06] hover:border-white/[0.12] transition-all">
-          <div className="text-xs text-[#B5764A] tracking-widest uppercase mb-2">Zuri</div>
-          <p className="text-sm text-white/40">Your personal intelligence concierge</p>
-        </Link>
-        <Link href="/dashboard/client/essence" className="glass rounded-sm p-5 border border-white/[0.06] hover:border-white/[0.12] transition-all">
-          <div className="text-xs text-[#C6A664] tracking-widest uppercase mb-2">Daily Essence</div>
-          <p className="text-sm text-white/40">Your daily intelligence brief</p>
-        </Link>
-        <Link href="/dashboard/client/journal" className="glass rounded-sm p-5 border border-white/[0.06] hover:border-white/[0.12] transition-all">
-          <div className="text-xs text-[#8B7AA8] tracking-widest uppercase mb-2">Journal</div>
-          <p className="text-sm text-white/40">{entriesThisWeek} {entriesThisWeek === 1 ? 'entry' : 'entries'} this week</p>
-        </Link>
+        {clientPrefix && (
+          <Link href={`${clientPrefix}/zuri`} className="glass rounded-sm p-5 border border-white/[0.06] hover:border-white/[0.12] transition-all">
+            <div className="text-xs text-[#B5764A] tracking-widest uppercase mb-2">Zuri</div>
+            <p className="text-sm text-white/40">Your personal intelligence concierge</p>
+          </Link>
+        )}
+        {clientPrefix && (
+          <Link href={`${clientPrefix}/essence`} className="glass rounded-sm p-5 border border-white/[0.06] hover:border-white/[0.12] transition-all">
+            <div className="text-xs text-[#C6A664] tracking-widest uppercase mb-2">Daily Essence</div>
+            <p className="text-sm text-white/40">Your daily intelligence brief</p>
+          </Link>
+        )}
+        {clientPrefix && (
+          <Link href={`${clientPrefix}/journal`} className="glass rounded-sm p-5 border border-white/[0.06] hover:border-white/[0.12] transition-all">
+            <div className="text-xs text-[#8B7AA8] tracking-widest uppercase mb-2">Journal</div>
+            <p className="text-sm text-white/40">{entriesThisWeek} {entriesThisWeek === 1 ? 'entry' : 'entries'} this week</p>
+          </Link>
+        )}
         <Link href="/dashboard/personal/profile" className="glass rounded-sm p-5 border border-white/[0.06] hover:border-white/[0.12] transition-all">
           <div className="text-xs text-[#5E8B84] tracking-widest uppercase mb-2">Profile</div>
           <p className="text-sm text-white/40">Manage your personal profile</p>

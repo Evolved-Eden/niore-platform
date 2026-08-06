@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import { useSelfClientKey } from "@/lib/client-view";
 
 type Entity = {
   id: string;
@@ -38,6 +39,7 @@ const ENTITY_COLORS: Record<string, string> = {
 };
 
 export default function AdminChatPage() {
+  const { prefix: clientPrefix } = useSelfClientKey();
   const [entities, setEntities] = useState<Entity[]>([
     { id: "zuri", key: "zuri", name: "Zuri", tagline: "Core intelligence", type: "zuri" },
   ]);
@@ -251,25 +253,25 @@ export default function AdminChatPage() {
 
       {/* Quick config links */}
       <div className="px-6 pb-3 flex items-center gap-2 flex-wrap">
-        {chatMode === "agent" && (
+        {chatMode === "agent" && clientPrefix && (
           <Link
-            href="/dashboard/client/agents"
+            href={`${clientPrefix}/agents`}
             className="text-[10px] px-2 py-1 rounded-full border border-white/10 text-white/30 hover:text-white/60 hover:border-white/20 transition-all"
           >
             Manage Agents →
           </Link>
         )}
-        {chatMode === "swarm" && (
+        {chatMode === "swarm" && clientPrefix && (
           <Link
-            href="/dashboard/client/swarms"
+            href={`${clientPrefix}/swarms`}
             className="text-[10px] px-2 py-1 rounded-full border border-white/10 text-white/30 hover:text-white/60 hover:border-white/20 transition-all"
           >
             Manage Swarms →
           </Link>
         )}
-        {chatMode === "twin" && (
+        {chatMode === "twin" && clientPrefix && (
           <Link
-            href="/dashboard/client/twin"
+            href={`${clientPrefix}/twin`}
             className="text-[10px] px-2 py-1 rounded-full border border-white/10 text-white/30 hover:text-white/60 hover:border-white/20 transition-all"
           >
             Configure Twin →

@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
+import { useSelfClientKey } from '@/lib/client-view'
 
 type EssenceRow = {
   id?: string
@@ -40,6 +41,7 @@ const PRIORITY_COLORS: Record<string, string> = {
 
 export default function AdminEssencePage() {
   const router = useRouter()
+  const { prefix: clientPrefix } = useSelfClientKey()
   const [loading, setLoading] = useState(true)
   const [name, setName] = useState('')
   const [storedItems, setStoredItems] = useState<EssenceRow[]>([])
@@ -362,8 +364,8 @@ export default function AdminEssencePage() {
             )}
           </div>
           <p className="text-sm text-white/70 whitespace-pre-line">{blueprintTile.content}</p>
-          {blueprintTile.upgradeMessage && (
-            <Link href="/dashboard/client/essence-profile?upgrade=expanded" className="inline-block mt-3 text-xs font-medium text-[#7A2E32] hover:underline">
+          {blueprintTile.upgradeMessage && clientPrefix && (
+            <Link href={`${clientPrefix}/essence-profile?upgrade=expanded`} className="inline-block mt-3 text-xs font-medium text-[#7A2E32] hover:underline">
               {blueprintTile.upgradeMessage} →
             </Link>
           )}

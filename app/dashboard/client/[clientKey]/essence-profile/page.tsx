@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { useClientView } from '@/lib/client-view'
 import Link from 'next/link'
+import { useClientView } from '@/lib/client-view'
 
 type IntakeInfo = {
   archetype?: string
@@ -782,7 +782,7 @@ export default function ClientBlueprintPage() {
               )}
 
               <Link
-                href="/dashboard/client/essence-profile/assess"
+                href="${prefix}/essence-profile/assess"
                 className="inline-block px-6 py-3 bg-[#C6A664] text-black text-sm font-bold rounded-sm hover:bg-white transition-all"
               >
                 {intake.hasIntake ? 'Complete Full Blueprint Assessment →' : 'Start Blueprint Assessment →'}
@@ -803,7 +803,7 @@ export default function ClientBlueprintPage() {
                       <div className="text-sm text-white/70 mt-1">{blueprint.archetype}</div>
                     </div>
                     <Link
-                      href="/dashboard/client/essence-profile/assess"
+                      href="${prefix}/essence-profile/assess"
                       className="text-[10px] font-bold px-3 py-1.5 rounded-sm border border-[#C6A664]/40 text-[#C6A664] hover:bg-[#C6A664]/10 transition-all"
                     >
                       Edit Blueprint →
@@ -955,7 +955,7 @@ export default function ClientBlueprintPage() {
                       {twinExists ? 'Your AI Twin is active and linked to this blueprint.' : 'No AI Twin deployed yet.'}
                     </p>
                     {!twinExists && (
-                      <Link href="/dashboard/client/twin" className="text-xs text-[#C6A664] hover:underline mt-1 inline-block">
+                      <Link href="${prefix}/twin" className="text-xs text-[#C6A664] hover:underline mt-1 inline-block">
                         Configure Twin from Blueprint →
                       </Link>
                     )}
@@ -1039,7 +1039,7 @@ export default function ClientBlueprintPage() {
             )}
             {purchasedEnhanced && !purchasedExpanded && (
               <p className="mt-3 text-xs text-[#5E8B84]/60 text-center">
-                Add the Expanded Blueprint for full whole-life intelligence scan → <Link href="/dashboard/client/essence-profile/assess" className="underline hover:text-[#5E8B84]">Go to Assessment</Link>
+                Add the Expanded Blueprint for full whole-life intelligence scan → <Link href="${prefix}/essence-profile/assess" className="underline hover:text-[#5E8B84]">Go to Assessment</Link>
               </p>
             )}
           </div>
@@ -1083,7 +1083,7 @@ export default function ClientBlueprintPage() {
                         )}
                         {owned && (
                           <Link
-                            href={`/dashboard/client/essence-profile/domain?key=${mod.id}`}
+                            href={`${prefix}/essence-profile/domain?key=${mod.id}`}
                             className="px-3 py-1.5 text-[10px] font-bold rounded-sm border border-[#C6A664]/40 text-[#C6A664] hover:bg-[#C6A664]/10 transition-all"
                           >
                             Answer Questions
@@ -1140,13 +1140,13 @@ export default function ClientBlueprintPage() {
 
           {/* Links */}
           <div className="glass rounded-sm p-5 border border-white/[0.06] space-y-3">
-            <Link href="/dashboard/client/twin" className="block text-xs text-white/40 hover:text-white/70 transition-colors">
+            <Link href="${prefix}/twin" className="block text-xs text-white/40 hover:text-white/70 transition-colors">
               → View AI Twin
             </Link>
-            <Link href="/dashboard/client/zuri" className="block text-xs text-white/40 hover:text-white/70 transition-colors">
+            <Link href="${prefix}/zuri" className="block text-xs text-white/40 hover:text-white/70 transition-colors">
               → Ask Zuri
             </Link>
-            <Link href="/dashboard/client/essence-profile/assess" className="block text-xs text-white/40 hover:text-white/70 transition-colors">
+            <Link href="${prefix}/essence-profile/assess" className="block text-xs text-white/40 hover:text-white/70 transition-colors">
               → Edit / Re-take Assessment
             </Link>
             <Link href="/intake" className="block text-xs text-white/40 hover:text-white/70 transition-colors">

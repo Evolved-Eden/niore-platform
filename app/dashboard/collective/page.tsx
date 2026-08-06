@@ -3,6 +3,7 @@ import { supabaseAdmin } from '@/lib/supabase/admin'
 import Link from 'next/link'
 import EssenceBoard from '@/components/EssenceBoard'
 import UpgradePanel from '@/components/UpgradePanel'
+import { buildClientKey } from '@/lib/client-dashboard'
 
 /**
  * Collective Overview -- distinct from Business/Creator/Personal in one
@@ -28,9 +29,11 @@ export default async function CollectiveDashboard() {
   // Resolve the Collective's tier entitlements (member/workstation/seat caps)
   const { data: clientRow } = await supabaseAdmin
     .from('clients')
-    .select('plan_tier_key')
+    .select('id, business_name, full_name, plan_tier_key')
     .eq('id', user.id)
     .maybeSingle()
+
+  const clientPrefix = clientRow ? `/dashboard/client/${buildClientKey(clientRow)}` : ''
 
   let entitlements: { max_members: number | null; max_workstations: number | null; max_concurrent_seats: number | null } | null = null
   if (clientRow?.plan_tier_key) {
@@ -105,10 +108,12 @@ export default async function CollectiveDashboard() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-        <Link href="/dashboard/client/organization" className="glass rounded-sm p-5 border border-white/[0.06] hover:border-white/[0.12] transition-all">
-          <div className="text-sm font-medium text-white mb-1">Manage Members</div>
-          <p className="text-xs text-white/40">Invite, remove, and set roles across your Collective</p>
-        </Link>
+        {clientPrefix && (
+          <Link href={`${clientPrefix}/organization`} className="glass rounded-sm p-5 border border-white/[0.06] hover:border-white/[0.12] transition-all">
+            <div className="text-sm font-medium text-white mb-1">Manage Members</div>
+            <p className="text-xs text-white/40">Invite, remove, and set roles across your Collective</p>
+          </Link>
+        )}
         <Link href="/dashboard/collective/workstations" className="glass rounded-sm p-5 border border-white/[0.06] hover:border-white/[0.12] transition-all">
           <div className="text-sm font-medium text-white mb-1">Workstations</div>
           <p className="text-xs text-white/40">Breakout groups -- Board, Committees, sub-teams</p>
@@ -117,10 +122,12 @@ export default async function CollectiveDashboard() {
           <div className="text-sm font-medium text-white mb-1">Governance</div>
           <p className="text-xs text-white/40">Roles, voting, approvals, and decision logs</p>
         </Link>
-        <Link href="/dashboard/client/workforce" className="glass rounded-sm p-5 border border-white/[0.06] hover:border-white/[0.12] transition-all">
-          <div className="text-sm font-medium text-white mb-1">Workforce</div>
-          <p className="text-xs text-white/40">Shared Employees, Teams, and Depts</p>
-        </Link>
+        {clientPrefix && (
+          <Link href={`${clientPrefix}/workforce`} className="glass rounded-sm p-5 border border-white/[0.06] hover:border-white/[0.12] transition-all">
+            <div className="text-sm font-medium text-white mb-1">Workforce</div>
+            <p className="text-xs text-white/40">Shared Employees, Teams, and Depts</p>
+          </Link>
+        )}
       </div>
 
       <UpgradePanel currentRole="collective" />

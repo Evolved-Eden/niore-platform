@@ -3,10 +3,12 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useVerticals } from '@/lib/verticals';
+import { useSelfClientKey } from '@/lib/client-view';
 
 const ZURI_AGENT_ID = 'AGT-215';
 
 export default function ZuriAdminPage() {
+  const { prefix: clientPrefix } = useSelfClientKey();
   const [agent, setAgent] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -149,12 +151,14 @@ export default function ZuriAdminPage() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <Link
-            href="/dashboard/client/zuri"
-            className="px-4 py-2 text-sm text-white/60 border border-white/10 rounded-sm hover:text-white transition-colors"
-          >
-            Preview Client View
-          </Link>
+          {clientPrefix && (
+            <Link
+              href={`${clientPrefix}/zuri`}
+              className="px-4 py-2 text-sm text-white/60 border border-white/10 rounded-sm hover:text-white transition-colors"
+            >
+              Preview Client View
+            </Link>
+          )}
           <button
             onClick={handleSave}
             disabled={saving}

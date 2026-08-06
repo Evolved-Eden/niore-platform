@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useVerticals } from '@/lib/verticals'
+import { useClientView } from '@/lib/client-view'
 
 // ── Types ─────────────────────────────────────────────────
 interface RegistryAgent {
@@ -53,6 +54,9 @@ const STATUS_STYLES: Record<string, string> = {
 }
 
 export default function ClientAgentsPage() {
+  const { targetClientId } = useClientView()
+  const clientIdParam = targetClientId ? `?clientId=${encodeURIComponent(targetClientId)}` : ''
+
   // ── Registry ──
   const [registryAgents, setRegistryAgents] = useState<RegistryAgent[]>([])
   const [registryLoading, setRegistryLoading] = useState(true)
@@ -85,25 +89,27 @@ export default function ClientAgentsPage() {
 
   // ── Fetch registry agents ──
   useEffect(() => {
-    fetch('/api/client/agents/catalog')
+    fetch(`/api/client/agents/catalog${clientIdParam}`)
       .then(r => r.json())
       .then(data => {
         setRegistryAgents(data.agents || [])
         setRegistryLoading(false)
       })
       .catch(() => setRegistryLoading(false))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // ── Fetch deployed agents ──
   const fetchDeployed = useCallback(() => {
     setDeployedLoading(true)
-    fetch('/api/client/agents/deploy')
+    fetch(`/api/client/agents/deploy${clientIdParam}`)
       .then(r => r.json())
       .then(data => {
         setDeployedAgents(data.agents || [])
         setDeployedLoading(false)
       })
       .catch(() => setDeployedLoading(false))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
@@ -139,6 +145,7 @@ export default function ClientAgentsPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          clientId: targetClientId || undefined,
           agentId: deployModal.agent_id,
           agentName: deployForm.agentName.trim(),
           roleType: deployForm.roleType,
@@ -204,7 +211,7 @@ export default function ClientAgentsPage() {
       await fetch(`/api/client/agents/deploy`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id, status }),
+        body: JSON.stringify({ clientId: targetClientId || undefined, id, status }),
       })
       fetchDeployed()
     } catch { } finally {
@@ -520,7 +527,7 @@ export default function ClientAgentsPage() {
                           fetch('/api/client/agents/deploy', {
                             method: 'PATCH',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ id: agent.id, prompt: newPrompt }),
+                            body: JSON.stringify({ clientId: targetClientId || undefined, id: agent.id, prompt: newPrompt }),
                           }).then(() => fetchDeployed())
                         }
                       }}

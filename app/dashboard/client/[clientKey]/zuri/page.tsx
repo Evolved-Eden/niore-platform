@@ -3,38 +3,39 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useClientView } from "@/lib/client-view";
 
 type Message = {
   role: "user" | "assistant";
   content: string;
 };
 
-const QUICK_ACTIONS = [
+const getQuickActions = (prefix: string) => [
   {
     label: "Start Assessment",
     desc: "Assess your business intelligence",
-    href: "/dashboard/client/essence-profile/assess",
+    href: `${prefix}/essence-profile/assess`,
     icon: "◇",
     color: "#C6A664",
   },
   {
     label: "My Twin",
     desc: "View your AI digital twin",
-    href: "/dashboard/client/twin",
+    href: `${prefix}/twin`,
     icon: "◆",
     color: "#5E8B84",
   },
   {
     label: "Essence Board",
     desc: "Today's intelligence brief",
-    href: "/dashboard/client",
+    href: prefix,
     icon: "✦",
     color: "#8B7AA8",
   },
   {
     label: "Vault",
     desc: "Documents & knowledge",
-    href: "/dashboard/client/vault",
+    href: `${prefix}/vault`,
     icon: "▤",
     color: "#B5764A",
   },
@@ -64,6 +65,8 @@ const SUGGESTED_PROMPTS = [
 
 export default function ZuriChatPage() {
   const router = useRouter();
+  const { prefix } = useClientView();
+  const QUICK_ACTIONS = getQuickActions(prefix);
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",

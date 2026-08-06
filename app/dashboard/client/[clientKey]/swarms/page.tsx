@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useVerticals } from '@/lib/verticals'
+import { useClientView } from '@/lib/client-view'
 
 // ── Types ─────────────────────────────────────────────────
 interface SwarmTemplate {
@@ -46,6 +47,9 @@ const STATUS_STYLES: Record<string, string> = {
 }
 
 export default function ClientSwarmsPage() {
+  const { targetClientId } = useClientView()
+  const clientIdParam = targetClientId ? `?clientId=${encodeURIComponent(targetClientId)}` : ''
+
   // ── Registry ──
   const [templates, setTemplates] = useState<SwarmTemplate[]>([])
   const [templatesLoading, setTemplatesLoading] = useState(true)
@@ -88,25 +92,27 @@ export default function ClientSwarmsPage() {
 
   // ── Fetch deployed agents (for member selection) ──
   useEffect(() => {
-    fetch('/api/client/agents/deploy')
+    fetch(`/api/client/agents/deploy${clientIdParam}`)
       .then(r => r.json())
       .then(data => {
         const agents = (data.agents || []).filter((a: DeployedAgent) => a.status === 'active')
         setDeployedAgents(agents)
       })
       .catch(() => {})
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // ── Fetch deployed swarms ──
   const fetchDeployed = useCallback(() => {
     setDeployedLoading(true)
-    fetch('/api/client/swarms/deploy')
+    fetch(`/api/client/swarms/deploy${clientIdParam}`)
       .then(r => r.json())
       .then(data => {
         setDeployedSwarms(data.swarms || [])
         setDeployedLoading(false)
       })
       .catch(() => setDeployedLoading(false))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
@@ -151,6 +157,7 @@ export default function ClientSwarmsPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          clientId: targetClientId || undefined,
           swarmId: deployModal.swarm_key || deployModal.key,
           swarmName: deployForm.swarmName.trim(),
           vertical: deployForm.vertical,
@@ -188,7 +195,7 @@ export default function ClientSwarmsPage() {
       await fetch('/api/client/swarms/deploy', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id, status }),
+        body: JSON.stringify({ clientId: targetClientId || undefined, id, status }),
       })
       fetchDeployed()
     } catch { } finally {
@@ -488,6 +495,7 @@ export default function ClientSwarmsPage() {
                               method: 'PATCH',
                               headers: { 'Content-Type': 'application/json' },
                               body: JSON.stringify({ 
+                                clientId: targetClientId || undefined,
                                 id: swarm.id, 
                                 configuration: newConfig 
                               }),

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
+import { useClientView } from '@/lib/client-view'
 
 // ── Types ──────────────────────────────────────────────────────
 type ClientData = {
@@ -67,6 +68,9 @@ function Toggle({ enabled, onChange, label, description }: {
 
 // ── Main Page ─────────────────────────────────────────────────
 export default function ClientConnectorsPage() {
+  const { targetClientId, prefix } = useClientView()
+  const clientIdParam = targetClientId ? `?clientId=${encodeURIComponent(targetClientId)}` : ''
+
   const [client, setClient] = useState<ClientData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -92,7 +96,7 @@ export default function ClientConnectorsPage() {
 
   const fetchApiConnectors = useCallback(async () => {
     try {
-      const res = await fetch('/api/client/connectors')
+      const res = await fetch(`/api/client/connectors${clientIdParam}`)
       if (res.ok) {
         const data = await res.json()
         setApiConnectors(data.connectors ?? [])
@@ -110,7 +114,7 @@ export default function ClientConnectorsPage() {
 
   const fetchCalendarLink = useCallback(async () => {
     try {
-      const res = await fetch('/api/client/calendar')
+      const res = await fetch(`/api/client/calendar${clientIdParam}`)
       if (res.ok) {
         const data = await res.json()
         setCalendarLink(data.calendar)
@@ -131,6 +135,7 @@ export default function ClientConnectorsPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          clientId: targetClientId || undefined,
           calendar_connector_id: calendarConnectorId,
           email_connector_id: selectedEmailForCalendar || null,
         }),
@@ -166,7 +171,7 @@ export default function ClientConnectorsPage() {
       const res = await fetch('/api/client/connectors', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ connector_type_id: connector.id, credentials }),
+        body: JSON.stringify({ clientId: targetClientId || undefined, connector_type_id: connector.id, credentials }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Failed to save')
@@ -187,7 +192,7 @@ export default function ClientConnectorsPage() {
       const res = await fetch('/api/client/connectors', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ connector_type_id: connector.id }),
+        body: JSON.stringify({ clientId: targetClientId || undefined, connector_type_id: connector.id }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Failed to disconnect')
@@ -206,8 +211,8 @@ export default function ClientConnectorsPage() {
     setError('')
     try {
       const [clientRes, prefsRes] = await Promise.all([
-        fetch('/api/client'),
-        fetch('/api/client/notification-prefs'),
+        fetch(`/api/client${clientIdParam}`),
+        fetch(`/api/client/notification-prefs${clientIdParam}`),
       ])
       if (!clientRes.ok) throw new Error('Failed to load client data')
       const clientData = await clientRes.json()
@@ -239,7 +244,7 @@ export default function ClientConnectorsPage() {
       await fetch('/api/client/notification-prefs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ [key]: value }),
+        body: JSON.stringify({ clientId: targetClientId || undefined, [key]: value }),
       })
     } catch { /* best-effort */ }
   }, [])
@@ -253,7 +258,7 @@ export default function ClientConnectorsPage() {
         const res = await fetch('/api/client/zuri-connect', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ platform: 'discord', platform_id: null }),
+          body: JSON.stringify({ clientId: targetClientId || undefined, platform: 'discord', platform_id: null }),
         })
         if (!res.ok) throw new Error('Failed to disconnect Discord')
         setDiscordConnected(false)
@@ -274,7 +279,7 @@ export default function ClientConnectorsPage() {
         const res = await fetch('/api/client/zuri-connect', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ platform: 'discord', platform_id: discordUserId.trim() }),
+          body: JSON.stringify({ clientId: targetClientId || undefined, platform: 'discord', platform_id: discordUserId.trim() }),
         })
         if (!res.ok) throw new Error('Failed to connect Discord')
         setDiscordConnected(true)
@@ -294,7 +299,7 @@ export default function ClientConnectorsPage() {
         const res = await fetch('/api/client/zuri-connect', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ platform: 'whatsapp', platform_id: null }),
+          body: JSON.stringify({ clientId: targetClientId || undefined, platform: 'whatsapp', platform_id: null }),
         })
         if (!res.ok) throw new Error('Failed to disconnect WhatsApp')
         setWhatsappConnected(false)
@@ -314,7 +319,7 @@ export default function ClientConnectorsPage() {
         const res = await fetch('/api/client/zuri-connect', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ platform: 'whatsapp', platform_id: whatsappNumber.trim() }),
+          body: JSON.stringify({ clientId: targetClientId || undefined, platform: 'whatsapp', platform_id: whatsappNumber.trim() }),
         })
         if (!res.ok) throw new Error('Failed to connect WhatsApp')
         setWhatsappConnected(true)
@@ -698,7 +703,7 @@ export default function ClientConnectorsPage() {
             Book a consultation and our team will help you connect Zuri to your platforms.
           </p>
           <Link
-            href="/dashboard/client/consulting"
+            href={`${prefix}/consulting`}
             className="inline-block px-6 py-2.5 bg-[#C6A664] text-black text-xs font-bold rounded-sm hover:bg-white transition-all"
           >
             Book a Consultation

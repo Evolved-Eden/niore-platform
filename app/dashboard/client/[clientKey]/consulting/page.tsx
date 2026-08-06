@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { useClientView } from "@/lib/client-view";
 
 // ── Types ──────────────────────────────────────────────────────────
 type Consultation = {
@@ -77,6 +78,9 @@ function toGoogleCalUrl(c: Consultation): string {
 
 // ── Component ─────────────────────────────────────────────────────
 export default function ConsultingPage() {
+  const { targetClientId, prefix } = useClientView();
+  const clientIdParam = targetClientId ? `?clientId=${encodeURIComponent(targetClientId)}` : "";
+
   const [consultations, setConsultations] = useState<Consultation[]>([]);
   const [isEligible, setIsEligible] = useState(true);
   const [loading, setLoading] = useState(true);
@@ -114,8 +118,8 @@ export default function ConsultingPage() {
     setError("");
     try {
       const [consRes, clientRes] = await Promise.all([
-        fetch("/api/client/consultations"),
-        fetch("/api/client"),
+        fetch(`/api/client/consultations${clientIdParam}`),
+        fetch(`/api/client${clientIdParam}`),
       ]);
       if (!consRes.ok) throw new Error("Failed to load consultations");
       const consData = await consRes.json();
@@ -160,6 +164,7 @@ export default function ConsultingPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          clientId: targetClientId || undefined,
           scheduled_at: scheduled.toISOString(),
           duration_min: 30,
           consultation_type: consultationType,
@@ -194,7 +199,7 @@ export default function ConsultingPage() {
       const res = await fetch("/api/client/consultations", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id }),
+        body: JSON.stringify({ clientId: targetClientId || undefined, id }),
       });
       if (!res.ok) throw new Error("Failed to cancel");
       await fetchData();
@@ -212,7 +217,7 @@ export default function ConsultingPage() {
         const res = await fetch("/api/client/zuri-connect", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ platform: "discord", platform_id: null }),
+          body: JSON.stringify({ clientId: targetClientId || undefined, platform: "discord", platform_id: null }),
         });
         if (!res.ok) throw new Error("Failed to disconnect Discord");
         setDiscordConnected(false);
@@ -233,7 +238,7 @@ export default function ConsultingPage() {
         const res = await fetch("/api/client/zuri-connect", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ platform: "discord", platform_id: discordUserId.trim() }),
+          body: JSON.stringify({ clientId: targetClientId || undefined, platform: "discord", platform_id: discordUserId.trim() }),
         });
         if (!res.ok) throw new Error("Failed to connect Discord");
         setDiscordConnected(true);
@@ -253,7 +258,7 @@ export default function ConsultingPage() {
         const res = await fetch("/api/client/zuri-connect", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ platform: "whatsapp", platform_id: null }),
+          body: JSON.stringify({ clientId: targetClientId || undefined, platform: "whatsapp", platform_id: null }),
         });
         if (!res.ok) throw new Error("Failed to disconnect WhatsApp");
         setWhatsappConnected(false);
@@ -274,7 +279,7 @@ export default function ConsultingPage() {
         const res = await fetch("/api/client/zuri-connect", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ platform: "whatsapp", platform_id: whatsappNumber.trim() }),
+          body: JSON.stringify({ clientId: targetClientId || undefined, platform: "whatsapp", platform_id: whatsappNumber.trim() }),
         });
         if (!res.ok) throw new Error("Failed to connect WhatsApp");
         setWhatsappConnected(true);
@@ -870,7 +875,7 @@ export default function ConsultingPage() {
 
             <div className="space-y-2">
               <Link
-                href="/dashboard/client/zuri"
+                href={`${prefix}/zuri`}
                 className="flex items-center gap-3 px-4 py-3 rounded-sm border border-white/[0.06] hover:border-[#C6A664]/30 hover:bg-white/[0.02] transition-all group"
               >
                 <span className="text-base" style={{ color: "#C6A664" }}>
@@ -1031,7 +1036,7 @@ export default function ConsultingPage() {
               <button
                 onClick={() => {
                   setConfirmBooking(null);
-                  window.location.href = "/dashboard/client";
+                  window.location.href = prefix;
                 }}
                 className="flex-1 px-4 py-2.5 border border-white/10 text-white/50 text-xs font-medium rounded-sm hover:text-white hover:border-white/20 transition-all"
               >

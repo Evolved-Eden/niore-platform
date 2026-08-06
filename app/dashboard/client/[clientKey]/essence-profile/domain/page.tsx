@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { useClientView } from '@/lib/client-view'
 
 type Question = {
   key: string
@@ -24,6 +25,7 @@ type ExistingProfile = {
 function DomainAssessmentInner() {
   const params = useSearchParams()
   const router = useRouter()
+  const { prefix } = useClientView()
   const domain = params.get('key') || ''
 
   const [loading, setLoading] = useState(true)
@@ -107,7 +109,7 @@ function DomainAssessmentInner() {
         <h1 className="text-lg font-semibold mb-2">{label || 'Domain Module'}</h1>
         <p className="text-sm text-white/50 mb-6">{error.message}</p>
         <Link
-          href={error.purchaseUrl || '/dashboard/client/essence-profile'}
+          href={error.purchaseUrl || `${prefix}/essence-profile`}
           className="inline-block px-5 py-2 bg-[#C6A664] text-black text-xs font-bold rounded-sm hover:bg-white transition-all"
         >
           Go to Blueprint
@@ -134,7 +136,7 @@ function DomainAssessmentInner() {
           in your daily, weekly, and monthly intelligence going forward.
         </p>
         <Link
-          href="/dashboard/client/essence"
+          href={`${prefix}/essence`}
           className="inline-block px-5 py-2 bg-[#C6A664] text-black text-xs font-bold rounded-sm hover:bg-white transition-all"
         >
           View Essence Board
@@ -145,7 +147,7 @@ function DomainAssessmentInner() {
 
   return (
     <div className="max-w-2xl mx-auto py-10 animate-fade-in">
-      <button onClick={() => router.push('/dashboard/client/essence-profile')} className="text-xs text-white/30 hover:text-white/60 mb-6">
+      <button onClick={() => router.push(`${prefix}/essence-profile`)} className="text-xs text-white/30 hover:text-white/60 mb-6">
         ← Back to Blueprint
       </button>
       <h1 className="font-display text-xl font-bold mb-1">

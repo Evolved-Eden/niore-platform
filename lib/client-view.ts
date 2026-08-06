@@ -1,6 +1,7 @@
 'use client'
 
 import { useParams } from 'next/navigation'
+import { useState, useEffect } from 'react'
 
 // ════════════════════════════════════════════════════════════
 // Client-side companion to lib/client-dashboard.ts
@@ -48,5 +49,60 @@ export function useClientView(): {
     targetClientId: parsed?.clientId ?? '',
     slug: parsed?.slug ?? '',
     prefix: clientKey ? `/dashboard/client/${clientKey}` : '',
+  }
+}
+
+function slugify(input: string): string {
+  return input
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 60) || 'client'
+}
+
+// Build the viewer's OWN client key from a minimal client record. Used on
+// cross-surface pages (chat, personal, collective, admin) that link INTO a
+// client dashboard but are not themselves inside the [clientKey] route.
+export function buildSelfClientKey(client: {
+  id?: string | null
+  business_name?: string | null
+  full_name?: string | null
+} | null): string {
+  if (!client?.id) return ''
+  const name = client.business_name || client.full_name || 'Client'
+  return `${slugify(name)}--${client.id}`
+}
+
+// Resolve the signed-in user's own client key client-side via /api/client
+// (session fallback → the user's own client). Returns prefix='' when the
+// viewer has no client row; callers should hide keyed links in that case.
+export function useSelfClientKey(): {
+  clientKey: string
+  prefix: string
+  loading: boolean
+} {
+  const [clientKey, setClientKey] = useState('')
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    let cancelled = false
+    fetch('/api/client')
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error('no client'))))
+      .then((data) => {
+        if (!cancelled) setClientKey(buildSelfClientKey(data?.client ?? null))
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  return {
+    clientKey,
+    prefix: clientKey ? `/dashboard/client/${clientKey}` : '',
+    loading,
   }
 }

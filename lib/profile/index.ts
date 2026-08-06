@@ -35,19 +35,60 @@ export * from './soul-contract'
 export * from './tarot-oracle'
 
 /**
+ * Resolve the true UTC birth instant from a civil birth date, local wall-clock
+ * birth time, and the birth timezone (offset like "-05:00" or an IANA zone
+ * name such as "America/New_York"). Every downstream lens (astrology, vedic,
+ * etc.) must see the correct UTC instant, otherwise a birth at 11:14 PM EST is
+ * computed as if it happened at 23:14 UTC (5 hours early).
+ */
+function resolveBirthInstant(birthDateISO: string, birthTime?: string, timezone?: string): Date {
+  const base = new Date(birthDateISO)
+  if (!birthTime) return base
+
+  const [h, m] = birthTime.split(':').map(Number)
+  if (isNaN(h) || isNaN(m)) return base
+
+  // Wall-clock time, temporarily treated as UTC so we can shift it by the offset.
+  const wall = new Date(base)
+  wall.setUTCHours(h, m, 0, 0)
+
+  const tz = timezone?.trim()
+  if (!tz) return wall
+
+  const offMatch = tz.match(/^([+-])(\d{1,2}):?(\d{2})?$/)
+  if (offMatch) {
+    const sign = offMatch[1] === '-' ? -1 : 1
+    const offMin = sign * (parseInt(offMatch[2], 10) * 60 + parseInt(offMatch[3] || '0', 10))
+    return new Date(wall.getTime() - offMin * 60000)
+  }
+
+  // IANA zone name: compute the zone's UTC offset at this instant via Intl,
+  // then apply it (offsetMin = zone wall time - UTC, e.g. EST = -300).
+  try {
+    const fmt = (zone: string) => new Intl.DateTimeFormat('en-US', {
+      timeZone: zone,
+      hour12: false,
+      hourCycle: 'h23',
+      year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit', second: '2-digit',
+    }).formatToParts(wall)
+    const toUTCms = (parts: Intl.DateTimeFormatPart[]) => {
+      const g = (t: string) => Number((parts.find(p => p.type === t) ?? {}).value ?? 0)
+      return Date.UTC(g('year'), g('month') - 1, g('day'), g('hour'), g('minute'), g('second'))
+    }
+    const offsetMin = (toUTCms(fmt(tz)) - toUTCms(fmt('UTC'))) / 60000
+    return new Date(wall.getTime() - offsetMin * 60000)
+  } catch {
+    return wall
+  }
+}
+
+/**
  * Run all lens calculations on raw intake data.
  * This is the main entry point for full profile generation.
  */
 export async function calculateFullProfile(intake: IntakeData): Promise<ProfileResult> {
-  const birthDate = new Date(intake.birthDate)
-
-  // Parse birth time if provided
-  if (intake.birthTime) {
-    const [h, m] = intake.birthTime.split(':').map(Number)
-    if (!isNaN(h) && !isNaN(m)) {
-      birthDate.setUTCHours(h, m, 0, 0)
-    }
-  }
+  const birthDate = resolveBirthInstant(intake.birthDate, intake.birthTime, intake.timezone)
 
   const profile: ProfileLevel = {}
   const now = new Date()

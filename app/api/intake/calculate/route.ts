@@ -3,6 +3,29 @@ import { createAdminClient, createServiceClient } from '@/lib/supabase/server'
 import { getN8nUrl } from '@/lib/config'
 import { getPlanetLongitude } from '@/lib/profile/astrology'
 
+/**
+ * Resolve birth place text ("Queens, NY") to coordinates via OpenStreetMap
+ * Nominatim. Returns null on any failure so astrology falls back to its
+ * built-in default instead of breaking intake.
+ */
+async function geocodePlace(location?: string): Promise<{ latitude: number; longitude: number } | null> {
+  if (!location || !location.trim()) return null
+  try {
+    const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(location.trim())}`
+    const res = await fetch(url, { headers: { 'User-Agent': 'evolved-eden-intake/1.0' } })
+    if (!res.ok) return null
+    const rows = (await res.json()) as Array<{ lat?: string; lon?: string }>
+    const row = rows[0]
+    if (!row?.lat || !row?.lon) return null
+    const latitude = parseFloat(row.lat)
+    const longitude = parseFloat(row.lon)
+    if (isNaN(latitude) || isNaN(longitude)) return null
+    return { latitude, longitude }
+  } catch {
+    return null
+  }
+}
+
 // ── EE Core Engine ─────────────────────────────────────────────
 // Calculates the user's foundational profile from birth data.
 // Uses gate/degree mathematics internally but outputs EE proprietary domains.
@@ -406,6 +429,11 @@ export async function POST(req: NextRequest) {
 
       const svc = createServiceClient()
 
+      // Resolve birth location to coordinates once; used for the lens
+      // calculations AND persisted so later /api/profile/calculate re-runs
+      // (which only read sections) keep the same location.
+      const coords = await geocodePlace(birthLocation)
+
       // 1. Get existing client record
       const { data: existing } = await svc
         .from('clients')
@@ -426,6 +454,8 @@ export async function POST(req: NextRequest) {
             birthTime: birthTime || '',
             birthLocation: birthLocation || '',
             birthTimezone: birthTimezone || '',
+            latitude: coords?.latitude,
+            longitude: coords?.longitude,
             saved_at: new Date().toISOString(),
           },
           role: {
@@ -497,8 +527,9 @@ export async function POST(req: NextRequest) {
           lastName: nameParts.slice(-1)[0] || '',
           birthDate: dob,
           birthTime: birthTime || undefined,
-          latitude: undefined,
-          longitude: undefined,
+          timezone: birthTimezone || undefined,
+          latitude: coords?.latitude,
+          longitude: coords?.longitude,
         })
       } catch (lensErr) {
         console.error('Multi-lens calculation error:', lensErr)

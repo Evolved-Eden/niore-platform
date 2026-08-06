@@ -40,6 +40,7 @@ export async function POST(req: NextRequest) {
     const middleName = sections.middleName || personal.middleName
     const birthDate = sections.dob || personal.dob || personal.birthDate || ''
     const birthTime = sections.birthTime || personal.birthTime || ''
+    const birthTimezone = sections.birthTimezone || sections.timezone || personal.birthTimezone || personal.timezone
     const latitude = sections.latitude || personal.latitude
     const longitude = sections.longitude || personal.longitude
 
@@ -54,6 +55,7 @@ export async function POST(req: NextRequest) {
       lastName,
       birthDate,
       birthTime,
+      timezone: birthTimezone,
       latitude,
       longitude,
       role: sections.role,

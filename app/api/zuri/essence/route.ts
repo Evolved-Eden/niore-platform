@@ -1,22 +1,17 @@
-import { NextRequest, NextResponse } from 'next/server'
+﻿import { NextRequest, NextResponse } from 'next/server'
 import { getOpenAIKey, getAnthropicKey, getEssenceProvider, getEssenceModel } from '@/lib/config'
 import { runAgentByAgentId } from '@/lib/agents'
 
-// ── Types ──────────────────────────────────────────────────────────
+// â”€â”€ Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 type AIProvider = 'openai' | 'anthropic' | 'openrouter' | 'local' | 'disabled'
 type EssenceItem = { type: string; content: string; priority: 'high' | 'medium' | 'low' }
 
-// ── Fallback (always available, last resort) ──────────────────────
+// â”€â”€ Fallback (always available, last resort) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// No fabricated content: an empty board. Tiles only ever populate from real
+// lens data â€” nothing is invented when the client hasn't completed intake.
 const FALLBACK = {
-  items: [
-    { type: 'focus',    content: 'Review your intelligence blueprint alignment', priority: 'high' },
-    { type: 'action',   content: 'Complete one high-impact task before noon', priority: 'high' },
-    { type: 'timing',   content: 'Optimal engagement window: 10 AM - 2 PM', priority: 'medium' },
-    { type: 'habit',    content: 'Schedule recovery time between intensive sessions', priority: 'medium' },
-    { type: 'growth',   content: 'Reach out to 2 strategic connections today', priority: 'low' },
-    { type: 'brand',    content: 'Your brand voice is strongest in direct conversation', priority: 'low' },
-  ],
-  dailyQuestion: "What's one decision you made today that your future self would thank you for?",
+  items: [] as EssenceItem[],
+  dailyQuestion: '',
   provider: 'fallback' as const,
   range: 'daily' as const,
   topFive: [] as string[],
@@ -26,80 +21,11 @@ const FALLBACK = {
   crystals: [] as { name: string; reason: string }[],
   postingTime: null,
   businessMove: null,
-  personality: 'Complete your Blueprint Assessment to unlock your personality read.',
-  essenceProfile: { tier: 'base' as const, agentsUsed: [] as string[], content: 'Complete your Essence Assessment to unlock this tile.' },
+  personality: null,
+  essenceProfile: null,
 }
 
-// ── Gate-based suggestion templates ───────────────────────────────
-// Keyed by gate number, each entry provides diverse daily suggestions
-const GATE_SUGGESTIONS: Record<number, string[]> = {
-  1:  ["Express your original ideas — they carry creative force today", "Trust your unique perspective even when others doubt it", "Your creativity flows when you give yourself permission to be different"],
-  2:  ["Check if your current direction still aligns with your values", "Your sense of direction is strongest when you're still — listen before moving", "One small course correction now prevents drift later"],
-  3:  ["Embrace the chaos — innovation lives in the unknown", "Order emerges when you stop forcing it and start observing patterns", "Start something imperfectly instead of waiting for clarity"],
-  4:  ["Ask the question you've been avoiding — the answer is simpler than you think", "Your understanding deepens when you admit what you don't know", "Teach something to learn it fully"],
-  5:  ["Patience is not waiting — it's trusting the timing of your process", "Slow down to speed up: pause before reacting today", "Nature doesn't rush, yet everything gets done"],
-  6:  ["Use tension as information — friction reveals where growth is needed", "Stand your ground without making it personal", "A boundary today protects your energy tomorrow"],
-  7:  ["Lead through service, not authority — influence follows contribution", "Your example speaks louder than your words today", "Step into the role only you can fill"],
-  8:  ["Your authenticity is your strategy — drop the mask today", "Contribute from your essence, not your obligation", "What feels like showing off is actually showing up"],
-  9:  ["Focus on one thing that matters — depth beats breadth today", "Small details carry big messages — pay attention to what's precise", "Your power is in your focus, not your availability"],
-  10: ["Be present where you are — your presence shapes the room", "How you do one thing is how you do everything", "Self-awareness is the foundation of all growth"],
-  11: ["Let yourself vision without limitation — ideas need space to breathe", "The clearest vision comes when you stop looking and start feeling", "Inspiration follows action, not the other way around"],
-  12: ["Articulate what you sense but can't yet prove — words give form to intuition", "Your voice matters most when it's honest, not when it's polished", "Say the thing you've been holding back"],
-  13: ["Listen beyond words — the real message is in what's unsaid", "Your empathy is a radar — trust what it picks up today", "Connection deepens when you receive without fixing"],
-  14: ["Your skills compound when shared — teach what you know today", "Abundance follows generosity — give your best work away", "Power skills amplify when used in service of others"],
-  15: ["Find your rhythm and honor it — consistency beats intensity", "Extremes drain; moderation sustains. Check where you're overdoing it", "Your natural rhythm knows the pace — follow it"],
-  16: ["Mastery is showing up again, not getting it right the first time", "Practice something with full attention today — even 10 minutes counts", "Skill is built in the mundane, not the magical"],
-  17: ["Your perspective is unique — share it openly today", "A new angle on an old problem reveals the solution", "Curiosity expands your view — ask one question from a different lens"],
-  18: ["Improvement starts with honest assessment — not criticism", "One small fix today prevents a larger correction tomorrow", "Perfection is the enemy of progress — improve, don't perfect"],
-  19: ["Reach out — connection is the gateway to opportunity today", "Your desire for connection is a signal, not a weakness", "The right people are drawn to your authenticity"],
-  20: ["Observe before acting — awareness is your greatest tool today", "Contemplation turns information into wisdom", "Stillness reveals what busyness hides"],
-  21: ["Take control of what only you can manage; release the rest", "Control is a tool, not a destination — use it wisely today", "Mastery of self precedes mastery of circumstance"],
-  22: ["Receptivity is not passivity — it's active openness to what's emerging", "Grace under pressure is your superpower today", "Welcome the unexpected — it carries a gift"],
-  23: ["Discern what to integrate and what to release — not everything belongs", "Assimilation takes time — don't rush the process of understanding", "Distinction is clarity in action — separate signal from noise"],
-  24: ["Return to what you know to be true — renewal comes from roots", "What cycle is completing? Honor it before starting the next", "Rest is productive when it leads to renewal"],
-  25: ["Trust your spontaneous impulse today — not every move needs analysis", "Innocence is not naivety — it's openness without armor", "The most authentic response is the one you don't rehearse"],
-  26: ["Your ego is a compass — notice where it points but don't let it steer", "Greatness comes from serving something larger than yourself", "Use your influence to elevate others today"],
-  27: ["Nurture something today — including yourself", "Care is a currency that compounds when spent generously", "Supporting others' growth accelerates your own"],
-  28: ["Purpose reveals itself in action, not in contemplation", "The game is rigged in favor of those who play — take one step today", "Your life has purpose even when the path is unclear"],
-  29: ["Commitment is the bridge between intention and reality — cross it today", "Stay the course — persistence through difficulty builds character", "Your word is your bond. Honor one promise to yourself today"],
-  30: ["Desire is data — what you want reveals where you're meant to go", "Fire burns brightest when directed — channel your passion intentionally", "Wanting is not weakness; it's orientation toward growth"],
-  31: ["Influence begins with listening — lead by understanding first", "Your impact is proportional to your receptivity today", "The best leaders create other leaders, not followers"],
-  32: ["Consistency compounds — one small daily action beats sporadic intensity", "Continuity is more important than intensity today", "Stay with it — the breakthrough comes after the plateau"],
-  33: ["Privacy is productive — guard your energy by withdrawing when needed", "Solitude is not loneliness; it's strategic reset", "Your best work happens away from the crowd"],
-  34: ["Your vitality is high — channel it into what matters most", "Power without direction is destruction — aim carefully today", "You have more energy than you think — use it wisely"],
-  35: ["Change is the only constant — flow with it instead of fighting it", "Adaptability is intelligence in motion", "What's ending is making room for what's ready to begin"],
-  36: ["Crisis reveals character — you're stronger than this moment feels", "The dark is where seeds germinate — trust the process", "This challenge is your transformation in disguise"],
-  37: ["Friendship fuels growth — invest in your people today", "Equality in relationships creates the strongest foundation", "Collaboration multiplies your impact"],
-  38: ["The struggle is the teacher — what is this fight trying to show you?", "Opposition reveals alignment — stand firm where it matters", "Your resistance is a sign of life, not a problem to solve"],
-  39: ["Challenge is an invitation to expand — say yes to one hard thing", "The obstacle is the way — go through it, not around it", "Your edge grows where you push against resistance"],
-  40: ["Rest is not lazy — it's strategic. Take real alone time today", "Solitude recharges your capacity for connection", "Being alone is different from being lonely — embrace the distinction"],
-  41: ["Your imagination is previewing possibilities — pay attention", "What you can conceive, you can achieve — dream on purpose today", "Contraction precedes expansion — the pause is productive"],
-  42: ["Growth follows completion — finish what you started before starting new", "Completion is its own reward — don't rush the finale", "Something is ready to end so something new can begin"],
-  43: ["Breakthrough follows breakdown — press into the discomfort today", "Insight arrives when you stop pushing and start listening", "The answer you need is on the other side of a risk"],
-  44: ["Notice the patterns — the universe speaks in symbols today", "Your pattern recognition is heightened — trust your hunches", "Alertness to opportunity is the precursor to luck"],
-  45: ["Gathering people around a shared vision is your power today", "Leadership is service — bring people together around what matters", "Your tribe is waiting for you to call the circle"],
-  46: ["Luck favors determination — keep pushing upward today", "Your persistence will pay off sooner than you think", "One more step is all it takes to break through"],
-  47: ["Transformation is uncomfortable by design — lean into the tension", "Oppression is temporary; your response to it is transformative", "The pressure you feel is the birth of something new"],
-  48: ["You have everything you need — resourcefulness is your edge today", "Depth beats surface — go deeper into one question", "The well inside you never runs dry — draw from it"],
-  49: ["It's okay to reject what no longer serves you — principles over comfort", "Revolution starts with a single 'no' to what's not working", "Your values are your compass — check your heading today"],
-  50: ["Nourish your foundations today — health, relationships, systems", "Values are not abstract — they show up in daily choices", "What you feed grows; what you starve withers. Choose wisely"],
-  51: ["Shock wakes you up — pay attention to surprises today", "Courage is not the absence of fear; it's action despite it", "The unexpected carries a gift if you're open to receiving it"],
-  52: ["Stillness is not emptiness — it's readiness. Be still and know", "Composure under pressure is your superpower today", "Before you react, breathe. The pause is power"],
-  53: ["Growth happens in increments — trust the slow unfolding", "Development is not always visible — the roots are growing", "You're evolving even when it feels like standing still"],
-  54: ["Ambition without attachment is freedom — pursue without grasping", "Your drive is a gift when it's not a burden", "Aspire fully, but stay unattached to the outcome"],
-  55: ["Abundance is a mindset before it's a reality — shift your perspective", "Spirit moves through gratitude — find one thing to celebrate today", "Your cup overflows when you stop measuring it against others"],
-  56: ["Communication carries energy — choose your words with intention", "Your message matters more than your medium", "Wander with purpose — exploration fuels discovery"],
-  57: ["Intuition speaks in whispers — listen for the quiet knowing today", "Clarity comes from within, not from more information", "Trust your gut — it's processing data your mind hasn't caught yet"],
-  58: ["Joy is a discipline — choose it regardless of circumstances", "Your vitality is contagious when you lead with enjoyment", "Pleasure is not a distraction from purpose; it's fuel for it"],
-  59: ["Intimacy in all forms — connection, creativity, collaboration — is the theme", "Sexuality is creative energy — channel it into your work today", "Close relationships reveal where you're ready to grow"],
-  60: ["Limitation is a teacher — what boundary is trying to focus you?", "Realism is not pessimism; it's seeing clearly so you can act effectively", "Your limitations define your edge — work with them, not against them"],
-  61: ["Inner truth reveals itself in silence — create space for it today", "Mystery is not a problem to solve but a reality to embrace", "The deepest knowing cannot be spoken — sit with what you sense"],
-  62: ["Precision in communication prevents confusion — be exact today", "Detail work is sacred work — honor the small things", "Accuracy is a form of respect for your audience"],
-  63: ["Doubt is not the opposite of faith — it's part of the process", "Skepticism is healthy when it leads to investigation, not paralysis", "Question everything, but keep moving"],
-  64: ["Confusion precedes breakthrough — stay with the uncertainty", "Not knowing is the beginning of wisdom", "The unfinished is full of potential — leave room for surprise"],
-}
-
-// ── Archetype-specific daily questions ───────────────────────────
+// â”€â”€ Archetype-specific daily questions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const ARCHETYPE_QUESTIONS: Record<string, string[]> = {
   'The Pioneer': [
     "What frontier are you avoiding that only you can cross?",
@@ -183,21 +109,7 @@ const ARCHETYPE_QUESTIONS: Record<string, string[]> = {
   ],
 }
 
-const GENERIC_QUESTIONS = [
-  "What's one decision you made today that your future self would thank you for?",
-  "What's the conversation you're avoiding that needs to happen?",
-  "Where did you play small today when you could have stepped up?",
-  "What would you attempt if you knew you couldn't fail?",
-  "What are you pretending not to know?",
-  "What's the most important thing you're not doing?",
-  "If today were your last, what would you regret not having done?",
-  "What does your next level require you to let go of?",
-  "Who do you need to become to achieve what you want?",
-  "What's the gift in today's challenge?",
-]
-
-
-// ── Factual lens-derived lookups (always computed, not AI-dependent) ──
+// â”€â”€ Factual lens-derived lookups (always computed, not AI-dependent) â”€â”€
 // These ground the new Essence categories in real astrological/numerological
 // facts rather than static templates, so they change day-to-day with the
 // person's actual numerology day/month/year number and stay correct for
@@ -210,9 +122,9 @@ const MODALITY_BY_SIGN: Record<string, 'cardinal' | 'fixed' | 'mutable'> = {
 }
 
 const MODALITY_MEANING: Record<'cardinal' | 'fixed' | 'mutable', string> = {
-  cardinal: 'You initiate — you\'re built to start things, not just maintain them',
-  fixed: 'You sustain — you\'re built to see things through once you commit',
-  mutable: 'You adapt — you\'re built to flex and adjust faster than most',
+  cardinal: 'You initiate â€” you\'re built to start things, not just maintain them',
+  fixed: 'You sustain â€” you\'re built to see things through once you commit',
+  mutable: 'You adapt â€” you\'re built to flex and adjust faster than most',
 }
 
 const COLOR_BY_SIGN: Record<string, { name: string; hex: string }> = {
@@ -243,7 +155,7 @@ const CRYSTAL_BY_NUMBER: Record<number, { name: string; reason: string }> = {
 }
 
 const POSTING_TIME_BY_NUMBER: Record<number, { window: string; reason: string }> = {
-  1: { window: '8-10 AM', reason: 'lead with something new — this energy favors first moves' },
+  1: { window: '8-10 AM', reason: 'lead with something new â€” this energy favors first moves' },
   2: { window: '12-1 PM', reason: 'conversational, community-building content lands best' },
   3: { window: '2-4 PM', reason: 'creative and visual content performs best under this energy' },
   4: { window: '7-9 AM', reason: 'practical, how-to content resonates with this grounded energy' },
@@ -254,35 +166,34 @@ const POSTING_TIME_BY_NUMBER: Record<number, { window: string; reason: string }>
   9: { window: '3-5 PM', reason: 'wrap-up and highlight content fits this completion energy' },
 }
 
-const BUSINESS_MOVE_BY_HD_TYPE: Record<string, string> = {
-  Generator: "Respond, don't initiate — say yes to what excites you rather than pitching cold today.",
+const BUSINESS_MOVE_BY_HD_TYPE: Record<string, string> = {  Generator: "Respond, don't initiate â€” say yes to what excites you rather than pitching cold today.",
   'Manifesting Generator': 'Move fast on what lights you up, but inform others before you pivot.',
-  Projector: 'Wait for recognition or invitation before pitching — make your expertise visible instead of chasing.',
+  Projector: 'Wait for recognition or invitation before pitching â€” make your expertise visible instead of chasing.',
   Manifestor: 'Initiate boldly today, but inform key stakeholders before you act.',
-  Reflector: 'Sample the field before committing — check in with 1-2 trusted advisors before deciding.',
+  Reflector: 'Sample the field before committing â€” check in with 1-2 trusted advisors before deciding.',
 }
-const BUSINESS_MOVE_DEFAULT = 'Focus on your single highest-leverage business action today rather than spreading across many.'
+// (BUSINESS_MOVE_DEFAULT removed â€” no fabricated fallbacks)
 
 const PERSONALITY_BLURBS: Record<string, string> = {
-  'The Pioneer': "You lead by going first — your gift is crossing frontiers before there's a map.",
-  'The Sage': 'You lead through wisdom — people come to you to make sense of things.',
-  'The Alchemist': 'You transform what you touch — raw material becomes something new in your hands.',
-  'The Strategist': 'You see the board three moves ahead — your gift is clarity under complexity.',
-  'The Connector': "You build bridges — your network is your superpower, and you know it.",
-  'The Architect': 'You build what lasts — structure and systems are where you do your best work.',
-  'The Visionary': "You see what doesn't exist yet — and you can't help but build toward it.",
-  'The Guardian': 'You protect what matters — your strength shows up most when others need it.',
-  'The Catalyst': 'You move things that are stuck — change follows you into a room.',
-  'The Weaver': 'You integrate — your gift is finding the thread that ties everything together.',
-  'The Seeker': "You're driven by the question, not the answer — curiosity is your engine.",
-  'The Harmonizer': 'You find the balance point — peace, for you, is an active skill, not passivity.',
-  'The Artisan': 'You refine — craft and mastery matter more to you than speed.',
-  'The Navigator': "You course-correct fast — you'd rather adjust than stay stuck on the wrong path.",
-  'The Amplifier': 'You make things louder in the best way — momentum builds around you.',
-  'The Cultivator': 'You grow things patiently — you play the long game better than most.',
+  'The Pioneer': "You lead by going first â€” your gift is crossing frontiers before there's a map.",
+  'The Sage': 'You lead through wisdom â€” people come to you to make sense of things.',
+  'The Alchemist': 'You transform what you touch â€” raw material becomes something new in your hands.',
+  'The Strategist': 'You see the board three moves ahead â€” your gift is clarity under complexity.',
+  'The Connector': "You build bridges â€” your network is your superpower, and you know it.",
+  'The Architect': 'You build what lasts â€” structure and systems are where you do your best work.',
+  'The Visionary': "You see what doesn't exist yet â€” and you can't help but build toward it.",
+  'The Guardian': 'You protect what matters â€” your strength shows up most when others need it.',
+  'The Catalyst': 'You move things that are stuck â€” change follows you into a room.',
+  'The Weaver': 'You integrate â€” your gift is finding the thread that ties everything together.',
+  'The Seeker': "You're driven by the question, not the answer â€” curiosity is your engine.",
+  'The Harmonizer': 'You find the balance point â€” peace, for you, is an active skill, not passivity.',
+  'The Artisan': 'You refine â€” craft and mastery matter more to you than speed.',
+  'The Navigator': "You course-correct fast â€” you'd rather adjust than stay stuck on the wrong path.",
+  'The Amplifier': 'You make things louder in the best way â€” momentum builds around you.',
+  'The Cultivator': 'You grow things patiently â€” you play the long game better than most.',
 }
 
-/** Always-computed factual extras for the Essence Board — grounded in the
+/** Always-computed factual extras for the Essence Board â€” grounded in the
  * person's real astrology/numerology/human-design data (not AI-dependent),
  * so these stay correct and genuinely change day-to-day / week-to-week /
  * month-to-month rather than looping a fixed template pool. */
@@ -292,7 +203,7 @@ function computeLensExtras(
   hdType: string | undefined,
   archetype: string | undefined,
   range: 'daily' | 'weekly' | 'monthly',
-  seedNum: number
+  _seedNum: number
 ) {
   const sunSign: string | undefined = lensAstro?.sunSign
 
@@ -315,27 +226,26 @@ function computeLensExtras(
     ? { number: numNumber, label: `${numberLabel} ${numNumber}`, range }
     : null
 
-  const crystalNum = numNumber ? ((numNumber - 1) % 9) + 1 : (Math.abs(seedNum) % 9) + 1
-  const crystals = [CRYSTAL_BY_NUMBER[crystalNum] ?? CRYSTAL_BY_NUMBER[1]]
+  const crystalNum = numNumber ? ((numNumber - 1) % 9) + 1 : null
+  const crystals = crystalNum ? [CRYSTAL_BY_NUMBER[crystalNum] ?? CRYSTAL_BY_NUMBER[1]] : []
 
-  const postNum = numNumber ? ((numNumber - 1) % 9) + 1 : (Math.abs(seedNum) % 9) + 1
-  const postingTime = POSTING_TIME_BY_NUMBER[postNum] ?? POSTING_TIME_BY_NUMBER[1]
+  const postNum = numNumber ? ((numNumber - 1) % 9) + 1 : null
+  const postingTime = postNum ? (POSTING_TIME_BY_NUMBER[postNum] ?? null) : null
 
-  const businessMove = {
-    action: hdType ? (BUSINESS_MOVE_BY_HD_TYPE[hdType] ?? BUSINESS_MOVE_DEFAULT) : BUSINESS_MOVE_DEFAULT,
-    hdType: hdType ?? null,
-  }
+  const businessMove = hdType && BUSINESS_MOVE_BY_HD_TYPE[hdType]
+    ? { action: BUSINESS_MOVE_BY_HD_TYPE[hdType], hdType }
+    : null
 
   const personality = archetype && PERSONALITY_BLURBS[archetype]
     ? PERSONALITY_BLURBS[archetype]
     : sunSign
-      ? `A ${sunSign} Sun${lensAstro?.moonSign ? ` with ${lensAstro.moonSign} Moon` : ''} — complete your Blueprint Assessment for a full personality read.`
-      : 'Complete your Blueprint Assessment to unlock your personality read.'
+      ? `A ${sunSign} Sun${lensAstro?.moonSign ? ` with ${lensAstro.moonSign} Moon` : ''}`
+      : null
 
   return { numerology, color, modality, crystals, postingTime, businessMove, personality }
 }
 
-/** Blueprint essence tile — literally calls the Blueprint agent(s) via the
+/** Blueprint essence tile â€” literally calls the Blueprint agent(s) via the
  * agent-execution system (lib/agents.ts), tier-gated: base tier gets the
  * Blueprint Strategist (AGT-007) only; Enhanced/Expanded tiers get both
  * the Strategist and the Soul Blueprint Agent (AGT-212), with Enhanced
@@ -345,9 +255,10 @@ async function generateBlueprintTile(meta: any, range: 'daily' | 'weekly' | 'mon
   const expanded = !!meta?.essence_assessment_expanded
   const tier: 'base' | 'enhanced' | 'expanded' = expanded ? 'expanded' : enhanced ? 'enhanced' : 'base'
   const core = meta?.lenses?.humanDesign?.data
+  if (!core) return null
 
   const horizon = range === 'monthly' ? 'this month' : range === 'weekly' ? 'this week' : 'today'
-  const inputPrompt = `Give the user one focused, specific, actionable blueprint insight for ${horizon}, grounded in their profile — not generic advice. Archetype: ${core?.archetype || 'unknown'}. Overall score: ${core?.overallScore ?? 'n/a'}. Section scores: ${core?.scores ? JSON.stringify(core.scores) : 'n/a'}. Keep it to 2-4 sentences.`
+  const inputPrompt = `Give the user one focused, specific, actionable blueprint insight for ${horizon}, grounded in their profile â€” not generic advice. Archetype: ${core?.archetype || 'unknown'}. Overall score: ${core?.overallScore ?? 'n/a'}. Section scores: ${core?.scores ? JSON.stringify(core.scores) : 'n/a'}. Keep it to 2-4 sentences.`
 
   const agentIds = tier === 'base' ? ['AGT-007'] : ['AGT-007', 'AGT-212']
   const outputs: { agentId: string; agentName: string; text: string }[] = []
@@ -366,9 +277,7 @@ async function generateBlueprintTile(meta: any, range: 'daily' | 'weekly' | 'mon
     return {
       tier,
       agentsUsed: [] as string[],
-      content: core?.summary || core?.archetype
-        ? `Your saved blueprint summary: ${core?.summary || core?.archetype}`
-        : 'Complete your Blueprint Assessment to unlock this tile.',
+      content: core?.summary || core?.archetype || '',
       upgradeMessage: tier === 'base' ? 'Upgrade to Enhanced or Expanded Blueprint for deeper, dual-agent insight.' : undefined,
     }
   }
@@ -381,7 +290,7 @@ async function generateBlueprintTile(meta: any, range: 'daily' | 'weekly' | 'mon
   }
 }
 
-const SYSTEM_PROMPT = `You are the Essence Board generator for Evolved Eden — a multi-lens human intelligence engine.
+const SYSTEM_PROMPT = `You are the Essence Board generator for Evolved Eden â€” a multi-lens human intelligence engine.
 
 Generate a daily intelligence brief that synthesizes the user's astrological, numerological, and human design profile into actionable insights.
 
@@ -403,7 +312,7 @@ Rules:
 - If you have numerology data: reference their personal year/month/day energy
 - If you have human design data: consider their type, profile, and gates`
 
-// ── Detect which AI provider to use ────────────────────────────────
+// â”€â”€ Detect which AI provider to use â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function getProvider(): Promise<AIProvider> {
   // Check env vars directly first (fastest, no DB dependency)
   if (process.env.OPENROUTER_API_KEY) return 'openrouter'
@@ -420,12 +329,12 @@ async function getProvider(): Promise<AIProvider> {
     if (openaiKey) return 'openai'
     if (anthropicKey) return 'anthropic'
   } catch {
-    // DB config unavailable — ignore
+    // DB config unavailable â€” ignore
   }
-  return 'disabled' // No AI available — use deterministic fallback
+  return 'disabled' // No AI available â€” use deterministic fallback
 }
 
-// ── OpenAI / OpenRouter generator ────────────────────────────────────
+// â”€â”€ OpenAI / OpenRouter generator â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function generateWithOpenAI(prompt: string, mode: 'openai' | 'openrouter' = 'openai'): Promise<{ items: EssenceItem[]; dailyQuestion: string } | null> {
   const { default: OpenAI } = await import('openai')
   const isOpenRouter = mode === 'openrouter'
@@ -452,7 +361,7 @@ async function generateWithOpenAI(prompt: string, mode: 'openai' | 'openrouter' 
   return JSON.parse(raw)
 }
 
-// ── Anthropic generator ──────────────────────────────────────────────
+// â”€â”€ Anthropic generator â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function generateWithAnthropic(prompt: string): Promise<{ items: EssenceItem[]; dailyQuestion: string } | null> {
   try {
     const mod = await import('@anthropic-ai/sdk')
@@ -479,7 +388,7 @@ async function generateWithAnthropic(prompt: string): Promise<{ items: EssenceIt
   }
 }
 
-// ── Local / DB-driven generator ──────────────────────────────────────
+// â”€â”€ Local / DB-driven generator â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function generateLocal(
   userRole: string,
   context: string,
@@ -497,8 +406,7 @@ function generateLocal(
   const daySeed = new Date().toISOString().slice(0, 10)
   const seedNum = daySeed.split('-').reduce((s, p) => s + parseInt(p), 0)
 
-  // 1. Archetype-based focus (with gate suggestions if available)
-  const gateNum = Math.abs(seedNum) % 64 + 1
+  // 1. Archetype-based focus
   if (archetype) {
     items.push({ type: 'focus', content: `Lean into your ${archetype} archetype strengths today`, priority: 'high' })
   } else {
@@ -508,14 +416,14 @@ function generateLocal(
   // 2. Astrology-based suggestion (if available)
   if (a?.moonPhase && a?.sunSign) {
     const moonSuggestions: Record<string, string> = {
-      'New Moon': 'New moon energy — ideal for setting intentions and starting fresh initiatives',
-      'Waxing Crescent': 'Waxing crescent — momentum is building. Take visible action on your goals',
-      'First Quarter': 'First quarter moon — push through resistance. Challenges are clearing the path',
-      'Waxing Gibbous': 'Waxing gibbous — refine and adjust. What you\'re building needs one more polish',
-      'Full Moon': 'Full moon — harvest time. Celebrate progress and release what no longer serves',
-      'Waning Gibbous': 'Waning gibbous — share your wisdom. Teaching others consolidates your mastery',
-      'Last Quarter': 'Last quarter — release and forgive. Letting go creates space for the new',
-      'Waning Crescent': 'Waning crescent — rest and integrate. The next cycle begins soon',
+      'New Moon': 'New moon energy â€” ideal for setting intentions and starting fresh initiatives',
+      'Waxing Crescent': 'Waxing crescent â€” momentum is building. Take visible action on your goals',
+      'First Quarter': 'First quarter moon â€” push through resistance. Challenges are clearing the path',
+      'Waxing Gibbous': 'Waxing gibbous â€” refine and adjust. What you\'re building needs one more polish',
+      'Full Moon': 'Full moon â€” harvest time. Celebrate progress and release what no longer serves',
+      'Waning Gibbous': 'Waning gibbous â€” share your wisdom. Teaching others consolidates your mastery',
+      'Last Quarter': 'Last quarter â€” release and forgive. Letting go creates space for the new',
+      'Waning Crescent': 'Waning crescent â€” rest and integrate. The next cycle begins soon',
     }
     items.push({
       type: 'timing',
@@ -530,7 +438,7 @@ function generateLocal(
         const [planet, data]: [string, any] = activeTransits[seedNum % activeTransits.length]
         items.push({
           type: 'opportunity',
-          content: `Transit alert: ${planet} ${data.aspecting[0]} — a window for aligned action`,
+          content: `Transit alert: ${planet} ${data.aspecting[0]} â€” a window for aligned action`,
           priority: data.aspecting[0]?.includes('opposition') || data.aspecting[0]?.includes('square') ? 'high' : 'low',
         })
       }
@@ -540,15 +448,15 @@ function generateLocal(
   // 3. Numerology-based suggestion
   if (n?.personalYear) {
     const yearMeanings: Record<number, string> = {
-      1: 'Personal Year 1 — new beginnings. Start the project you\'ve been planning',
-      2: 'Personal Year 2 — patience and partnership. Collaborate rather than push',
-      3: 'Personal Year 3 — creative expression. Share your ideas and connect socially',
-      4: 'Personal Year 4 — build foundations. Discipline and structure pay off now',
-      5: 'Personal Year 5 — embrace change. Freedom and variety are the themes',
-      6: 'Personal Year 6 — nurture relationships. Home, family, and responsibility call',
-      7: 'Personal Year 7 — go inward. Research, reflect, and recharge',
-      8: 'Personal Year 8 — power and abundance. Your efforts manifest materially',
-      9: 'Personal Year 9 — completion. Tie loose ends and prepare for renewal',
+      1: 'Personal Year 1 â€” new beginnings. Start the project you\'ve been planning',
+      2: 'Personal Year 2 â€” patience and partnership. Collaborate rather than push',
+      3: 'Personal Year 3 â€” creative expression. Share your ideas and connect socially',
+      4: 'Personal Year 4 â€” build foundations. Discipline and structure pay off now',
+      5: 'Personal Year 5 â€” embrace change. Freedom and variety are the themes',
+      6: 'Personal Year 6 â€” nurture relationships. Home, family, and responsibility call',
+      7: 'Personal Year 7 â€” go inward. Research, reflect, and recharge',
+      8: 'Personal Year 8 â€” power and abundance. Your efforts manifest materially',
+      9: 'Personal Year 9 â€” completion. Tie loose ends and prepare for renewal',
     }
     items.push({
       type: 'optimization',
@@ -558,15 +466,15 @@ function generateLocal(
 
     // Personal Day number for micro-timing
     const dayThemes: Record<number, string> = {
-      1: 'Today favors initiation — start something bold',
-      2: 'Today favors cooperation — seek alignment',
-      3: 'Today favors creative expression — share your voice',
-      4: 'Today favors discipline — do the hard work',
-      5: 'Today favors adventure — break your routine',
-      6: 'Today favors service — help someone',
-      7: 'Today favors reflection — take time to think',
-      8: 'Today favors action — move with authority',
-      9: 'Today favors completion — finish what you started',
+      1: 'Today favors initiation â€” start something bold',
+      2: 'Today favors cooperation â€” seek alignment',
+      3: 'Today favors creative expression â€” share your voice',
+      4: 'Today favors discipline â€” do the hard work',
+      5: 'Today favors adventure â€” break your routine',
+      6: 'Today favors service â€” help someone',
+      7: 'Today favors reflection â€” take time to think',
+      8: 'Today favors action â€” move with authority',
+      9: 'Today favors completion â€” finish what you started',
     }
     if (n.personalDay && dayThemes[n.personalDay]) {
       items.push({
@@ -600,13 +508,10 @@ function generateLocal(
     if (sorted.length > 1) {
       items.push({
         type: 'optimization',
-        content: `${sorted[1][0].replace(/_/g, ' ')} scores ${sorted[1][1]} — a 10% gain here compounds quickly.`,
+        content: `${sorted[1][0].replace(/_/g, ' ')} scores ${sorted[1][1]} â€” a 10% gain here compounds quickly.`,
         priority: 'medium',
       })
     }
-  } else if (!a?.moonPhase) {
-    // Only add this generic suggestion if we haven't already filled the slot
-    items.push({ type: 'action', content: 'Complete your Blueprint Assessment to unlock personalized suggestions', priority: 'high' })
   }
 
   // 5. Pending tasks from essence_intelligence
@@ -619,47 +524,11 @@ function generateLocal(
     })
   }
 
-  // 6. Gate-specific suggestion from GATE_SUGGESTIONS
-  if (items.length < 5) {
-    const gs = GATE_SUGGESTIONS[gateNum]
-    if (gs) {
-      const suggestionIndex = Math.abs(seedNum) % gs.length
-      items.push({
-        type: 'focus',
-        content: gs[suggestionIndex],
-        priority: 'low',
-      })
-    }
-  }
-
-  // 7. Fill remaining slots
-  const fillers = [
-    { type: 'habit' as const, content: 'Take a 5-minute reset between deep work blocks', priority: 'low' as const },
-    { type: 'brand' as const, content: 'Your authentic voice is your strongest marketing asset', priority: 'low' as const },
-    { type: 'timing' as const, content: 'Schedule creative work for your peak energy window', priority: 'medium' as const },
-    { type: 'optimization' as const, content: 'Review yesterday\'s key insights and extract patterns', priority: 'medium' as const },
-    { type: 'habit' as const, content: 'Log one insight before end of day', priority: 'low' as const },
-    { type: 'brand' as const, content: 'Share one piece of original thinking today', priority: 'low' as const },
-  ]
-
-  while (items.length < 4) {
-    items.push(fillers[items.length % fillers.length])
-  }
-
-  items.sort((a, b) => {
-    const p = { high: 0, medium: 1, low: 2 }
-    return (p[a.priority] ?? 3) - (p[b.priority] ?? 3)
-  })
-
-  // Daily question: use ARCHETYPE_QUESTIONS or GENERIC_QUESTIONS
-  let dailyQuestion: string
+  // 6. Daily question â€” only when we have real profile data; otherwise empty.
+  let dailyQuestion = ''
   if (archetype && ARCHETYPE_QUESTIONS[archetype]) {
     const qs = ARCHETYPE_QUESTIONS[archetype]
     dailyQuestion = qs[Math.abs(seedNum) % qs.length]
-  } else if (n?.lifePath) {
-    dailyQuestion = GENERIC_QUESTIONS[Math.abs(seedNum + n.lifePath.value) % GENERIC_QUESTIONS.length]
-  } else {
-    dailyQuestion = GENERIC_QUESTIONS[Math.abs(seedNum) % GENERIC_QUESTIONS.length]
   }
 
   return {
@@ -668,7 +537,7 @@ function generateLocal(
   }
 }
 
-// ── POST handler ─────────────────────────────────────────────────────
+// â”€â”€ POST handler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 //
 // AUTH NOTE: this route previously had no auth check at all -- it trusted
 // whatever userId was in the body, so anyone who knew or guessed a user id
@@ -760,7 +629,7 @@ export async function POST(req: NextRequest) {
         lensAstro = lenses?.astrology?.data
         lensNumer = lenses?.numerology?.data
 
-        // ── Western Astrology ──
+        // â”€â”€ Western Astrology â”€â”€
         if (lensAstro) {
           const a = lensAstro
           const parts: string[] = ['[Western Astrology]']
@@ -775,7 +644,7 @@ export async function POST(req: NextRequest) {
           lensContext += parts.join('. ') + '\n'
         }
 
-        // ── Vedic Astrology ──
+        // â”€â”€ Vedic Astrology â”€â”€
         if (lenses?.vedicAstrology?.data) {
           const v = lenses.vedicAstrology.data
           const parts: string[] = ['[Vedic Astrology]']
@@ -786,7 +655,7 @@ export async function POST(req: NextRequest) {
           lensContext += parts.join('. ') + '\n'
         }
 
-        // ── Numerology ──
+        // â”€â”€ Numerology â”€â”€
         if (lenses?.numerology?.data) {
           const n = lenses.numerology.data
           const parts: string[] = ['[Numerology]']
@@ -798,13 +667,13 @@ export async function POST(req: NextRequest) {
           lensContext += parts.join('. ') + '\n'
         }
 
-        // ── Chinese Zodiac ──
+        // â”€â”€ Chinese Zodiac â”€â”€
         if (lenses?.chineseZodiac?.data) {
           const cz = lenses.chineseZodiac.data
           lensContext += `[Chinese Zodiac] ${cz.animal} (${cz.element} ${cz.yinYang}). ${cz.personality}\n`
         }
 
-        // ── Biorhythms ──
+        // â”€â”€ Biorhythms â”€â”€
         if (lenses?.biorhythms?.data) {
           const b = lenses.biorhythms.data
           lensContext += `[Biorhythms] Physical ${b.today.physicalScore > 0 ? '+' : ''}${b.today.physicalScore}% | Emotional ${b.today.emotionalScore > 0 ? '+' : ''}${b.today.emotionalScore}% | Intellectual ${b.today.intellectualScore > 0 ? '+' : ''}${b.today.intellectualScore}%\n`
@@ -813,22 +682,22 @@ export async function POST(req: NextRequest) {
           }
         }
 
-        // ── Elemental Archetype ──
+        // â”€â”€ Elemental Archetype â”€â”€
         if (lenses?.elementalArchetype?.data) {
           const ea = lenses.elementalArchetype.data
           lensContext += `[Elemental] Primary ${ea.primaryElement}, Secondary ${ea.secondaryElement}. Temperament: ${ea.temperament}. ${ea.expressionStyle}\n`
         }
 
-        // ── Life Theme ──
+        // â”€â”€ Life Theme â”€â”€
         if (lenses?.lifeTheme?.data) {
           const lt = lenses.lifeTheme.data
-          lensContext += `[Life Theme] ${lt.soulPurpose}. Current stage: ${lt.lifeStage.current} — ${lt.lifeStage.description}\n`
+          lensContext += `[Life Theme] ${lt.soulPurpose}. Current stage: ${lt.lifeStage.current} â€” ${lt.lifeStage.description}\n`
           if (lt.missionStatement) {
             lensContext += `Mission: ${lt.missionStatement}\n`
           }
         }
 
-        // ── Human Design ──
+        // â”€â”€ Human Design â”€â”€
         if (lenses?.humanDesign?.data) {
           const hd = lenses.humanDesign.data
           hdType = hd.foundation?.energyType
@@ -910,7 +779,7 @@ ${context ? `\nUser context: ${context}` : ''}
 ${lensContext ? `\nProfile data:\n${lensContext}` : ''}
 ${userId ? `\nUser ID: ${userId}` : ''}${memoryBlock}`
 
-    // Try the configured provider — wrapped in try-catch so AI errors
+    // Try the configured provider â€” wrapped in try-catch so AI errors
     // fall through to generateLocal() instead of the outer catch which
     // returns the completely static FALLBACK constant.
     try {
@@ -946,25 +815,25 @@ ${userId ? `\nUser ID: ${userId}` : ''}${memoryBlock}`
       usedProvider = result === null ? 'local' : 'local-fallback'
     }
 
-    // ── Always-computed factual extras (numerology/color/modality/crystals/
-    // posting time/business move/personality) — grounded in real lens data,
+    // â”€â”€ Always-computed factual extras (numerology/color/modality/crystals/
+    // posting time/business move/personality) â€” grounded in real lens data,
     // independent of which AI provider (if any) generated the core items.
     const daySeed = new Date().toISOString().slice(0, 10)
     const seedNum = daySeed.split('-').reduce((s, p) => s + parseInt(p), 0)
     const extras = computeLensExtras(lensAstro, lensNumer, hdType, archetypeName, range, seedNum)
     const topFive = (result.items || []).slice(0, 5).map(i => i.content)
 
-    // ── Blueprint tile — literally calls the Blueprint agent(s) via the
+    // â”€â”€ Blueprint tile â€” literally calls the Blueprint agent(s) via the
     // agent-execution system, tier-gated by the person's purchased level.
     let blueprintTile
     try {
       blueprintTile = await generateBlueprintTile(twinMeta, range)
     } catch (e) {
       console.error('Essence: blueprint tile generation failed:', e)
-      blueprintTile = { tier: 'base' as const, agentsUsed: [] as string[], content: 'Blueprint tile temporarily unavailable.' }
+      blueprintTile = null
     }
 
-    // ── Purchased Domain Modules -> permanent recurring essence categories.
+    // â”€â”€ Purchased Domain Modules -> permanent recurring essence categories.
     // Per owner instruction, buying a domain module isn't a one-time report;
     // once completed it shows up here permanently across all time horizons.
     const domainProfiles = twinMeta?.domainProfiles || {}

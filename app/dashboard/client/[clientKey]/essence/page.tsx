@@ -985,7 +985,8 @@ function EssenceIntelligencePage() {
             </div>
           </div>
 
-          {/* Daily Question */}
+          {/* Daily Question — only shown when real data exists */}
+          {dailyQuestion && (
           <div className="glass rounded-sm border border-white/[0.06] overflow-hidden">
             <div className="px-5 py-4 border-b border-white/[0.06]">
               <span className="text-xs text-white/30 tracking-widest uppercase">
@@ -996,11 +997,12 @@ function EssenceIntelligencePage() {
               <div className="flex items-start gap-3">
                 <span className="text-sm shrink-0 mt-0.5">\uD83D\uDCAD</span>
                 <p className="text-sm text-white/50 italic leading-relaxed">
-                  &ldquo;{dailyQuestion || "What's one decision you made today that your future self would thank you for?"}&rdquo;
+                  &ldquo;{dailyQuestion}&rdquo;
                 </p>
               </div>
             </div>
           </div>
+          )}
         </div>
       </div>
 

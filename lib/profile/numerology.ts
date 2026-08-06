@@ -94,6 +94,19 @@ function absoluteDifference(a: number, b: number): number {
   return d
 }
 
+/** Reduce to a single digit 1-9 (master numbers NOT preserved).
+ * Used for Personal Year/Month/Day, where the mainstream convention
+ * (numerologist.com, Astro-Seek, Karmaculator) always lands on 1-9. */
+function reduceToSingleDigit(n: number): number {
+  let d = n
+  while (d > 9) {
+    let s = 0
+    for (const c of String(d)) s += parseInt(c)
+    d = s
+  }
+  return d
+}
+
 function reduceDatePart(n: number): number {
   if (n === 0) return 0
   let d = n
@@ -209,10 +222,16 @@ export function calculateNumerology(
   }
 
   // ── Personal Year / Month / Day ──
-
-  const personalYear = reduceToDigit(curYear + lifePath.value)
-  const personalMonth = reduceToDigit(personalYear + curMonth)
-  const personalDay = reduceToDigit(personalMonth + curDay)
+  // Mainstream formula: Personal Year = birth month + birth day + current
+  // calendar year, each reduced, then the total reduced to 1-9. (The old code
+  // used lifePath.value instead of birth month+day, which gave a wrong number
+  // for nearly everyone.) Personal Month = Personal Year + calendar month,
+  // Personal Day = Personal Month + calendar day of month.
+  const personalYear = reduceToSingleDigit(
+    reduceToSingleDigit(month) + reduceToSingleDigit(day) + reduceToSingleDigit(curYear)
+  )
+  const personalMonth = reduceToSingleDigit(personalYear + curMonth)
+  const personalDay = reduceToSingleDigit(personalMonth + curDay)
 
   return {
     lifePath,

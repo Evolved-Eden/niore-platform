@@ -121,6 +121,48 @@ function getPlanetDistanceAU(bodyName: string, date: Date): number | null {
   }
 }
 
+/** True Lunar Nodes at a given date.
+ * The North Node is the ecliptic longitude of the Moon at its ascending node
+ * crossing. astronomy-engine's SearchMoonNode finds the crossing times; we take
+ * the Moon's ecliptic longitude at the two ascending crossings bracketing the
+ * birth moment and interpolate (the node moves ~1.6°/month retrograde).
+ * (The old code used the Moon's own position 14 days before birth, which is
+ * NOT the node and could be anywhere in the zodiac.) */
+function calcLunarNodes(date: Date): { north: number; south: number } | null {
+  try {
+    const A = require('astronomy-engine')
+    const ms = date.getTime()
+    let evt: any = A.SearchMoonNode(new Date(ms - 40 * 86400000))
+    const asc: { lon: number; t: number }[] = []
+    for (let i = 0; i < 30 && evt; i++) {
+      const t = evt.time.date.getTime()
+      if (t > ms + 40 * 86400000) break
+      if (evt.kind === A.NodeEventKind.Ascending) {
+        asc.push({ lon: A.EclipticGeoMoon(evt.time.date).lon, t })
+      }
+      evt = A.NextMoonNode(evt)
+    }
+    if (asc.length === 0) return null
+    let north: number
+    const i = asc.findIndex(a => a.t >= ms)
+    if (i <= 0) {
+      north = asc[0].lon
+    } else {
+      const a0 = asc[i - 1]
+      const a1 = asc[i]
+      const f = (ms - a0.t) / (a1.t - a0.t)
+      let d = a1.lon - a0.lon
+      if (d > 180) d -= 360
+      if (d < -180) d += 360
+      north = ((a0.lon + d * f) % 360 + 360) % 360
+    }
+    const south = ((north + 180) % 360 + 360) % 360
+    return { north, south }
+  } catch {
+    return null
+  }
+}
+
 // ── Ascendant / Rising Sign ────────────────────────────
 
 function calcAscendant(date: Date, latitude: number, longitude: number): number {
@@ -148,10 +190,14 @@ function calcAscendant(date: Date, latitude: number, longitude: number): number 
 
   // Ascendant formula
   // ASC = arctan2(-cos(RAMC), sin(e) * tan(lat) + sin(RAMC) * cos(e))
+  // NOTE: this closed form actually yields the DESCENDANT (western horizon
+  // point) — verified against the library's own ECT→EQD→HOR rotation matrices
+  // and the sunrise identity (at sunrise the Sun's longitude ≈ the ascendant,
+  // which this formula missed by 180°). Add 180° to get the true rising point.
   const numerator = -Math.cos(ramc)
   const denominator = Math.sin(e) * Math.tan(lat) + Math.sin(ramc) * Math.cos(e)
 
-  let asc = Math.atan2(numerator, denominator) * 180 / Math.PI
+  let asc = Math.atan2(numerator, denominator) * 180 / Math.PI + 180
   asc = ((asc % 360) + 360) % 360
 
   return asc
@@ -344,37 +390,26 @@ export function calculateAstrology(input: AstrologyInput): AstrologyProfile | nu
       }
     }
 
-    // North Node and Lilith approximations
-    // North Node is where the Moon's orbit intersects the ecliptic
-    // Approximate using lunar node calculation
-    try {
-      const A = require('astronomy-engine')
-      const nn = A.EclipticLongitude(A.Body.Moon, date)
-      // Moon's ascending node moves retrograde ~19.3°/year
-      // This is a simplified approach
-      const d = new Date(date.getTime() - 14 * 86400000) // ~2 weeks before
-      const moonLon = getPlanetLongitude('Moon', d) ?? 0
-      // For a rough node position, use the lunar node approximation:
-      // The node is where the Moon crosses the ecliptic
-      // Very simplified: use the Moon's ecliptic latitude sign change
-      if (moonLon) {
-        planets['NorthNode'] = {
-          longitude: moonLon,
-          sign: signName(moonLon),
-          signIndex: signIndex(moonLon),
-          degrees: degreesInSign(moonLon),
-          house: planetHouse(moonLon, ascendant),
-        }
-        const sLon = ((moonLon + 180) % 360 + 360) % 360
-        planets['SouthNode'] = {
-          longitude: sLon,
-          sign: signName(sLon),
-          signIndex: signIndex(sLon),
-          degrees: degreesInSign(sLon),
-          house: planetHouse(sLon, ascendant),
-        }
+    // True Lunar Nodes (North Node = ascending node longitude, South = opposite)
+    const nodes = calcLunarNodes(date)
+    if (nodes) {
+      const nn = nodes.north
+      const sn = nodes.south
+      planets['NorthNode'] = {
+        longitude: nn,
+        sign: signName(nn),
+        signIndex: signIndex(nn),
+        degrees: degreesInSign(nn),
+        house: planetHouse(nn, ascendant),
       }
-    } catch { /* non-critical */ }
+      planets['SouthNode'] = {
+        longitude: sn,
+        sign: signName(sn),
+        signIndex: signIndex(sn),
+        degrees: degreesInSign(sn),
+        house: planetHouse(sn, ascendant),
+      }
+    }
 
     // Calculate aspects
     const aspects = calcAspects({

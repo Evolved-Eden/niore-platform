@@ -93,7 +93,7 @@ export async function POST(req: NextRequest) {
 
     // Create the promotion code
     const promoCode = await stripe.promotionCodes.create({
-      coupon: coupon.id,
+      promotion: { type: 'coupon' as const, coupon: coupon.id },
       code: code.toUpperCase().trim(),
       max_redemptions: max_redemptions || undefined,
       expires_at: expires_at || undefined,

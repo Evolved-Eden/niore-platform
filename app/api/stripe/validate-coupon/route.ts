@@ -42,8 +42,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ valid: false, error: 'This coupon has been fully redeemed' })
     }
 
-    // Get the coupon details
-    const couponId = typeof (promo as any).coupon === 'string' ? (promo as any).coupon : (promo as any).coupon.id
+    // Get the coupon details (coupon nests under `promotion` in API 2026-05-27)
+    const couponRef = (promo as any).promotion?.coupon
+    const couponId = typeof couponRef === 'string' ? couponRef : couponRef?.id
+    if (!couponId) {
+      return NextResponse.json({ valid: false, error: 'Invalid coupon code' })
+    }
     const coupon = await stripe.coupons.retrieve(couponId)
 
     if (!coupon.valid) {

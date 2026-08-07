@@ -19,7 +19,8 @@ export async function GET() {
     const couponMap = new Map(coupons.data.map(c => [c.id, c]))
 
     const list = promoCodes.data.map((pc: any) => {
-      const couponId = typeof pc.coupon === 'string' ? pc.coupon : pc.coupon.id
+      const couponRef = pc.promotion?.coupon
+      const couponId = typeof couponRef === 'string' ? couponRef : couponRef?.id
       const c = couponMap.get(couponId)
       return {
         id: pc.id,

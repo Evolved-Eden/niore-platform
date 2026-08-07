@@ -33,13 +33,13 @@ export async function POST(req: NextRequest) {
 
   try {
     // ── Step 1: WARN (3-day lookahead) ────────────────────────────────
-    // Subscriptions whose trial or current period ends inside the window.
+    // Subscriptions whose current period ends inside the window.
     const { data: soonSubs, error: soonSubsError } = await supabaseAdmin
       .from('subscriptions')
-      .select('organization_id, status, trial_end, current_period_end')
+      .select('organization_id, status, current_period_end')
       .in('status', ACTIVE_SUBSCRIPTION_STATUSES)
-      .or(`trial_end.gte.${warnStart},current_period_end.gte.${warnStart}`)
-      .or(`trial_end.lte.${warnEnd},current_period_end.lte.${warnEnd}`)
+      .gte('current_period_end', warnStart)
+      .lte('current_period_end', warnEnd)
 
     if (soonSubsError) throw soonSubsError
 
@@ -55,8 +55,7 @@ export async function POST(req: NextRequest) {
 
     const warnTargets = new Map<string, Date>()
     for (const s of soonSubs || []) {
-      const expiresAt = s.trial_end || s.current_period_end
-      if (expiresAt) warnTargets.set(s.organization_id, new Date(expiresAt))
+      if (s.current_period_end) warnTargets.set(s.organization_id, new Date(s.current_period_end))
     }
     for (const o of soonOrgs || []) {
       if (o.license_expires_at) warnTargets.set(o.id, new Date(o.license_expires_at))
@@ -100,9 +99,9 @@ export async function POST(req: NextRequest) {
 
     const { data: expiredSubs, error: expiredSubsError } = await supabaseAdmin
       .from('subscriptions')
-      .select('organization_id, status, trial_end, current_period_end, ended_at')
+      .select('organization_id, status, current_period_end, canceled_at')
       .in('status', ACTIVE_SUBSCRIPTION_STATUSES)
-      .or(`trial_end.lt.${nowIso},current_period_end.lt.${nowIso}`)
+      .lt('current_period_end', nowIso)
 
     if (expiredSubsError) throw expiredSubsError
 

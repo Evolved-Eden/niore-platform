@@ -270,7 +270,7 @@ export default async function DashboardHub({ searchParams }: { searchParams?: Pr
               </p>
             </div>
             <Link
-              href={role === 'client' ? '/dashboard/client/essence-profile/assess' : `/dashboard/${role}`}
+              href={role === 'client' ? '/intake' : `/dashboard/${role}`}
               className="px-6 py-3 bg-[#C6A664] text-black text-sm font-bold rounded-sm hover:bg-white transition-all shrink-0 glow-acid group-hover/cta:shadow-[0_0_32px_rgba(200,255,0,0.3)]"
             >
               {role === 'client' ? 'Start Blueprint →' : 'Go to Dashboard →'}

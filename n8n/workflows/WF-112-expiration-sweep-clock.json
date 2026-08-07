@@ -1,0 +1,38 @@
+{
+  "name": "WF-112 — Trial/Renewal Expiration Handler (Clock)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": { "interval": [ { "field": "cronExpression", "expression": "0 6 * * *" } ] }
+      },
+      "id": "daily-0600",
+      "name": "Daily 06:00 UTC",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [-420, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.NIORE_APP_URL}}/api/internal/clients/expiration-sweep",
+        "authentication": "none",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [
+          { "name": "x-internal-cron-secret", "value": "={{$env.INTERNAL_CRON_SECRET}}" }
+        ] },
+        "options": { "timeout": 120000 }
+      },
+      "id": "call-expiration-sweep",
+      "name": "Run Expiration Sweep",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [-160, 300]
+    }
+  ],
+  "connections": {
+    "Daily 06:00 UTC": { "main": [[{ "node": "Run Expiration Sweep", "type": "main", "index": 0 }]] }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "meta": { "templateId": "WF-112" }
+}

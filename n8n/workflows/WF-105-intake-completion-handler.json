@@ -1,0 +1,73 @@
+{
+  "name": "WF-105 — Intake Completion Handler",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "intake-complete",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "intake-webhook",
+      "name": "Intake Complete Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [-420, 260]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Normalize the intake-complete payload from the app.\n// Expected body: { client_id, lens_results?, calculated_at? }\nconst body = $input.first().json.body || $input.first().json;\nconst clientId = body.client_id || body.clientId || body.id;\nif (!clientId) {\n  throw new Error('WF-105: missing client_id in intake-complete payload');\n}\nreturn [{ json: { client_id: clientId, source: body.source || 'intake', calculated_at: body.calculated_at || null } }];\n"
+      },
+      "id": "normalize-payload",
+      "name": "Normalize Payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-160, 260]
+    },
+    {
+      "parameters": {
+        "url": "={{$env.SUPABASE_URL}}/rest/v1/notification_logs",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": { "parameters": [
+          { "name": "organization_id", "value": "={{$json.client_id}}" },
+          { "name": "client_id", "value": "={{$json.client_id}}" },
+          { "name": "notification_type", "value": "blueprint_ready" },
+          { "name": "channel", "value": "in_app" },
+          { "name": "subject", "value": "Your Blueprint is ready" },
+          { "name": "message", "value": "Your multi-lens Blueprint has been calculated and is ready to view." },
+          { "name": "delivery_status", "value": "queued" },
+          { "name": "metadata", "value": "={{$json}}" }
+        ] },
+        "options": {}
+      },
+      "id": "insert-notification",
+      "name": "Queue Blueprint Ready Notification",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [80, 260],
+      "credentials": { "httpHeaderAuth": { "id": "ZJYTOXNkzLKVeF0e", "name": "Supabase Service Role" } }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { success: true, client_id: $json.organization_id } }}",
+        "options": {}
+      },
+      "id": "intake-respond",
+      "name": "Respond To Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [320, 260]
+    }
+  ],
+  "connections": {
+    "Intake Complete Webhook": { "main": [[{ "node": "Normalize Payload", "type": "main", "index": 0 }]] },
+    "Normalize Payload": { "main": [[{ "node": "Queue Blueprint Ready Notification", "type": "main", "index": 0 }]] },
+    "Queue Blueprint Ready Notification": { "main": [[{ "node": "Respond To Webhook", "type": "main", "index": 0 }]] }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "meta": { "templateId": "WF-105" }
+}

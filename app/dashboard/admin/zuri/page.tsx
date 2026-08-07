@@ -132,7 +132,7 @@ export default function ZuriAdminPage() {
   }
 
   const templateOptions = templates.filter((t: any) =>
-    ['blueprint', 'essence', 'workflow'].includes(t._template_type)
+    ['essenceboard', 'essintelligence', 'workflow'].includes(t._template_type)
   );
 
   return (

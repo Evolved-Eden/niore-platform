@@ -54,10 +54,10 @@ export default async function AdminOverview() {
 
   // ── Core entity counts ──
   const [userCount, clientCount, orgCount, archetypeCount, generatorCount,
-         blueprintCount, essenceCount, workflowCount, avatarCount, tierCount] = await Promise.all([
+         essenceboardCount, essintelligenceCount, workflowCount, avatarCount, tierCount] = await Promise.all([
     count('users'), count('clients'), count('organizations'),
     count('archetypes'), count('agent_generators'),
-    count('essence_engines'), count('essence_templates'), count('workflow_templates'),
+    count('essenceboard_templates'), count('essintelligence_templates'), count('workflow_templates'),
     count('avatars'), count('tier_entitlements'),
   ])
 
@@ -106,7 +106,7 @@ export default async function AdminOverview() {
         <StatCard label="Agents" value={agentCount} color="#C6A664" icon="🤖" />
         <StatCard label="Swarms" value={swarmCount ?? 0} color="#5E8B84" icon="🐝" />
         <StatCard label="Generators" value={generatorCount} color="#8B7AA8" icon="⚙️" />
-        <StatCard label="Templates" value={blueprintCount + essenceCount + workflowCount} color="#B5764A" icon="📋" detail={`${blueprintCount}B · ${essenceCount}E · ${workflowCount}W`} />
+        <StatCard label="Templates" value={essenceboardCount + essintelligenceCount + workflowCount} color="#B5764A" icon="📋" detail={`${essenceboardCount}EB · ${essintelligenceCount}EI · ${workflowCount}W`} />
         <StatCard label="Users" value={userCount} color="#7A2E32" icon="👥" />
         <StatCard label="Clients" value={clientCount} color="#5E8B84" icon="📋" />
       </div>
@@ -226,7 +226,7 @@ export default async function AdminOverview() {
           <div className="w-2 h-2 rounded-full bg-[#5E8B84] animate-pulse-slow" />
           <div>
             <div className="text-xs text-white/30">Templates</div>
-            <div className="text-sm text-white/70">{blueprintCount + essenceCount + workflowCount} active · {swarmCount ?? 0} swarms</div>
+            <div className="text-sm text-white/70">{essenceboardCount + essintelligenceCount + workflowCount} active · {swarmCount ?? 0} swarms</div>
           </div>
         </div>
       </div>

@@ -9,54 +9,54 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const type = searchParams.get('type') || 'all';
 
-    let blueprints: any[] = [];
-    let essences: any[] = [];
+    let essenceboards: any[] = [];
+    let essintelligences: any[] = [];
     let workflows: any[] = [];
 
-    if (type === 'all' || type === 'blueprint') {
+    if (type === 'all' || type === 'essenceboard') {
       const { data, error } = await supabaseAdmin
-        .from('essintelligence_templates')
+        .from('essenceboard_templates')
         .select('*')
         .order('key', { ascending: true });
-      if (!error) blueprints = (data || []).map((b: any) => ({ ...b, _template_type: 'blueprint' }));
+      if (!error) essenceboards = (data || []).map((b: any) => ({ ...b, _template_type: 'essenceboard' }));
     }
 
-    if (type === 'all' || type === 'essence') {
+    if (type === 'all' || type === 'essintelligence') {
       const { data, error } = await supabaseAdmin
         .from('essintelligence_templates')
         .select('*')
         .order('key', { ascending: true });
-      if (!error) essences = (data || []).map((e: any) => ({ ...e, _template_type: 'essence' }));
+      if (!error) essintelligences = (data || []).map((e: any) => ({ ...e, _template_type: 'essintelligence' }));
     }
 
     if (type === 'all' || type === 'workflow') {
       const { data, error } = await supabaseAdmin
-        .from('workflows')
-        .select('id, name, description, vertical, category, stages, is_active, tags, n8n_webhook_url')
+        .from('workflow_templates')
+        .select('*')
         .order('name', { ascending: true });
       if (!error) workflows = (data || []).map((w: any) => ({
-        key: w.id,
+        key: w.key,
         name: w.name,
         description: w.description,
-        vertical_key: w.vertical,
-        workflow_type: w.category,
+        vertical_key: w.tier,
+        workflow_type: w.workflow_type,
         is_active: w.is_active,
-        stages_json: w.stages || [],
-        tags: w.tags,
-        n8n_webhook_url: w.n8n_webhook_url,
+        stages_json: w.stages_json || [],
+        tags: w.function_category_key ? [w.function_category_key] : [],
+        n8n_webhook_url: null,
         _template_type: 'workflow',
-        sections_json: w.stages || [],
-        template_json: { workflow_type: w.category, stages: w.stages },
+        sections_json: w.stages_json || [],
+        template_json: { workflow_type: w.workflow_type, stages: w.stages_json, frequency: w.frequency },
       }));
     }
 
-    const templates = [...blueprints, ...essences, ...workflows];
+    const templates = [...essenceboards, ...essintelligences, ...workflows];
 
     return NextResponse.json({
       templates,
       count: templates.length,
-      blueprint_count: blueprints.length,
-      essence_count: essences.length,
+      essenceboard_count: essenceboards.length,
+      essintelligence_count: essintelligences.length,
       workflow_count: workflows.length,
     });
   } catch (error: any) {
@@ -69,18 +69,33 @@ export async function POST(request: NextRequest) {
     const auth = await requireAdmin()
     if (auth instanceof NextResponse) return auth
     const body = await request.json();
-    const templateType = body._template_type || body.type || 'blueprint';
+    const templateType = body._template_type || body.type || 'essintelligence';
 
-    if (templateType === 'essence') {
+    if (templateType === 'essenceboard') {
       const { data, error } = await supabaseAdmin
-        .from('essintelligence_templates')
+        .from('essenceboard_templates')
         .insert({
           key: body.key, name: body.name, description: body.description || null,
           specialty_key: body.vertical_key || null, subcategory_key: body.subcategory_key || null,
           is_active: body.is_active ?? true, sections_json: body.sections_json || [],
           template_json: body.template_json || {}, essence_json: body.essence_json || null,
-          config_key: body.blueprint_key || null, mas_category: body.mas_category || null,
+          config_key: body.config_key || null, mas_category: body.mas_category || null,
           mas_priority: body.mas_priority || null,
+        })
+        .select()
+        .single();
+      if (error) throw error;
+      return NextResponse.json({ success: true, template: data });
+    }
+
+    if (templateType === 'workflow') {
+      const { data, error } = await supabaseAdmin
+        .from('workflow_templates')
+        .insert({
+          key: body.key, name: body.name, description: body.description || null,
+          workflow_type: body.workflow_type || 'GENERAL', tier: body.vertical_key || null,
+          is_active: body.is_active ?? true, stages_json: body.sections_json || [],
+          workflow_json: body.template_json || {},
         })
         .select()
         .single();
@@ -92,9 +107,11 @@ export async function POST(request: NextRequest) {
       .from('essintelligence_templates')
       .insert({
         key: body.key, name: body.name, description: body.description || null,
-        vertical_key: body.vertical_key || null, subcategory_key: body.subcategory_key || null,
+        specialty_key: body.vertical_key || null, subcategory_key: body.subcategory_key || null,
         is_active: body.is_active ?? true, sections_json: body.sections_json || [],
-        template_json: body.template_json || {},
+        template_json: body.template_json || {}, essence_json: body.essence_json || null,
+        config_key: body.config_key || null, mas_category: body.mas_category || null,
+        mas_priority: body.mas_priority || null,
       })
       .select()
       .single();

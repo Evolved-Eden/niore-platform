@@ -23,8 +23,8 @@ export default function TemplatesPage() {
     load();
   }, [filterType]);
 
-  const blueprintCount = templates.filter((t: any) => t._template_type === 'blueprint').length;
-  const essenceCount = templates.filter((t: any) => t._template_type === 'essence').length;
+  const essenceboardCount = templates.filter((t: any) => t._template_type === 'essenceboard').length;
+  const essintelligenceCount = templates.filter((t: any) => t._template_type === 'essintelligence').length;
   const workflowCount = templates.filter((t: any) => t._template_type === 'workflow').length;
 
   return (
@@ -36,9 +36,9 @@ export default function TemplatesPage() {
           <p className="text-white/40 text-sm mt-1">
             {templates.length} template{templates.length !== 1 ? 's' : ''}
             <span className="text-white/20"> — </span>
-            <span className="text-blue-400">{blueprintCount} blueprint</span>
+            <span className="text-amber-400">{essenceboardCount} essenceboard</span>
             <span className="text-white/20"> · </span>
-            <span className="text-amber-400">{essenceCount} essence</span>
+            <span className="text-blue-400">{essintelligenceCount} essintelligence</span>
             <span className="text-white/20"> · </span>
             <span className="text-green-400">{workflowCount} workflow</span>
           </p>
@@ -49,8 +49,8 @@ export default function TemplatesPage() {
       <div className="flex gap-2">
         {[
           { key: 'all', label: 'All' },
-          { key: 'blueprint', label: 'Assessments' },
-          { key: 'essence', label: 'Essences' },
+          { key: 'essenceboard', label: 'Essenceboards' },
+          { key: 'essintelligence', label: 'Essintelligences' },
           { key: 'workflow', label: 'Workflows' },
         ].map((f) => (
           <button
@@ -82,13 +82,13 @@ export default function TemplatesPage() {
                 </div>
                   <div className="flex gap-2">
                   <span className={`px-2 py-0.5 rounded text-xs font-medium border ${
-                    tpl._template_type === 'blueprint'
+                    tpl._template_type === 'essintelligence'
                       ? 'bg-blue-500/10 text-blue-400 border-blue-500/20'
                       : tpl._template_type === 'workflow'
                       ? 'bg-green-500/10 text-green-400 border-green-500/20'
                       : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
                   }`}>
-                    {tpl._template_type === 'blueprint' ? 'Assessment' : tpl._template_type === 'workflow' ? 'Workflow' : 'Essence'}
+                    {tpl._template_type === 'essintelligence' ? 'Essintelligence' : tpl._template_type === 'workflow' ? 'Workflow' : 'Essenceboard'}
                   </span>
                   <span className={`px-2 py-0.5 rounded text-xs font-medium border ${
                     tpl.is_active ? 'bg-green-500/10 text-green-400 border-green-500/20' : 'bg-white/5 text-white/40 border-white/10'

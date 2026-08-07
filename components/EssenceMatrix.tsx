@@ -130,7 +130,7 @@ export default function EssenceMatrix({ onClose }: { onClose: () => void }) {
         <div>
           <h2 className="text-lg font-bold text-white">Essence Matrix</h2>
           <p className="text-white/30 text-xs mt-0.5">
-            Cross-blueprint system aggregation — {summary.total_unique_systems} unique systems across {summary.total_blueprints} blueprints
+            Cross-essintelligence system aggregation — {summary.total_unique_systems} unique systems across {summary.total_blueprints} essintelligences
           </p>
         </div>
         <button onClick={onClose} className="text-white/30 hover:text-white/70 text-sm px-3 py-1.5 border border-white/10 rounded-sm transition-colors">
@@ -146,7 +146,7 @@ export default function EssenceMatrix({ onClose }: { onClose: () => void }) {
         </div>
         <div className="bg-white/[0.03] border border-white/[0.06] rounded-sm p-4">
           <div className="text-2xl font-bold text-white">{summary.total_system_mappings}</div>
-          <div className="text-xs text-white/30 mt-1">System × Blueprint Mappings</div>
+          <div className="text-xs text-white/30 mt-1">System × Essintelligence Mappings</div>
         </div>
         <div className="bg-white/[0.03] border border-white/[0.06] rounded-sm p-4">
           <div className="text-2xl font-bold text-white">{summary.average_overlap}x</div>
@@ -154,7 +154,7 @@ export default function EssenceMatrix({ onClose }: { onClose: () => void }) {
         </div>
         <div className="bg-white/[0.03] border border-white/[0.06] rounded-sm p-4">
           <div className="text-2xl font-bold text-white">{summary.total_blueprints}</div>
-          <div className="text-xs text-white/30 mt-1">Blueprints</div>
+          <div className="text-xs text-white/30 mt-1">Essintelligences</div>
         </div>
       </div>
 
@@ -162,7 +162,7 @@ export default function EssenceMatrix({ onClose }: { onClose: () => void }) {
       {summary.most_shared_system && summary.most_shared_system.overlap_count > 1 && (
         <div className="bg-white/[0.03] border border-[#C6A664]/20 rounded-sm px-4 py-3 text-sm text-white/60">
           <span className="text-[#C6A664] font-medium">Most shared system: </span>
-          {summary.most_shared_system.name} — appears in <strong>{summary.most_shared_system.overlap_count}</strong> blueprints
+          {summary.most_shared_system.name} — appears in <strong>{summary.most_shared_system.overlap_count}</strong> essintelligences
         </div>
       )}
 
@@ -259,7 +259,7 @@ export default function EssenceMatrix({ onClose }: { onClose: () => void }) {
 
       {/* Footer */}
       <div className="text-center text-xs text-white/20 pb-4">
-        Blueprint columns: Core | Essence | Rhythm | Purpose | Momentum | Relationships | Evolution
+        Essintelligence columns: Core | Essence | Rhythm | Purpose | Momentum | Relationships | Evolution
       </div>
     </div>
   )

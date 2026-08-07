@@ -14,14 +14,16 @@ export default function TemplateManager({ params }: { params: Promise<{ type: st
     (async () => {
       const { type } = await params;
       try {
-        // Fetch from both template types
-        const [blueRes, essenceRes] = await Promise.all([
-          fetch('/api/admin/templates?type=blueprint'),
-          fetch('/api/admin/templates?type=essence'),
+        // Fetch from all template types
+        const [ebRes, eiRes, wfRes] = await Promise.all([
+          fetch('/api/admin/templates?type=essenceboard'),
+          fetch('/api/admin/templates?type=essintelligence'),
+          fetch('/api/admin/templates?type=workflow'),
         ]);
-        const blueData = await blueRes.json();
-        const essenceData = await essenceRes.json();
-        const all = [...(blueData.templates || []), ...(essenceData.templates || [])];
+        const ebData = await ebRes.json();
+        const esData = await eiRes.json();
+        const wfData = await wfRes.json();
+        const all = [...(ebData.templates || []), ...(esData.templates || []), ...(wfData.templates || [])];
         const tpl = all.find((t: any) => t.key === type);
         if (tpl) {
           setTemplate(tpl);
@@ -38,14 +40,14 @@ export default function TemplateManager({ params }: { params: Promise<{ type: st
       let parsed;
       try { parsed = JSON.parse(sectionsJson); } catch { throw new Error('Invalid JSON'); }
 
-      const endpoint = template._template_type === 'essence' ? 'essence_templates' : 'essence_engines'; // this var is only used to pick _template_type in the POST body below, not a real table name
+      const endpoint = template._template_type === 'essenceboard' ? 'essenceboard_templates' : 'essintelligence_templates'; // this var is only used to pick _template_type in the POST body below, not a real table name
 
       const res = await fetch('/api/admin/templates', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...template,
-          _template_type: template._template_type || 'blueprint',
+          _template_type: template._template_type || 'essintelligence',
           sections_json: parsed,
           template_json: parsed,
         }),
@@ -71,11 +73,11 @@ export default function TemplateManager({ params }: { params: Promise<{ type: st
           <h1 className="font-display text-2xl font-bold tracking-tight text-white">Template: {template.name || template.key}</h1>
           <p className="text-white/40 text-sm mt-1">
             <span className={`px-2 py-0.5 rounded text-xs font-medium border ${
-              template._template_type === 'blueprint'
+              template._template_type === 'essintelligence'
                 ? 'bg-blue-500/10 text-blue-400 border-blue-500/20'
                 : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
             }`}>
-              {template._template_type === 'blueprint' ? 'Assessment' : 'Essence'}
+              {template._template_type === 'essintelligence' ? 'Essintelligence' : 'Essenceboard'}
             </span>
           </p>
         </div>

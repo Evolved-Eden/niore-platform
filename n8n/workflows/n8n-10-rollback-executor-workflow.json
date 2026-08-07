@@ -1,0 +1,419 @@
+{
+  "name": "n8n Rollback Executor Workflow (Shared Core)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "responseMode": "onReceived"
+      },
+      "id": "wh-rollback",
+      "name": "Rollback Request",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1400,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\nreturn [{ json: { deployment_id: item.deployment_id || null, reason: item.reason || 'Deployment rollback requested', triggered_by: item.triggered_by || null, organization_id: item.organization_id || null, client_id: item.client_id || null } }];"
+      },
+      "id": "norm-rollback",
+      "name": "Normalize Rollback",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1160,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{$env.SUPABASE_URL}}/rest/v1/essintelligence_deployments?select=id,organization_id,client_id,specialty_key,status,n8n_workflow_id&id=eq.{{$json.deployment_id}}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth"
+      },
+      "id": "http-rollback-fetch",
+      "name": "Fetch Deployment",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -920,
+        300
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "ZJYTOXNkzLKVeF0e",
+          "name": "Supabase Service Role"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const rows = Array.isArray($input.first().json) ? $input.first().json : [];\nconst dep = rows[0] || null;\nconst ctx = $('Normalize Rollback').first().json;\nconst valid = !!dep && dep.status !== 'rolled_back' && dep.status !== 'rollback_pending';\nreturn [{ json: { deployment: dep, deployment_id: ctx.deployment_id, reason: ctx.reason, triggered_by: ctx.triggered_by, organization_id: dep?.organization_id || ctx.organization_id, client_id: dep?.client_id || ctx.client_id, can_rollback: valid, invalid_reason: dep ? null : 'deployment_not_found' } }];"
+      },
+      "id": "valid-rollback",
+      "name": "Validate Rollback",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -680,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{$json.can_rollback}}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "if-rollback",
+      "name": "Can Rollback",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -440,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{$env.SUPABASE_URL}}/rest/v1/essintelligence_deployments?id=eq.{{$json.deployment_id}}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "body",
+              "value": "={{JSON.stringify({status: 'rollback_pending', updated_at: new Date().toISOString()})}}",
+              "parameterType": "json"
+            }
+          ]
+        }
+      },
+      "id": "http-rollback-mark",
+      "name": "Mark Rollback Pending",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -200,
+        180
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "ZJYTOXNkzLKVeF0e",
+          "name": "Supabase Service Role"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const patched = Array.isArray($input.first().json) ? $input.first().json[0] : $input.first().json;\nconst ctx = $('Validate Rollback').first().json;\nreturn [{ json: { deployment_id: ctx.deployment_id, workflow_id: null, client_id: ctx.client_id, organization_id: ctx.organization_id, status: 'started', event_type: 'rollback', error_message: patched?.error || null, input: JSON.stringify({ deployment_id: ctx.deployment_id, reason: ctx.reason, triggered_by: ctx.triggered_by }), context: JSON.stringify({ target_status: 'rolled_back', reason: ctx.reason }) } }];"
+      },
+      "id": "log-rollback",
+      "name": "Prepare Log",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        40,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.SUPABASE_URL}}/rest/v1/workflow_run_logs",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "body",
+              "value": "={{JSON.stringify({workflow_id: $json.workflow_id, client_id: $json.client_id, organization_id: $json.organization_id, status: $json.status, event_type: $json.event_type, error_message: $json.error_message, input: $json.input, context: $json.context})}}",
+              "parameterType": "json"
+            }
+          ]
+        }
+      },
+      "id": "http-rollback-log",
+      "name": "Log Rollback Run",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        280,
+        180
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "ZJYTOXNkzLKVeF0e",
+          "name": "Supabase Service Role"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.INTERNAL_OPS_DISCORD_WEBHOOK}}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "content",
+              "value": "=↩️ Rollback requested for deployment {{$json.deployment_id}}: {{$json.reason}}"
+            }
+          ]
+        }
+      },
+      "id": "http-rollback-notify",
+      "name": "Notify Ops",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        280,
+        340
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "ZJYTOXNkzLKVeF0e",
+          "name": "Supabase Service Role"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const logged = Array.isArray($input.first().json) ? $input.first().json[0] : $input.first().json;\nreturn [{ json: { success: !logged?.error, deployment_id: $json.deployment_id, status: 'rollback_pending', run_log_id: logged?.id || null, error: logged?.error || null } }];"
+      },
+      "id": "resp-rollback",
+      "name": "Rollback Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        520,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: { success: false, deployment_id: $json.deployment_id, status: 'invalid', invalid_reason: $json.invalid_reason || 'cannot_rollback', deployment_status: $json.deployment?.status || null } }];"
+      },
+      "id": "invalid-rollback",
+      "name": "Invalid Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -200,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{$json}}"
+      },
+      "id": "resp-rollback-wh",
+      "name": "Rollback Respond",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        760,
+        300
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "noop-rollback",
+      "name": "Notify No-Op",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        520,
+        340
+      ]
+    }
+  ],
+  "connections": {
+    "Rollback Request": {
+      "main": [
+        [
+          {
+            "node": "Normalize Rollback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Rollback": {
+      "main": [
+        [
+          {
+            "node": "Fetch Deployment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Deployment": {
+      "main": [
+        [
+          {
+            "node": "Validate Rollback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Rollback": {
+      "main": [
+        [
+          {
+            "node": "Can Rollback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Can Rollback": {
+      "main": [
+        [
+          {
+            "node": "Mark Rollback Pending",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Invalid Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Invalid Response": {
+      "main": [
+        [
+          {
+            "node": "Rollback Respond",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark Rollback Pending": {
+      "main": [
+        [
+          {
+            "node": "Prepare Log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Log": {
+      "main": [
+        [
+          {
+            "node": "Log Rollback Run",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Notify Ops",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Ops": {
+      "main": [
+        [
+          {
+            "node": "Notify No-Op",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify No-Op": {
+      "main": [
+        []
+      ]
+    },
+    "Log Rollback Run": {
+      "main": [
+        [
+          {
+            "node": "Rollback Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rollback Response": {
+      "main": [
+        [
+          {
+            "node": "Rollback Respond",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rollback Respond": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "templateId": "n8n_rollback_executor_workflow"
+  }
+}

@@ -51,13 +51,13 @@ export const FAQ_CATEGORIES: FaqCategory[] = [
       },
       {
         q: "Can I customize agents for my specific business?",
-        a: "Yes. Every agent is configurable — you set their behavior, knowledge sources, communication style, automation level, and integration points. Our essence assessment recommends the right agents for your vertical, and you can fine-tune them from your dashboard.",
+        a: "Yes. Every agent is configurable — you set their behavior, knowledge sources, communication style, automation level, and integration points. Our essence assessment recommends the right agents for your specialty, and you can fine-tune them from your dashboard.",
         tags: ["customize", "configure", "custom"],
       },
       {
-        q: "What verticals do you support?",
-        a: "We currently have demos and agent packs for: Luxury Med Spa, Luxury Hotel, Luxury Real Estate, Corporate HR, and Legal Practice. Our essence assessment maps your needs to the right agents regardless of industry — we can build custom verticals for Enterprise clients.",
-        tags: ["verticals", "industries", "demos"],
+        q: "What specialties do you support?",
+        a: "We currently have demos and agent packs for: Luxury Med Spa, Luxury Hotel, Luxury Real Estate, Corporate HR, and Legal Practice. Our essence assessment maps your needs to the right agents regardless of industry — we can build custom specialties for Enterprise clients.",
+        tags: ["specialties", "industries", "demos"],
       },
     ],
   },
@@ -73,7 +73,7 @@ export const FAQ_CATEGORIES: FaqCategory[] = [
       },
       {
         q: "Is there a free trial?",
-        a: "We offer a full demo experience so you can see exactly how your intelligence system would work before committing. You can explore agents, swarms, and essence boards for any vertical. When you're ready, choose a plan and deploy.",
+        a: "We offer a full demo experience so you can see exactly how your intelligence system would work before committing. You can explore agents, swarms, and essence boards for any specialty. When you're ready, choose a plan and deploy.",
         tags: ["trial", "free", "demo"],
       },
       {
@@ -83,7 +83,7 @@ export const FAQ_CATEGORIES: FaqCategory[] = [
       },
       {
         q: "What is Business OS?",
-        a: "Business OS is our enterprise-grade tier for organizations requiring dedicated deployment, multi-vertical orchestration, white-label capabilities, and full governance. It includes custom agent, swarm, and memory scale, plus a dedicated intelligence architect. Custom pricing -- available when your essence score is 85+ or you need Enterprise scale.",
+        a: "Business OS is our enterprise-grade tier for organizations requiring dedicated deployment, multi-specialty orchestration, white-label capabilities, and full governance. It includes custom agent, swarm, and memory scale, plus a dedicated intelligence architect. Custom pricing -- available when your essence score is 85+ or you need Enterprise scale.",
         tags: ["business os", "enterprise", "custom"],
       },
     ],
@@ -149,7 +149,7 @@ export const FAQ_CATEGORIES: FaqCategory[] = [
     questions: [
       {
         q: "How long does deployment take?",
-        a: "Basic deployment (AI Twin + agents + Essence Board) is instant after registration — your system is provisioned automatically. Custom vertical builds, multi-agent swarms, and enterprise deployments typically take 1-3 business days depending on complexity.",
+        a: "Basic deployment (AI Twin + agents + Essence Board) is instant after registration — your system is provisioned automatically. Custom specialty builds, multi-agent swarms, and enterprise deployments typically take 1-3 business days depending on complexity.",
         tags: ["deploy", "deployment", "how long", "time"],
       },
       {

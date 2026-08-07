@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { VERTICAL_LIST } from '@/components/demo/vertical-data'
+import { SPECIALTY_LIST } from '@/components/demo/specialty-data'
 
 export default function DemoHubPage() {
   return (
@@ -18,13 +18,13 @@ export default function DemoHubPage() {
           See Intelligence <span className="text-[#C6A664]">In Action</span>
         </h1>
         <p className="text-white/40 text-lg max-w-xl mx-auto leading-relaxed mb-12">
-          Pick a vertical below. Every demo shows the exact agents, swarms, essence board,
+          Pick a specialty below. Every demo shows the exact agents, swarms, essence board,
           and pricing for that industry — all personalized by Zuri.
         </p>
 
-        {/* Vertical Grid */}
+        {/* Specialty Grid */}
         <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 px-4">
-          {VERTICAL_LIST.map((v) => (
+          {SPECIALTY_LIST.map((v) => (
             <Link
               key={v.slug}
               href={`/demo/${v.slug}`}

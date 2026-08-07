@@ -2,17 +2,17 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useVerticals } from '@/lib/verticals';
+import { useSpecialties } from '@/lib/specialties';
 
 export default function CreateSwarmPage() {
   const router = useRouter();
-  const { verticals, loading: verticalsLoading } = useVerticals();
+  const { specialties, loading: specialtiesLoading } = useSpecialties();
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     key: '',
     name: '',
     description: '',
-    vertical_key: '',
+    agent_specialty_key: '',
     member_agents: [] as string[],
     is_active: true,
   });
@@ -39,7 +39,7 @@ export default function CreateSwarmPage() {
     <div className="max-w-4xl mx-auto space-y-6">
       <div>
         <h1 className="font-display text-2xl font-bold tracking-tight text-white">Create New Swarm</h1>
-        <p className="text-white/40 text-sm mt-1">Define a new swarm of agents for vertical workflows.</p>
+        <p className="text-white/40 text-sm mt-1">Define a new swarm of agents for specialty workflows.</p>
       </div>
 
       <form onSubmit={handleSubmit} className="glass rounded-sm p-6 space-y-6 border border-white/[0.06]">
@@ -81,17 +81,17 @@ export default function CreateSwarmPage() {
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-white/70 mb-1">Vertical</label>
+            <label className="block text-sm font-medium text-white/70 mb-1">Specialty</label>
             <select
-              value={form.vertical_key}
-              onChange={(e) => setForm({ ...form, vertical_key: e.target.value })}
+              value={form.agent_specialty_key}
+              onChange={(e) => setForm({ ...form, agent_specialty_key: e.target.value })}
               className="w-full bg-white/5 border border-white/10 rounded-sm px-3 py-2 text-sm text-white/70"
             >
               <option value="">None (Universal)</option>
-              {verticalsLoading ? (
+              {specialtiesLoading ? (
                 <option value="" disabled>Loading...</option>
               ) : (
-                verticals.map((v) => (
+                specialties.map((v) => (
                   <option key={v.key || v.id} value={v.key || v.id}>{v.name}</option>
                 ))
               )}

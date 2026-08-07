@@ -34,7 +34,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "={{$env.NIORE_APP_URL}}/api/internal/verticals/run-agent",
+        "url": "={{$env.NIORE_APP_URL}}/api/internal/specialties/run-agent",
         "sendHeaders": true,
         "headerParameters": { "parameters": [ { "name": "x-internal-secret", "value": "={{$env.INTERNAL_CRON_SECRET}}" } ] },
         "sendBody": true,

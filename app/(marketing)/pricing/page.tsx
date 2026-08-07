@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import PlanBuilder from '@/components/demo/plan-builder'
-import { type PathType } from '@/components/demo/vertical-data'
+import { type PathType } from '@/components/demo/specialty-data'
 
 const PATHS: PathType[] = ['client', 'creator', 'personal', 'affiliate']
 
@@ -145,7 +145,7 @@ function StandardPricing({ path, setPath, pathname }: { path: PathType; setPath:
           </div>
 
           <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-6">
-            <PlanBuilder path={path} verticalColor="#C6A664" />
+            <PlanBuilder path={path} accentColor="#C6A664" />
           </div>
 
           <div className="mt-8 rounded-3xl border border-white/10 bg-white/[0.02] p-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

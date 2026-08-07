@@ -11,7 +11,7 @@ type AgentData = {
   icon: string
   color: string
   capabilities: string[]
-  vertical_ids: string[]
+  specialty_ids: string[]
   triggers: string[]
   data_sources: string[]
   outputs: string[]
@@ -22,7 +22,7 @@ type AgentData = {
 
 type AgentModalProps = {
   agentId: string | null
-  verticalColor: string
+  accentColor: string
   onClose: () => void
 }
 
@@ -42,7 +42,7 @@ const VERTICAL_LABELS: Record<string, string> = {
   legal: 'Legal Practice',
 }
 
-export default function AgentModal({ agentId, verticalColor, onClose }: AgentModalProps) {
+export default function AgentModal({ agentId, accentColor, onClose }: AgentModalProps) {
   const [agent, setAgent] = useState<AgentData | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -102,7 +102,7 @@ export default function AgentModal({ agentId, verticalColor, onClose }: AgentMod
             <div className="flex items-center gap-4 mb-6">
               <div
                 className="w-14 h-14 rounded-xl flex items-center justify-center text-2xl"
-                style={{ backgroundColor: `${verticalColor}15`, color: verticalColor }}
+                style={{ backgroundColor: `${accentColor}15`, color: accentColor }}
               >
                 {agent.icon}
               </div>
@@ -110,7 +110,7 @@ export default function AgentModal({ agentId, verticalColor, onClose }: AgentMod
                 <h2 className="font-display text-xl font-bold text-white">{agent.name}</h2>
                 <p className="text-sm text-white/50">{agent.tagline}</p>
                 <div className="flex items-center gap-2 mt-1">
-                  <span className="text-[10px] px-1.5 py-0.5 rounded-full border" style={{ borderColor: `${verticalColor}30`, color: agent.color || verticalColor }}>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded-full border" style={{ borderColor: `${accentColor}30`, color: agent.color || accentColor }}>
                     {agent.agent_type}
                   </span>
                   <span className="text-[10px] text-white/30">{agent.category}</span>
@@ -127,7 +127,7 @@ export default function AgentModal({ agentId, verticalColor, onClose }: AgentMod
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {agent.capabilities.map((cap) => (
                   <div key={cap} className="flex items-center gap-2 text-xs text-white/60">
-                    <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: verticalColor }} />
+                    <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: accentColor }} />
                     {cap}
                   </div>
                 ))}
@@ -187,13 +187,13 @@ export default function AgentModal({ agentId, verticalColor, onClose }: AgentMod
               </div>
             )}
 
-            {/* Verticals */}
-            {agent.vertical_ids.length > 0 && (
+            {/* Specialties */}
+            {agent.specialty_ids.length > 0 && (
               <div className="mb-6">
                 <h3 className="text-xs text-white/30 tracking-widest uppercase mb-3">Available In</h3>
                 <div className="flex flex-wrap gap-1.5">
-                  {agent.vertical_ids.map((v) => (
-                    <span key={v} className="text-[10px] px-2 py-1 rounded-full" style={{ backgroundColor: `${verticalColor}12`, color: verticalColor }}>
+                  {agent.specialty_ids.map((v) => (
+                    <span key={v} className="text-[10px] px-2 py-1 rounded-full" style={{ backgroundColor: `${accentColor}12`, color: accentColor }}>
                       {VERTICAL_LABELS[v] || v}
                     </span>
                   ))}
@@ -209,7 +209,7 @@ export default function AgentModal({ agentId, verticalColor, onClose }: AgentMod
               </div>
               <button
                 className="px-5 py-2.5 text-xs font-bold rounded-sm transition-all"
-                style={{ backgroundColor: verticalColor, color: '#000' }}
+                style={{ backgroundColor: accentColor, color: '#000' }}
                 onClick={() => window.location.href = '/pricing'}
               >
                 Activate Agent

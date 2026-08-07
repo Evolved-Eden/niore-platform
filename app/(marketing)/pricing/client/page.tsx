@@ -36,7 +36,7 @@ function PricingClientPage() {
             <span className="rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 text-xs text-white/40">client pathway</span>
           </div>
           <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-6">
-            <PlanBuilder path="client" verticalColor="#C6A664" />
+            <PlanBuilder path="client" accentColor="#C6A664" />
           </div>
           <div className="mt-8 rounded-3xl border border-white/10 bg-white/[0.02] p-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>

@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
             workflowJson: workflow.workflow_json,
             stages: workflow.stages,
             category: workflow.category,
-            vertical: workflow.vertical,
+            specialty: workflow.specialty,
             tags: workflow.tags,
             triggeredBy: triggeredBy || 'manual',
             runLogId: runLog.id,

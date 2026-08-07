@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
     if (auth instanceof NextResponse) return auth
     const { searchParams } = new URL(request.url)
     const search = searchParams.get('search') || ''
-    const vertical = searchParams.get('vertical') || ''
+    const specialty = searchParams.get('specialty') || ''
 
     let sbQuery = supabaseAdmin
       .from('swarm_templates')
@@ -30,8 +30,8 @@ export async function GET(request: NextRequest) {
     if (search) {
       sbQuery = sbQuery.ilike('key', `%${search}%`)
     }
-    if (vertical) {
-      sbQuery = sbQuery.eq('vertical_key', vertical)
+    if (specialty) {
+      sbQuery = sbQuery.eq('agent_specialty_key', specialty)
     }
 
     const { data, count, error } = await sbQuery.order('key', { ascending: true })

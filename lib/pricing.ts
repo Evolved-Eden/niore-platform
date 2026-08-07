@@ -480,8 +480,8 @@ const STANDALONE_PRODUCTS_FALLBACK: Record<string, StandaloneProduct> = {
 // ── Specialty Add-On Packs ─────────────────────────────────
 // (formerly "Vertical" -- "specialty" is the locked platform term)
 // SOURCE OF TRUTH: Supabase `catalog_items` where catalog_type = 'vertical_pack'
-// (the DB-level type_key itself is a larger rename -- see the standing note
-// on the vertical->specialty migration; the display name was already updated).
+// (the vertical->specialty migration is complete; 'vertical_pack' remains as
+// the stored data value for backward compatibility).
 export interface SpecialtyPack {
   id: string
   name: string
@@ -498,7 +498,7 @@ async function fetchSpecialtyPacksFromSupabase(): Promise<Record<string, Special
   const result: Record<string, SpecialtyPack> = {}
   for (const row of rows) {
     if (row.base_price == null) continue
-    // Normalize slugs like "vertical-ecommerce" / "wealth-vertical" /
+    // Normalize legacy slugs like "vertical-ecommerce" / "wealth-vertical" /
     // "legal-vertical" down to a clean short id ("ecommerce", "wealth", "legal").
     const id = row.slug.replace(/-/g, '_').replace(/^vertical_/, '').replace(/_vertical$/, '')
     result[id] = {

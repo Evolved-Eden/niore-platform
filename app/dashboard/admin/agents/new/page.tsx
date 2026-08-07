@@ -12,7 +12,7 @@ interface RegistryAgent {
   capabilities: string[] | null;
   agent_type: string | null;
   category: string | null;
-  vertical_ids: string[] | null;
+  specialty_ids: string[] | null;
   triggers: string[] | null;
   data_sources: string[] | null;
   outputs: string[] | null;
@@ -53,8 +53,8 @@ export default function CreateAgentPage() {
   const [formData, setFormData] = useState({
     agent_id: '',
     agent_name: '',
-    vertical: '',
-    vertical_subs: [] as string[],
+    agent_specialty: '',
+    agent_specialty_subs: [] as string[],
     role_type: '',
     archetype_id: 'ARC-001',
     avatar: 'EDEN',
@@ -287,12 +287,12 @@ export default function CreateAgentPage() {
           <h2 className="text-sm font-semibold text-white/60 tracking-wider uppercase">Systems & Templates</h2>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-white/70 mb-1">Vertical</label>
+              <label className="block text-sm font-medium text-white/70 mb-1">Specialty</label>
               <input
                 type="text"
                 placeholder="real_estate, hospitality, medspa"
-                value={formData.vertical}
-                onChange={(e) => setFormData({ ...formData, vertical: e.target.value })}
+                value={formData.agent_specialty}
+                onChange={(e) => setFormData({ ...formData, agent_specialty: e.target.value })}
                 className="w-full bg-white/5 border border-white/10 rounded-sm px-3 py-2 text-sm text-white/70 placeholder-white/30"
               />
             </div>

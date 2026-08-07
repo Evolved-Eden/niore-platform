@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
 
     const { data, error } = await supabaseAdmin
       .from('tier_entitlements')
-      .select('plan_key, max_agents, max_custom_agents, max_vertical_agents, max_swarms, max_swarm_capacity, max_workflows, max_workflow_runs_monthly, max_storage_gb')
+      .select('plan_key, max_agents, max_custom_agents, max_specialty_agents, max_swarms, max_swarm_capacity, max_workflows, max_workflow_runs_monthly, max_storage_gb')
       .in('plan_key', keys)
 
     if (error) throw error

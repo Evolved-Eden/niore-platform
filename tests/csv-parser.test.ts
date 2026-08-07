@@ -112,7 +112,7 @@ describe('parseRange', () => {
 })
 
 describe('parseCsv', () => {
-  const csv = `Agent_ID,Agent_Name,Vertical,Subvertical,Role_Type,Archetype_ID,Archetype_Name,Avatar,Primary_Template,Secondary_Template,Primary_System_Range,Secondary_System_Range,Tertiary_System_Range,Generator_Models,Capability,Trust,Activation,Synergy,Evolution,Risk,MAS,Health_Status
+  const csv = `Agent_ID,Agent_Name,Agent_Specialty,Sub_Specialty,Role_Type,Archetype_ID,Archetype_Name,Avatar,Primary_Template,Secondary_Template,Primary_System_Range,Secondary_System_Range,Tertiary_System_Range,Generator_Models,Capability,Trust,Activation,Synergy,Evolution,Risk,MAS,Health_Status
 AGT-001,Test Agent,general,sub,CORE,1,Archetype 1,avatar1,t1,t2,1-30,31-60,,,85,72,90,68,45,30,65.0,ACTIVE
 AGT-002,Shifted Agent,general,sub,5,Archetype Alpha,avatar2,t1,t2,1-30,31-60,,,78,65,82,70,50,35,63.3,ACTIVE`
 

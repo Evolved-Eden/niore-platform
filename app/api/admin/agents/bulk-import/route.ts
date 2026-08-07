@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
 export async function GET() {
   // Return CSV template headers
   const headers = [
-    'agent_id', 'agent_name', 'role_type', 'vertical', 'avatar',
+    'agent_id', 'agent_name', 'role_type', 'agent_specialty', 'avatar',
     'archetype_id', 'primary_template', 'decision_mode',
     'autonomy_level', 'authority_level', 'risk_level',
     'health_status', 'evolution_status'

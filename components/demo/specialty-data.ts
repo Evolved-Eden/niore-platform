@@ -1,5 +1,5 @@
-// ── Vertical-Specific Intelligence Data ──
-// Each vertical has: agents, swarm, essence board preview, walkthrough, brand colors
+// ── Specialty-Specific Intelligence Data ──
+// Each specialty has: agents, swarm, essence board preview, walkthrough, brand colors
 
 export type Agent = {
   id: string
@@ -10,7 +10,7 @@ export type Agent = {
   capabilities: string[]
 }
 
-export type VerticalData = {
+export type SpecialtyData = {
   id: string
   slug: string
   title: string
@@ -33,7 +33,7 @@ export type VerticalData = {
   defaultPlan: string
 }
 
-export const VERTICALS: Record<string, VerticalData> = {
+export const SPECIALTIES: Record<string, SpecialtyData> = {
   med_spa: {
     id: 'med_spa',
     slug: 'med-spa',
@@ -385,10 +385,10 @@ export const VERTICALS: Record<string, VerticalData> = {
   },
 }
 
-export const VERTICAL_LIST = Object.values(VERTICALS)
+export const SPECIALTY_LIST = Object.values(SPECIALTIES)
 
-export function getVerticalBySlug(slug: string): VerticalData | undefined {
-  return VERTICAL_LIST.find(v => v.slug === slug)
+export function getSpecialtyBySlug(slug: string): SpecialtyData | undefined {
+  return SPECIALTY_LIST.find(v => v.slug === slug)
 }
 
 // ── Concrete Pricing (aligned with catalog_items & lib/pricing.ts) ──

@@ -225,7 +225,7 @@ export default function ClientsTable({ initialClients }: { initialClients: Clien
               <th className="px-4 py-3 text-left text-xs text-white/30 tracking-widest uppercase font-normal">Base Plan</th>
               <th className="px-4 py-3 text-left text-xs text-white/30 tracking-widest uppercase font-normal">+Plans</th>
               <th className="px-4 py-3 text-left text-xs text-white/30 tracking-widest uppercase font-normal">Add-ons</th>
-              <th className="px-4 py-3 text-left text-xs text-white/30 tracking-widest uppercase font-normal">Vertical</th>
+              <th className="px-4 py-3 text-left text-xs text-white/30 tracking-widest uppercase font-normal">Specialty</th>
               <th className="px-4 py-3 text-left text-xs text-white/30 tracking-widest uppercase font-normal">Created</th>
               <th className="px-4 py-3 text-right text-xs text-white/30 tracking-widest uppercase font-normal">Actions</th>
             </tr>
@@ -261,7 +261,7 @@ export default function ClientsTable({ initialClients }: { initialClients: Clien
                       ? <span className="text-[#5E8B84]">{c.addons.join(', ')}</span>
                       : '—'}
                   </td>
-                  <td className="px-4 py-4 text-sm text-white/40 max-w-[120px] truncate">{c.primary_vertical || '—'}</td>
+                  <td className="px-4 py-4 text-sm text-white/40 max-w-[120px] truncate">{c.primary_specialty || '—'}</td>
                   <td className="px-4 py-4 text-sm text-white/40">
                     {c.created_at ? new Date(c.created_at).toLocaleDateString() : '—'}
                   </td>
@@ -417,7 +417,7 @@ export default function ClientsTable({ initialClients }: { initialClients: Clien
               <Row label="+ Plans">{(detailClient.additional_plans || []).length > 0 ? detailClient.additional_plans!.join(', ') : '—'}</Row>
               <Row label="Add-ons">{(detailClient.addons || []).length > 0 ? detailClient.addons!.join(', ') : '—'}</Row>
               <Row label="Onboarding">{detailClient.onboarding_status || '—'}</Row>
-              <Row label="Vertical">{detailClient.primary_vertical || '—'}</Row>
+              <Row label="Specialty">{detailClient.primary_specialty || '—'}</Row>
               <Row label="VIP Level">{detailClient.vip_level || '—'}</Row>
               <Row label="Lifecycle">{detailClient.lifecycle_stage || '—'}</Row>
               <Row label="Total Spend">{detailClient.total_spend ? `$${detailClient.total_spend}` : '—'}</Row>
@@ -438,7 +438,7 @@ export default function ClientsTable({ initialClients }: { initialClients: Clien
                 <option value="biz_name">Business Name</option>
                 <option value="email">Email</option>
                 <option value="phone">Phone</option>
-                <option value="primary_vertical">Vertical</option>
+                <option value="primary_specialty">Specialty</option>
                 <option value="vip_level">VIP Level</option>
                 <option value="lifecycle_stage">Lifecycle Stage</option>
                 <option value="client_type">Client Type</option>

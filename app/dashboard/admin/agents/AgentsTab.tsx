@@ -93,7 +93,7 @@ function AgentsContent() {
               <th className="px-6 py-3 text-left text-xs text-white/30 tracking-widest uppercase font-normal">Agent ID</th>
               <th className="px-6 py-3 text-left text-xs text-white/30 tracking-widest uppercase font-normal">Name</th>
               <th className="px-6 py-3 text-left text-xs text-white/30 tracking-widest uppercase font-normal">Role</th>
-              <th className="px-6 py-3 text-left text-xs text-white/30 tracking-widest uppercase font-normal">Vertical</th>
+              <th className="px-6 py-3 text-left text-xs text-white/30 tracking-widest uppercase font-normal">Specialty</th>
               <th className="px-6 py-3 text-left text-xs text-white/30 tracking-widest uppercase font-normal">Status</th>
               <th className="px-6 py-3 text-left text-xs text-white/30 tracking-widest uppercase font-normal">Published</th>
               <th className="px-6 py-3 text-right text-xs text-white/30 tracking-widest uppercase font-normal"></th>
@@ -113,7 +113,7 @@ function AgentsContent() {
                     {agent.role_type || 'NULL'}
                   </span>
                 </td>
-                <td className="px-6 py-4 text-sm text-white/50">{agent.vertical || '—'}</td>
+                <td className="px-6 py-4 text-sm text-white/50">{agent.agent_specialty || '—'}</td>
                 <td className="px-6 py-4">
                   <span className={`px-2 py-0.5 rounded text-xs font-medium border ${
                     agent.health_status === 'ACTIVE'

@@ -2,8 +2,8 @@
 
 import { useEffect, useState, useCallback } from 'react'
 
-type CatalogAgent = { agent_id: string; name: string; tagline?: string; vertical?: string; icon?: string }
-type CatalogSwarm = { swarm_key: string; name: string; description?: string; vertical_slug?: string; active_agents?: number }
+type CatalogAgent = { agent_id: string; name: string; tagline?: string; agent_specialty?: string; icon?: string }
+type CatalogSwarm = { swarm_key: string; name: string; description?: string; agent_specialty_slug?: string; active_agents?: number }
 
 export default function AdminDeploymentsPage() {
   const [clients, setClients] = useState<any[]>([])
@@ -157,7 +157,7 @@ export default function AdminDeploymentsPage() {
           client_id: clientId,
           swarm_id: picked.swarm_key,
           swarm_name: picked.name,
-          vertical: picked.vertical_slug,
+          specialty: picked.agent_specialty_slug,
         }),
       })
       const d = await res.json()
@@ -239,7 +239,7 @@ export default function AdminDeploymentsPage() {
                         tier ? (
                           <span>
                             Entitlements for <span className="text-white/70">{c.client.plan_tier_key}</span>: {' '}
-                            {tier.max_vertical_agents ?? 0} vertical agents, {tier.max_custom_agents ?? 0} custom agents,{' '}
+                            {tier.max_specialty_agents ?? 0} specialty agents, {tier.max_custom_agents ?? 0} custom agents,{' '}
                             {tier.max_swarms ?? tier.max_swarm_capacity ?? 0} swarms, {tier.max_workflows ?? 0} workflows.
                           </span>
                         ) : (
@@ -275,7 +275,7 @@ export default function AdminDeploymentsPage() {
                         <p className="text-xs font-medium text-white/50 mb-2">Deploy an Agent</p>
                         <div className="flex flex-wrap gap-2 items-center">
                           <input
-                            placeholder="Search the 415-agent catalog by name or vertical..."
+                            placeholder="Search the 415-agent catalog by name or specialty..."
                             value={agentSearch[cid] ?? ''}
                             onChange={(e) => { setAgentSearch((p) => ({ ...p, [cid]: e.target.value })); setAgentPicked((p) => ({ ...p, [cid]: null })) }}
                             className="flex-1 min-w-[220px] bg-white/5 border border-white/10 rounded-sm px-2 py-1.5 text-xs text-white/70 placeholder-white/30"
@@ -298,7 +298,7 @@ export default function AdminDeploymentsPage() {
                               >
                                 <span>{a.icon || '🔧'}</span>
                                 <span>{a.name}</span>
-                                <span className="text-white/30">· {a.vertical}</span>
+                                <span className="text-white/30">· {a.agent_specialty}</span>
                               </button>
                             ))}
                           </div>
@@ -315,7 +315,7 @@ export default function AdminDeploymentsPage() {
                           <div key={s.swarm_id} className="flex items-center justify-between bg-white/[0.02] rounded-sm px-3 py-2">
                             <div>
                               <p className="text-sm text-white">{s.swarm_name}</p>
-                              <p className="text-xs text-white/40">{s.vertical} · {s.status}</p>
+                              <p className="text-xs text-white/40">{s.specialty} · {s.status}</p>
                             </div>
                             <button onClick={() => handleRemoveSwarm(cid, s.swarm_id)} className="text-xs text-red-400 hover:text-red-300 transition-colors">
                               Remove
@@ -328,7 +328,7 @@ export default function AdminDeploymentsPage() {
                         <p className="text-xs font-medium text-white/50 mb-2">Deploy a Swarm</p>
                         <div className="flex flex-wrap gap-2 items-center">
                           <input
-                            placeholder="Search the 38-swarm catalog by name or vertical..."
+                            placeholder="Search the 38-swarm catalog by name or specialty..."
                             value={swarmSearch[cid] ?? ''}
                             onChange={(e) => { setSwarmSearch((p) => ({ ...p, [cid]: e.target.value })); setSwarmPicked((p) => ({ ...p, [cid]: null })) }}
                             className="flex-1 min-w-[220px] bg-white/5 border border-white/10 rounded-sm px-2 py-1.5 text-xs text-white/70 placeholder-white/30"
@@ -350,7 +350,7 @@ export default function AdminDeploymentsPage() {
                                 className="w-full text-left px-3 py-2 text-xs text-white/70 hover:bg-white/5 flex items-center gap-2"
                               >
                                 <span>{s.name}</span>
-                                <span className="text-white/30">· {s.vertical_slug} · {s.active_agents ?? 0} agents</span>
+                                <span className="text-white/30">· {s.agent_specialty_slug} · {s.active_agents ?? 0} agents</span>
                               </button>
                             ))}
                           </div>

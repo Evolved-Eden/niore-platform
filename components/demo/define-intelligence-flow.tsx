@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { BASE_PLANS, ADDONS, type PathType as PlanPathType } from './vertical-data'
+import { BASE_PLANS, ADDONS, type PathType as PlanPathType } from './specialty-data'
 
 type PathType = 'client' | 'creator' | 'personal' | 'affiliate' | null
 

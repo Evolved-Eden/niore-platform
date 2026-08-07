@@ -13,7 +13,7 @@ export async function GET() {
     evolution_statuses: { table: 'evolution_statuses', select: 'status_id', order: 'status_id' },
     agent_types: { table: 'agent_types', select: 'key, name, description', order: 'name' },
     archetypes: { table: 'archetypes', select: 'archetype_id, archetype_name', order: 'archetype_id' },
-    verticals: { table: 'verticals', select: 'key, name, description, icon', order: 'name' },
+    specialties: { table: 'specialties', select: 'key, name, description, icon', order: 'name' },
   };
 
   const results: Record<string, unknown> = {};

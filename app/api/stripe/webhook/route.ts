@@ -705,7 +705,7 @@ export async function POST(req: Request) {
 
     if (agentIds.length > 0 && org) {
       const registryMap = await lookupAgentRegistry(agentIds)
-      const vertical = meta.vertical || ""
+      const specialty = meta.specialty || ""
 
       const agentRecords = agentIds
         .map((agentId: string) => {
@@ -717,7 +717,7 @@ export async function POST(req: Request) {
             agent_name: reg.name,
             agent_id: agentId,
             role_type: "VERTICAL",
-            vertical,
+            agent_specialty: specialty,
             is_active: true,
             status: "active",
             health_status: "ACTIVE" as const,
@@ -728,7 +728,7 @@ export async function POST(req: Request) {
             capabilities: reg.capabilities || [],
             metadata: {
               source: "checkout",
-              vertical,
+              specialty,
               agent_id_ref: agentId,
             },
           }
@@ -748,7 +748,7 @@ export async function POST(req: Request) {
             agent_id: a.id,
             agent_name: a.agent_name,
             role_type: a.role_type,
-            vertical: a.vertical,
+            specialty: a.agent_specialty,
             deployment_status: "active",
             metadata: a.metadata,
           }))
@@ -784,9 +784,9 @@ export async function POST(req: Request) {
       }
     }
 
-    // ── 6. Tag org with vertical ──
-    const checkoutVertical = meta.vertical || ""
-    if (checkoutVertical && org) {
+    // ── 6. Tag org with specialty ──
+    const checkoutSpecialty = meta.specialty || ""
+    if (checkoutSpecialty && org) {
       const { data: orgRow } = await supabaseAdmin
         .from("organizations")
         .select("metadata")
@@ -795,7 +795,7 @@ export async function POST(req: Request) {
 
       await supabaseAdmin
         .from("organizations")
-        .update({ metadata: { ...((orgRow?.metadata as Record<string, unknown>) ?? {}), vertical: checkoutVertical } })
+        .update({ metadata: { ...((orgRow?.metadata as Record<string, unknown>) ?? {}), specialty: checkoutSpecialty } })
         .eq("id", org.id)
     }
 

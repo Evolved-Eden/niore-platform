@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { useVerticals } from '@/lib/verticals'
+import { useSpecialties } from '@/lib/specialties'
 import { useClientView } from '@/lib/client-view'
 
 // ── Types ─────────────────────────────────────────────────
@@ -25,7 +25,7 @@ interface DeployedAgent {
   agent_id: string
   agent_name: string
   role_type: string | null
-  vertical: string | null
+  specialty: string | null
   prompt: string | null
   intelligence_docs: Record<string, unknown>[] | null
   profile_image: string | null
@@ -40,7 +40,7 @@ interface UploadedFile {
   type: string
 }
 
-// VERTICALS replaced with dynamic useVerticals() hook below
+// SPECIALTIES replaced with dynamic useSpecialties() hook below
 
 const ROLE_TYPES = [
   'CORE', 'VERTICAL', 'BRIDGE', 'CROSS_SYSTEM', 'UTILITY', 'CRISIS',
@@ -61,9 +61,9 @@ export default function ClientAgentsPage() {
   const [registryAgents, setRegistryAgents] = useState<RegistryAgent[]>([])
   const [registryLoading, setRegistryLoading] = useState(true)
   const [search, setSearch] = useState('')
-  const [filterVertical, setFilterVertical] = useState('all')
+  const [filterSpecialty, setFilterSpecialty] = useState('all')
   const [filterRole, setFilterRole] = useState('all')
-  const { verticals, loading: verticalsLoading } = useVerticals()
+  const { specialties, loading: specialtiesLoading } = useSpecialties()
 
   // ── Deployed ──
   const [deployedAgents, setDeployedAgents] = useState<DeployedAgent[]>([])
@@ -80,7 +80,7 @@ export default function ClientAgentsPage() {
   const [deployForm, setDeployForm] = useState({
     agentName: '',
     roleType: '',
-    vertical: '',
+    specialty: '',
     prompt: '',
     profileImage: '',
   })
@@ -122,7 +122,7 @@ export default function ClientAgentsPage() {
     setDeployForm({
       agentName: agent.name,
       roleType: agent.agent_type || '',
-      vertical: agent.category || '',
+      specialty: agent.category || '',
       prompt: '',
       profileImage: '',
     })
@@ -149,7 +149,7 @@ export default function ClientAgentsPage() {
           agentId: deployModal.agent_id,
           agentName: deployForm.agentName.trim(),
           roleType: deployForm.roleType,
-          vertical: deployForm.vertical,
+          specialty: deployForm.specialty,
           prompt: deployForm.prompt,
           intelligenceDocs: uploadedFiles,
           profileImage: deployForm.profileImage || undefined,
@@ -226,7 +226,7 @@ export default function ClientAgentsPage() {
   // ── Filter registry ──
   const filteredRegistry = registryAgents.filter(a => {
     if (search && !a.name?.toLowerCase().includes(search.toLowerCase()) && !a.agent_id?.toLowerCase().includes(search.toLowerCase())) return false
-    if (filterVertical !== 'all' && a.category !== filterVertical) return false
+    if (filterSpecialty !== 'all' && a.category !== filterSpecialty) return false
     if (filterRole !== 'all' && a.agent_type !== filterRole) return false
     return true
   })
@@ -301,14 +301,14 @@ export default function ClientAgentsPage() {
               className="bg-white/5 border border-white/10 rounded-sm px-3 py-2 text-sm text-white/70 placeholder-white/30 w-60"
             />
             <select
-              value={filterVertical}
-              onChange={(e) => setFilterVertical(e.target.value)}
+              value={filterSpecialty}
+              onChange={(e) => setFilterSpecialty(e.target.value)}
               className="bg-white/5 border border-white/10 rounded-sm px-3 py-2 text-sm text-white/70"
             >
-              <option value="all">All Verticals</option>
-              {verticalsLoading ? (
+              <option value="all">All Specialties</option>
+              {specialtiesLoading ? (
                 <option value="" disabled>Loading...</option>
-              ) : verticals.map(v => (
+              ) : specialties.map(v => (
                 <option key={v.key} value={v.key}>{v.name || v.key}</option>
               ))}
             </select>
@@ -329,7 +329,7 @@ export default function ClientAgentsPage() {
             <div className="text-center py-16 text-white/30 text-sm">Loading agent catalog...</div>
           ) : filteredRegistry.length === 0 ? (
             <div className="text-center py-16 text-white/30 text-sm">
-              {search || filterVertical !== 'all' || filterRole !== 'all'
+              {search || filterSpecialty !== 'all' || filterRole !== 'all'
                 ? 'No agents match your filters'
                 : 'No agents available in the registry'
               }
@@ -472,10 +472,10 @@ export default function ClientAgentsPage() {
                         <span className="text-white/60">{agent.role_type}</span>
                       </div>
                     )}
-                    {agent.vertical && (
+                    {agent.specialty && (
                       <div className="flex justify-between">
-                        <span className="text-white/30">Vertical</span>
-                        <span className="text-white/60">{agent.vertical}</span>
+                        <span className="text-white/30">Specialty</span>
+                        <span className="text-white/60">{agent.specialty}</span>
                       </div>
                     )}
                     {agent.prompt && (
@@ -517,7 +517,7 @@ export default function ClientAgentsPage() {
                         setDeployForm({
                           agentName: agent.agent_name,
                           roleType: agent.role_type || '',
-                          vertical: agent.vertical || '',
+                          specialty: agent.specialty || '',
                           prompt: agent.prompt || '',
                           profileImage: agent.profile_image || '',
                         })
@@ -591,7 +591,7 @@ export default function ClientAgentsPage() {
                 />
               </div>
 
-              {/* Role Type + Vertical */}
+              {/* Role Type + Specialty */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-medium text-white/70 mb-1">Role Type</label>
@@ -607,16 +607,16 @@ export default function ClientAgentsPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-white/70 mb-1">Vertical</label>
+                  <label className="block text-xs font-medium text-white/70 mb-1">Specialty</label>
                   <select
-                    value={deployForm.vertical}
-                    onChange={(e) => setDeployForm({ ...deployForm, vertical: e.target.value })}
+                    value={deployForm.specialty}
+                    onChange={(e) => setDeployForm({ ...deployForm, specialty: e.target.value })}
                     className="w-full bg-white/5 border border-white/10 rounded-sm px-3 py-2 text-sm text-white/70"
                   >
-                    <option value="">Select Vertical</option>
-                    {verticalsLoading ? (
+                    <option value="">Select Specialty</option>
+                    {specialtiesLoading ? (
                       <option value="" disabled>Loading...</option>
-                    ) : verticals.map(v => (
+                    ) : specialties.map(v => (
                       <option key={v.key} value={v.key}>{v.name || v.key}</option>
                     ))}
                   </select>

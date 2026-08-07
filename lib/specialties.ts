@@ -2,22 +2,22 @@
 
 import { useState, useEffect } from 'react'
 
-let cachedVerticals: any[] | null = null
+let cachedSpecialties: any[] | null = null
 
-export async function fetchVerticals(): Promise<any[]> {
-  if (cachedVerticals) return cachedVerticals
+export async function fetchSpecialties(): Promise<any[]> {
+  if (cachedSpecialties) return cachedSpecialties
   try {
-    const res = await fetch('/api/admin/verticals')
+    const res = await fetch('/api/admin/specialties')
     if (!res.ok) throw new Error('Failed to fetch')
     const data = await res.json()
-    cachedVerticals = data.verticals || []
-    return cachedVerticals!
+    cachedSpecialties = data.specialties || []
+    return cachedSpecialties!
   } catch {
-    return getDefaultVerticals()
+    return getDefaultSpecialties()
   }
 }
 
-export function getDefaultVerticals() {
+export function getDefaultSpecialties() {
   return [
     { key: 'real_estate', name: 'Real Estate' },
     { key: 'hospitality', name: 'Hospitality' },
@@ -37,16 +37,16 @@ export function getDefaultVerticals() {
   ]
 }
 
-export function useVerticals() {
-  const [verticals, setVerticals] = useState<any[]>([])
+export function useSpecialties() {
+  const [specialties, setSpecialties] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetchVerticals().then(v => {
-      setVerticals(v)
+    fetchSpecialties().then(s => {
+      setSpecialties(s)
       setLoading(false)
     })
   }, [])
 
-  return { verticals, loading }
+  return { specialties, loading }
 }

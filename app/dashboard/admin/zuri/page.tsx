@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useVerticals } from '@/lib/verticals';
+import { useSpecialties } from '@/lib/specialties';
 import { useSelfClientKey } from '@/lib/client-view';
 
 const ZURI_AGENT_ID = 'AGT-215';
@@ -23,11 +23,11 @@ export default function ZuriAdminPage() {
   const [riskLevel, setRiskLevel] = useState('low');
   const [primaryTemplate, setPrimaryTemplate] = useState('');
   const [secondaryTemplate, setSecondaryTemplate] = useState('');
-  const [vertical, setVertical] = useState('core');
+  const [specialty, setSpecialty] = useState('core');
   const [agentName, setAgentName] = useState('');
   const [tagline, setTagline] = useState('');
   const [templates, setTemplates] = useState<any[]>([]);
-  const { verticals, loading: verticalsLoading } = useVerticals();
+  const { specialties, loading: specialtiesLoading } = useSpecialties();
 
   useEffect(() => {
     async function load() {
@@ -41,7 +41,7 @@ export default function ZuriAdminPage() {
           setAgent(zuri);
           setAgentName(zuri.agent_name || '');
           setTagline(zuri.tagline || '');
-          setVertical(zuri.vertical || 'core');
+          setSpecialty(zuri.agent_specialty || 'core');
           setAutonomyLevel(zuri.autonomy_level || 'supervised');
           setAuthorityLevel(zuri.authority_level || 'advisor');
           setRiskLevel(zuri.risk_level || 'low');
@@ -77,7 +77,7 @@ export default function ZuriAdminPage() {
         agentId: ZURI_AGENT_ID,
         agentName,
         tagline,
-        vertical,
+        agent_specialty: specialty,
         autonomyLevel,
         authorityLevel,
         riskLevel,
@@ -189,15 +189,15 @@ export default function ZuriAdminPage() {
             />
           </div>
           <div>
-            <label className="block text-xs text-white/40 mb-1.5">Vertical</label>
+            <label className="block text-xs text-white/40 mb-1.5">Specialty</label>
             <select
-              value={vertical}
-              onChange={(e) => setVertical(e.target.value)}
+              value={specialty}
+              onChange={(e) => setSpecialty(e.target.value)}
               className="w-full bg-white/5 border border-white/10 rounded-sm px-4 py-2.5 text-sm text-white"
             >
-              {verticalsLoading ? (
+              {specialtiesLoading ? (
                 <option value="" disabled>Loading...</option>
-              ) : verticals.map(v => (
+              ) : specialties.map(v => (
                 <option key={v.key} value={v.key}>{v.name || v.key.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase())}</option>
               ))}
             </select>

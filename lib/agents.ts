@@ -22,7 +22,7 @@ export interface AgentRecord {
   long_description: string | null
   tagline: string | null
   role_type: string | null
-  vertical: string | null
+  agent_specialty: string | null
   capabilities: unknown
   model: string | null
   system_prompt: string | null
@@ -102,7 +102,7 @@ export function buildFallbackSystemPrompt(agent: AgentRecord): string {
     `You are ${agent.agent_name || agent.agent_id}, an AI agent${agent.role_type ? ` (${agent.role_type})` : ""}.`,
     agent.tagline || null,
     agent.long_description || agent.description || null,
-    agent.vertical ? `Vertical: ${agent.vertical}` : null,
+    agent.agent_specialty ? `Specialty: ${agent.agent_specialty}` : null,
     capabilitiesText || null,
   ]
     .filter(Boolean)
@@ -117,7 +117,7 @@ export async function getAgentByAgentId(agentId: string): Promise<AgentRecord | 
   const { data, error } = await supabaseAdmin
     .from("agents")
     .select(
-      "id, agent_id, agent_name, description, long_description, tagline, role_type, vertical, capabilities, model, system_prompt, brand_kit_id, business_id"
+      "id, agent_id, agent_name, description, long_description, tagline, role_type, agent_specialty, capabilities, model, system_prompt, brand_kit_id, business_id"
     )
     .eq("agent_id", agentId)
     .is("deleted_at", null)

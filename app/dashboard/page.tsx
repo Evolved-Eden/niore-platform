@@ -132,7 +132,7 @@ const DEMO_LANES = [
 ]
 
 const EXCHANGE_ITEMS = [
-  'Agent templates for vertical demos',
+  'Agent templates for specialty demos',
   'Blueprint scoring and pricing paths',
   'n8n workflow bridge to Discord and social',
   'Supabase identity, roles, and vault data',

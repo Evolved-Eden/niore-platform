@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { swarmId, swarmName, vertical, memberAgentIds, configuration, departmentId } = body
+    const { swarmId, swarmName, specialty, memberAgentIds, configuration, departmentId } = body
 
     if (!swarmId || !swarmName) {
       return NextResponse.json(
@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
       client_id: ctx.clientId,
       swarm_id: swarmId,
       swarm_name: swarmName,
-      vertical: vertical || null,
+      specialty: specialty || null,
       member_agent_ids: memberAgentIds || [],
       configuration: configuration || null,
       department_id: departmentId || null,

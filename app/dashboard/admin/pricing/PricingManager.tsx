@@ -101,7 +101,7 @@ export default function PricingManager({ initialTiers, initialEntitlements }: { 
                   <th className="px-4 py-3 text-left text-xs text-white/30 tracking-widest uppercase font-normal">Key</th>
                   <th className="px-4 py-3 text-left text-xs text-white/30 tracking-widest uppercase font-normal">Name</th>
                   <th className="px-4 py-3 text-left text-xs text-white/30 tracking-widest uppercase font-normal">Org</th>
-                  <th className="px-4 py-3 text-right text-xs text-white/30 tracking-widest uppercase font-normal">Vert Agents</th>
+                  <th className="px-4 py-3 text-right text-xs text-white/30 tracking-widest uppercase font-normal">Specialty Agents</th>
                   <th className="px-4 py-3 text-right text-xs text-white/30 tracking-widest uppercase font-normal">Custom Agents</th>
                   <th className="px-4 py-3 text-right text-xs text-white/30 tracking-widest uppercase font-normal">Workflows</th>
                   <th className="px-4 py-3 text-right text-xs text-white/30 tracking-widest uppercase font-normal">Swarm Cap</th>
@@ -115,7 +115,7 @@ export default function PricingManager({ initialTiers, initialEntitlements }: { 
                     <td className="px-4 py-3 text-sm text-white/60 font-mono">{t.key}</td>
                     <td className="px-4 py-3 text-sm text-white/80">{t.name}</td>
                     <td className="px-4 py-3">{t.is_organization ? '🏢' : t.is_creator ? '🎨' : '—'}</td>
-                    <td className="px-4 py-3 text-sm text-white/60 text-right">{t.max_vertical_agents}</td>
+                    <td className="px-4 py-3 text-sm text-white/60 text-right">{t.max_specialty_agents}</td>
                     <td className="px-4 py-3 text-sm text-white/60 text-right">{t.max_custom_agents}</td>
                     <td className="px-4 py-3 text-sm text-white/60 text-right">{t.max_workflows}</td>
                     <td className="px-4 py-3 text-sm text-white/60 text-right">{t.max_swarm_capacity}</td>
@@ -149,7 +149,7 @@ export default function PricingManager({ initialTiers, initialEntitlements }: { 
                   <Field label="Sweet Spot" name="price_sweet_spot" value={editTier.price_sweet_spot || ''} />
                 </Grid>
                 <Grid>
-                  <Field label="Max Vert Agents" name="max_vertical_agents" value={editTier.max_vertical_agents ?? 0} type="number" />
+                  <Field label="Max Specialty Agents" name="max_specialty_agents" value={editTier.max_specialty_agents ?? 0} type="number" />
                   <Field label="Max Custom Agents" name="max_custom_agents" value={editTier.max_custom_agents ?? 0} type="number" />
                 </Grid>
                 <Grid>
@@ -182,7 +182,7 @@ export default function PricingManager({ initialTiers, initialEntitlements }: { 
               <thead>
                 <tr className="border-b border-white/[0.06]">
                   <th className="px-4 py-3 text-left text-xs text-white/30 tracking-widest uppercase font-normal">Plan</th>
-                  <th className="px-4 py-3 text-right text-xs text-white/30 tracking-widest uppercase font-normal">Vert Agents</th>
+                  <th className="px-4 py-3 text-right text-xs text-white/30 tracking-widest uppercase font-normal">Specialty Agents</th>
                   <th className="px-4 py-3 text-right text-xs text-white/30 tracking-widest uppercase font-normal">Custom</th>
                   <th className="px-4 py-3 text-right text-xs text-white/30 tracking-widest uppercase font-normal">Swarm</th>
                   <th className="px-4 py-3 text-right text-xs text-white/30 tracking-widest uppercase font-normal">Wf</th>
@@ -195,7 +195,7 @@ export default function PricingManager({ initialTiers, initialEntitlements }: { 
                 {entitlements.map((e: any) => (
                   <tr key={e.id} className="hover:bg-white/[0.02]">
                     <td className="px-4 py-3 text-sm text-white/70 font-mono">{e.plan_key}</td>
-                    <td className="px-4 py-3 text-sm text-white/60 text-right">{e.max_vertical_agents}</td>
+                    <td className="px-4 py-3 text-sm text-white/60 text-right">{e.max_specialty_agents}</td>
                     <td className="px-4 py-3 text-sm text-white/60 text-right">{e.max_custom_agents}</td>
                     <td className="px-4 py-3 text-sm text-white/60 text-right">{e.max_swarm_capacity}</td>
                     <td className="px-4 py-3 text-sm text-white/60 text-right">{e.max_workflows}</td>
@@ -224,7 +224,7 @@ export default function PricingManager({ initialTiers, initialEntitlements }: { 
                   </select>
                 </div>
                 <Grid>
-                  <Field label="Max Vert Agents" name="max_vertical_agents" value={editEnt.max_vertical_agents ?? 0} type="number" />
+                  <Field label="Max Specialty Agents" name="max_specialty_agents" value={editEnt.max_specialty_agents ?? 0} type="number" />
                   <Field label="Max Custom Agents" name="max_custom_agents" value={editEnt.max_custom_agents ?? 0} type="number" />
                 </Grid>
                 <Grid>

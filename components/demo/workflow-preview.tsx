@@ -3,7 +3,7 @@
 import { useState } from 'react'
 
 type WorkflowPreviewProps = {
-  verticalColor: string
+  accentColor: string
   workflowIds: string[]
 }
 
@@ -87,7 +87,7 @@ const WORKFLOWS: Record<string, {
   },
 }
 
-export default function WorkflowPreview({ verticalColor, workflowIds }: WorkflowPreviewProps) {
+export default function WorkflowPreview({ accentColor, workflowIds }: WorkflowPreviewProps) {
   const [expanded, setExpanded] = useState<string | null>(null)
 
   const workflows = workflowIds.map(id => WORKFLOWS[id]).filter(Boolean)
@@ -107,7 +107,7 @@ export default function WorkflowPreview({ verticalColor, workflowIds }: Workflow
                 className="flex items-center justify-between w-full p-3 text-left hover:bg-white/[0.02] transition-colors"
               >
                 <div className="flex items-center gap-3">
-                  <span className="text-sm" style={{ color: verticalColor }}>⚡</span>
+                  <span className="text-sm" style={{ color: accentColor }}>⚡</span>
                   <div>
                     <span className="text-xs font-medium text-white/70">{wf.name}</span>
                     <p className="text-[10px] text-white/40">{wf.trigger}</p>

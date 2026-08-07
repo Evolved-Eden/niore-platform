@@ -16,7 +16,7 @@ async function provisionAccount({
   fullName,
   planTierKey,
   role = 'client',
-  verticalKey = null,
+  specialtyKey = null,
   swarmKey = null,
 }: {
   userId: string
@@ -24,7 +24,7 @@ async function provisionAccount({
   fullName?: string | null
   planTierKey: string
   role?: string
-  verticalKey?: string | null
+  specialtyKey?: string | null
   swarmKey?: string | null
 }) {
   const supabase = await createAdminClient()
@@ -53,12 +53,12 @@ async function provisionAccount({
     name: `${name}'s Intelligence`,
     owner_id: userId,
     slug: `${email.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase()}_org`,
-    industry: verticalKey || null,
+    industry: specialtyKey || null,
     subscription_plan: planTierKey,
     subscription_status: 'active',
     organization_type: role,
     settings: {
-      vertical_key: verticalKey,
+      specialty_key: specialtyKey,
       swarm_key: swarmKey,
       plan_tier: planTierKey,
     },
@@ -180,7 +180,7 @@ export async function POST(request: NextRequest) {
     const email = body.email as string
     const planTierKey = (body.planTierKey as string) || 'client_founder'
     const role = (body.role as string) || 'client'
-    const verticalKey = (body.verticalKey as string) || null
+    const specialtyKey = (body.specialtyKey as string) || null
     const swarmKey = (body.swarmKey as string) || null
     const fullName = (body.fullName as string) || null
 
@@ -188,7 +188,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'userId and email required' }, { status: 400 })
     }
 
-    const result = await provisionAccount({ userId, email, fullName, planTierKey, role, verticalKey, swarmKey })
+    const result = await provisionAccount({ userId, email, fullName, planTierKey, role, specialtyKey, swarmKey })
 
     return NextResponse.json({
       success: true,

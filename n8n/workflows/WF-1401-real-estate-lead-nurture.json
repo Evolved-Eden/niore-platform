@@ -27,7 +27,7 @@
     {
       "parameters": {
         "method": "GET",
-        "url": "={{$env.SUPABASE_URL}}/rest/v1/clients?select=id,full_name,organization_id&organization_id=in.({{$json.org_ids}})&primary_vertical=eq.real_estate&status=eq.active&lifecycle_stage=eq.lead",
+        "url": "={{$env.SUPABASE_URL}}/rest/v1/clients?select=id,full_name,organization_id&organization_id=in.({{$json.org_ids}})&primary_specialty=eq.real_estate&status=eq.active&lifecycle_stage=eq.lead",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "httpHeaderAuth"
       },
@@ -41,7 +41,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "={{$env.NIORE_APP_URL}}/api/internal/verticals/run-agent",
+        "url": "={{$env.NIORE_APP_URL}}/api/internal/specialties/run-agent",
         "sendHeaders": true,
         "headerParameters": { "parameters": [ { "name": "x-internal-secret", "value": "={{$env.INTERNAL_CRON_SECRET}}" } ] },
         "sendBody": true,
@@ -56,7 +56,7 @@
       "id": "run-agent", "name": "Run Lead Nurture Agent (AGT-010)",
       "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [-100, 220],
       "onError": "continueRegularOutput",
-      "notes": "No published agent is literally named 'Lead Nurture Agent' -- mapped to AGT-010 (Client Experience Agent), the closest real published real_estate-vertical agent for prospect relationship work."
+      "notes": "No published agent is literally named 'Lead Nurture Agent' -- mapped to AGT-010 (Client Experience Agent), the closest real published real_estate-specialty agent for prospect relationship work."
     }
   ],
   "connections": {

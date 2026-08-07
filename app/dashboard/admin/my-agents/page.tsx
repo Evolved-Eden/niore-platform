@@ -22,7 +22,7 @@ interface DeployedAgent {
   agent_id: string
   agent_name: string
   role_type: string | null
-  vertical: string | null
+  specialty: string | null
   status: string
   created_at: string
 }
@@ -76,7 +76,7 @@ export default function AdminMyAgentsPage() {
           agentId: agent.agent_id || agent.id,
           agentName: agent.name,
           roleType: agent.agent_type || null,
-          vertical: agent.category || null,
+          specialty: agent.category || null,
         }),
       })
       const data = await res.json()
@@ -160,7 +160,7 @@ export default function AdminMyAgentsPage() {
                 </div>
                 <div>
                   <div className="text-sm text-white/80 font-medium">{agent.agent_name}</div>
-                  <div className="text-xs text-white/30">{agent.role_type || '—'} {agent.vertical ? `· ${agent.vertical}` : ''}</div>
+                  <div className="text-xs text-white/30">{agent.role_type || '—'} {agent.specialty ? `· ${agent.specialty}` : ''}</div>
                 </div>
               </div>
               <div className="flex items-center gap-3">

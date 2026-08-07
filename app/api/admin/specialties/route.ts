@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
       .order('name', { ascending: true });
 
     if (error) throw error;
-    return NextResponse.json({ verticals: data || [] });
+    return NextResponse.json({ specialties: data || [] });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (error) throw error;
-    return NextResponse.json({ success: true, vertical: data });
+    return NextResponse.json({ success: true, specialty: data });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

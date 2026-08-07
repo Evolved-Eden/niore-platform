@@ -11,7 +11,7 @@ interface SwarmTemplate {
   // optional here so callers' `t.swarm_name || t.name` fallback still works.
   swarm_name?: string | null
   description?: string | null
-  vertical_key?: string | null
+  agent_specialty_slug?: string | null
   member_agents?: string[] | null
   is_active?: boolean | null
 }
@@ -20,7 +20,7 @@ interface DeployedSwarm {
   id: string
   swarm_id: string
   swarm_name: string
-  vertical: string | null
+  specialty: string | null
   member_agent_ids: string[]
   status: string
   created_at: string
@@ -54,7 +54,7 @@ export default function AdminMySwarmsPage() {
       // Load deployed swarms
       const { data: dep } = await supabase
         .from('client_deployed_swarms')
-        .select('id, swarm_id, swarm_name, vertical, member_agent_ids, status, created_at')
+        .select('id, swarm_id, swarm_name, specialty, member_agent_ids, status, created_at')
         .eq('client_id', user.id)
         .order('created_at', { ascending: false })
       if (dep) setDeployed(dep as DeployedSwarm[])
@@ -80,7 +80,7 @@ export default function AdminMySwarmsPage() {
       client_id: userId,
       swarm_id: key,
       swarm_name: template.swarm_name || template.name || key,
-      vertical: template.vertical_key || null,
+      specialty: template.agent_specialty_slug || null,
       member_agent_ids: template.member_agents || [],
       status: 'active',
     } as any)
@@ -89,7 +89,7 @@ export default function AdminMySwarmsPage() {
         id: 'temp-' + Date.now(),
         swarm_id: key,
         swarm_name: template.swarm_name || template.name || key,
-        vertical: template.vertical_key || null,
+        specialty: template.agent_specialty_slug || null,
         member_agent_ids: template.member_agents || [],
         status: 'active',
         created_at: new Date().toISOString(),
@@ -160,7 +160,7 @@ export default function AdminMySwarmsPage() {
                 </div>
                 <div>
                   <div className="text-sm text-white/80 font-medium">{swarm.swarm_name}</div>
-                  <div className="text-xs text-white/30">{swarm.member_agent_ids?.length || 0} agents {swarm.vertical ? `· ${swarm.vertical}` : ''}</div>
+                  <div className="text-xs text-white/30">{swarm.member_agent_ids?.length || 0} agents {swarm.specialty ? `· ${swarm.specialty}` : ''}</div>
                 </div>
               </div>
               <div className="flex items-center gap-3">

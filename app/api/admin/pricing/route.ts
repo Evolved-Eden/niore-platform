@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
 
     if (action === 'upsert_tier') {
       const { id, key, name, description, is_organization, is_creator,
-              max_vertical_agents, max_custom_agents, max_workflows,
+              max_specialty_agents, max_custom_agents, max_workflows,
               max_swarm_capacity, max_memory_gbs, price_range, price_sweet_spot, status } = body
 
       if (id) {
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
           .from('membership_tiers')
           .update({
             key, name, description, is_organization, is_creator,
-            max_vertical_agents, max_custom_agents, max_workflows,
+            max_specialty_agents, max_custom_agents, max_workflows,
             max_swarm_capacity, max_memory_gbs, price_range, price_sweet_spot, status,
             updated_at: new Date().toISOString(),
           })
@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
           .from('membership_tiers')
           .insert({
             key, name, description, is_organization, is_creator,
-            max_vertical_agents, max_custom_agents, max_workflows,
+            max_specialty_agents, max_custom_agents, max_workflows,
             max_swarm_capacity, max_memory_gbs, price_range, price_sweet_spot,
             status: status || 'active',
           })
@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (action === 'upsert_entitlement') {
-      const { id, plan_key, max_vertical_agents, max_custom_agents, max_swarm_capacity,
+      const { id, plan_key, max_specialty_agents, max_custom_agents, max_swarm_capacity,
               max_workflows, max_ai_memory_gbs, can_use_legal_addon, can_use_wealth_addon,
               can_use_luxury_hospitality_addon, can_use_creator_commerce_addon, status } = body
 
@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
         const { error } = await supabaseAdmin
           .from('tier_entitlements')
           .update({
-            plan_key, max_vertical_agents, max_custom_agents,
+            plan_key, max_specialty_agents, max_custom_agents,
             max_swarm_capacity, max_workflows, max_ai_memory_gbs,
             can_use_legal_addon, can_use_wealth_addon,
             can_use_luxury_hospitality_addon, can_use_creator_commerce_addon,
@@ -87,7 +87,7 @@ export async function POST(request: NextRequest) {
         const { error } = await supabaseAdmin
           .from('tier_entitlements')
           .insert({
-            plan_key, max_vertical_agents, max_custom_agents,
+            plan_key, max_specialty_agents, max_custom_agents,
             max_swarm_capacity, max_workflows, max_ai_memory_gbs,
             can_use_legal_addon, can_use_wealth_addon,
             can_use_luxury_hospitality_addon, can_use_creator_commerce_addon,

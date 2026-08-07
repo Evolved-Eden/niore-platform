@@ -3,15 +3,15 @@
 import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useVerticals } from '@/lib/verticals';
+import { useSpecialties } from '@/lib/specialties';
 
 function SwarmsContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const search = searchParams.get('search') || '';
-  const vertical = searchParams.get('vertical') || '';
+  const specialty = searchParams.get('specialty') || '';
 
-  const { verticals, loading: verticalsLoading } = useVerticals();
+  const { specialties, loading: specialtiesLoading } = useSpecialties();
   const [swarms, setSwarms] = useState<any[]>([]);
   const [count, setCount] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -20,7 +20,7 @@ function SwarmsContent() {
     setLoading(true);
     const params = new URLSearchParams();
     if (search) params.set('search', search);
-    if (vertical) params.set('vertical', vertical);
+    if (specialty) params.set('specialty', specialty);
 
     fetch(`/api/admin/swarms?${params.toString()}`)
       .then(res => res.json())
@@ -30,7 +30,7 @@ function SwarmsContent() {
       })
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, [search, vertical]);
+  }, [search, specialty]);
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -59,26 +59,26 @@ function SwarmsContent() {
             if (e.key === 'Enter') {
               const params = new URLSearchParams();
               if (e.currentTarget.value) params.set('search', e.currentTarget.value);
-              if (vertical) params.set('vertical', vertical);
+              if (specialty) params.set('specialty', specialty);
               router.push(`/dashboard/admin/swarms?${params.toString()}`);
             }
           }}
         />
         <select
-          value={vertical}
+          value={specialty}
           onChange={(e) => {
             const params = new URLSearchParams();
             if (search) params.set('search', search);
-            if (e.target.value) params.set('vertical', e.target.value);
+            if (e.target.value) params.set('specialty', e.target.value);
             router.push(`/dashboard/admin/swarms?${params.toString()}`);
           }}
           className="bg-white/5 border border-white/10 rounded-sm px-3 py-2 text-sm text-white/70"
         >
-          <option value="">All Verticals</option>
-          {verticalsLoading ? (
+          <option value="">All Specialties</option>
+          {specialtiesLoading ? (
             <option value="" disabled>Loading...</option>
           ) : (
-            verticals.map((v) => (
+            specialties.map((v) => (
               <option key={v.key || v.id} value={v.key || v.id}>{v.name}</option>
             ))
           )}
@@ -117,9 +117,9 @@ function SwarmsContent() {
                 </div>
               </div>
 
-              {swarm.vertical_key && (
+              {swarm.agent_specialty_key && (
                 <div className="mt-3">
-                  <span className="px-2 py-0.5 bg-purple-500/10 text-purple-400 border border-purple-500/20 rounded text-xs">{swarm.vertical_key}</span>
+                  <span className="px-2 py-0.5 bg-purple-500/10 text-purple-400 border border-purple-500/20 rounded text-xs">{swarm.agent_specialty_key}</span>
                 </div>
               )}
 

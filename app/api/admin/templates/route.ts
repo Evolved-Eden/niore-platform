@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
         key: w.key,
         name: w.name,
         description: w.description,
-        vertical_key: w.tier,
+        specialty_key: w.tier,
         workflow_type: w.workflow_type,
         is_active: w.is_active,
         stages_json: w.stages_json || [],
@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
         .from('essenceboard_templates')
         .insert({
           key: body.key, name: body.name, description: body.description || null,
-          specialty_key: body.vertical_key || null, subcategory_key: body.subcategory_key || null,
+          specialty_key: body.specialty_key || null, subcategory_key: body.subcategory_key || null,
           is_active: body.is_active ?? true, sections_json: body.sections_json || [],
           template_json: body.template_json || {}, essence_json: body.essence_json || null,
           config_key: body.config_key || null, mas_category: body.mas_category || null,
@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
         .from('workflow_templates')
         .insert({
           key: body.key, name: body.name, description: body.description || null,
-          workflow_type: body.workflow_type || 'GENERAL', tier: body.vertical_key || null,
+          workflow_type: body.workflow_type || 'GENERAL', tier: body.specialty_key || null,
           is_active: body.is_active ?? true, stages_json: body.sections_json || [],
           workflow_json: body.template_json || {},
         })
@@ -107,7 +107,7 @@ export async function POST(request: NextRequest) {
       .from('essintelligence_templates')
       .insert({
         key: body.key, name: body.name, description: body.description || null,
-        specialty_key: body.vertical_key || null, subcategory_key: body.subcategory_key || null,
+        specialty_key: body.specialty_key || null, subcategory_key: body.subcategory_key || null,
         is_active: body.is_active ?? true, sections_json: body.sections_json || [],
         template_json: body.template_json || {}, essence_json: body.essence_json || null,
         config_key: body.config_key || null, mas_category: body.mas_category || null,

@@ -196,7 +196,7 @@ export default async function ClientProfilePage({ params }: { params: Promise<{ 
   const birthLocation = client?.birth_location
   const energyType = client?.energy_type
   const archetype = client?.archetype
-  const vertical = client?.primary_vertical ?? client?.vertical
+  const specialty = client?.primary_specialty ?? client?.specialty
 
   // ── Essence items (server-side fetch) ───────────────────────
   let essenceItems: { type: string; content: string; priority: string }[] = []
@@ -355,7 +355,7 @@ export default async function ClientProfilePage({ params }: { params: Promise<{ 
                 { label: 'Birth Date', value: dob ?? '—' },
                 { label: 'Birth Location', value: birthLocation ?? '—' },
                 { label: 'Archetype', value: archetype ?? '—' },
-                { label: 'Vertical', value: vertical ?? '—' },
+                { label: 'Specialty', value: specialty ?? '—' },
               ].map((field) => (
                 <div key={field.label} className="flex items-center justify-between border-b border-white/[0.04] pb-2.5">
                   <div>

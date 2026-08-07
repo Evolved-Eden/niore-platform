@@ -15,7 +15,7 @@ interface Workflow {
   id: string;
   name: string;
   description: string | null;
-  vertical: string;
+  specialty: string;
   category: string;
   run_status: string;
   is_active: boolean;
@@ -55,7 +55,7 @@ interface Client {
   user_email?: string;
 }
 
-interface Vertical {
+interface Specialty {
   id: string;
   name: string;
   key: string;
@@ -89,15 +89,15 @@ export default function WorkflowDesigner() {
   const [workflowName, setWorkflowName] = useState('');
   const [workflowDescription, setWorkflowDescription] = useState('');
   const [workflowType, setWorkflowType] = useState('INTAKE');
-  const [vertical, setVertical] = useState('');
+  const [specialty, setSpecialty] = useState('');
   const [category, setCategory] = useState('general');
 
-  // Suggest a descriptive name when type, vertical, or category changes
-  const suggestName = useCallback((type: string, vert: string, cat: string) => {
+  // Suggest a descriptive name when type, specialty, or category changes
+  const suggestName = useCallback((type: string, spec: string, cat: string) => {
     if (workflowId) return; // Don't overwrite existing workflow names
     const parts = [type?.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase())];
     if (cat && cat !== 'general') parts.push(cat.charAt(0).toUpperCase() + cat.slice(1));
-    if (vert && vert !== 'general') parts.push(vert.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase()));
+    if (spec && spec !== 'general') parts.push(spec.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase()));
     parts.push('Workflow');
     setWorkflowName(parts.join(' '));
   }, [workflowId]);
@@ -109,9 +109,9 @@ export default function WorkflowDesigner() {
     { key: 'identify_business', order: 1, title: 'Business Identification', required: true },
   ]);
 
-  // Verticals
-  const [verticals, setVerticals] = useState<Vertical[]>([]);
-  const [verticalsLoading, setVerticalsLoading] = useState(true);
+  // Specialties
+  const [specialties, setSpecialties] = useState<Specialty[]>([]);
+  const [specialtiesLoading, setSpecialtiesLoading] = useState(true);
 
   // Agents & Clients for assignment
   const [agents, setAgents] = useState<Agent[]>([]);
@@ -128,27 +128,27 @@ export default function WorkflowDesigner() {
   // Current workflow for editing
   const [currentWorkflowData, setCurrentWorkflowData] = useState<any>(null);
 
-  // Suggest name when type/vertical/category change (initial + subsequent)
+  // Suggest name when type/specialty/category change (initial + subsequent)
   useEffect(() => {
-    suggestName(workflowType, vertical, category);
-  }, [workflowType, vertical, category, suggestName]);
+    suggestName(workflowType, specialty, category);
+  }, [workflowType, specialty, category, suggestName]);
 
-  // Fetch verticals on mount
+  // Fetch specialties on mount
   useEffect(() => {
-    const loadVerticals = async () => {
+    const loadSpecialties = async () => {
       try {
-        const res = await fetch('/api/admin/verticals');
+        const res = await fetch('/api/admin/specialties');
         if (res.ok) {
           const data = await res.json();
-          setVerticals(data.verticals || []);
+          setSpecialties(data.specialties || []);
         }
       } catch (err) {
-        console.error('Failed to load verticals:', err);
+        console.error('Failed to load specialties:', err);
       } finally {
-        setVerticalsLoading(false);
+        setSpecialtiesLoading(false);
       }
     };
-    loadVerticals();
+    loadSpecialties();
   }, []);
 
   // Fetch agents and clients for assignment selectors
@@ -236,7 +236,7 @@ export default function WorkflowDesigner() {
     setWorkflowId(wf.id);
     setWorkflowName(wf.name);
     setWorkflowDescription(wf.description || '');
-    setVertical(wf.vertical);
+    setSpecialty(wf.specialty);
     setCategory(wf.category || 'general');
     setTagsInput((wf.tags || []).join(', '));
     setN8nWebhookUrl(wf.n8n_webhook_url || '');
@@ -283,7 +283,7 @@ export default function WorkflowDesigner() {
         name: workflowName,
         description: workflowDescription || null,
         type: workflowType,
-        vertical,
+        specialty,
         category,
         tags,
         stages,
@@ -293,7 +293,7 @@ export default function WorkflowDesigner() {
       const payload: any = {
         name: workflowName,
         description: workflowDescription || null,
-        vertical: vertical || 'general',
+        specialty: specialty || 'general',
         workflow_json: workflowJson,
         stages: stages,
         category,
@@ -411,7 +411,7 @@ export default function WorkflowDesigner() {
             setWorkflowName('');
             setWorkflowDescription('');
             setWorkflowType('INTAKE');
-            setVertical('');
+            setSpecialty('');
               setCategory('general');
               setTagsInput('');
               setN8nWebhookUrl('');
@@ -429,7 +429,7 @@ export default function WorkflowDesigner() {
         </div>
       </div>
 
-      {/* Row 1: Workflow Name | Description | Type | Category | Vertical */}
+      {/* Row 1: Workflow Name | Description | Type | Category | Specialty */}
       <div className="glass rounded-sm p-6 border border-white/[0.06]">
         <h2 className="text-lg font-bold text-white/80 mb-4">Workflow Configuration</h2>
         <div className="grid grid-cols-5 gap-4">
@@ -483,15 +483,15 @@ export default function WorkflowDesigner() {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-white/70 mb-1">Vertical</label>
+            <label className="block text-sm font-medium text-white/70 mb-1">Specialty</label>
             <select
-              value={vertical}
-              onChange={(e) => setVertical(e.target.value)}
+              value={specialty}
+              onChange={(e) => setSpecialty(e.target.value)}
               className="w-full bg-white/5 border border-white/10 rounded-sm px-3 py-2 text-sm text-white/70"
-              disabled={verticalsLoading}
+              disabled={specialtiesLoading}
             >
-              <option value="">{verticalsLoading ? 'Loading...' : 'None (Universal)'}</option>
-              {verticals.length === 0 && !verticalsLoading && (
+              <option value="">{specialtiesLoading ? 'Loading...' : 'None (Universal)'}</option>
+              {specialties.length === 0 && !specialtiesLoading && (
                 <>
                   <option value="real_estate">Real Estate</option>
                   <option value="hospitality">Hospitality</option>
@@ -500,7 +500,7 @@ export default function WorkflowDesigner() {
                   <option value="beauty">Beauty</option>
                 </>
               )}
-              {verticals.map((v) => (
+              {specialties.map((v) => (
                 <option key={v.id} value={v.key || v.name.toLowerCase()}>{v.name}</option>
               ))}
             </select>
@@ -679,7 +679,7 @@ export default function WorkflowDesigner() {
             name: workflowName,
             description: workflowDescription || null,
             type: workflowType,
-            vertical,
+            specialty,
             category,
             tags: tagsInput.split(',').map((t) => t.trim()).filter(Boolean),
             n8n_webhook_url: n8nWebhookUrl || null,

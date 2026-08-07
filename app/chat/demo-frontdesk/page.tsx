@@ -10,7 +10,7 @@ type Message = {
   content: string;
 };
 
-const VERTICAL_DEMOS = [
+const SPECIALTY_DEMOS = [
   {
     id: "med_spa",
     title: "Luxury Med Spa",
@@ -72,8 +72,8 @@ function DemoContent() {
   const [greetingReady, setGreetingReady] = useState(false);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [showVerticalPicker, setShowVerticalPicker] = useState(false);
-  const [selectedVertical, setSelectedVertical] = useState("");
+  const [showSpecialtyPicker, setShowSpecialtyPicker] = useState(false);
+  const [selectedSpecialty, setSelectedSpecialty] = useState("");
   const [showPaymentCta, setShowPaymentCta] = useState(false);
   const [showFaqSidebar, setShowFaqSidebar] = useState(false);
   const [faqSearch, setFaqSearch] = useState("");
@@ -107,8 +107,8 @@ function DemoContent() {
       chips.push({ label: "📝 What's the Assessment?", question: "What is the Essence Assessment?" });
       chips.push({ label: "🔄 Retake", question: "Can I retake the Assessment?" });
     }
-    if (lastMsg.toLowerCase().includes("vertical") || lastMsg.toLowerCase().includes("industry") || lastMsg.toLowerCase().includes("demo")) {
-      chips.push({ label: "🏢 What verticals?", question: "What verticals do you support?" });
+    if (lastMsg.toLowerCase().includes("specialty") || lastMsg.toLowerCase().includes("industry") || lastMsg.toLowerCase().includes("demo")) {
+      chips.push({ label: "🏢 What specialties?", question: "What specialties do you support?" });
     }
     if (lastMsg.toLowerCase().includes("security") || lastMsg.toLowerCase().includes("data") || lastMsg.toLowerCase().includes("private")) {
       chips.push({ label: "🔒 Is my data secure?", question: "Is my data secure?" });
@@ -148,14 +148,14 @@ function DemoContent() {
     inputRef.current?.focus();
   }, [isLoading]);
 
-  // Detect when Zuri asks about vertical selection
+  // Detect when Zuri asks about specialty selection
   const lastAssistantMsg = messages.filter(m => m.role === "assistant").slice(-1)[0]?.content || "";
   useEffect(() => {
-    const verticalKeywords = VERTICAL_DEMOS.map(v => v.title.toLowerCase());
-    const hasVerticalRef = verticalKeywords.some(k => lastAssistantMsg.toLowerCase().includes(k));
+    const specialtyKeywords = SPECIALTY_DEMOS.map(v => v.title.toLowerCase());
+    const hasSpecialtyRef = specialtyKeywords.some(k => lastAssistantMsg.toLowerCase().includes(k));
     const userCount = messages.filter(m => m.role === "user").length;
-    if (lastAssistantMsg.toLowerCase().includes("pick") || lastAssistantMsg.toLowerCase().includes("choose") || hasVerticalRef) {
-      if (userCount >= 3) setShowVerticalPicker(true);
+    if (lastAssistantMsg.toLowerCase().includes("pick") || lastAssistantMsg.toLowerCase().includes("choose") || hasSpecialtyRef) {
+      if (userCount >= 3) setShowSpecialtyPicker(true);
     }
   }, [lastAssistantMsg]);
 
@@ -168,7 +168,7 @@ function DemoContent() {
     setMessages(updated);
     setInput("");
     setIsLoading(true);
-    setShowVerticalPicker(false);
+    setShowSpecialtyPicker(false);
 
     setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
 
@@ -218,11 +218,11 @@ function DemoContent() {
     }
   }
 
-  function selectVertical(v: string) {
-    setSelectedVertical(v);
-    setShowVerticalPicker(false);
+  function selectSpecialty(v: string) {
+    setSelectedSpecialty(v);
+    setShowSpecialtyPicker(false);
     // Send the selection to Zuri
-    setInput(`I'd like to see the ${VERTICAL_DEMOS.find(d => d.id === v)?.title || v} demo`);
+    setInput(`I'd like to see the ${SPECIALTY_DEMOS.find(d => d.id === v)?.title || v} demo`);
     setTimeout(() => {
       const form = document.querySelector("form");
       form?.requestSubmit();
@@ -231,8 +231,8 @@ function DemoContent() {
 
   function handleReset() {
     setMessages([]);
-    setShowVerticalPicker(false);
-    setSelectedVertical("");
+    setShowSpecialtyPicker(false);
+    setSelectedSpecialty("");
     setShowPaymentCta(false);
     setInput("");
     setGreetingReady(false);
@@ -311,7 +311,7 @@ function DemoContent() {
       </div>
 
       {/* FAQ Quick-Chips */}
-      {faqQuickChips.length > 0 && messages.length > 1 && !showVerticalPicker && !showPaymentCta && (
+      {faqQuickChips.length > 0 && messages.length > 1 && !showSpecialtyPicker && !showPaymentCta && (
         <div className="px-6 pb-3">
           <div className="max-w-2xl mx-auto">
             <p className="text-[10px] text-white/20 mb-2 tracking-wider uppercase">Quick Answers</p>
@@ -336,16 +336,16 @@ function DemoContent() {
         </div>
       )}
 
-      {/* Vertical Selection Cards */}
-      {showVerticalPicker && !selectedVertical && (
+      {/* Specialty Selection Cards */}
+      {showSpecialtyPicker && !selectedSpecialty && (
         <div className="px-6 pb-6">
           <div className="max-w-2xl mx-auto">
             <p className="text-xs text-white/30 mb-3 tracking-wider uppercase">Choose a demo to explore</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-              {VERTICAL_DEMOS.map((v) => (
+              {SPECIALTY_DEMOS.map((v) => (
                 <button
                   key={v.id}
-                  onClick={() => selectVertical(v.id)}
+                  onClick={() => selectSpecialty(v.id)}
                   className="glass rounded-sm p-4 border border-white/[0.06] hover:border-white/20 hover:bg-white/[0.03] transition-all text-left group"
                 >
                   <div className="text-lg mb-1" style={{ color: v.color }}>{v.emoji}</div>

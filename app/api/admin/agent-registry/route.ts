@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
         outputs: a.outputs || [],
         workflow_ids: (meta.workflow_ids as string[]) || [],
         agent_type: a.agent_type || 'ai',
-        category: (meta.category as string) || a.mas_category || a.vertical || null,
+        category: (meta.category as string) || a.mas_category || a.agent_specialty || null,
         is_active: (a as any).status === 'active',
         is_published: (a as any).is_published ?? false,
         metadata: meta,

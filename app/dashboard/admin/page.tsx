@@ -17,7 +17,7 @@ export default async function AdminOverview() {
   // ── Agent catalog (416 agents) ──
   const { data: agentCatalog } = await supabaseAdmin
     .from('agent_catalog')
-    .select('role_type, category, vertical, is_system_agent')
+    .select('role_type, category, agent_specialty, is_system_agent')
 
   const agentCount = agentCatalog?.length ?? 0
 

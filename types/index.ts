@@ -125,8 +125,8 @@ export type EssenceTemplateRow = {
   key: string
   name?: string | null
   description?: string | null
-  vertical_id?: string | null
-  vertical_key?: string | null
+  specialty_id?: string | null
+  specialty_key?: string | null
   sections_json?: unknown
   template_json?: unknown
   is_active?: boolean | null
@@ -139,8 +139,8 @@ export type RISTemplateRow = {
   key: string
   name?: string | null
   description?: string | null
-  vertical_id?: string | null
-  vertical_key?: string | null
+  specialty_id?: string | null
+  specialty_key?: string | null
   signal_weights_json?: unknown
   template_json?: unknown
   is_active?: boolean | null
@@ -148,7 +148,7 @@ export type RISTemplateRow = {
   updated_at?: string
 }
 
-export type VerticalRow = {
+export type SpecialtyRow = {
   id: string
   key?: string | null
   name?: string | null
@@ -161,11 +161,11 @@ export type VerticalRow = {
   updated_at?: string
 }
 
-export type VerticalSubRow = {
+export type SpecialtySubRow = {
   id: string
   key?: string | null
-  vertical_id?: string | null
-  vertical_key?: string | null
+  specialty_id?: string | null
+  specialty_key?: string | null
   name?: string | null
   description?: string | null
   slug?: string | null
@@ -182,7 +182,7 @@ export type AgentTypeRow = {
   description?: string | null
   capabilities?: unknown
   runtime_type?: string | null
-  canonical_vertical_slug?: string | null
+  canonical_agent_specialty_slug?: string | null
   canonical_template?: string | null
   is_active?: boolean | null
   created_at?: string
@@ -199,7 +199,7 @@ export type SwarmTemplateRow = {
   template_json?: unknown
   is_active?: boolean | null
   metadata?: unknown
-  vertical_key?: string | null
+  agent_specialty_key?: string | null
   created_at?: string
   updated_at?: string
 }
@@ -304,7 +304,7 @@ export type Business = {
   organization_id?: string
   name?: string
   slug?: string
-  vertical_id?: string | null
+  specialty_id?: string | null
   onboarding_status?: string | null
   metadata?: Record<string, unknown> | null
   specialty_ids?: string[] | null
@@ -330,7 +330,7 @@ export type Client = {
   onboarding_status?: string | null
   plan_tier_key?: string | null
   access_mode_key?: string | null
-  primary_vertical?: string | null
+  primary_specialty?: string | null
   birthday?: string | null
   agent_deployments?: number | null
   swarm_deployments?: number | null
@@ -407,7 +407,7 @@ export type MembershipTier = {
   features?: Record<string, unknown> | null
   is_organization?: boolean
   is_creator?: boolean
-  max_vertical_agents?: number
+  max_specialty_agents?: number
   max_custom_agents?: number
   max_swarm_capacity?: number
   max_workflows?: number
@@ -423,7 +423,7 @@ export type TierEntitlement = {
   id: string
   plan_key?: string
   category?: string | null
-  max_vertical_agents?: number
+  max_specialty_agents?: number
   max_custom_agents?: number
   max_agents?: number
   max_swarm_capacity?: number
@@ -524,7 +524,7 @@ export type ClientTwin = {
   intelligence_score?: number | null
   intelligence_state?: string | null
   mas_vector?: Record<string, unknown> | null
-  preferred_verticals?: string[] | null
+  preferred_specialties?: string[] | null
   memory_score?: number | null
   mas_score?: Record<string, unknown> | null
   mas_state?: Record<string, unknown> | null
@@ -559,8 +559,8 @@ export type AIMemory = {
 export type CanonicalAgent = {
   slug?: string
   name?: string
-  vertical?: string | null
-  canonical_vertical_slug?: string | null
+  agent_specialty?: string | null
+  canonical_agent_specialty_slug?: string | null
   canonical_template?: string | null
   is_master?: boolean
   is_bridge?: boolean
@@ -589,7 +589,6 @@ export type KnowledgeBaseEntry = {
   org_id?: string | null
   title?: string | null
   content?: string | null
-  vertical?: string | null
   specialty?: string | null
   source_type?: string | null
   source_id?: string | null
@@ -647,7 +646,7 @@ export type ClientDeployedAgentRow = {
   agent_id?: string | null
   agent_name: string
   role_type?: string | null
-  vertical?: string | null
+  specialty?: string | null
   prompt?: string | null
   intelligence_docs?: Record<string, unknown>[] | null
   profile_image?: string | null
@@ -671,7 +670,7 @@ export type ClientDeployedSwarmRow = {
   client_id?: string | null
   swarm_id: string
   swarm_name: string
-  vertical?: string | null
+  specialty?: string | null
   member_agent_ids?: string[] | null
   configuration?: Record<string, unknown> | null
   status?: string | null
@@ -709,8 +708,8 @@ export type CanonicalAgentMapRow = {
   id: string
   slug?: string | null
   name?: string | null
-  vertical?: string | null
-  canonical_vertical_slug?: string | null
+  agent_specialty?: string | null
+  canonical_agent_specialty_slug?: string | null
   canonical_template?: string | null
   is_master?: boolean | null
   is_bridge?: boolean | null
@@ -728,7 +727,7 @@ export type CanonicalAgentMapRow = {
 
 export type WorkflowDemoRow = {
   id: string
-  vertical?: string | null
+  specialty?: string | null
   name?: string | null
   description?: string | null
   workflow_json?: Record<string, unknown> | null
@@ -808,7 +807,7 @@ export type ClientNotificationPrefsRow = {
 
 // public.client_essence_actions -- logs an agent execution triggered from an
 // EssenceBoard item. Written by app/api/client/essence/execute/route.ts and
-// app/api/internal/verticals/run-agent/route.ts. Field names here match what
+// app/api/internal/specialties/run-agent/route.ts. Field names here match what
 // those callers actually read/write (action_type/prompt/status/etc.), not
 // the older action/input_data/output_data columns from the initial
 // 00028_essence_text_columns.sql create -- the table has evidently grown
@@ -862,8 +861,8 @@ export type Agent = {
   metadata?: Record<string, unknown> | null
   capabilities?: Record<string, unknown> | null
   specialties?: string[] | null
-  vertical?: string | null
-  vertical_subs?: string[] | null
+  agent_specialty?: string | null
+  agent_specialty_subs?: string[] | null
   archetype_id?: string | null
   avatar_id?: string | null
   avatar?: string | null
@@ -922,7 +921,7 @@ export type AgentRegistryRow = {
   icon?: string | null
   color?: string | null
   capabilities?: string[] | null
-  vertical_ids?: string[] | null
+  specialty_ids?: string[] | null
   triggers?: string[] | null
   data_sources?: string[] | null
   outputs?: string[] | null
@@ -950,7 +949,7 @@ export type AgentCatalogRow = {
   capabilities?: string[] | null
   agent_type?: string | null
   category?: string | null
-  vertical?: string | null
+  agent_specialty?: string | null
   role_type?: string | null
   is_active?: boolean | null
   is_published?: boolean | null
@@ -967,7 +966,7 @@ export type SwarmCatalogRow = {
   swarm_key?: string | null
   name?: string | null
   description?: string | null
-  vertical_key?: string | null
+  agent_specialty_slug?: string | null
   member_agents?: string[] | null
   is_active?: boolean | null
   template_type?: string | null
@@ -990,7 +989,7 @@ export type AgentSwarmRow = {
   primary_objective?: string | null
   memory_enabled?: boolean | null
   autonomous_enabled?: boolean | null
-  vertical_slug?: string | null
+  agent_specialty_slug?: string | null
   swarm_type?: string | null
   client_id?: string | null
   active_agents?: number | null
@@ -1143,8 +1142,8 @@ export type CourseEnrollmentRow = {
 export type EvolvedEdenAgentRow = {
   agent_id: string
   agent_name: string
-  vertical?: string | null
-  subvertical?: string | null
+  agent_specialty?: string | null
+  sub_agent_specialty?: string | null
   role_type?: string | null
   archetype_id?: number | null
   archetype_name?: string | null
@@ -1237,8 +1236,8 @@ export type Database = {
       swarm_templates: TableWithDefaults<SwarmTemplateRow>
       tier_entitlements: TableWithDefaults<TierEntitlement>
       users: TableWithDefaults<User>
-      specialty_subs: TableWithDefaults<VerticalSubRow>
-      specialties: TableWithDefaults<VerticalRow>
+      specialty_subs: TableWithDefaults<SpecialtySubRow>
+      specialties: TableWithDefaults<SpecialtyRow>
       workflow_demos: TableWithDefaults<WorkflowDemoRow>
       workflow_run_logs: TableWithDefaults<WorkflowRunLogRow>
     }

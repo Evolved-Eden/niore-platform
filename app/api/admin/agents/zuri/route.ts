@@ -7,7 +7,7 @@ export async function PUT(request: Request) {
     const auth = await requireAdmin();
     if (auth instanceof NextResponse) return auth;
     const body = await request.json();
-    const { agentId, agentName, tagline, vertical, autonomyLevel, authorityLevel, riskLevel, primaryTemplate, secondaryTemplate, metadata } = body;
+    const { agentId, agentName, tagline, agent_specialty, autonomyLevel, authorityLevel, riskLevel, primaryTemplate, secondaryTemplate, metadata } = body;
 
     if (!agentId) {
       return NextResponse.json({ error: 'agentId required' }, { status: 400 });
@@ -16,7 +16,7 @@ export async function PUT(request: Request) {
     const updates: Record<string, any> = { updated_at: new Date().toISOString() };
     if (agentName !== undefined) updates.agent_name = agentName;
     if (tagline !== undefined) updates.tagline = tagline;
-    if (vertical !== undefined) updates.vertical = vertical;
+    if (agent_specialty !== undefined) updates.agent_specialty = agent_specialty;
     if (autonomyLevel !== undefined) updates.autonomy_level = autonomyLevel;
     if (authorityLevel !== undefined) updates.authority_level = authorityLevel;
     if (riskLevel !== undefined) updates.risk_level = riskLevel;

@@ -2,19 +2,19 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { ADDONS, BASE_PLANS, type PathType } from './vertical-data'
+import { ADDONS, BASE_PLANS, type PathType } from './specialty-data'
 
 type PlanBuilderProps = {
   path: PathType
   defaultPlan?: string
-  verticalColor?: string
-  /** Optional vertical slug (passed from demo pages) */
-  vertical?: string
+  accentColor?: string
+  /** Optional specialty slug (passed from demo pages) */
+  specialty?: string
   /** Optional agent IDs selected in the demo */
   agentIds?: string[]
 }
 
-export default function PlanBuilder({ path, defaultPlan, verticalColor = '#C6A664', vertical, agentIds }: PlanBuilderProps) {
+export default function PlanBuilder({ path, defaultPlan, accentColor = '#C6A664', specialty, agentIds }: PlanBuilderProps) {
   const router = useRouter()
   const plans: Record<string, { name: string; price: number; period: string; tagline: string; popular?: boolean }> = BASE_PLANS[path]
   const planEntries = Object.entries(plans)
@@ -53,7 +53,7 @@ export default function PlanBuilder({ path, defaultPlan, verticalColor = '#C6A66
           path,
           addons: ADDONS.filter(a => selectedAddons.has(a.id)).map(a => ({ id: a.id, name: a.name })),
           agent_ids: agentIds || [],
-          vertical: vertical || '',
+          specialty: specialty || '',
         }),
       })
 
@@ -134,7 +134,7 @@ export default function PlanBuilder({ path, defaultPlan, verticalColor = '#C6A66
                 <p className="text-[10px] text-white/40 truncate">{addon.desc}</p>
               </div>
               <div className="flex items-center gap-2 ml-3">
-                <span className="text-xs font-mono whitespace-nowrap" style={{ color: verticalColor }}>
+                <span className="text-xs font-mono whitespace-nowrap" style={{ color: accentColor }}>
                   +${addon.price}{addon.period}
                 </span>
                 <div className={`w-4 h-4 rounded-sm border flex items-center justify-center transition-all ${
@@ -176,7 +176,7 @@ export default function PlanBuilder({ path, defaultPlan, verticalColor = '#C6A66
           <div className="flex justify-between items-baseline">
             <span className="text-sm font-semibold text-white/80">Total</span>
             <div className="text-right">
-              <span className="text-xl font-bold" style={{ color: verticalColor }}>
+              <span className="text-xl font-bold" style={{ color: accentColor }}>
                 ${total.toLocaleString()}
               </span>
               <span className="text-xs text-white/30 ml-1">
@@ -201,7 +201,7 @@ export default function PlanBuilder({ path, defaultPlan, verticalColor = '#C6A66
         disabled={checkoutLoading}
         className="block w-full py-3.5 text-center text-sm font-bold rounded-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         style={{
-          backgroundColor: verticalColor,
+          backgroundColor: accentColor,
           color: '#000',
         }}
         onMouseOver={(e) => { if (!checkoutLoading) e.currentTarget.style.opacity = '0.9' }}

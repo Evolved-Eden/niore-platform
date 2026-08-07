@@ -50,7 +50,7 @@ export async function GET(req: NextRequest) {
         id: swarm.id,
         swarm_id: swarm.swarm_id,
         swarm_name: swarm.swarm_name,
-        vertical: swarm.vertical,
+        specialty: swarm.specialty,
         status: swarm.status,
       })
     }
@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
   try {
     const auth = await requireAdmin()
     if (auth instanceof NextResponse) return auth
-    const { client_id, swarm_id, swarm_name, vertical, action } = await req.json()
+    const { client_id, swarm_id, swarm_name, specialty, action } = await req.json()
 
     if (!client_id) {
       return NextResponse.json({ error: 'client_id is required' }, { status: 400 })
@@ -82,7 +82,7 @@ export async function POST(req: NextRequest) {
           client_id,
           swarm_id,
           swarm_name,
-          vertical: vertical || null,
+          specialty: specialty || null,
           status: 'active',
         })
         .select()

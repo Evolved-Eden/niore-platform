@@ -27,7 +27,7 @@
     {
       "parameters": {
         "method": "GET",
-        "url": "={{$env.SUPABASE_URL}}/rest/v1/clients?select=id,full_name,organization_id,metadata&organization_id=in.({{$json.org_ids}})&primary_vertical=eq.real_estate&status=eq.active&lifecycle_stage=eq.searching",
+        "url": "={{$env.SUPABASE_URL}}/rest/v1/clients?select=id,full_name,organization_id,metadata&organization_id=in.({{$json.org_ids}})&primary_specialty=eq.real_estate&status=eq.active&lifecycle_stage=eq.searching",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "httpHeaderAuth"
       },
@@ -40,7 +40,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "={{$env.NIORE_APP_URL}}/api/internal/verticals/run-agent",
+        "url": "={{$env.NIORE_APP_URL}}/api/internal/specialties/run-agent",
         "sendHeaders": true,
         "headerParameters": { "parameters": [ { "name": "x-internal-secret", "value": "={{$env.INTERNAL_CRON_SECRET}}" } ] },
         "sendBody": true,

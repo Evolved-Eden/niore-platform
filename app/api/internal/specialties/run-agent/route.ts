@@ -4,12 +4,12 @@ import { runAgentByAgentId } from '@/lib/agents'
 
 export const dynamic = 'force-dynamic'
 
-// Shared execution endpoint for scheduled vertical-pack workflows (n8n cron
+// Shared execution endpoint for scheduled specialty-pack workflows (n8n cron
 // jobs, e.g. the Real Estate Pack workflows) to run a real agent against a
 // specific client without a browser session. Mirrors the shape of
 // /api/client/essence/execute (same client_essence_actions logging) but
 // works for service-role/cron callers and doesn't require an essence_item_id
-// -- vertical-pack workflows aren't tied to a specific EssenceBoard item.
+// -- specialty-pack workflows aren't tied to a specific EssenceBoard item.
 export async function POST(req: NextRequest) {
   const secret = req.headers.get('x-internal-secret')
   if (!secret || secret !== process.env.INTERNAL_CRON_SECRET) {
@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
       const { output } = await runAgentByAgentId(agentId, prompt || '')
       resultSummary = output
     } catch (execError: any) {
-      console.error(`Vertical agent run failed (${agentId}):`, execError)
+      console.error(`Specialty agent run failed (${agentId}):`, execError)
       resultSummary = `Execution failed: ${execError.message || 'unknown error'}`
       finalStatus = 'failed'
     }
@@ -75,7 +75,7 @@ export async function POST(req: NextRequest) {
       result: resultSummary,
     })
   } catch (error: any) {
-    console.error('Internal vertical agent run error:', error)
+    console.error('Internal specialty agent run error:', error)
     return NextResponse.json({ error: error.message || 'Execution failed' }, { status: 500 })
   }
 }

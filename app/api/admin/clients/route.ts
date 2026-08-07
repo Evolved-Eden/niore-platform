@@ -131,7 +131,7 @@ export async function POST(request: NextRequest) {
         // Fetch client record to get email, full_name, etc.
         const { data: client } = await supabaseAdmin
           .from('clients')
-          .select('id, email, full_name, plan_tier_key, client_type, primary_vertical')
+          .select('id, email, full_name, plan_tier_key, client_type, primary_specialty')
           .eq('id', clientId)
           .single()
         if (!client) {
@@ -144,7 +144,7 @@ export async function POST(request: NextRequest) {
           fullName: client.full_name || null,
           planTierKey,
           role: client.client_type === 'creator' ? 'creator' : 'client',
-          verticalKey: client.primary_vertical || null,
+          specialtyKey: client.primary_specialty || null,
           swarmKey: null,
         })
         return NextResponse.json({ success: true, message: 'Account provisioned', orgId: result.orgId })

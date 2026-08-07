@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json()
     const {
-      agentId, agentName, roleType, vertical, prompt, intelligenceDocs, profileImage,
+      agentId, agentName, roleType, specialty, prompt, intelligenceDocs, profileImage,
       swarmId, titleKey, customTitle,
     } = body
 
@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
       agent_id: agentId,
       agent_name: agentName,
       role_type: roleType || null,
-      vertical: vertical || null,
+      specialty: specialty || null,
       prompt: prompt || null,
       intelligence_docs: intelligenceDocs || null,
       profile_image: profileImage || null,

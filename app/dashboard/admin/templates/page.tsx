@@ -98,9 +98,9 @@ export default function TemplatesPage() {
                 </div>
               </div>
               {tpl.description && <p className="text-sm text-white/50 mt-3">{tpl.description}</p>}
-              {(tpl.vertical_key || tpl.workflow_type) && (
+              {(tpl.specialty_key || tpl.workflow_type) && (
                 <div className="mt-3 flex gap-2">
-                  {tpl.vertical_key && <span className="px-2 py-0.5 bg-purple-500/10 text-purple-400 border border-purple-500/20 rounded text-xs">{tpl.vertical_key}</span>}
+                  {tpl.specialty_key && <span className="px-2 py-0.5 bg-purple-500/10 text-purple-400 border border-purple-500/20 rounded text-xs">{tpl.specialty_key}</span>}
                   {tpl.workflow_type && <span className="px-2 py-0.5 bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 rounded text-xs">{tpl.workflow_type}</span>}
                 </div>
               )}

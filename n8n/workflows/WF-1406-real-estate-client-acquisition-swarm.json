@@ -64,7 +64,7 @@
           { "name": "client_id", "value": "={{$('Fetch Org Owner (Client) ID').item.json.owner_id}}" },
           { "name": "swarm_id", "value": "real_estate_swarm" },
           { "name": "swarm_name", "value": "Real Estate Swarm" },
-          { "name": "vertical", "value": "real_estate" },
+          { "name": "specialty", "value": "real_estate" },
           { "name": "deployment_status", "value": "active" },
           { "name": "status", "value": "active" }
         ] },

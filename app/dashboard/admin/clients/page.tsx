@@ -18,7 +18,7 @@ export type ClientRow = {
   addons: string[] | null
   onboarding_status: string | null
   client_type: string | null
-  primary_vertical: string | null
+  primary_specialty: string | null
   vip_level: string | null
   total_spend: string | null
   lifetime_value: string | null
@@ -55,7 +55,7 @@ export default async function AdminClientsPage() {
       addons: c.addons || [],
       onboarding_status: c.onboarding_status,
       client_type: c.client_type,
-      primary_vertical: c.primary_vertical,
+      primary_specialty: c.primary_specialty,
       vip_level: c.vip_level,
       total_spend: c.total_spend,
       lifetime_value: c.lifetime_value,

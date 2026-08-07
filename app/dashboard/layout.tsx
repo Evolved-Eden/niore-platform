@@ -71,7 +71,7 @@ const NAV: Record<UserRole, { label: string; href: string }[]> = {
     { label: 'Pricing',        href: '/dashboard/admin/pricing' },
     { label: 'Coupons',        href: '/dashboard/admin/coupons' },
     { label: 'Deployments',    href: '/dashboard/admin/deployments' },
-    { label: 'Verticals',      href: '/dashboard/admin/verticals' },
+    { label: 'Specialties',  href: '/dashboard/admin/specialties' },
     { label: 'Avatars',        href: '/dashboard/admin/avatars' },
     { label: 'Essential Employees', href: '/dashboard/admin/agents' },
     { label: 'Teams & Depts',  href: '/dashboard/admin/swarms' },

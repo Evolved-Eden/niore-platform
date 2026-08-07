@@ -7,7 +7,7 @@ interface Workflow {
   id: string;
   name: string;
   description: string | null;
-  vertical: string;
+  specialty: string;
   category: string;
   run_status: string;
   is_active: boolean;
@@ -158,7 +158,7 @@ export default function WorkflowListPage() {
               <tr className="border-b border-white/[0.06] text-white/40 text-xs uppercase tracking-wider">
                 <th className="text-left px-4 py-3 font-medium">Name</th>
                 <th className="text-left px-4 py-3 font-medium">Category</th>
-                <th className="text-left px-4 py-3 font-medium">Vertical</th>
+                <th className="text-left px-4 py-3 font-medium">Specialty</th>
                 <th className="text-left px-4 py-3 font-medium">Status</th>
                 <th className="text-left px-4 py-3 font-medium">Assigned To</th>
                 <th className="text-left px-4 py-3 font-medium">Last Run</th>
@@ -189,9 +189,9 @@ export default function WorkflowListPage() {
                         <span className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-medium ${CATEGORY_COLORS[wf.category] || CATEGORY_COLORS.general}`}>
                           {wf.category}
                         </span>
-                        {wf.vertical && (
+                        {wf.specialty && (
                           <span className="inline-block px-1.5 py-0.5 rounded text-[10px] font-medium bg-white/5 text-white/40 border border-white/10">
-                            {wf.vertical}
+                            {wf.specialty}
                           </span>
                         )}
                       </div>
@@ -204,7 +204,7 @@ export default function WorkflowListPage() {
                         {wf.category}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-white/50">{wf.vertical}</td>
+                    <td className="px-4 py-3 text-white/50">{wf.specialty}</td>
                     <td className="px-4 py-3">
                       <span className={`inline-block px-2 py-0.5 rounded-sm text-xs font-medium ${STATUS_COLORS[wf.run_status] || STATUS_COLORS.draft}`}>
                         {wf.run_status}

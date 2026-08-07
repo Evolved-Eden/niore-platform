@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { useVerticals } from '@/lib/verticals'
+import { useSpecialties } from '@/lib/specialties'
 import { useClientView } from '@/lib/client-view'
 
 // ── Types ─────────────────────────────────────────────────
@@ -11,7 +11,7 @@ interface SwarmTemplate {
   name: string | null
   swarm_name: string | null
   description: string | null
-  vertical_key: string | null
+  agent_specialty_key: string | null
   member_agents: string[]
   is_active: boolean
   metadata: Record<string, unknown> | null
@@ -22,7 +22,7 @@ interface DeployedSwarm {
   client_id: string
   swarm_id: string
   swarm_name: string
-  vertical: string | null
+  specialty: string | null
   member_agent_ids: string[]
   configuration: Record<string, unknown> | null
   status: string
@@ -37,7 +37,7 @@ interface DeployedAgent {
   status: string
 }
 
-// VERTICALS replaced with dynamic useVerticals() hook below
+// SPECIALTIES replaced with dynamic useSpecialties() hook below
 
 const STATUS_STYLES: Record<string, string> = {
   active: 'bg-[#C6A664]/10 text-[#C6A664] border-[#C6A664]/20',
@@ -54,7 +54,7 @@ export default function ClientSwarmsPage() {
   const [templates, setTemplates] = useState<SwarmTemplate[]>([])
   const [templatesLoading, setTemplatesLoading] = useState(true)
   const [search, setSearch] = useState('')
-  const [filterVertical, setFilterVertical] = useState('all')
+  const [filterSpecialty, setFilterSpecialty] = useState('all')
 
   // ── Deployed ──
   const [deployedSwarms, setDeployedSwarms] = useState<DeployedSwarm[]>([])
@@ -64,7 +64,7 @@ export default function ClientSwarmsPage() {
   const [deployedAgents, setDeployedAgents] = useState<DeployedAgent[]>([])
 
   // ── UI ──
-  const { verticals, loading: verticalsLoading } = useVerticals()
+  const { specialties, loading: specialtiesLoading } = useSpecialties()
   const [tab, setTab] = useState<'available' | 'deployed'>('available')
   const [deployModal, setDeployModal] = useState<SwarmTemplate | null>(null)
   const [deploying, setDeploying] = useState(false)
@@ -74,7 +74,7 @@ export default function ClientSwarmsPage() {
   // ── Deploy form ──
   const [deployForm, setDeployForm] = useState({
     swarmName: '',
-    vertical: '',
+    specialty: '',
     configuration: '',
     selectedAgents: [] as string[],
   })
@@ -124,7 +124,7 @@ export default function ClientSwarmsPage() {
     setDeployModal(swarm)
     setDeployForm({
       swarmName: swarm.swarm_name || swarm.name || swarm.key,
-      vertical: swarm.vertical_key || '',
+      specialty: swarm.agent_specialty_key || '',
       configuration: '',
       selectedAgents: [],
     })
@@ -160,7 +160,7 @@ export default function ClientSwarmsPage() {
           clientId: targetClientId || undefined,
           swarmId: deployModal.swarm_key || deployModal.key,
           swarmName: deployForm.swarmName.trim(),
-          vertical: deployForm.vertical,
+          specialty: deployForm.specialty,
           memberAgentIds: deployForm.selectedAgents,
           configuration: config,
         }),
@@ -211,7 +211,7 @@ export default function ClientSwarmsPage() {
   const filteredTemplates = templates.filter(t => {
     const name = t.swarm_name || t.name || t.key || ''
     if (search && !name.toLowerCase().includes(search.toLowerCase())) return false
-    if (filterVertical !== 'all' && t.vertical_key !== filterVertical) return false
+    if (filterSpecialty !== 'all' && t.agent_specialty_key !== filterSpecialty) return false
     return true
   })
 
@@ -285,14 +285,14 @@ export default function ClientSwarmsPage() {
               className="bg-white/5 border border-white/10 rounded-sm px-3 py-2 text-sm text-white/70 placeholder-white/30 w-60"
             />
             <select
-              value={filterVertical}
-              onChange={(e) => setFilterVertical(e.target.value)}
+              value={filterSpecialty}
+              onChange={(e) => setFilterSpecialty(e.target.value)}
               className="bg-white/5 border border-white/10 rounded-sm px-3 py-2 text-sm text-white/70"
             >
-              <option value="all">All Verticals</option>
-              {verticalsLoading ? (
+              <option value="all">All Specialties</option>
+              {specialtiesLoading ? (
                 <option value="" disabled>Loading...</option>
-              ) : verticals.map(v => (
+              ) : specialties.map(v => (
                 <option key={v.key} value={v.key}>{v.name || v.key}</option>
               ))}
             </select>
@@ -303,7 +303,7 @@ export default function ClientSwarmsPage() {
             <div className="text-center py-16 text-white/30 text-sm">Loading Team catalog...</div>
           ) : filteredTemplates.length === 0 ? (
             <div className="text-center py-16 text-white/30 text-sm">
-              {search || filterVertical !== 'all'
+              {search || filterSpecialty !== 'all'
                 ? 'No Teams match your filters'
                 : 'No Teams available yet'
               }
@@ -322,8 +322,8 @@ export default function ClientSwarmsPage() {
                       <span className="text-2xl shrink-0">🧠</span>
                       <div className="flex-1 min-w-0">
                         <h3 className="text-sm font-medium text-white/80 truncate">{name}</h3>
-                        {swarm.vertical_key && (
-                          <span className="text-[10px] text-white/40">{swarm.vertical_key}</span>
+                        {swarm.agent_specialty_key && (
+                          <span className="text-[10px] text-white/40">{swarm.agent_specialty_key}</span>
                         )}
                       </div>
                       <button
@@ -356,11 +356,11 @@ export default function ClientSwarmsPage() {
                       </div>
                     )}
 
-                    {/* Vertical badge */}
-                    {swarm.vertical_key && (
+                    {/* Specialty badge */}
+                    {swarm.agent_specialty_key && (
                       <div className="mt-3">
                         <span className="px-2 py-0.5 bg-purple-500/10 text-purple-400 border border-purple-500/20 rounded text-[10px]">
-                          {swarm.vertical_key}
+                          {swarm.agent_specialty_key}
                         </span>
                       </div>
                     )}
@@ -433,10 +433,10 @@ export default function ClientSwarmsPage() {
 
                     {/* Details */}
                     <div className="space-y-1 text-[10px]">
-                      {swarm.vertical && (
+                      {swarm.specialty && (
                         <div className="flex justify-between">
-                          <span className="text-white/30">Vertical</span>
-                          <span className="text-white/60">{swarm.vertical}</span>
+                          <span className="text-white/30">Specialty</span>
+                          <span className="text-white/60">{swarm.specialty}</span>
                         </div>
                       )}
                       <div className="flex justify-between">
@@ -566,18 +566,18 @@ export default function ClientSwarmsPage() {
                 />
               </div>
 
-              {/* Vertical */}
+              {/* Specialty */}
               <div>
-                <label className="block text-xs font-medium text-white/70 mb-1">Vertical</label>
+                <label className="block text-xs font-medium text-white/70 mb-1">Specialty</label>
                 <select
-                  value={deployForm.vertical}
-                  onChange={(e) => setDeployForm({ ...deployForm, vertical: e.target.value })}
+                  value={deployForm.specialty}
+                  onChange={(e) => setDeployForm({ ...deployForm, specialty: e.target.value })}
                   className="w-full bg-white/5 border border-white/10 rounded-sm px-3 py-2 text-sm text-white/70"
                 >
-                  <option value="">Select Vertical</option>
-                  {verticalsLoading ? (
+                  <option value="">Select Specialty</option>
+                  {specialtiesLoading ? (
                     <option value="" disabled>Loading...</option>
-                  ) : verticals.map(v => (
+                  ) : specialties.map(v => (
                     <option key={v.key} value={v.key}>{v.name || v.key}</option>
                   ))}
                 </select>

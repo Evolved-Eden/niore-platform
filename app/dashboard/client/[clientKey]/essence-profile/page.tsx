@@ -613,7 +613,7 @@ export default function ClientBlueprintPage() {
                 scores: parsed.scores || {},
                 summary: parsed.summary || '',
                 recommended_agents: parsed.recommended_agents || [],
-                intake_role: parsed.vertical_key || 'client',
+                intake_role: parsed.specialty_key || 'client',
               }
             } catch {}
           }

@@ -20,13 +20,13 @@ export async function GET(req: NextRequest) {
 
     let query = supabaseAdmin
       .from('agent_catalog')
-      .select('agent_id, name, tagline, vertical, icon, role_type, category')
+      .select('agent_id, name, tagline, agent_specialty, icon, role_type, category')
       .eq('is_published', true)
       .order('name', { ascending: true })
       .limit(limit)
 
     if (search) {
-      query = query.or(`name.ilike.%${search}%,vertical.ilike.%${search}%,agent_id.ilike.%${search}%`)
+      query = query.or(`name.ilike.%${search}%,agent_specialty.ilike.%${search}%,agent_id.ilike.%${search}%`)
     }
 
     const { data, error } = await query

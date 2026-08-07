@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, type FormEvent } from 'react'
 import Link from 'next/link'
-import { VERTICAL_LIST, getVerticalBySlug, type VerticalData } from './vertical-data'
+import { SPECIALTY_LIST, getSpecialtyBySlug, type SpecialtyData } from './specialty-data'
 import PlanBuilder from './plan-builder'
 import AgentModal from './agent-modal'
 import WorkflowPreview from './workflow-preview'
@@ -12,8 +12,8 @@ type Message = {
   content: string
 }
 
-export default function DemoVerticalPage({ slug }: { slug: string }) {
-  const verticalData = getVerticalBySlug(slug)
+export default function DemoSpecialtyPage({ slug }: { slug: string }) {
+  const specialtyData = getSpecialtyBySlug(slug)
   const [showChat, setShowChat] = useState(false)
   const [showPlanBuilder, setShowPlanBuilder] = useState(false)
   const [showAgents, setShowAgents] = useState(false)
@@ -22,8 +22,8 @@ export default function DemoVerticalPage({ slug }: { slug: string }) {
   const [showWorkflows, setShowWorkflows] = useState(false)
   const [selectedAgent, setSelectedAgent] = useState<string | null>(null)
 
-  // Map agent IDs from vertical-data to the DB agent_id for the modal
-  // (they're the same in vertical-data.ts)
+  // Map agent IDs from specialty-data to the DB agent_id for the modal
+  // (they're the same in specialty-data.ts)
   const agentIdMap: Record<string, string> = {
     client_concierge: 'client_concierge',
     treatment_intelligence: 'treatment_intelligence',
@@ -71,18 +71,18 @@ export default function DemoVerticalPage({ slug }: { slug: string }) {
     inputRef.current?.focus()
   }, [isLoading])
 
-  if (!verticalData) {
+  if (!specialtyData) {
     return (
       <div className="min-h-screen bg-[#0A0A0B] text-white flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold mb-2">Vertical not found</h1>
+          <h1 className="text-2xl font-bold mb-2">Specialty not found</h1>
           <Link href="/demo" className="text-[#C6A664] hover:underline">← Back to demos</Link>
         </div>
       </div>
     )
   }
 
-  const vertical = verticalData
+  const specialty = specialtyData
 
   // Sections animated in
   const sections = [
@@ -110,7 +110,7 @@ export default function DemoVerticalPage({ slug }: { slug: string }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           messages: updated.map(m => ({ role: m.role, content: m.content })),
-          context: `You are walking through the ${vertical.title} demo. The user has seen the agents, swarm, and essence board for this vertical. Answer questions about pricing, capabilities, or customization. Keep responses concise and warm. If asked about pricing, explain the plans and offer to build their plan.`,
+          context: `You are walking through the ${specialty.title} demo. The user has seen the agents, swarm, and essence board for this specialty. Answer questions about pricing, capabilities, or customization. Keep responses concise and warm. If asked about pricing, explain the plans and offer to build their plan.`,
         }),
       })
 
@@ -141,7 +141,7 @@ export default function DemoVerticalPage({ slug }: { slug: string }) {
     } catch {
       setMessages((prev) => [...prev, {
         role: 'assistant',
-        content: "I'm sorry, I'm having trouble connecting. You can build your plan below or explore another vertical.",
+        content: "I'm sorry, I'm having trouble connecting. You can build your plan below or explore another specialty.",
       }])
     } finally {
       setIsLoading(false)
@@ -163,24 +163,24 @@ export default function DemoVerticalPage({ slug }: { slug: string }) {
             href="/demo"
             className="text-xs px-2.5 py-1 rounded-full border border-white/10 text-white/40 hover:text-white/70 hover:border-white/30 transition-all"
           >
-            All Verticals
+            All Specialties
           </Link>
         </div>
       </header>
 
       {/* Hero */}
       <section className="relative px-6 pt-20 pb-16 overflow-hidden">
-        <div className={`absolute inset-0 bg-gradient-to-b ${vertical.gradient} pointer-events-none`} />
+        <div className={`absolute inset-0 bg-gradient-to-b ${specialty.gradient} pointer-events-none`} />
         <div className="max-w-4xl mx-auto relative z-10">
           <div className="flex items-center gap-3 mb-4">
-            <span className="text-3xl" style={{ color: vertical.color }}>{vertical.emoji}</span>
+            <span className="text-3xl" style={{ color: specialty.color }}>{specialty.emoji}</span>
             <div>
-              <p className="text-xs text-white/30 tracking-widest uppercase">Vertical Demo</p>
-              <h1 className="font-display text-4xl md:text-5xl font-bold tracking-tight">{vertical.title}</h1>
+              <p className="text-xs text-white/30 tracking-widest uppercase">Specialty Demo</p>
+              <h1 className="font-display text-4xl md:text-5xl font-bold tracking-tight">{specialty.title}</h1>
             </div>
           </div>
-          <p className="text-lg text-white/50 max-w-2xl mb-8">{vertical.tagline}</p>
-          <p className="text-sm text-white/40 max-w-xl leading-relaxed mb-8">{vertical.description}</p>
+          <p className="text-lg text-white/50 max-w-2xl mb-8">{specialty.tagline}</p>
+          <p className="text-sm text-white/40 max-w-xl leading-relaxed mb-8">{specialty.description}</p>
 
           {/* Section nav */}
           <div className="flex flex-wrap gap-2">
@@ -205,7 +205,7 @@ export default function DemoVerticalPage({ slug }: { slug: string }) {
         {/* Agent Modal */}
         <AgentModal
           agentId={selectedAgent}
-          verticalColor={vertical.color}
+          accentColor={specialty.color}
           onClose={() => setSelectedAgent(null)}
         />
 
@@ -213,10 +213,10 @@ export default function DemoVerticalPage({ slug }: { slug: string }) {
         {showAgents && (
           <section className="animate-fade-in">
             <h2 className="font-display text-2xl font-bold mb-6">
-              Your <span style={{ color: vertical.color }}>Agents</span>
+              Your <span style={{ color: specialty.color }}>Agents</span>
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {vertical.agents.map((agent) => (
+              {specialty.agents.map((agent) => (
                 <button
                   key={agent.id}
                   onClick={() => handleAgentClick(agent.id)}
@@ -225,7 +225,7 @@ export default function DemoVerticalPage({ slug }: { slug: string }) {
                   <div className="flex items-center gap-3 mb-3">
                     <div
                       className="w-10 h-10 rounded-lg flex items-center justify-center text-lg"
-                      style={{ backgroundColor: `${vertical.color}15`, color: vertical.color }}
+                      style={{ backgroundColor: `${specialty.color}15`, color: specialty.color }}
                     >
                       {agent.icon}
                     </div>
@@ -241,7 +241,7 @@ export default function DemoVerticalPage({ slug }: { slug: string }) {
                   <div className="space-y-1">
                     {agent.capabilities.slice(0, 3).map((cap) => (
                       <div key={cap} className="flex items-center gap-1.5">
-                        <span className="w-1 h-1 rounded-full" style={{ backgroundColor: vertical.color }} />
+                        <span className="w-1 h-1 rounded-full" style={{ backgroundColor: specialty.color }} />
                         <span className="text-[10px] text-white/40">{cap}</span>
                       </div>
                     ))}
@@ -259,28 +259,28 @@ export default function DemoVerticalPage({ slug }: { slug: string }) {
         {showSwarm && (
           <section className="animate-fade-in">
             <h2 className="font-display text-2xl font-bold mb-2">
-              The <span style={{ color: vertical.color }}>Swarm</span>
+              The <span style={{ color: specialty.color }}>Swarm</span>
             </h2>
-            <p className="text-sm text-white/40 mb-6">{vertical.swarm.description}</p>
+            <p className="text-sm text-white/40 mb-6">{specialty.swarm.description}</p>
             <div className="rounded-sm border border-white/[0.06] bg-white/[0.02] p-6">
               <div className="flex items-center gap-2 mb-4">
                 <div
                   className="w-8 h-8 rounded-lg flex items-center justify-center text-sm"
-                  style={{ backgroundColor: `${vertical.color}20`, color: vertical.color }}
+                  style={{ backgroundColor: `${specialty.color}20`, color: specialty.color }}
                 >
                   ⊕
                 </div>
                 <div>
-                  <h3 className="text-sm font-semibold text-white/80">{vertical.swarm.name}</h3>
-                  <p className="text-[10px] text-white/40">{vertical.swarm.agents.length} agents connected</p>
+                  <h3 className="text-sm font-semibold text-white/80">{specialty.swarm.name}</h3>
+                  <p className="text-[10px] text-white/40">{specialty.swarm.agents.length} agents connected</p>
                 </div>
               </div>
               <div className="flex flex-wrap gap-2">
-                {vertical.swarm.agents.map((agentName) => (
+                {specialty.swarm.agents.map((agentName) => (
                   <span
                     key={agentName}
                     className="text-xs px-2.5 py-1 rounded-full border"
-                    style={{ borderColor: `${vertical.color}30`, color: vertical.color }}
+                    style={{ borderColor: `${specialty.color}30`, color: specialty.color }}
                   >
                     {agentName}
                   </span>
@@ -302,30 +302,30 @@ export default function DemoVerticalPage({ slug }: { slug: string }) {
         {showEssence && (
           <section className="animate-fade-in">
             <h2 className="font-display text-2xl font-bold mb-2">
-              Daily <span style={{ color: vertical.color }}>Essence Board</span>
+              Daily <span style={{ color: specialty.color }}>Essence Board</span>
             </h2>
             <p className="text-sm text-white/40 mb-6">
               Every morning, your intelligence system delivers a personalized command center.
             </p>
             <div
               className="rounded-sm border p-6"
-              style={{ borderColor: `${vertical.color}20`, backgroundColor: `${vertical.color}05` }}
+              style={{ borderColor: `${specialty.color}20`, backgroundColor: `${specialty.color}05` }}
             >
               <div className="flex items-center gap-2 mb-4">
                 <div
                   className="w-2 h-2 rounded-full animate-pulse-slow"
-                  style={{ backgroundColor: vertical.color }}
+                  style={{ backgroundColor: specialty.color }}
                 />
-                <span className="text-xs font-semibold" style={{ color: vertical.color }}>
-                  {vertical.essenceBoard.title}
+                <span className="text-xs font-semibold" style={{ color: specialty.color }}>
+                  {specialty.essenceBoard.title}
                 </span>
               </div>
               <div className="space-y-3">
-                {vertical.essenceBoard.items.map((item, i) => (
+                {specialty.essenceBoard.items.map((item, i) => (
                   <div key={i} className="flex items-start gap-3">
                     <span
                       className="text-xs font-mono mt-0.5 shrink-0"
-                      style={{ color: vertical.color }}
+                      style={{ color: specialty.color }}
                     >
                       {String(i + 1).padStart(2, '0')}
                     </span>
@@ -341,7 +341,7 @@ export default function DemoVerticalPage({ slug }: { slug: string }) {
         {showWorkflows && (
           <section className="animate-fade-in">
             <h2 className="font-display text-2xl font-bold mb-2">
-              Intelligence <span style={{ color: vertical.color }}>Workflows</span>
+              Intelligence <span style={{ color: specialty.color }}>Workflows</span>
             </h2>
             <p className="text-sm text-white/40 mb-6">
               Each agent is powered by automated workflows that handle events, schedules, and real-time data.
@@ -349,10 +349,10 @@ export default function DemoVerticalPage({ slug }: { slug: string }) {
             </p>
             <div
               className="rounded-sm border p-6"
-              style={{ borderColor: `${vertical.color}20`, backgroundColor: `${vertical.color}03` }}
+              style={{ borderColor: `${specialty.color}20`, backgroundColor: `${specialty.color}03` }}
             >
               <WorkflowPreview
-                verticalColor={vertical.color}
+                accentColor={specialty.color}
                 workflowIds={['wf1', 'wf2', 'wf3', 'wf4', 'wf5']}
               />
             </div>
@@ -363,34 +363,34 @@ export default function DemoVerticalPage({ slug }: { slug: string }) {
         {showChat && (
           <section className="animate-fade-in">
             <h2 className="font-display text-2xl font-bold mb-6">
-              Walkthrough with <span style={{ color: vertical.color }}>Zuri</span>
+              Walkthrough with <span style={{ color: specialty.color }}>Zuri</span>
             </h2>
 
             {/* Static walkthrough first */}
             {messages.length === 0 && (
               <div
                 className="rounded-sm p-6 mb-6 border"
-                style={{ borderColor: `${vertical.color}20`, backgroundColor: `${vertical.color}08` }}
+                style={{ borderColor: `${specialty.color}20`, backgroundColor: `${specialty.color}08` }}
               >
                 <p className="text-sm text-white/70 whitespace-pre-line leading-relaxed">
-                  {vertical.walkthrough}
+                  {specialty.walkthrough}
                 </p>
                 <div className="mt-4 flex flex-wrap gap-3">
                   <button
                     onClick={() => {
                       setMessages([
-                        { role: 'assistant', content: `Welcome to the ${vertical.title} Intelligence demo. I'm Zuri, your private architect.\n\nYou've seen the agents, the swarm, and the Essence Board. What questions do you have? Would you like to dive deeper into a specific agent, see how pricing works, or explore how this integrates with your existing tools?` },
+                        { role: 'assistant', content: `Welcome to the ${specialty.title} Intelligence demo. I'm Zuri, your private architect.\n\nYou've seen the agents, the swarm, and the Essence Board. What questions do you have? Would you like to dive deeper into a specific agent, see how pricing works, or explore how this integrates with your existing tools?` },
                       ])
                     }}
                     className="px-5 py-2.5 text-xs font-bold rounded-sm transition-all"
-                    style={{ backgroundColor: vertical.color, color: '#000' }}
+                    style={{ backgroundColor: specialty.color, color: '#000' }}
                   >
                     Start Chatting with Zuri →
                   </button>
                   <Link
                     href="/dashboard/client/zuri"
                     className="px-5 py-2.5 text-xs font-bold rounded-sm border transition-all"
-                    style={{ borderColor: `${vertical.color}40`, color: vertical.color }}
+                    style={{ borderColor: `${specialty.color}40`, color: specialty.color }}
                   >
                     Open Full Zuri Chat ↗
                   </Link>
@@ -428,7 +428,7 @@ export default function DemoVerticalPage({ slug }: { slug: string }) {
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder={isLoading ? 'Zuri is thinking...' : 'Ask Zuri about this vertical...'}
+                  placeholder={isLoading ? 'Zuri is thinking...' : 'Ask Zuri about this specialty...'}
                   disabled={isLoading}
                   className="flex-1 bg-white/[0.04] border border-white/10 rounded-sm px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-white/20 transition-colors disabled:opacity-40"
                 />
@@ -448,21 +448,21 @@ export default function DemoVerticalPage({ slug }: { slug: string }) {
         {showPlanBuilder && (
           <section className="animate-fade-in">
             <h2 className="font-display text-2xl font-bold mb-2">
-              Build Your <span style={{ color: vertical.color }}>Plan</span>
+              Build Your <span style={{ color: specialty.color }}>Plan</span>
             </h2>
             <p className="text-sm text-white/40 mb-6">
               Customize your intelligence system. Add agents, swarms, and capabilities as you grow.
             </p>
             <div
               className="rounded-sm border p-6"
-              style={{ borderColor: `${vertical.color}20`, backgroundColor: `${vertical.color}03` }}
+              style={{ borderColor: `${specialty.color}20`, backgroundColor: `${specialty.color}03` }}
             >
               <PlanBuilder
-                path={(vertical.defaultPlan?.split('_')[0] as any) || 'client'}
-                defaultPlan={vertical.defaultPlan}
-                verticalColor={vertical.color}
-                vertical={vertical.slug}
-                agentIds={vertical.agents.map(a => a.id)}
+                path={(specialty.defaultPlan?.split('_')[0] as any) || 'client'}
+                defaultPlan={specialty.defaultPlan}
+                accentColor={specialty.color}
+                specialty={specialty.slug}
+                agentIds={specialty.agents.map(a => a.id)}
               />
             </div>
           </section>
@@ -473,7 +473,7 @@ export default function DemoVerticalPage({ slug }: { slug: string }) {
       <div className="border-t border-white/5 px-6 py-6">
         <div className="max-w-4xl mx-auto flex flex-wrap items-center justify-between gap-4">
           <div className="flex gap-4">
-            {VERTICAL_LIST.filter(v => v.slug !== slug).slice(0, 3).map((v) => (
+            {SPECIALTY_LIST.filter(v => v.slug !== slug).slice(0, 3).map((v) => (
               <Link
                 key={v.slug}
                 href={`/demo/${v.slug}`}

@@ -22,7 +22,7 @@ export async function GET() {
     // 2. Fetch user's deployed agents with custom names
     const { data: deployed } = await supabaseAdmin
       .from('client_deployed_agents')
-      .select('id, agent_id, agent_name, status, role_type, vertical, created_at')
+      .select('id, agent_id, agent_name, status, role_type, specialty, created_at')
       .eq('client_id', user?.id ?? '')
       .neq('status', 'undeployed')
       .order('created_at', { ascending: false })
@@ -92,6 +92,6 @@ export async function GET() {
     return NextResponse.json({ agents, count: agents.length })
   } catch (error) {
     console.error('Agent catalog fetch failed:', error)
-    return NextResponse.json({ agents: [], count: 0, verticals: {} })
+    return NextResponse.json({ agents: [], count: 0, specialties: {} })
   }
 }

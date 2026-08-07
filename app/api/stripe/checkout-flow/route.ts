@@ -15,7 +15,7 @@ const stripe = lazy(() => new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersio
  * POST /api/stripe/checkout-flow
  *
  * Unified checkout flow that:
- * 1. Accepts plan + add-ons + agent selections + optional vertical
+ * 1. Accepts plan + add-ons + agent selections + optional specialty
  * 2. Creates Stripe Checkout Session via unified pricing map
  * 3. Returns redirect URL
  *
@@ -25,7 +25,7 @@ const stripe = lazy(() => new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersio
  *   path: "client",
  *   addons: [{ id: "additional_agent", name: "Additional Agent" }],
  *   agent_ids: ["lead_nurture", "property_match", ...],
- *   vertical: "real_estate",
+ *   specialty: "real_estate",
  * }
  *
  * If user is not logged in, returns { requiresAuth: true, redirectUrl: "/register?..." }
@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
       path,
       addons = [],
       agent_ids = [],
-      vertical = '',
+      specialty = '',
       coupon,
     } = body
 
@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
     if (path) queryParams.set('path', path)
     if (addons.length) queryParams.set('addons', JSON.stringify(addons.map((a: any) => a.id)))
     if (agent_ids.length) queryParams.set('agent_ids', JSON.stringify(agent_ids))
-    if (vertical) queryParams.set('vertical', vertical)
+    if (specialty) queryParams.set('specialty', specialty)
 
     // Not logged in → redirect to register with checkout intent
     if (!user) {
@@ -119,7 +119,7 @@ export async function POST(req: NextRequest) {
     if (path) metadata.path = path
     if (user?.id) metadata.user_id = user.id
     if (agent_ids.length) metadata.agent_ids = JSON.stringify(agent_ids)
-    if (vertical) metadata.vertical = vertical
+    if (specialty) metadata.specialty = specialty
     if (addonIds.size) metadata.addons = JSON.stringify(Array.from(addonIds))
 
     const origin = process.env.NEXT_PUBLIC_APP_URL || req.headers.get('origin')
@@ -131,7 +131,7 @@ export async function POST(req: NextRequest) {
     if (tier) successParams.set('tier', tier)
     if (path) successParams.set('path', path)
     if (agent_ids.length) successParams.set('agent_ids', encodeURIComponent(JSON.stringify(agent_ids)))
-    if (vertical) successParams.set('vertical', vertical)
+    if (specialty) successParams.set('specialty', specialty)
     if (addonIds.size) successParams.set('addons', encodeURIComponent(JSON.stringify(Array.from(addonIds))))
 
     const sessionParams: any = {

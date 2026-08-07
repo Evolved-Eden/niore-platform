@@ -152,8 +152,8 @@ export default function EditAgentPage({ params }: { params: Promise<{ id: string
               <div className="w-full bg-white/5 border border-white/10 rounded-sm px-3 py-2 text-sm text-white/50">{agent.archetype_id || '—'}</div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-white/70 mb-1">Vertical</label>
-              <div className="w-full bg-white/5 border border-white/10 rounded-sm px-3 py-2 text-sm text-white/50">{agent.vertical || '—'}</div>
+              <label className="block text-sm font-medium text-white/70 mb-1">Specialty</label>
+              <div className="w-full bg-white/5 border border-white/10 rounded-sm px-3 py-2 text-sm text-white/50">{agent.agent_specialty || '—'}</div>
             </div>
             <div>
               <label className="block text-sm font-medium text-white/70 mb-1">Health Status</label>
@@ -171,7 +171,7 @@ export default function EditAgentPage({ params }: { params: Promise<{ id: string
 
           {/* Editable content: tagline / description / system prompt.
               These were auto-generated from each agent's name/tagline/
-              vertical/role_type as a reviewable starting point -- edit
+              specialty/role_type as a reviewable starting point -- edit
               and save here. */}
           <div className="pt-4 border-t border-white/[0.06] space-y-4">
             <div>

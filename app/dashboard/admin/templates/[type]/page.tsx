@@ -103,10 +103,10 @@ export default function TemplateManager({ params }: { params: Promise<{ type: st
           <textarea rows={2} value={template.description || ''} onChange={(e) => setTemplate({ ...template, description: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-sm px-3 py-2 text-sm text-white/70 placeholder-white/30" />
         </div>
 
-        {template.vertical_key && (
+        {template.specialty_key && (
           <div>
-            <label className="block text-sm font-medium text-white/70 mb-1">Vertical</label>
-            <input type="text" value={template.vertical_key} disabled className="w-full bg-white/5 border border-white/10 rounded-sm px-3 py-2 text-sm text-white/40" />
+            <label className="block text-sm font-medium text-white/70 mb-1">Specialty</label>
+            <input type="text" value={template.specialty_key} disabled className="w-full bg-white/5 border border-white/10 rounded-sm px-3 py-2 text-sm text-white/40" />
           </div>
         )}
 

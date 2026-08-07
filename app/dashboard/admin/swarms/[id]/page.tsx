@@ -2,18 +2,18 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useVerticals } from '@/lib/verticals';
+import { useSpecialties } from '@/lib/specialties';
 
 export default function EditSwarmPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
-  const { verticals, loading: verticalsLoading } = useVerticals();
+  const { specialties, loading: specialtiesLoading } = useSpecialties();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
     key: '',
     name: '',
     description: '',
-    vertical_key: '',
+    agent_specialty_key: '',
     member_agents: [] as string[],
     is_active: true,
   });
@@ -29,7 +29,7 @@ export default function EditSwarmPage({ params }: { params: Promise<{ id: string
           key: swarm.key || '',
           name: swarm.name || '',
           description: swarm.description || '',
-          vertical_key: swarm.vertical_key || '',
+          agent_specialty_key: swarm.agent_specialty_key || '',
           member_agents: swarm.member_agents || [],
           is_active: swarm.is_active ?? true,
         });
@@ -65,7 +65,7 @@ export default function EditSwarmPage({ params }: { params: Promise<{ id: string
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-display text-2xl font-bold tracking-tight text-white">Edit Swarm: {form.key}</h1>
-          <p className="text-white/40 text-sm mt-1">Update swarm metadata, members, and vertical configuration.</p>
+          <p className="text-white/40 text-sm mt-1">Update swarm metadata, members, and specialty configuration.</p>
         </div>
         <button onClick={() => router.push('/dashboard/admin/swarms')} className="px-4 py-2 text-sm font-medium bg-white/5 border border-white/10 text-white/60 rounded-sm hover:text-white transition-colors">
           Back to Swarms
@@ -89,13 +89,13 @@ export default function EditSwarmPage({ params }: { params: Promise<{ id: string
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-white/70 mb-1">Vertical</label>
-            <select value={form.vertical_key} onChange={(e) => setForm({ ...form, vertical_key: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-sm px-3 py-2 text-sm text-white/70">
+            <label className="block text-sm font-medium text-white/70 mb-1">Specialty</label>
+            <select value={form.agent_specialty_key} onChange={(e) => setForm({ ...form, agent_specialty_key: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-sm px-3 py-2 text-sm text-white/70">
               <option value="">None (Universal)</option>
-              {verticalsLoading ? (
+              {specialtiesLoading ? (
                 <option value="" disabled>Loading...</option>
               ) : (
-                verticals.map((v) => (
+                specialties.map((v) => (
                   <option key={v.key || v.id} value={v.key || v.id}>{v.name}</option>
                 ))
               )}

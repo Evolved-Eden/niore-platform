@@ -15,7 +15,7 @@ function RegisterForm() {
   const planTier = searchParams.get("tier") || searchParams.get("plan") || "";
   const selectedAddons = searchParams.get("addons") || "";
   const selectedAgentIds = searchParams.get("agent_ids") || "";
-  const selectedVertical = searchParams.get("vertical") || "";
+  const selectedSpecialty = searchParams.get("specialty") || "";
   const isCheckoutFlow = searchParams.get("checkout") === "1";
   const redirectTo = searchParams.get("redirect") || "";
   const couponParam = searchParams.get("coupon") || "";
@@ -50,7 +50,7 @@ function RegisterForm() {
               path: initialRole,
               addons: addonsList,
               agent_ids: agentIds,
-              vertical: selectedVertical,
+              specialty: selectedSpecialty,
               coupon: coupon || undefined,
             }),
           });
@@ -148,7 +148,7 @@ function RegisterForm() {
             path: role,
             addons: addonsList,
             agent_ids: agentIds,
-            vertical: selectedVertical,
+            specialty: selectedSpecialty,
             coupon: coupon || undefined,
           }),
         });

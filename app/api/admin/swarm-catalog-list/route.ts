@@ -14,12 +14,12 @@ export async function GET(req: NextRequest) {
 
     let query = supabaseAdmin
       .from('swarm_catalog')
-      .select('swarm_key, name, description, vertical_slug, swarm_type, active_agents')
+      .select('swarm_key, name, description, agent_specialty_slug, swarm_type, active_agents')
       .order('name', { ascending: true })
       .limit(limit)
 
     if (search) {
-      query = query.or(`name.ilike.%${search}%,vertical_slug.ilike.%${search}%,swarm_key.ilike.%${search}%`)
+      query = query.or(`name.ilike.%${search}%,agent_specialty_slug.ilike.%${search}%,swarm_key.ilike.%${search}%`)
     }
 
     const { data, error } = await query

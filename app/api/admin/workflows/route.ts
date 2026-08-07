@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const category = searchParams.get('category');
     const status = searchParams.get('status');
-    const vertical = searchParams.get('vertical');
+    const specialty = searchParams.get('specialty');
 
     let sbQuery = supabaseAdmin
       .from('workflows')
@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
 
     if (category) sbQuery = sbQuery.eq('category', category);
     if (status) sbQuery = sbQuery.eq('run_status', status);
-    if (vertical) sbQuery = sbQuery.eq('vertical', vertical);
+    if (specialty) sbQuery = sbQuery.eq('specialty', specialty);
 
     const { data, count, error } = await sbQuery
       .order('updated_at', { ascending: false });
@@ -34,11 +34,11 @@ export async function POST(request: NextRequest) {
     const auth = await requireAdmin();
     if (auth instanceof NextResponse) return auth;
     const body = await request.json();
-    const { id, vertical, name, description, workflow_json, stages, category, tags, n8n_webhook_url, is_active } = body;
+    const { id, specialty, name, description, workflow_json, stages, category, tags, n8n_webhook_url, is_active } = body;
 
     if (id) {
       const updates: Record<string, any> = { updated_at: new Date().toISOString() };
-      if (vertical !== undefined) updates.vertical = vertical;
+      if (specialty !== undefined) updates.specialty = specialty;
       if (name !== undefined) updates.name = name;
       if (description !== undefined) updates.description = description;
       if (workflow_json !== undefined) updates.workflow_json = workflow_json;
@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
       const { data, error } = await supabaseAdmin
         .from('workflows')
         .insert({
-          vertical: vertical || 'general',
+          specialty: specialty || 'general',
           name,
           description: description || null,
           workflow_json: workflow_json || {},

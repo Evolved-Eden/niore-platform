@@ -46,6 +46,55 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // ── Fetch client's tier entitlements ──
+    const { data: clientRow } = await ctx.svc
+      .from('clients')
+      .select('plan_tier_key')
+      .eq('id', ctx.clientId)
+      .maybeSingle()
+
+    if (!clientRow?.plan_tier_key) {
+      return NextResponse.json(
+        { error: 'No active plan tier found. Upgrade to deploy teams.' },
+        { status: 403 }
+      )
+    }
+
+    const { data: tierEnt, error: tierErr } = await ctx.svc
+      .from('tier_entitlements')
+      .select('max_swarms, max_swarm_capacity')
+      .eq('plan_key', clientRow.plan_tier_key)
+      .maybeSingle()
+
+    if (tierErr) throw tierErr
+
+    // Count current active swarms
+    const { data: currentSwarms, error: countErr } = await ctx.svc
+      .from('client_deployed_swarms')
+      .select('id, member_agent_ids')
+      .eq('client_id', ctx.clientId)
+      .neq('status', 'undeployed')
+
+    if (countErr) throw countErr
+
+    const currentSwarmCount = currentSwarms?.length ?? 0
+    const currentMemberCount = currentSwarms?.reduce((sum, s) => sum + (Array.isArray(s.member_agent_ids) ? s.member_agent_ids.length : 0), 0) ?? 0
+    const newMemberCount = Array.isArray(memberAgentIds) ? memberAgentIds.length : 0
+
+    // Check limits
+    if (tierEnt?.max_swarms !== null && tierEnt?.max_swarms !== undefined && currentSwarmCount >= tierEnt.max_swarms) {
+      return NextResponse.json(
+        { error: `Team limit reached (${tierEnt.max_swarms}). Upgrade your plan to deploy more teams.` },
+        { status: 403 }
+      )
+    }
+    if (tierEnt?.max_swarm_capacity !== null && tierEnt?.max_swarm_capacity !== undefined && currentMemberCount + newMemberCount > tierEnt.max_swarm_capacity) {
+      return NextResponse.json(
+        { error: `Total team member capacity would be exceeded (${tierEnt.max_swarm_capacity}). Current: ${currentMemberCount}, adding ${newMemberCount}.` },
+        { status: 403 }
+      )
+    }
+
     const id = crypto.randomUUID()
     const now = new Date().toISOString()
 

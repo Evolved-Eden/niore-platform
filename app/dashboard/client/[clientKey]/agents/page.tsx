@@ -17,6 +17,7 @@ interface RegistryAgent {
   category: string | null
   is_active: boolean
   deployed: boolean
+  is_core: boolean
 }
 
 interface DeployedAgent {
@@ -32,6 +33,12 @@ interface DeployedAgent {
   status: string
   created_at: string
   updated_at: string
+}
+
+interface TierEntitlements {
+  max_agents?: number | null
+  max_custom_agents?: number | null
+  max_specialty_agents?: number | null
 }
 
 interface UploadedFile {
@@ -65,6 +72,10 @@ export default function ClientAgentsPage() {
   const [filterRole, setFilterRole] = useState('all')
   const { specialties, loading: specialtiesLoading } = useSpecialties()
 
+  // ── Entitlements ──
+  const [entitlements, setEntitlements] = useState<TierEntitlements | null>(null)
+  const [entitlementsLoading, setEntitlementsLoading] = useState(true)
+
   // ── Deployed ──
   const [deployedAgents, setDeployedAgents] = useState<DeployedAgent[]>([])
   const [deployedLoading, setDeployedLoading] = useState(true)
@@ -86,6 +97,18 @@ export default function ClientAgentsPage() {
   })
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([])
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // ── Fetch entitlements ──
+  useEffect(() => {
+    fetch(`/api/client/entitlements${clientIdParam}`)
+      .then(r => r.json())
+      .then(data => {
+        setEntitlements(data.entitlements)
+        setEntitlementsLoading(false)
+      })
+      .catch(() => setEntitlementsLoading(false))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // ── Fetch registry agents ──
   useEffect(() => {
@@ -222,6 +245,27 @@ export default function ClientAgentsPage() {
   // ── Stats ──
   const totalDeployed = deployedAgents.length
   const activeCount = deployedAgents.filter(a => a.status === 'active').length
+  const customCount = deployedAgents.filter(a => a.role_type === 'CUSTOM').length
+  const specialtyCount = deployedAgents.filter(a => a.role_type === 'VERTICAL' || a.role_type === 'SPECIALTY').length
+
+  // Entitlement limit checks
+  const atTotalLimit = entitlements?.max_agents !== null && entitlements?.max_agents !== undefined && totalDeployed >= entitlements.max_agents
+  const atCustomLimit = entitlements?.max_custom_agents !== null && entitlements?.max_custom_agents !== undefined && customCount >= entitlements.max_custom_agents
+  const atSpecialtyLimit = entitlements?.max_specialty_agents !== null && entitlements?.max_specialty_agents !== undefined && specialtyCount >= entitlements.max_specialty_agents
+  const atAnyLimit = atTotalLimit || atCustomLimit || atSpecialtyLimit
+
+  // Helper to check if a specific agent type would exceed limits
+  const wouldExceedLimit = (agent: RegistryAgent) => {
+    if (!entitlements) return false
+    const deployingRole = agent.agent_type // using agent_type as role indicator
+    const isCustom = deployingRole === 'CUSTOM'
+    const isSpecialty = deployingRole === 'VERTICAL' || deployingRole === 'SPECIALTY'
+    
+    if (entitlements.max_agents !== null && entitlements.max_agents !== undefined && totalDeployed >= entitlements.max_agents) return true
+    if (isCustom && entitlements.max_custom_agents !== null && entitlements.max_custom_agents !== undefined && customCount >= entitlements.max_custom_agents) return true
+    if (isSpecialty && entitlements.max_specialty_agents !== null && entitlements.max_specialty_agents !== undefined && specialtyCount >= entitlements.max_specialty_agents) return true
+    return false
+  }
 
   // ── Filter registry ──
   const filteredRegistry = registryAgents.filter(a => {
@@ -244,18 +288,74 @@ export default function ClientAgentsPage() {
       {/* ── Stats Bar ── */}
       <div className="grid grid-cols-3 gap-4">
         <div className="glass rounded-sm p-4 border border-white/[0.06]">
-          <div className="text-[10px] text-white/30 tracking-widest uppercase mb-1">Total Deployed</div>
-          <div className="text-2xl font-light text-white">{totalDeployed}</div>
+          <div className="text-[10px] text-white/30 tracking-widest uppercase mb-1">Total Agents</div>
+          <div className="text-2xl font-light text-white">
+            {totalDeployed}
+            {entitlements?.max_agents !== null && entitlements?.max_agents !== undefined && (
+              <span className={`text-base font-normal ml-1 ${atTotalLimit ? 'text-red-400' : 'text-white/30'}`}>
+                / {entitlements.max_agents}
+              </span>
+            )}
+          </div>
+          {entitlements?.max_agents !== null && entitlements?.max_agents !== undefined && (
+            <div className="mt-2 h-1.5 bg-white/5 rounded-full overflow-hidden">
+              <div
+                className={`h-full transition-all ${atTotalLimit ? 'bg-red-500' : 'bg-[#C6A664]'}`}
+                style={{ width: `${Math.min(100, (totalDeployed / entitlements.max_agents) * 100)}%` }}
+              />
+            </div>
+          )}
         </div>
         <div className="glass rounded-sm p-4 border border-white/[0.06]">
           <div className="text-[10px] text-white/30 tracking-widest uppercase mb-1">Active</div>
           <div className="text-2xl font-light text-[#C6A664]">{activeCount}</div>
         </div>
         <div className="glass rounded-sm p-4 border border-white/[0.06]">
-          <div className="text-[10px] text-white/30 tracking-widest uppercase mb-1">Available Recommendations</div>
+          <div className="text-[10px] text-white/30 tracking-widest uppercase mb-1">Available</div>
           <div className="text-2xl font-light text-[#5E8B84]">{registryAgents.length}</div>
         </div>
       </div>
+
+      {/* Custom/Specialty limits */}
+      {(entitlements?.max_custom_agents !== null && entitlements?.max_custom_agents !== undefined) ||
+       (entitlements?.max_specialty_agents !== null && entitlements?.max_specialty_agents !== undefined) ? (
+        <div className="grid grid-cols-2 gap-4">
+          {entitlements?.max_custom_agents !== null && entitlements?.max_custom_agents !== undefined && (
+            <div className="glass rounded-sm p-3 border border-white/[0.06]">
+              <div className="text-[10px] text-white/30 tracking-widest uppercase mb-1">Custom Agents</div>
+              <div className="text-lg font-light text-white">
+                {customCount}
+                <span className={`text-sm font-normal ml-1 ${atCustomLimit ? 'text-red-400' : 'text-white/30'}`}>
+                  / {entitlements.max_custom_agents}
+                </span>
+              </div>
+              <div className="mt-1 h-1 bg-white/5 rounded-full overflow-hidden">
+                <div
+                  className={`h-full transition-all ${atCustomLimit ? 'bg-red-500' : 'bg-[#5E8B84]'}`}
+                  style={{ width: `${Math.min(100, entitlements.max_custom_agents > 0 ? (customCount / entitlements.max_custom_agents) * 100 : 0)}%` }}
+                />
+              </div>
+            </div>
+          )}
+          {entitlements?.max_specialty_agents !== null && entitlements?.max_specialty_agents !== undefined && (
+            <div className="glass rounded-sm p-3 border border-white/[0.06]">
+              <div className="text-[10px] text-white/30 tracking-widest uppercase mb-1">Specialty Agents</div>
+              <div className="text-lg font-light text-white">
+                {specialtyCount}
+                <span className={`text-sm font-normal ml-1 ${atSpecialtyLimit ? 'text-red-400' : 'text-white/30'}`}>
+                  / {entitlements.max_specialty_agents}
+                </span>
+              </div>
+              <div className="mt-1 h-1 bg-white/5 rounded-full overflow-hidden">
+                <div
+                  className={`h-full transition-all ${atSpecialtyLimit ? 'bg-red-500' : 'bg-purple-500'}`}
+                  style={{ width: `${Math.min(100, entitlements.max_specialty_agents > 0 ? (specialtyCount / entitlements.max_specialty_agents) * 100 : 0)}%` }}
+                />
+              </div>
+            </div>
+          )}
+        </div>
+      ) : null}
 
       {/* ── Tabs ── */}
       <div className="flex gap-2 mb-4">
@@ -331,7 +431,11 @@ export default function ClientAgentsPage() {
             <div className="text-center py-16 text-white/30 text-sm">
               {search || filterSpecialty !== 'all' || filterRole !== 'all'
                 ? 'No agents match your filters'
-                : 'No agents available in the registry'
+                : !entitlementsLoading && !entitlements
+                  ? 'No active plan found. Upgrade to access the full agent catalog.'
+                  : !entitlements
+                    ? 'Core agents available. Upgrade your plan to unlock premium agents.'
+                    : 'No agents available in the registry'
               }
             </div>
           ) : (
@@ -359,6 +463,10 @@ export default function ClientAgentsPage() {
                     {agent.deployed ? (
                       <span className="px-3 py-1.5 bg-green-500/10 text-green-400 border border-green-500/20 text-[10px] font-medium rounded-sm shrink-0">
                         Deployed ✓
+                      </span>
+                    ) : wouldExceedLimit(agent) ? (
+                      <span className="px-3 py-1.5 bg-red-500/10 text-red-400 border border-red-500/20 text-[10px] font-medium rounded-sm shrink-0">
+                        Limit Reached
                       </span>
                     ) : (
                       <button
@@ -397,6 +505,22 @@ export default function ClientAgentsPage() {
                     <div className="mt-3">
                       <span className="px-2 py-0.5 bg-purple-500/10 text-purple-400 border border-purple-500/20 rounded text-[10px]">
                         {agent.category}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Core/Premium badge */}
+                  {agent.is_core && (
+                    <div className="mt-3">
+                      <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded text-[10px]">
+                        Core Agent
+                      </span>
+                    </div>
+                  )}
+                  {!agent.is_core && entitlements && (
+                    <div className="mt-3">
+                      <span className="px-2 py-0.5 bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded text-[10px]">
+                        Premium Agent
                       </span>
                     </div>
                   )}

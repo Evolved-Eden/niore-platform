@@ -1,0 +1,146 @@
+{
+  "name": "n8n Enrichment Workflow (Shared Core)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "responseMode": "onReceived"
+      },
+      "id": "wh-enrich",
+      "name": "Enrichment Request",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1200,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\nreturn [{ json: { client_id: item.client_id, agent_id: item.agent_id || 'AGT-014', prompt: item.prompt || 'Enrich this client record with any additional intelligence you can infer.', action_type: item.action_type || 'enrichment' } }];"
+      },
+      "id": "norm-enrich",
+      "name": "Normalize Enrichment",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -960,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.NIORE_APP_URL}}/api/internal/specialties/run-agent",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-internal-secret",
+              "value": "={{$env.INTERNAL_CRON_SECRET}}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "clientId",
+              "value": "={{$json.client_id}}"
+            },
+            {
+              "name": "agentId",
+              "value": "={{$json.agent_id}}"
+            },
+            {
+              "name": "actionType",
+              "value": "={{$json.action_type}}"
+            },
+            {
+              "name": "prompt",
+              "value": "={{$json.prompt}}"
+            }
+          ]
+        }
+      },
+      "id": "http-enrich",
+      "name": "Run Enrichment Agent",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -720,
+        300
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "ZJYTOXNkzLKVeF0e",
+          "name": "Supabase Service Role"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{$json}}"
+      },
+      "id": "resp-enrich",
+      "name": "Enrich Respond",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -400,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Enrichment Request": {
+      "main": [
+        [
+          {
+            "node": "Normalize Enrichment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Enrichment": {
+      "main": [
+        [
+          {
+            "node": "Run Enrichment Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Enrichment Agent": {
+      "main": [
+        [
+          {
+            "node": "Enrich Respond",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enrich Respond": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "templateId": "n8n_enrichment_workflow"
+  }
+}

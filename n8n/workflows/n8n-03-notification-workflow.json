@@ -1,0 +1,183 @@
+{
+  "name": "n8n Notification Workflow (Shared Core)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "responseMode": "onReceived"
+      },
+      "id": "wh-notify",
+      "name": "Notification Request",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1200,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\nconst channel = (item.channel || 'discord').toLowerCase();\nreturn [{ json: { channel, recipient: item.recipient || null, subject: item.subject || null, message: item.message || '', organization_id: item.organization_id || null, client_id: item.client_id || null } }];"
+      },
+      "id": "norm-notify",
+      "name": "Build Notification",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -960,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.INTERNAL_OPS_DISCORD_WEBHOOK}}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "content",
+              "value": "=🔔 {{$json.subject ? $json.subject + ': ' : ''}}{{ $json.message }}"
+            }
+          ]
+        }
+      },
+      "id": "http-notify-discord",
+      "name": "Send Discord",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -720,
+        220
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "ZJYTOXNkzLKVeF0e",
+          "name": "Supabase Service Role"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.SUPABASE_URL}}/rest/v1/notification_logs",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "body",
+              "value": "={{JSON.stringify({notification_type: 'system', channel: $json.channel, recipient: $json.recipient, subject: $json.subject, message: $json.message, organization_id: $json.organization_id, client_id: $json.client_id, delivery_status: 'sent', sent_at: new Date().toISOString()})}}",
+              "parameterType": "json"
+            }
+          ]
+        }
+      },
+      "id": "http-notify-log",
+      "name": "Log Notification",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -720,
+        420
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "ZJYTOXNkzLKVeF0e",
+          "name": "Supabase Service Role"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{$json}}"
+      },
+      "id": "resp-notify",
+      "name": "Notify Respond",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -400,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Notification Request": {
+      "main": [
+        [
+          {
+            "node": "Build Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Notification": {
+      "main": [
+        [
+          {
+            "node": "Send Discord",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Log Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Discord": {
+      "main": [
+        [
+          {
+            "node": "Notify Respond",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Notification": {
+      "main": [
+        [
+          {
+            "node": "Notify Respond",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Respond": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "templateId": "n8n_notification_workflow"
+  }
+}

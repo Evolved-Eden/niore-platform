@@ -1,0 +1,299 @@
+{
+  "name": "n8n Router Workflow (Shared Core)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "responseMode": "onReceived"
+      },
+      "id": "wh-router",
+      "name": "Entity Dispatch",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1400,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\nconst entityType = (item.entity_type || 'message').toLowerCase();\nconst routed = { entity_type: entityType, client_id: item.client_id || null, organization_id: item.organization_id || null, payload: item.data || {} };\nif (entityType === 'agent') routed.agent_id = item.agent_id || item.data?.agent_id || null;\nif (entityType === 'agent') routed.action_type = item.action_type || item.data?.action_type || 'routed';\nif (entityType === 'agent') routed.prompt = item.prompt || item.data?.prompt || '';\nreturn [{ json: routed }];"
+      },
+      "id": "cls-router",
+      "name": "Classify Entity",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1160,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "dataPropertyName": "entity_type",
+        "rules": {
+          "values": [
+            {
+              "casedValue": {
+                "value1": "=agent"
+              },
+              "type": "string",
+              "value": "agent",
+              "output": 0
+            },
+            {
+              "casedValue": {
+                "value1": "=swarm"
+              },
+              "type": "string",
+              "value": "swarm",
+              "output": 1
+            },
+            {
+              "casedValue": {
+                "value1": "=essintelligence"
+              },
+              "type": "string",
+              "value": "essintelligence",
+              "output": 2
+            },
+            {
+              "casedValue": {
+                "value1": "=message"
+              },
+              "type": "string",
+              "value": "message",
+              "output": 3
+            }
+          ]
+        }
+      },
+      "id": "sw-router",
+      "name": "Route By Type",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        -920,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.NIORE_APP_URL}}/api/internal/specialties/run-agent",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-internal-secret",
+              "value": "={{$env.INTERNAL_CRON_SECRET}}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "clientId",
+              "value": "={{$json.client_id}}"
+            },
+            {
+              "name": "agentId",
+              "value": "={{$json.agent_id}}"
+            },
+            {
+              "name": "actionType",
+              "value": "={{$json.action_type}}"
+            },
+            {
+              "name": "prompt",
+              "value": "={{$json.prompt}}"
+            }
+          ]
+        }
+      },
+      "id": "http-router-agent",
+      "name": "Run Routed Agent",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -680,
+        100
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "ZJYTOXNkzLKVeF0e",
+          "name": "Supabase Service Role"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: { status: 'not_built', entity_type: 'swarm', message: 'Swarm execution endpoint not yet wired; logged for routing only.', original: $input.first().json } }];"
+      },
+      "id": "code-router-swarm",
+      "name": "Swarm Router Stub",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -680,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: { status: 'not_built', entity_type: 'essintelligence', message: 'Essintelligence execution endpoint not yet wired.', original: $input.first().json } }];"
+      },
+      "id": "code-router-ess",
+      "name": "Essintelligence Router Stub",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -680,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: { status: 'routed_to_discord', entity_type: 'message', message: 'Message routed to Discord outbound.', original: $input.first().json } }];"
+      },
+      "id": "code-router-msg",
+      "name": "Message Router Stub",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -680,
+        700
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{$json}}"
+      },
+      "id": "resp-router",
+      "name": "Router Respond",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -400,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Entity Dispatch": {
+      "main": [
+        [
+          {
+            "node": "Classify Entity",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Classify Entity": {
+      "main": [
+        [
+          {
+            "node": "Route By Type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route By Type": {
+      "main": [
+        [
+          {
+            "node": "Run Routed Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Swarm Router Stub",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Essintelligence Router Stub",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Message Router Stub",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Routed Agent": {
+      "main": [
+        [
+          {
+            "node": "Router Respond",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Swarm Router Stub": {
+      "main": [
+        [
+          {
+            "node": "Router Respond",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Essintelligence Router Stub": {
+      "main": [
+        [
+          {
+            "node": "Router Respond",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message Router Stub": {
+      "main": [
+        [
+          {
+            "node": "Router Respond",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Router Respond": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "templateId": "n8n_router_workflow"
+  }
+}

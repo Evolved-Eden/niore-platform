@@ -1,0 +1,264 @@
+{
+  "name": "n8n Task Orchestration Workflow (Shared Core)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "responseMode": "onReceived"
+      },
+      "id": "wh-task",
+      "name": "Task Orchestration",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1400,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\nconst tasks = Array.isArray(item.tasks) ? item.tasks : [item];\nreturn tasks.map((t, i) => ({ json: { task_id: t.task_id || ('task-' + (i + 1)), client_id: t.client_id || item.client_id || null, agent_id: t.agent_id || null, action_type: t.action_type || 'orchestrated', prompt: t.prompt || t.task || '', organization_id: item.organization_id || null } }));"
+      },
+      "id": "norm-task",
+      "name": "Normalize Tasks",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1160,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      },
+      "id": "bat-task",
+      "name": "One Task At A Time",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -920,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.agent_id}}",
+              "value2": ""
+            }
+          ]
+        }
+      },
+      "id": "if-task",
+      "name": "Has Agent",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -680,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.NIORE_APP_URL}}/api/internal/specialties/run-agent",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-internal-secret",
+              "value": "={{$env.INTERNAL_CRON_SECRET}}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "clientId",
+              "value": "={{$json.client_id}}"
+            },
+            {
+              "name": "agentId",
+              "value": "={{$json.agent_id}}"
+            },
+            {
+              "name": "actionType",
+              "value": "={{$json.action_type}}"
+            },
+            {
+              "name": "prompt",
+              "value": "={{$json.prompt}}"
+            }
+          ]
+        }
+      },
+      "id": "http-task-agent",
+      "name": "Run Task Agent",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -440,
+        180
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "ZJYTOXNkzLKVeF0e",
+          "name": "Supabase Service Role"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: { task_id: $json.task_id, status: 'queued_for_manual', client_id: $json.client_id, task: $json.prompt } }];"
+      },
+      "id": "code-task-log",
+      "name": "Log Manual Task",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -440,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: { count: $input.all().length, results: $input.all().map(i => i.json), completed: true } }];"
+      },
+      "id": "collect-task",
+      "name": "Collect Results",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -160,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{$json}}"
+      },
+      "id": "resp-task",
+      "name": "Task Respond",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        80,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Task Orchestration": {
+      "main": [
+        [
+          {
+            "node": "Normalize Tasks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Tasks": {
+      "main": [
+        [
+          {
+            "node": "One Task At A Time",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "One Task At A Time": {
+      "main": [
+        [
+          {
+            "node": "Has Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Task Respond",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Agent": {
+      "main": [
+        [
+          {
+            "node": "Run Task Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log Manual Task",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Task Agent": {
+      "main": [
+        [
+          {
+            "node": "Collect Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Manual Task": {
+      "main": [
+        [
+          {
+            "node": "Collect Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect Results": {
+      "main": [
+        [
+          {
+            "node": "One Task At A Time",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Task Respond": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "templateId": "n8n_task_workflow"
+  }
+}

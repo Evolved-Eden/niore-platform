@@ -1,0 +1,196 @@
+{
+  "name": "n8n Intake Workflow (Shared Core)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "responseMode": "onReceived"
+      },
+      "id": "wh-intake",
+      "name": "Generic Intake",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1200,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\nconst table = item.table || 'clients';\nconst row = item.row || item;\nconst entityType = item.entity_type || 'generic';\nconst clientId = item.client_id || null;\nconst organizationId = item.organization_id || null;\nreturn [{ json: { table, row, entity_type: entityType, client_id: clientId, organization_id: organizationId } }];"
+      },
+      "id": "norm-intake",
+      "name": "Normalize Intake",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -960,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.SUPABASE_URL}}/rest/v1/{{$json.table}}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "body",
+              "value": "={{JSON.stringify($json.row)}}",
+              "parameterType": "json"
+            }
+          ]
+        }
+      },
+      "id": "http-intake-insert",
+      "name": "Insert Intake Row",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -720,
+        300
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "ZJYTOXNkzLKVeF0e",
+          "name": "Supabase Service Role"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const created = $input.first().json;\nconst ok = !Array.isArray(created) && created && created.error;\nreturn [{ json: { success: !ok, created: Array.isArray(created) ? created[0] : created, intake_error: ok ? created.error : null } }];"
+      },
+      "id": "resp-intake",
+      "name": "Build Intake Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -480,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.INTERNAL_OPS_DISCORD_WEBHOOK}}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "content",
+              "value": "=📥 Intake processed: {{$json.table}} ({{$json.success ? 'ok' : 'failed'}})"
+            }
+          ]
+        }
+      },
+      "id": "http-intake-notify",
+      "name": "Notify Ops",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -240,
+        220
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "ZJYTOXNkzLKVeF0e",
+          "name": "Supabase Service Role"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{$json}}"
+      },
+      "id": "intake-respond",
+      "name": "Respond To Caller",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Generic Intake": {
+      "main": [
+        [
+          {
+            "node": "Normalize Intake",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Intake": {
+      "main": [
+        [
+          {
+            "node": "Insert Intake Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert Intake Row": {
+      "main": [
+        [
+          {
+            "node": "Build Intake Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Intake Response": {
+      "main": [
+        [
+          {
+            "node": "Notify Ops",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Respond To Caller",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Ops": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "templateId": "n8n_intake_workflow"
+  }
+}

@@ -1,0 +1,279 @@
+{
+  "name": "n8n Approval Router Workflow (Shared Core)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "responseMode": "onReceived"
+      },
+      "id": "wh-arouter",
+      "name": "Approval Dispatch",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1600,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\nreturn [{ json: { workflow_group: item.workflow_group || 'Access', requested_by: item.requested_by || null, amount: Number(item.amount || 0), reason: item.reason || item.subject || 'Approval request', builder_job_id: item.builder_job_id || null } }];"
+      },
+      "id": "norm-arouter",
+      "name": "Normalize Request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1360,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{$env.SUPABASE_URL}}/rest/v1/approval_matrix?select=id,name,workflow_group,approval_level,approver_role,max_amount,requires_second_approval,escalation_level&workflow_group=eq.{{$json.workflow_group}}&is_active=eq.true&order=approval_level.asc",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth"
+      },
+      "id": "http-arouter-rules",
+      "name": "Fetch Approval Rules",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1120,
+        300
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "ZJYTOXNkzLKVeF0e",
+          "name": "Supabase Service Role"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const rules = Array.isArray($input.first().json) ? $input.first().json : [];\nconst ctx = $('Normalize Request').first().json;\nconst amount = ctx.amount || 0;\nconst path = [];\nfor (const r of rules) {\n  path.push({ approval_matrix_id: r.id, approval_level: r.approval_level, approver_role: r.approver_role, max_amount: r.max_amount, requires_second_approval: r.requires_second_approval });\n}\n// Escalation: if amount exceeds any rule's max_amount, require the next level.\nconst needsSecond = rules.some(r => r.requires_second_approval === true) || rules.some(r => r.max_amount != null && amount > Number(r.max_amount));\nconst target = needsSecond && path.length > 1 ? path[1] : (path[0] || {});\nreturn [{ json: { workflow_group: ctx.workflow_group, requested_by: ctx.requested_by, amount, reason: ctx.reason, builder_job_id: ctx.builder_job_id, approval_path: path, needs_second_approval: needsSecond, approval_matrix_id: target.approval_matrix_id || null, approval_level: target.approval_level || 1, approver_role: target.approver_role || null } }];"
+      },
+      "id": "esc-arouter",
+      "name": "Resolve Escalation",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -880,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.SUPABASE_URL}}/rest/v1/governance_approvals",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "body",
+              "value": "={{JSON.stringify({approval_matrix_id: $json.approval_matrix_id, status: 'pending', requested_by: $json.requested_by, builder_job_id: $json.builder_job_id})}}",
+              "parameterType": "json"
+            }
+          ]
+        }
+      },
+      "id": "http-arouter-insert",
+      "name": "Create Governance Approval",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -640,
+        300
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "ZJYTOXNkzLKVeF0e",
+          "name": "Supabase Service Role"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.INTERNAL_OPS_DISCORD_WEBHOOK}}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "content",
+              "value": "=🛂 Approval required ({{$json.workflow_group}}, level {{$json.approval_level}}) for {{$json.reason}} — {{$json.amount > 0 ? '$' + $json.amount : 'no amount'}}"
+            }
+          ]
+        }
+      },
+      "id": "http-arouter-notify",
+      "name": "Notify Approvers",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -400,
+        220
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "ZJYTOXNkzLKVeF0e",
+          "name": "Supabase Service Role"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const created = Array.isArray($input.first().json) ? $input.first().json[0] : $input.first().json;\nconst ctx = $('Resolve Escalation').first().json;\nreturn [{ json: { approval_id: created?.id || null, status: created?.status || 'pending', workflow_group: ctx.workflow_group, approval_path: ctx.approval_path, needs_second_approval: ctx.needs_second_approval, approval_matrix_id: ctx.approval_matrix_id, approval_level: ctx.approval_level } }];"
+      },
+      "id": "extract-arouter",
+      "name": "Extract Approval Id",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -160,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{$json}}"
+      },
+      "id": "resp-arouter",
+      "name": "Router Respond",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        80,
+        300
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "noop-arouter",
+      "name": "Insert No-Op",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -880,
+        480
+      ]
+    }
+  ],
+  "connections": {
+    "Approval Dispatch": {
+      "main": [
+        [
+          {
+            "node": "Normalize Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Request": {
+      "main": [
+        [
+          {
+            "node": "Fetch Approval Rules",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Approval Rules": {
+      "main": [
+        [
+          {
+            "node": "Resolve Escalation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resolve Escalation": {
+      "main": [
+        [
+          {
+            "node": "Create Governance Approval",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Insert No-Op",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert No-Op": {
+      "main": [
+        []
+      ]
+    },
+    "Create Governance Approval": {
+      "main": [
+        [
+          {
+            "node": "Notify Approvers",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Extract Approval Id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Approvers": {
+      "main": [
+        []
+      ]
+    },
+    "Extract Approval Id": {
+      "main": [
+        [
+          {
+            "node": "Router Respond",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Router Respond": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "templateId": "n8n_approval_router_workflow"
+  }
+}

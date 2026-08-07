@@ -1,0 +1,378 @@
+{
+  "name": "n8n Approval Workflow (Shared Core)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "responseMode": "onReceived"
+      },
+      "id": "wh-approval",
+      "name": "Approval Request",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1600,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\nreturn [{ json: { workflow_group: item.workflow_group || 'Access', requested_by: item.requested_by || null, amount: item.amount || 0, reason: item.reason || item.subject || 'Approval request' } }];"
+      },
+      "id": "prep-approval",
+      "name": "Prepare Approval Query",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1360,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{$env.SUPABASE_URL}}/rest/v1/approval_matrix?select=id,name,workflow_group,approval_level,approver_role,max_amount,requires_second_approval&workflow_group=eq.{{$json.workflow_group}}&is_active=eq.true&order=approval_level.asc",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth"
+      },
+      "id": "http-approval-rule",
+      "name": "Fetch Approval Rule",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1120,
+        300
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "ZJYTOXNkzLKVeF0e",
+          "name": "Supabase Service Role"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const rules = Array.isArray($input.first().json) ? $input.first().json : [];\nconst rule = rules[0] || {};\nconst ctx = $('Prepare Approval Query').first().json;\nreturn [{ json: { approval_matrix_id: rule.id || null, status: 'pending', requested_by: ctx.requested_by, decision_reason: null, amount: ctx.amount, workflow_group: ctx.workflow_group, reason: ctx.reason } }];"
+      },
+      "id": "build-approval",
+      "name": "Build Approval Row",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -880,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.SUPABASE_URL}}/rest/v1/governance_approvals",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "body",
+              "value": "={{JSON.stringify({approval_matrix_id: $json.approval_matrix_id, status: 'pending', requested_by: $json.requested_by})}}",
+              "parameterType": "json"
+            }
+          ]
+        }
+      },
+      "id": "http-approval-insert",
+      "name": "Insert Governance Approval",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -640,
+        300
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "ZJYTOXNkzLKVeF0e",
+          "name": "Supabase Service Role"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.INTERNAL_OPS_DISCORD_WEBHOOK}}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "content",
+              "value": "=🛂 Approval requested ({{$json.workflow_group}}) for {{$json.reason}} — {{$json.amount > 0 ? '$' + $json.amount : 'no amount'}}"
+            }
+          ]
+        }
+      },
+      "id": "http-approval-notify",
+      "name": "Notify Approvers",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -400,
+        220
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "ZJYTOXNkzLKVeF0e",
+          "name": "Supabase Service Role"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const created = Array.isArray($input.first().json) ? $input.first().json[0] : $input.first().json;\nreturn [{ json: { approval_id: created?.id || null, status: created?.status || 'pending', approval_matrix_id: created?.approval_matrix_id || null } }];"
+      },
+      "id": "extract-approval",
+      "name": "Extract Approval Id",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -160,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "resume": "webhook"
+      },
+      "id": "wait-approval",
+      "name": "Wait For Decision",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 2,
+      "position": [
+        80,
+        300
+      ],
+      "notes": "Resume webhook URL is generated at execution time. Approvers finalize via the governance UI which updates the row; this branch continues when the wait resumes."
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{$env.SUPABASE_URL}}/rest/v1/governance_approvals?select=id,status,decided_by,decision_reason,decided_at&id=eq.{{$json.approval_id}}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth"
+      },
+      "id": "http-approval-check",
+      "name": "Check Decision",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        320,
+        300
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "ZJYTOXNkzLKVeF0e",
+          "name": "Supabase Service Role"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json[0]?.status}}",
+              "value2": "approved"
+            }
+          ]
+        }
+      },
+      "id": "if-approval",
+      "name": "Has Decision",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        560,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const row = Array.isArray($input.first().json) ? $input.first().json[0] : $input.first().json;\nreturn [{ json: { approval_id: row?.id, status: row?.status || 'pending', decided_by: row?.decided_by || null, decision_reason: row?.decision_reason || null } }];"
+      },
+      "id": "resolve-approval",
+      "name": "Resolve Decision",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        800,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{$json}}"
+      },
+      "id": "resp-approval",
+      "name": "Approval Respond",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1040,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Approval Request": {
+      "main": [
+        [
+          {
+            "node": "Prepare Approval Query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Approval Query": {
+      "main": [
+        [
+          {
+            "node": "Fetch Approval Rule",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Approval Rule": {
+      "main": [
+        [
+          {
+            "node": "Build Approval Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Approval Row": {
+      "main": [
+        [
+          {
+            "node": "Insert Governance Approval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert Governance Approval": {
+      "main": [
+        [
+          {
+            "node": "Notify Approvers",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Extract Approval Id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Approvers": {
+      "main": [
+        []
+      ]
+    },
+    "Extract Approval Id": {
+      "main": [
+        [
+          {
+            "node": "Wait For Decision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait For Decision": {
+      "main": [
+        [
+          {
+            "node": "Check Decision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Decision": {
+      "main": [
+        [
+          {
+            "node": "Has Decision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Decision": {
+      "main": [
+        [
+          {
+            "node": "Resolve Decision",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Check Decision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resolve Decision": {
+      "main": [
+        [
+          {
+            "node": "Approval Respond",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Approval Respond": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "templateId": "n8n_approval_workflow"
+  }
+}

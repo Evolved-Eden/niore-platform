@@ -1,0 +1,210 @@
+{
+  "name": "n8n Monitoring Workflow (Shared Core)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 3 * * *"
+            }
+          ]
+        }
+      },
+      "id": "trig-mon",
+      "name": "Daily 03:00 UTC",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1200,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{$env.SUPABASE_URL}}/rest/v1/essintelligence_deployments?select=id,client_id,specialty_key,status,updated_at&status=neq.active",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth"
+      },
+      "id": "http-mon-deploys",
+      "name": "Fetch Essintelligence Deployments",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -960,
+        200
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "ZJYTOXNkzLKVeF0e",
+          "name": "Supabase Service Role"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{$env.SUPABASE_URL}}/rest/v1/workflow_run_logs?select=id,workflow_id,status,error_message,created_at&status=eq.failed&order=created_at.desc&limit=50",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth"
+      },
+      "id": "http-mon-logs",
+      "name": "Fetch Failed Run Logs",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -960,
+        420
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "ZJYTOXNkzLKVeF0e",
+          "name": "Supabase Service Role"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const deploys = $('Fetch Essintelligence Deployments').all().flatMap(i => Array.isArray(i.json) ? i.json : [i.json]);\nconst failedLogs = $('Fetch Failed Run Logs').all().flatMap(i => Array.isArray(i.json) ? i.json : [i.json]);\nconst issues = [];\nif (deploys.length > 0) issues.push(deploys.length + ' essintelligence deployment(s) not active');\nif (failedLogs.length > 0) issues.push(failedLogs.length + ' failed workflow run(s)');\nreturn [{ json: { checked_at: new Date().toISOString(), deployment_issues: deploys.length, failed_run_count: failedLogs.length, issue_count: issues.length, issues, failed_logs: failedLogs.slice(0, 10) } }];"
+      },
+      "id": "report-mon",
+      "name": "Build Health Report",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -720,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{$json.issue_count}}",
+              "value2": 0,
+              "operator": "larger"
+            }
+          ]
+        }
+      },
+      "id": "if-mon",
+      "name": "Has Issues",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -480,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.INTERNAL_OPS_DISCORD_WEBHOOK}}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "content",
+              "value": "=🩺 Monitoring: {{$json.issue_count}} issue(s)\\n{{$json.issues.join('\\n')}}"
+            }
+          ]
+        }
+      },
+      "id": "http-mon-alert",
+      "name": "Alert Ops Channel",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -240,
+        200
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "ZJYTOXNkzLKVeF0e",
+          "name": "Supabase Service Role"
+        }
+      },
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "connections": {
+    "Daily 03:00 UTC": {
+      "main": [
+        [
+          {
+            "node": "Fetch Essintelligence Deployments",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Fetch Failed Run Logs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Essintelligence Deployments": {
+      "main": [
+        [
+          {
+            "node": "Build Health Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Failed Run Logs": {
+      "main": [
+        [
+          {
+            "node": "Build Health Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Health Report": {
+      "main": [
+        [
+          {
+            "node": "Has Issues",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Issues": {
+      "main": [
+        [
+          {
+            "node": "Alert Ops Channel",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Alert Ops Channel": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "templateId": "n8n_monitoring_workflow"
+  }
+}

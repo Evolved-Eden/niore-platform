@@ -1,0 +1,159 @@
+{
+  "name": "n8n Scoring Workflow (Shared Core)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "responseMode": "onReceived"
+      },
+      "id": "wh-score",
+      "name": "Scoring Request",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1200,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\nconst answers = item.answers || {};\nconst entries = Object.values(answers);\nconst avg = entries.length ? entries.reduce((a, b) => a + Number(b || 0), 0) / entries.length : 0;\nconst deploymentId = item.deployment_id || null;\nreturn [{ json: { deployment_id: deploymentId, score: Math.round(avg * 100) / 100, answers, specialty_key: item.specialty_key || null } }];"
+      },
+      "id": "calc-score",
+      "name": "Compute Score",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -960,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{$env.SUPABASE_URL}}/rest/v1/essintelligence_deployments?id=eq.{{$json.deployment_id}}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "body",
+              "value": "={{JSON.stringify({assessment_scores: {computed_score: $json.score, answers: $json.answers}, updated_at: new Date().toISOString()})}}",
+              "parameterType": "json"
+            }
+          ]
+        }
+      },
+      "id": "http-score-store",
+      "name": "Store Assessment Scores",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -720,
+        300
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "ZJYTOXNkzLKVeF0e",
+          "name": "Supabase Service Role"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const patched = Array.isArray($input.first().json) ? $input.first().json[0] : $input.first().json;\nreturn [{ json: { success: !patched?.error, deployment_id: $json.deployment_id, score: $json.score, stored: !!patched?.id, error: patched?.error || null } }];"
+      },
+      "id": "resp-score",
+      "name": "Score Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -480,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{$json}}"
+      },
+      "id": "resp-score-wh",
+      "name": "Score Respond",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -240,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Scoring Request": {
+      "main": [
+        [
+          {
+            "node": "Compute Score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compute Score": {
+      "main": [
+        [
+          {
+            "node": "Store Assessment Scores",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store Assessment Scores": {
+      "main": [
+        [
+          {
+            "node": "Score Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Score Response": {
+      "main": [
+        [
+          {
+            "node": "Score Respond",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Score Respond": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "templateId": "n8n_scoring_workflow"
+  }
+}

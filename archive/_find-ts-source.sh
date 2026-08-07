@@ -1,1 +1,0 @@
-sshpass -p "Shemeca2027#" ssh -o StrictHostKeyChecking=no root@148.230.86.150 docker exec --user root n8n sh -c "ls /usr/local/lib/node_modules/n8n/node_modules/.pnpm/ | grep n8n-workflow"

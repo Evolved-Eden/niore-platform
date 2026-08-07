@@ -1,1 +1,0 @@
-sshpass -p "Shemeca2027#" ssh -o StrictHostKeyChecking=no root@148.230.86.150 docker exec --user root n8n sh -c "tail -100 /home/node/.n8n/n8nEventLog.log 2>/dev/null | grep -iE 'error|execut|wf1|38Bb|QeRf|fail' | tail -20"

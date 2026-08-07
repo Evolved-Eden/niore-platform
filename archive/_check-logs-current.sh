@@ -1,1 +1,0 @@
-sshpass -p "Shemeca2027#" ssh -o StrictHostKeyChecking=no root@148.230.86.150 docker logs n8n --tail 200 2>&1 | tail -50

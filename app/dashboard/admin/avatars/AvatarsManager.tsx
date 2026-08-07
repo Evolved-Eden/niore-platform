@@ -25,6 +25,7 @@ export default function AvatarsManager({ initialAvatars }: { initialAvatars: any
     data.is_active = !!data.is_active
     data.tone_tags = data.tone_tags ? data.tone_tags.split(',').map((s: string) => s.trim()).filter(Boolean) : []
     data.keywords = data.keywords ? data.keywords.split(',').map((s: string) => s.trim()).filter(Boolean) : []
+    data.archetypes = data.archetypes ? data.archetypes.split(',').map((s: string) => s.trim()).filter(Boolean) : []
     data.sort_order = parseInt(data.sort_order || '0')
     const ok = await api({ action: 'upsert', ...data })
     if (ok) {
@@ -72,7 +73,7 @@ export default function AvatarsManager({ initialAvatars }: { initialAvatars: any
                 </div>
                 {a.is_active !== false && <span className="text-xs text-green-400 bg-green-900/30 px-2 py-0.5 rounded-sm">active</span>}
               </div>
-              {a.archetype && <div className="text-xs text-white/40 mb-1">Archetype: {a.archetype}</div>}
+              {a.archetypes?.length > 0 && <div className="text-xs text-white/40 mb-1">Archetypes: {a.archetypes.join(', ')}</div>}
               {a.bio && <div className="text-xs text-white/50 line-clamp-2 mb-2">{a.bio}</div>}
               <div className="flex items-center justify-between mt-3 pt-2 border-t border-white/[0.04]">
                 <span className="text-xs text-white/30">Order: {a.sort_order}</span>
@@ -103,8 +104,8 @@ export default function AvatarsManager({ initialAvatars }: { initialAvatars: any
                 </div>
               </div>
               <div>
-                <label className="block text-xs text-white/40 mb-1">Archetype</label>
-                <input name="archetype" defaultValue={edit.archetype || ''} className="w-full bg-white/[0.04] border border-white/[0.08] rounded-sm px-3 py-2 text-sm text-white/70" />
+                <label className="block text-xs text-white/40 mb-1">Archetypes (comma-sep)</label>
+                <input name="archetypes" defaultValue={(edit.archetypes || []).join(', ')} className="w-full bg-white/[0.04] border border-white/[0.08] rounded-sm px-3 py-2 text-sm text-white/70" />
               </div>
               <div>
                 <label className="block text-xs text-white/40 mb-1">Bio</label>

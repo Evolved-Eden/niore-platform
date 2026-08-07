@@ -1035,7 +1035,7 @@ export type AvatarRow = {
   sort_order?: number | null
   avatar_key?: string | null
   avatar_id?: string | null
-  archetypes?: string | null
+  archetypes?: string[] | null
   created_at?: string
   updated_at?: string
 }

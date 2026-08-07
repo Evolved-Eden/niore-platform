@@ -9,6 +9,7 @@ import {
   getPlanTier,
   getStandaloneProduct,
 } from '@/lib/pricing'
+import { resolvePromotionCode } from '@/lib/stripe'
 
 const stripe = lazy(() => new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: STRIPE_API_VERSION }))
 
@@ -68,9 +69,13 @@ export async function POST(req: NextRequest) {
       cancel_url: `${origin}/dashboard/client/essence-profile`,
     }
 
-    // Apply coupon/promotion code if provided
+    // Apply coupon/promotion code if provided (accepts raw code or promo ID)
     if (coupon) {
-      sessionParams.discounts = [{ promotion_code: coupon }]
+      const promotionCodeId = await resolvePromotionCode(coupon)
+      if (!promotionCodeId) {
+        return NextResponse.json({ error: 'Invalid coupon code' }, { status: 400 })
+      }
+      sessionParams.discounts = [{ promotion_code: promotionCodeId }]
     }
 
     const session = await stripe.checkout.sessions.create(sessionParams)

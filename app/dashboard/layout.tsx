@@ -180,7 +180,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
   try {
     const { data, error } = await serviceClient
       .from('clients')
-      .select('plan_tier_key, additional_plans, addons, status, metadata')
+      .select('id, business_name, full_name, display_name, plan_tier_key, additional_plans, addons, status, metadata')
       .eq('id', user.id)
       .maybeSingle()
     if (error) {

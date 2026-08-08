@@ -397,7 +397,7 @@ export default function ClientSwarmsPage() {
               {templates.length > 0 && (
                 <div className="mt-6 p-4 bg-[#C6A664]/5 border border-[#C6A664]/10 rounded-sm inline-block">
                   <p className="text-xs text-[#C6A664]/70">
-                    💡 Based on your blueprint, we recommend deploying{' '}
+                    💡 Based on your intelligence, we recommend deploying{' '}
                     <button
                       onClick={() => {
                         const rec = templates[0]

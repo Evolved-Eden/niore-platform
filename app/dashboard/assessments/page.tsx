@@ -71,8 +71,8 @@ export default function AssessmentsHub() {
   }
 
   const core: Surface[] = [
-    { href: '/intake', icon: '◈', label: 'Blueprint Intake', desc: 'The guided assessment that powers your entire profile', color: '#C6A664', keyed: false },
-    { href: `${prefix}/essence-profile`, icon: '◆', label: 'Essence Profile', desc: 'Your blueprint results, lenses, and domain modules', color: '#5E8B84', keyed: true },
+    { href: '/onboarding', icon: '◈', label: 'Intelligence Intake', desc: 'The guided onboarding that powers your entire profile', color: '#C6A664', keyed: false },
+    { href: `${prefix}/profile`, icon: '◆', label: 'Profile', desc: 'Your intelligence results, lenses, and domain modules', color: '#5E8B84', keyed: true },
     { href: `${prefix}/essence`, icon: '⊙', label: 'Essence Intelligence', desc: 'Daily intelligence board and multi-lens insights', color: '#8B7AA8', keyed: true },
     { href: `${prefix}/essence-profile/domain`, icon: '◇', label: 'Domain Modules', desc: 'Relationship, Personal, Spiritual, Lifestyle, Creativity, Legacy deep-dives', color: '#B5764A', keyed: true },
   ]
@@ -107,17 +107,17 @@ export default function AssessmentsHub() {
 
       {/* Intake banner */}
       <Link
-        href="/intake"
+        href="/onboarding"
         className="relative block rounded-sm p-[2px] bg-gradient-to-r from-[#C6A664] via-white/20 to-[#C6A664] group mb-8"
       >
         <div className="bg-[#0A0A0B] rounded-[3px] p-6 h-full flex items-center justify-between flex-wrap gap-4">
           <div>
             <div className="text-xs text-[#C6A664] tracking-widest uppercase mb-1">Foundation</div>
-            <h2 className="font-display text-lg font-semibold mb-1 text-white">Blueprint Intake</h2>
-            <p className="text-sm text-white/40">Start or continue the guided assessment that unlocks your entire intelligence profile.</p>
+            <h2 className="font-display text-lg font-semibold mb-1 text-white">Intelligence Intake</h2>
+            <p className="text-sm text-white/40">Start or continue the guided onboarding that unlocks your entire intelligence profile.</p>
           </div>
           <span className="px-6 py-3 bg-[#C6A664] text-black text-sm font-bold rounded-sm hover:bg-white transition-all shrink-0">
-            Start Blueprint →
+            Start Onboarding →
           </span>
         </div>
       </Link>
@@ -196,7 +196,7 @@ export default function AssessmentsHub() {
 
       {!prefix && (
         <div className="mt-8 glass rounded-sm p-4 text-xs text-white/40">
-          Some surfaces unlock after your client profile is set up. Start with the Blueprint Intake above.
+          Some surfaces unlock after your client profile is set up. Start with the Intelligence Intake above.
         </div>
       )}
     </div>

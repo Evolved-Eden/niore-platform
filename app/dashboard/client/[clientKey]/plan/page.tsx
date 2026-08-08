@@ -14,7 +14,7 @@ const PLAN_CATEGORIES: PlanCategory[] = [
     label: 'Client',
     color: '#C6A664',
     tiers: [
-      { key: 'client_founder', name: 'Founder', description: 'Solo intelligence foundation — core blueprint, essence, and twin' },
+      { key: 'client_founder', name: 'Founder', description: 'Solo intelligence foundation — core profile, essence, and twin' },
       { key: 'client_org', name: 'Org', description: 'Small organization collaboration — shared intelligence, agents, vault access' },
       { key: 'client_enterprise', name: 'Enterprise', description: 'Full org intelligence — swarms, deployments, analytics' },
     ],
@@ -91,7 +91,7 @@ const PLAN_CATEGORIES: PlanCategory[] = [
     tiers: [
       { key: 'enterprise_concierge', name: 'Enterprise Concierge', description: 'Dedicated concierge intelligence — managed services' },
       { key: 'enterprise_eden_force', name: 'Eden Force', description: 'Elite intelligence operations — full spectrum deployment' },
-      { key: 'enterprise_omnigrid', name: 'Omnigrid', description: 'Universal intelligence grid — all systems, unlimited scale' },
+      { key: 'enterprise_omnigrid', name: 'Essence Engine', description: 'Universal essence engine — all systems, unlimited scale' },
     ],
   },
 ]

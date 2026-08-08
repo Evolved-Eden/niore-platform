@@ -103,7 +103,7 @@ function DemoContent() {
       chips.push({ label: "🤖 AI Twin vs Agent", question: "What's the difference between an AI Twin and an Agent?" });
       chips.push({ label: "📊 Agent limits", question: "How many agents can I have?" });
     }
-    if (lastMsg.toLowerCase().includes("blueprint") || lastMsg.toLowerCase().includes("assess")) {
+    if (lastMsg.toLowerCase().includes("blueprint") || lastMsg.toLowerCase().includes("essence engine") || lastMsg.toLowerCase().includes("assess")) {
       chips.push({ label: "📝 What's the Assessment?", question: "What is the Essence Assessment?" });
       chips.push({ label: "🔄 Retake", question: "Can I retake the Assessment?" });
     }

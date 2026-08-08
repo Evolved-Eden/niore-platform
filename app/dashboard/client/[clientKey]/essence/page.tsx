@@ -231,7 +231,7 @@ function EssenceIntelligencePage() {
               if (s.personal) parts.push(`Name: ${s.personal.name}, DOB: ${s.personal.dob}`)
               if (s.results?.blueprint) {
                 const bp = s.results.blueprint
-                parts.push(`Blueprint: ${bp.archetype}, Energy Type: ${bp.foundation?.energyType || ''}, Core Architecture: ${bp.foundation?.coreArch || ''}`)
+                parts.push(`Intelligence: ${bp.archetype}, Energy Type: ${bp.foundation?.energyType || ''}, Core Architecture: ${bp.foundation?.coreArch || ''}`)
                 parts.push(`Natural Gift: ${bp.foundation?.naturalGift || ''}, Growth Edge: ${bp.foundation?.growthEdge || ''}`)
               }
               if (s.results?.essence) {
@@ -581,7 +581,7 @@ function EssenceIntelligencePage() {
 
       {/* ── Multi-lens Essence Tiles (hidden during matrix view) ── */}
       {!showMatrix && (<>
-        <EssenceInsightsPanel extras={extras} />
+        <EssenceInsightsPanel extras={extras} prefix={prefix} />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* ══════════ Main — 2/3 ══════════ */}
@@ -697,7 +697,7 @@ function EssenceIntelligencePage() {
                 <div className="text-center py-4">
                   <div className="text-2xl mb-3">\u25C8</div>
                   <p className="text-sm text-white/50 mb-4 max-w-md mx-auto">
-                    No blueprint assessment found. Run your assessment to unlock
+                    No essence assessment found. Run your assessment to unlock
                     personalized essence intelligence calibrated to your profile.
                   </p>
                   <div className="flex items-center justify-center gap-3">
@@ -715,8 +715,8 @@ function EssenceIntelligencePage() {
                     </Link>
                   </div>
                   <p className="text-[10px] text-white/20 mt-3">
-                    Already have a blueprint?{' '}
-                    <Link href={`${prefix}/essence-profile`} className="text-white/40 hover:text-white/60 underline">
+                    Already have an essence profile?{' '}
+                    <Link href={`${prefix}/profile`} className="text-white/40 hover:text-white/60 underline">
                       View it here
                     </Link>
                   </p>
@@ -767,7 +767,7 @@ function EssenceIntelligencePage() {
                   )}
 
                   <p className="text-xs text-white/30 italic">
-                    Your essence intelligence is calibrated to your blueprint profile.
+                    Your essence intelligence is calibrated to your intelligence profile.
                   </p>
                 </div>
               )}
@@ -937,10 +937,10 @@ function EssenceIntelligencePage() {
               {blueprint?.exists && (
                 <div className="pt-2 border-t border-white/[0.06]">
                   <Link
-                    href={`${prefix}/essence-profile`}
+                    href={`${prefix}/profile`}
                     className="text-xs text-[#C6A664] hover:opacity-80 transition-all"
                   >
-                    View Full Essence Profile →
+                    View Full Profile →
                   </Link>
                 </div>
               )}

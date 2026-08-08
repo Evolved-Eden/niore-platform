@@ -151,9 +151,9 @@ function StandardPricing({ path, setPath, pathname }: { path: PathType; setPath:
           <div className="mt-8 rounded-3xl border border-white/10 bg-white/[0.02] p-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-xs uppercase tracking-[0.3em] text-white/30 mb-2">Full Assessment</p>
-              <h3 className="text-xl font-semibold">Take the full blueprint multistep assessment.</h3>
+              <h3 className="text-xl font-semibold">Take the full intelligence assessment.</h3>
               <p className="text-sm text-white/40 max-w-2xl mt-2">
-                Move beyond pricing and launch the real blueprint flow that builds your twin, essence boards, business OS, and deployment intake.
+                Move beyond pricing and launch the real onboarding flow that builds your twin, essence boards, business OS, and deployment intake.
               </p>
             </div>
             <Link
@@ -352,7 +352,7 @@ function UpgradeContent({ path, setPath, user }: { path: PathType; setPath: (p: 
               <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div>
                   <p className="text-xs uppercase tracking-[0.3em] text-white/30 mb-2">Not sure what you need?</p>
-                  <h3 className="text-xl font-semibold">Take the full blueprint assessment.</h3>
+                  <h3 className="text-xl font-semibold">Take the full intelligence assessment.</h3>
                   <p className="text-sm text-white/40 max-w-2xl mt-2">
                     Get personalized plan recommendations based on your actual needs.
                   </p>

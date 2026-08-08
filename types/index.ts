@@ -4,8 +4,8 @@
 
 // (Round 32: removed 6 unused types here -- BlueprintQuestionType/Option/Question/
 // Section/ScoringDomain/TemplateContent -- confirmed zero references anywhere in
-// app/ or lib/. Matched the shape of the now-deleted orphaned /blueprint/assess
-// quiz system; dead type-only code, not worth renaming, just removing.)
+// app/ or lib/. Matched the shape of the now-deleted orphaned legacy quiz system;
+// dead type-only code, not worth renaming, just removing.)
 
 // ── Schema-backed types for generic query support ────────────
 export type EssenceEngineRow = {

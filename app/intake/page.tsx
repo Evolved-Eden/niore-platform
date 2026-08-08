@@ -623,7 +623,7 @@ export default function IntakePage() {
             {/* CTA */}
             <div className="text-center">
               <p className="text-sm text-white/40 mb-4">
-                Now let Zuri show you what your personalized intelligence ecosystem looks like.
+                Now let Zuri show you what your personalized intelligence system looks like.
               </p>
               <button
                 onClick={() => finishIntake()}
@@ -645,7 +645,7 @@ export default function IntakePage() {
               Intake <span className="text-[#C6A664]">Complete</span>
             </h1>
             <p className="text-white/40 leading-relaxed mb-8 max-w-md mx-auto">
-              Your profile has been saved. Zuri is synthesizing your intelligence blueprint
+              Your profile has been saved. Zuri is synthesizing your intelligence profile
               to deliver personalized insights.
             </p>
             <div className="glass rounded-sm p-6 mb-8 text-left max-w-sm mx-auto space-y-3">

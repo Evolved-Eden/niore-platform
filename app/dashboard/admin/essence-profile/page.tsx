@@ -82,7 +82,7 @@ export default function AdminBlueprintPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="text-white/20 text-sm">Loading blueprint...</div>
+        <div className="text-white/20 text-sm">Loading intelligence...</div>
       </div>
     )
   }
@@ -98,7 +98,7 @@ export default function AdminBlueprintPage() {
       {/* Header */}
       <div className="mb-8">
         <h1 className="font-display text-2xl font-bold tracking-tight mb-1">
-          My <span className="text-[#7A2E32]">Blueprint</span>
+          My <span className="text-[#7A2E32]">Intelligence</span>
         </h1>
         <p className="text-white/30 text-sm">Personal intelligence archetype and profile</p>
       </div>
@@ -125,7 +125,7 @@ export default function AdminBlueprintPage() {
                 {/* Score bar */}
                 <div>
                   <div className="flex items-center justify-between text-sm mb-2">
-                    <span className="text-white/40">Blueprint Score</span>
+                    <span className="text-white/40">Intelligence Score</span>
                     <span className="text-[#7A2E32] font-bold">{blueprint.overallScore}%</span>
                   </div>
                   <div className="h-2 rounded-full bg-white/[0.06] overflow-hidden">
@@ -206,7 +206,7 @@ export default function AdminBlueprintPage() {
               className="block p-4 rounded-sm glass-hover border border-[#7A2E32]/20 hover:border-[#7A2E32]/40 transition-colors"
             >
               <div className="text-xs text-[#7A2E32] tracking-widest uppercase mb-1">Re-Assess</div>
-              <div className="text-sm text-white/60">Update your blueprint →</div>
+              <div className="text-sm text-white/60">Update your intelligence →</div>
             </Link>
           )}
           <Link

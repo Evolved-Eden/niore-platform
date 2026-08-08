@@ -278,7 +278,7 @@ async function generateBlueprintTile(meta: any, range: 'daily' | 'weekly' | 'mon
       tier,
       agentsUsed: [] as string[],
       content: core?.summary || core?.archetype || '',
-      upgradeMessage: tier === 'base' ? 'Upgrade to Enhanced or Expanded Blueprint for deeper, dual-agent insight.' : undefined,
+      upgradeMessage: tier === 'base' ? 'Upgrade to Enhanced or Expanded Essence Engine for deeper, dual-agent insight.' : undefined,
     }
   }
 
@@ -286,7 +286,7 @@ async function generateBlueprintTile(meta: any, range: 'daily' | 'weekly' | 'mon
     tier,
     agentsUsed: outputs.map(o => o.agentName),
     content: outputs.map(o => o.text).join('\n\n'),
-    upgradeMessage: tier === 'base' ? 'Upgrade to Enhanced or Expanded Blueprint for deeper, dual-agent insight.' : undefined,
+    upgradeMessage: tier === 'base' ? 'Upgrade to Enhanced or Expanded Essence Engine for deeper, dual-agent insight.' : undefined,
   }
 }
 

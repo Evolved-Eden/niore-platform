@@ -330,5 +330,5 @@ export interface EEArchetypeResult {
   confidence: number   // 0-1, top signal share of total weight
   signals: EEArchetypeSignal[]
   rationale: string[]  // grounded "why" lines
-  summary: string      // one-line blueprint wording
+  summary: string      // one-line intelligence wording
 }

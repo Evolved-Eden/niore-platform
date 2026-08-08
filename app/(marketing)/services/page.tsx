@@ -7,7 +7,7 @@ const CONSULTING_TIERS = [
     title: 'Intelligence Strategy & Design',
     tagline: 'Your vision, architected into an intelligence system',
     price: 'From $5,000',
-    description: 'A deep-dive engagement for leaders who know what they want but need the blueprint. We map your organization, design your intelligence ecosystem, and deliver a ready-to-build roadmap — including agent architecture, data strategy, and deployment plan.',
+    description: 'A deep-dive engagement for leaders who know what they want but need the intelligence. We map your organization, design your intelligence ecosystem, and deliver a ready-to-build roadmap — including agent architecture, data strategy, and deployment plan.',
     audience: 'Founders, CEOs, and leaders building their first or next-generation intelligence system.',
     deliverables: [
       'Organizational intelligence audit',

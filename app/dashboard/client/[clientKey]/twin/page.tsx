@@ -682,11 +682,11 @@ export default function ClientTwinPage() {
                 <p className="text-[11px] text-white/40">Talk to your twin</p>
               </Link>
               <Link
-                href={`${prefix}/essence-profile`}
+                href={`${prefix}/profile`}
                 className="glass rounded-sm p-4 border border-white/[0.06] hover:border-[#C6A664]/30 transition-all group"
               >
-                <div className="text-xs text-[#C6A664] tracking-widest uppercase mb-1">Blueprint</div>
-                <p className="text-[11px] text-white/40">View full blueprint</p>
+                <div className="text-xs text-[#C6A664] tracking-widest uppercase mb-1">Intelligence</div>
+                <p className="text-[11px] text-white/40">View full intelligence profile</p>
               </Link>
               <Link
                 href={`${prefix}/twin/configure`}
@@ -877,7 +877,7 @@ export default function ClientTwinPage() {
                 value={instructions}
                 onChange={e => setInstructions(e.target.value)}
                 rows={6}
-                placeholder="e.g. Always consider the user's Blueprint archetype before making recommendations. Prioritize strategic alignment over speed. Never share raw personality scores with third parties..."
+                placeholder="e.g. Always consider the user's Essence archetype before making recommendations. Prioritize strategic alignment over speed. Never share raw personality scores with third parties..."
                 className="w-full px-3 py-2.5 bg-white/[0.04] border border-white/10 rounded-sm text-sm text-white/70 focus:outline-none focus:border-[#C6A664]/40 resize-none"
               />
               <div className="flex justify-end mt-3">
@@ -1002,7 +1002,7 @@ export default function ClientTwinPage() {
               <ul className="space-y-2 text-xs text-white/40">
                 <li>&bull; Upload clear, well-structured documents</li>
                 <li>&bull; Set instructions before uploading knowledge</li>
-                <li>&bull; Train in topics that align with your blueprint</li>
+                <li>&bull; Train in topics that align with your essence</li>
                 <li>&bull; Update training as your needs evolve</li>
               </ul>
             </div>

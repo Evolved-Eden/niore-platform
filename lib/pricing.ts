@@ -331,7 +331,7 @@ const ESSINTELLIGENCE_MODULES_FALLBACK: Record<string, EssintelligenceModule> = 
   agency_os:         { key: 'agency_os',          name: 'Agency OS',         amount: 24900, stripePriceId: price('AGENCY_OS'),          recurring: true },
   employee_os:       { key: 'employee_os',        name: 'Employee OS',       amount: 49900, stripePriceId: price('EMPLOYEE_OS'),        recurring: true },
   security_os:       { key: 'security_os',        name: 'Security OS',       amount: 49900, stripePriceId: price('SECURITY_OS'),        recurring: true },
-  blueprint_os:      { key: 'blueprint_os',       name: 'Blueprint OS',      amount: 49900, stripePriceId: price('BLUEPRINT_OS'),       recurring: true },
+  blueprint_os:      { key: 'blueprint_os',       name: 'Essence Engine OS', amount: 49900, stripePriceId: price('BLUEPRINT_OS'),       recurring: true },
   healthcare_os:     { key: 'healthcare_os',      name: 'Healthcare OS',     amount: 49900, stripePriceId: price('HEALTHCARE_OS'),      recurring: true },
   luxury_os:         { key: 'luxury_os',          name: 'Luxury OS',         amount: 99900, stripePriceId: price('LUXURY_OS'),          recurring: true },
   wealth_os:         { key: 'wealth_os',          name: 'Wealth OS',         amount: 99900, stripePriceId: price('WEALTH_OS'),          recurring: true },

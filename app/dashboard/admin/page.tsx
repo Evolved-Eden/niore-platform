@@ -75,7 +75,7 @@ export default async function AdminOverview() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-display text-3xl font-bold tracking-tight text-white">OmniGrid Control</h1>
+          <h1 className="font-display text-3xl font-bold tracking-tight text-white">Essence Engine Control</h1>
           <p className="text-white/40 text-sm mt-1">
             {populatedTables.length} active tables · {totalRowEstimate.toLocaleString()} total rows · {agentCount} agents · {userCount} users · {orgCount} orgs
           </p>

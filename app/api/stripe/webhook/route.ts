@@ -546,8 +546,8 @@ export async function POST(req: Request) {
           if (products.includes("expanded_blueprint") || products.includes("enhanced_blueprint")) {
             await sendEmail({
               to: email,
-              subject: "Your expanded Blueprint tier is unlocked",
-              html: `<p>Your Blueprint tier has been unlocked. <a href="${appUrl}/dashboard/client/essence-profile">View your full Blueprint</a>.</p>`,
+              subject: "Your expanded Essence Engine tier is unlocked",
+              html: `<p>Your Essence Engine tier has been unlocked. <a href="${appUrl}/dashboard/client/profile">View your full intelligence profile</a>.</p>`,
             })
           }
           for (const pid of newlyPurchasedDomains) {

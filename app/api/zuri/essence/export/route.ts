@@ -48,7 +48,7 @@ export async function GET(req: NextRequest) {
     text += `╚══════════════════════════════════════════════════════════╝\n\n`
     text += `Date: ${now}\n`
     text += `Archetype: ${archetype}\n`
-    text += `Blueprint Score: ${overallScore}/100\n`
+    text += `Intelligence Score: ${overallScore}/100\n`
     text += `${'═'.repeat(55)}\n\n`
 
     if (!items || items.length === 0) {
@@ -89,7 +89,7 @@ export async function GET(req: NextRequest) {
     doc.fontSize(20).font('Helvetica-Bold').text('Essence Intelligence Board', { align: 'center' })
     doc.moveDown(0.3)
     doc.fontSize(10).font('Helvetica').text(`Date: ${now}`, { align: 'center' })
-    doc.text(`Archetype: ${archetype}  |  Blueprint Score: ${overallScore}/100`, { align: 'center' })
+    doc.text(`Archetype: ${archetype}  |  Intelligence Score: ${overallScore}/100`, { align: 'center' })
     doc.moveDown(0.5)
     doc.moveTo(50, doc.y).lineTo(545, doc.y).stroke()
     doc.moveDown(0.5)

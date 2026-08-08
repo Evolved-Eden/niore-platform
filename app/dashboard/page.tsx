@@ -36,7 +36,7 @@ const QUICK_ACTIONS: Record<string, QuickAction[]> = {
   admin: [
     { title: 'Users', desc: 'Manage platform users', href: '/dashboard/admin/users', icon: '✦' },
     { title: 'Agents', desc: 'Deploy and monitor agents', href: '/dashboard/admin/agents', icon: '⊕' },
-    { title: 'OmniGrid', desc: 'Full system control panel', href: '/dashboard/admin', icon: '◈' },
+    { title: 'Essence Engine', desc: 'Full system control panel', href: '/dashboard/admin', icon: '◈' },
   ],
   personal: [
     { title: 'My Hub', desc: 'Your personal intelligence hub', href: '/dashboard/personal', icon: '✦' },
@@ -52,7 +52,7 @@ const QUICK_ACTIONS: Record<string, QuickAction[]> = {
 }
 
 const SYSTEM_STATUSES = [
-  { label: 'Blueprint', key: 'blueprint', online: true },
+  { label: 'Intelligence', key: 'blueprint', online: true },
   { label: 'Twin', key: 'twin', online: true },
   { label: 'Essence', key: 'essence', online: true },
   { label: 'Agents', key: 'agents', online: true },
@@ -60,7 +60,7 @@ const SYSTEM_STATUSES = [
 ]
 
 const KPI_ITEMS = [
-  { label: 'Blueprint Score', value: '92%', icon: '◆', color: '#C6A664' },
+  { label: 'Intelligence Score', value: '92%', icon: '◆', color: '#C6A664' },
   { label: 'Twin Status', value: 'Active', icon: '⟐', color: '#5E8B84' },
   { label: 'Essence Items', value: '14', icon: '⊙', color: '#8B7AA8' },
   { label: 'Agents Deployed', value: '3', icon: '⊕', color: '#C6A664' },
@@ -71,7 +71,7 @@ const KPI_ITEMS = [
 const QUICK_STATS = [
   { label: 'System Uptime', value: '99.9%' },
   { label: 'Intelligence Level', value: 'Lv. 7' },
-  { label: 'Blueprint Status', value: 'Optimized' },
+  { label: 'Intelligence Status', value: 'Optimized' },
   { label: 'Active Agents', value: '3 Online' },
 ]
 
@@ -100,7 +100,7 @@ const ROLE_PATHS = [
   {
     role: 'Clients',
     href: '/define-intelligence/client',
-    metric: 'Blueprint -> Twin -> Deploy',
+    metric: 'Intelligence -> Twin -> Deploy',
     copy: 'Build a practical AI operating system around the way your business already works.',
   },
   {
@@ -133,7 +133,7 @@ const DEMO_LANES = [
 
 const EXCHANGE_ITEMS = [
   'Agent templates for specialty demos',
-  'Blueprint scoring and pricing paths',
+  'Intelligence scoring and pricing paths',
   'n8n workflow bridge to Discord and social',
   'Supabase identity, roles, and vault data',
 ]
@@ -261,7 +261,7 @@ export default async function DashboardHub({ searchParams }: { searchParams?: Pr
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div>
               <h2 className="font-display text-lg font-semibold mb-1 text-white">
-                {role === 'client' ? 'Run Your Blueprint Assessment' : 'Open Your Dashboard'}
+                {role === 'client' ? 'Run Your Intelligence Assessment' : 'Open Your Dashboard'}
               </h2>
               <p className="text-sm text-white/40">
                 {role === 'client'
@@ -270,10 +270,10 @@ export default async function DashboardHub({ searchParams }: { searchParams?: Pr
               </p>
             </div>
             <Link
-              href={role === 'client' ? '/intake' : `/dashboard/${role}`}
+              href={role === 'client' ? '/onboarding' : `/dashboard/${role}`}
               className="px-6 py-3 bg-[#C6A664] text-black text-sm font-bold rounded-sm hover:bg-white transition-all shrink-0 glow-acid group-hover/cta:shadow-[0_0_32px_rgba(200,255,0,0.3)]"
             >
-              {role === 'client' ? 'Start Blueprint →' : 'Go to Dashboard →'}
+              {role === 'client' ? 'Start Onboarding →' : 'Go to Dashboard →'}
             </Link>
           </div>
         </div>

@@ -365,7 +365,7 @@ export default function AdminEssencePage() {
           </div>
           <p className="text-sm text-white/70 whitespace-pre-line">{blueprintTile.content}</p>
           {blueprintTile.upgradeMessage && clientPrefix && (
-            <Link href={`${clientPrefix}/essence-profile?upgrade=expanded`} className="inline-block mt-3 text-xs font-medium text-[#7A2E32] hover:underline">
+            <Link href={`${clientPrefix}/profile`} className="inline-block mt-3 text-xs font-medium text-[#7A2E32] hover:underline">
               {blueprintTile.upgradeMessage} →
             </Link>
           )}

@@ -564,7 +564,7 @@ export default function DefineIntelligenceFlow({ initialPath }: { initialPath?: 
             ))}
           </div>
           <p className="text-xs text-white/20 text-center max-w-md">
-            Every account starts with a universal package — including Zuri, Front Desk, Blueprint Profile, Essence Board, and RIS License.
+            Every account starts with a universal package — including Zuri, Front Desk, Intelligence Profile, Essence Board, and RIS License.
           </p>
         </section>
       </main>

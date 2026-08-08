@@ -12,7 +12,6 @@ interface NavItem {
 const NAV_ICONS: Record<string, string> = {
   Overview:       '◈',
   Profile:        '✦',
-  'Essence Profile':      '◆',
   'My Essence Profile': '◆',
   Assessment:     '◇',
   'Essence Intel':'⊙',
@@ -36,7 +35,6 @@ const NAV_ICONS: Record<string, string> = {
 const NAV_SECTION: Record<string, number> = {
   Overview: 1,
   Profile: 1,
-  'Essence Profile': 1,
   'My Essence Profile': 1,
   Assessment: 1,
   'Essence Intel': 2,

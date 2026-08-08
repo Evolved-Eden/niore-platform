@@ -138,7 +138,7 @@ export default function AdminChatPage() {
       zuri: `Switched to ${entityName}. How can I help you manage the ecosystem?`,
       agent: `Now chatting with **${entityName}**. This is a deployed intelligence agent. What would you like it to do?`,
       swarm: `Now managing **${entityName}**. This is a multi-agent swarm. You can monitor, configure, or direct it.`,
-      twin: `Now connected to your **AI Twin**. Your twin reflects your blueprint, essence, and intelligence profile.`,
+      twin: `Now connected to your **AI Twin**. Your twin reflects your intelligence, essence, and profile.`,
     };
     setMessages([
       {

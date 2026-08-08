@@ -717,13 +717,13 @@ export async function POST(req: NextRequest) {
 
       // Also seed ai_memories so the essence API finds memory context
       try {
-        const memContent = `Blueprint: ${result.blueprint.archetype}. ${result.blueprint.summary}`
+        const memContent = `Intelligence: ${result.blueprint.archetype}. ${result.blueprint.summary}`
         await svc.from('ai_memories').insert({
           entity_type: 'user',
           entity_id: user.id,
           memory_type: 'intake_blueprint',
           content: memContent.slice(0, 1000),
-          title: `${result.blueprint.archetype} Blueprint - ${new Date().toISOString().split('T')[0]}`,
+          title: `${result.blueprint.archetype} Intelligence - ${new Date().toISOString().split('T')[0]}`,
           client_id: user.id,
         } as any)
       } catch (memSeedErr) {

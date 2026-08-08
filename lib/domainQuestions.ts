@@ -1,6 +1,6 @@
 /**
  * Domain Intelligence Modules — question banks for the 6 a-la-carte
- * blueprint add-ons ($50 each, purchased from /dashboard/client/essence-profile).
+ * essence engine add-ons ($50 each, purchased from /dashboard/client/profile).
  *
  * Each module's 5 questions are drawn from specific systems in the Evolved
  * Eden 155-system master list (per owner spec), not generic filler:

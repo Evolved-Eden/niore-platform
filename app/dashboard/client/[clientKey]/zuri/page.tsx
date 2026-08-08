@@ -56,11 +56,11 @@ const getQuickActions = (prefix: string) => [
 ];
 
 const SUGGESTED_PROMPTS = [
-  "Help me start my intelligence blueprint",
+  "Help me start my intelligence assessment",
   "What does my essence board say today?",
   "Show me my twin's latest scores",
   "How do I upgrade my plan?",
-  "What's the OmniGrid ecosystem?",
+  "What's the Essence Engine ecosystem?",
 ];
 
 export default function ZuriChatPage() {
@@ -105,7 +105,7 @@ export default function ZuriChatPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           messages: updated.map((m) => ({ role: m.role, content: m.content })),
-          context: "User is on their dashboard Zuri page. They can start a blueprint, check their twin, essence board, vault, or manage their account.",
+          context: "User is on their dashboard Zuri page. They can start an intelligence assessment, check their twin, essence board, vault, or manage their account.",
         }),
       });
 

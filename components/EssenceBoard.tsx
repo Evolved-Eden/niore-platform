@@ -27,7 +27,7 @@ const PRIORITY_COLORS: Record<string, string> = {
 }
 
 const DEFAULT_ITEMS: EssenceItem[] = [
-  { type: 'focus',    content: 'Review your intelligence blueprint alignment', priority: 'high' },
+  { type: 'focus',    content: 'Review your intelligence alignment', priority: 'high' },
   { type: 'action',   content: 'Complete one high-impact task before noon', priority: 'high' },
   { type: 'timing',   content: 'Optimal engagement window: 10 AM - 2 PM', priority: 'medium' },
   { type: 'habit',    content: 'Schedule recovery time between intensive sessions', priority: 'medium' },

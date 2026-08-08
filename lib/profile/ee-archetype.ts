@@ -12,7 +12,7 @@
 // - Replaces the fabricated gate mod-math archetype names
 //   ("Primal Explorer") with deterministic, explainable
 //   synthesis from real chart data.
-// - Blueprint naming (static, birth-derived) lives here;
+// - Intelligence naming (static, birth-derived) lives here;
 //   behavior naming (daily engine) is deliberately separate.
 // ───────────────────────────────────────────────────────
 
@@ -82,7 +82,7 @@ const ARCHETYPE_LAYER: Record<string, string> = {
   'The Cultivator': 'Purpose',
 }
 
-// One-line blueprint wording per archetype (the naming layer).
+// One-line intelligence wording per archetype (the naming layer).
 const ARCHETYPE_WORDING: Record<string, string> = {
   'The Pioneer': 'You go first — forging paths where there is no map yet.',
   'The Sage': 'You distill experience into wisdom that others can use.',

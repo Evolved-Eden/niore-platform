@@ -99,7 +99,7 @@ export default async function ClientDashboard({ params }: { params: Promise<{ cl
   const stats = [
     { label: 'Intelligence Score', value: engagementScore, color: '#C6A664', icon: '◈' },
     { label: 'Twins Active',       value: twin ? '1' : '0',                color: '#5E8B84', icon: '⟐' },
-    { label: 'Blueprint Score',    value: blueprintScore,                   color: '#8B7AA8', icon: '◆' },
+    { label: 'Essence Score',     value: blueprintScore,                   color: '#8B7AA8', icon: '◆' },
     { label: 'Lifetime Value',     value: clientFull?.lifetime_value ? `$${clientFull.lifetime_value}` : '—', color: '#B5764A', icon: '✦' },
   ]
 
@@ -225,7 +225,7 @@ export default async function ClientDashboard({ params }: { params: Promise<{ cl
                   <div className="text-sm text-white/70">
                     {twin
                       ? 'Your AI twin is active and learning from your interactions.'
-                      : 'No AI twin deployed yet. Run your blueprint to configure your first one.'}
+                      : 'No AI twin deployed yet. Run your essence assessment to configure your first one.'}
                   </div>
                 </div>
                 {!twin && (
@@ -233,7 +233,7 @@ export default async function ClientDashboard({ params }: { params: Promise<{ cl
                     href={`${prefix}/essence-profile/assess`}
                     className="px-5 py-2 bg-[#C6A664] text-black text-xs font-bold rounded-sm hover:bg-white transition-all shrink-0 glow-acid"
                   >
-                    Run Blueprint →
+                    Run Essence Assessment →
                   </Link>
                 )}
               </div>
@@ -255,24 +255,24 @@ export default async function ClientDashboard({ params }: { params: Promise<{ cl
             </div>
             <div className="text-sm text-white/50">
               <span className="text-white/80 font-medium">{agentCount ?? 0}</span> agent{(agentCount ?? 0) !== 1 ? 's' : ''} currently deployed.
-              {' '}Unlock autonomous intelligence agents through your blueprint.
+              {' '}Unlock autonomous intelligence agents through your intelligence profile.
             </div>
             <Link
-              href={`${prefix}/essence-profile`}
+              href={`${prefix}/agents`}
               className="inline-block mt-3 text-xs text-[#C6A664] hover:text-white transition-colors"
             >
               Deploy new agent →
             </Link>
           </div>
 
-          {/* Blueprint Progress */}
+          {/* Intelligence Progress */}
           <div className="glass rounded-sm p-6">
             <div className="flex items-center justify-between mb-4">
               <div className="text-xs text-white/30 tracking-widest uppercase flex items-center gap-2">
-                <span className="text-[#8B7AA8]">◆</span> Blueprint Progress
+                <span className="text-[#8B7AA8]">◆</span> Intelligence Progress
               </div>
               <Link
-                href={`${prefix}/essence-profile`}
+                href={`${prefix}/profile`}
                 className="text-[10px] text-white/20 hover:text-white/50 transition-colors tracking-wider uppercase"
               >
                 View full →
@@ -297,8 +297,8 @@ export default async function ClientDashboard({ params }: { params: Promise<{ cl
             ) : (
               <div className="text-sm text-white/50">
                 {twin
-                  ? 'Blueprint assessment submitted. Results are being processed.'
-                  : 'Complete the blueprint assessment to unlock your full intelligence ecosystem.'}
+                  ? 'Intelligence assessment submitted. Results are being processed.'
+                  : 'Complete the intelligence assessment to unlock your full intelligence ecosystem.'}
               </div>
             )}
             {!twin && (

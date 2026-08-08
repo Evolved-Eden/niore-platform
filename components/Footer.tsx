@@ -6,7 +6,7 @@ const footerLinks = [
   { label: 'Define Intelligence', href: '/define-intelligence' },
   { label: 'Demo', href: '/demo' },
   { label: 'Pricing', href: '/pricing' },
-  { label: 'Take the Blueprint', href: '/intake' },
+  { label: 'Start Onboarding', href: '/onboarding' },
   { label: 'Services', href: EXTERNAL_LINKS.SERVICES, external: true },
   { label: 'Exchange', href: EXTERNAL_LINKS.EXCHANGE, external: true },
 ]

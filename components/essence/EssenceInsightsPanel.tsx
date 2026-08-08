@@ -29,7 +29,7 @@ export type EssenceExtras = {
  * that make the rest of that file risky to split apart without a build to
  * verify against.
  */
-export default function EssenceInsightsPanel({ extras }: { extras: EssenceExtras }) {
+export default function EssenceInsightsPanel({ extras, prefix = '' }: { extras: EssenceExtras; prefix?: string }) {
   return (
     <>
       <div className="mb-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
@@ -112,12 +112,12 @@ export default function EssenceInsightsPanel({ extras }: { extras: EssenceExtras
         </div>
       )}
 
-      {/* ── Blueprint tile (calls the Blueprint agent(s), tier-gated) ── */}
+      {/* ── Essence Engine tile (calls the Essence Engine agent(s), tier-gated) ── */}
       {extras.blueprintTile && (
         <div className="mb-6 glass rounded-sm border border-white/[0.06] p-4">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
-              <span className="text-[10px] uppercase tracking-widest text-[#C6A664] font-medium">Blueprint</span>
+              <span className="text-[10px] uppercase tracking-widest text-[#C6A664] font-medium">Essence Engine</span>
               <span className="text-[9px] px-2 py-0.5 rounded-full bg-white/10 text-white/50 uppercase">{extras.blueprintTile.tier}</span>
             </div>
             {extras.blueprintTile.agentsUsed.length > 0 && (
@@ -127,7 +127,7 @@ export default function EssenceInsightsPanel({ extras }: { extras: EssenceExtras
           <p className="text-sm text-white/70 whitespace-pre-line">{extras.blueprintTile.content}</p>
           {extras.blueprintTile.upgradeMessage && (
             <Link
-              href="/dashboard/client/essence-profile?upgrade=expanded"
+              href={`${prefix}/profile`}
               className="inline-block mt-3 text-xs font-medium text-[#C6A664] hover:underline"
             >
               {extras.blueprintTile.upgradeMessage} →

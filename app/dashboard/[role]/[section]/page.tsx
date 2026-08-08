@@ -11,8 +11,8 @@ const SECTION_META: Record<UserRole, Record<string, { title: string; description
       description: 'View and tune your AI-synthesized digital intelligence.',
     },
     'essence-profile': {
-      title: 'Essence Profile',
-      description: 'Review assessment results, recommendations, and deployment modules.',
+      title: 'Profile',
+      description: 'Review your intelligence, assessment results, and deployment modules.',
     },
     vault: {
       title: 'Intelligence Vault',

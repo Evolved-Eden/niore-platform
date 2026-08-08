@@ -1,5 +1,6 @@
 import { requireClientView } from '@/lib/client-dashboard'
 import { createServiceClient } from '@/lib/supabase/server'
+import { EssenceEnginePanel } from '@/components/essence/EssenceEnginePanel'
 import Link from 'next/link'
 
 // ─── Role color map ───────────────────────────────────────────
@@ -63,7 +64,7 @@ const PLAN_LABELS: Record<string, string> = {
   // enterprise_*
   enterprise_concierge: 'Enterprise Concierge',
   enterprise_eden_force: 'Eden Force',
-  enterprise_omnigrid: 'Omnigrid',
+  enterprise_omnigrid: 'Essence Engine',
 }
 
 function planLabel(key: string | null | undefined): string {
@@ -221,7 +222,7 @@ export default async function ClientProfilePage({ params }: { params: Promise<{ 
   }
   if (essenceItems.length === 0) {
     essenceItems = [
-      { type: 'action', content: 'No daily essence items yet — complete your blueprint to unlock personalized intelligence briefs.', priority: 'low' },
+      { type: 'action', content: 'No daily essence items yet — complete your intelligence profile to unlock personalized intelligence briefs.', priority: 'low' },
     ]
   }
 
@@ -329,7 +330,7 @@ export default async function ClientProfilePage({ params }: { params: Promise<{ 
             <div className="px-6 py-4 grid grid-cols-3 gap-3">
               <StatCell label="Role" value={ROLE_LABELS[role] ?? role} color={roleColor} />
               <StatCell label="Twin Status" value={twin ? 'Active' : 'Inactive'} color={twin ? '#5E8B84' : '#6b7280'} />
-              <StatCell label="Blueprint" value={hasBlueprint ? 'Complete' : 'Pending'} color={hasBlueprint ? '#C6A664' : '#6b7280'} />
+              <StatCell label="Intelligence" value={hasBlueprint ? 'Complete' : 'Pending'} color={hasBlueprint ? '#C6A664' : '#6b7280'} />
             </div>
           </div>
 
@@ -389,71 +390,8 @@ export default async function ClientProfilePage({ params }: { params: Promise<{ 
             )}
           </div>
 
-          {/* ─── 3. BLUEPRINT STATUS ─────────────────────────── */}
-          <div className="glass rounded-sm p-6">
-            <SectionHeader title="Blueprint Status" />
-            {hasBlueprint && twin ? (
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <div className="text-3xl font-bold text-[#C6A664]">
-                      {(twin as any)?.metadata?.lenses?.humanDesign?.data?.overallScore ?? '—'}
-                    </div>
-                    <div className="text-[10px] text-white/30 tracking-widest uppercase mt-1">Overall Score</div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-sm text-white/70">{(twin as any)?.metadata?.lenses?.humanDesign?.data?.archetype ?? '—'}</div>
-                    <div className="text-[10px] text-white/30 tracking-widest uppercase mt-0.5">Archetype</div>
-                  </div>
-                </div>
-                {/* Dimension scores */}
-                {(() => {
-                  const scores: Record<string, number> | undefined = (twin as any)?.metadata?.lenses?.humanDesign?.data?.scores
-                  if (!scores || Object.keys(scores).length === 0) return null
-                  return (
-                    <div className="space-y-2.5 mb-4">
-                      {Object.entries(scores).map(([key, val]) => (
-                        <ScoreBar
-                          key={key}
-                          label={key.replace(/_/g, ' ')}
-                          value={val}
-                          color="#C6A664"
-                        />
-                      ))}
-                    </div>
-                  )
-                })()}
-                {/* Summary */}
-                {(twin as any)?.metadata?.lenses?.humanDesign?.data?.summary && (
-                  <p className="text-sm text-white/50 leading-relaxed mt-4 pt-4 border-t border-white/[0.06]">
-                    {(twin as any).metadata.lenses.humanDesign.data.summary}
-                  </p>
-                )}
-                <Link
-                  href={`${prefix}/essence-profile`}
-                  className="inline-block mt-4 text-xs text-[#C6A664]/60 hover:text-[#C6A664] transition-colors"
-                >
-                  View full blueprint →
-                </Link>
-              </div>
-            ) : (
-              <div className="text-center py-6">
-                <div className="w-12 h-12 rounded-full bg-white/[0.03] border border-white/10 flex items-center justify-center mx-auto mb-3">
-                  <span className="text-lg text-white/20">◈</span>
-                </div>
-                <p className="text-sm text-white/40 mb-1">No blueprint yet</p>
-                <p className="text-xs text-white/20 mb-4">Complete the assessment to unlock your intelligence foundation</p>
-                {access === 'self' && (
-                  <Link
-                    href={`${prefix}/essence-profile/assess`}
-                    className="inline-block px-5 py-2.5 bg-[#C6A664] text-black text-xs font-bold rounded-sm hover:bg-white transition-all"
-                  >
-                    Take Assessment →
-                  </Link>
-                )}
-              </div>
-            )}
-          </div>
+          {/* ─── 3. ESSENCE ENGINE (merged from essence-profile) ── */}
+          <EssenceEnginePanel />
 
           {/* ─── 4. AI TWIN STATUS ────────────────────────────── */}
           <div className="glass rounded-sm p-6">
@@ -492,7 +430,7 @@ export default async function ClientProfilePage({ params }: { params: Promise<{ 
                   <span className="text-lg text-white/20">◆</span>
                 </div>
                 <p className="text-sm text-white/40 mb-1">No AI twin deployed</p>
-                <p className="text-xs text-white/20 mb-4">Complete your blueprint to generate your twin</p>
+                <p className="text-xs text-white/20 mb-4">Complete your intelligence profile to generate your twin</p>
                 {access === 'self' && (
                   <Link
                     href={`${prefix}/essence-profile/assess`}
@@ -582,7 +520,7 @@ export default async function ClientProfilePage({ params }: { params: Promise<{ 
           </Link>
 
           {/* ─── 7. AGENT DEPLOYMENTS ─────────────────────────── */}
-          <Link href={`${prefix}/essence-profile`} className="block glass rounded-sm p-5 border border-white/[0.06] hover:border-white/[0.12] transition-all group">
+          <Link href={`${prefix}/agents`} className="block glass rounded-sm p-5 border border-white/[0.06] hover:border-white/[0.12] transition-all group">
             <div className="flex items-center justify-between mb-3">
               <div className="text-xs text-white/30 tracking-widest uppercase">Agents</div>
               <div className="w-8 h-8 rounded-full bg-white/[0.04] flex items-center justify-center group-hover:bg-white/[0.08] transition-colors">
@@ -594,7 +532,7 @@ export default async function ClientProfilePage({ params }: { params: Promise<{ 
             <div className="text-3xl font-light text-[#5E8B84] mb-1">{agentDeployments}</div>
             <p className="text-xs text-white/40">deployed agent{agentDeployments !== 1 ? 's' : ''}</p>
             {agentDeployments === 0 && (
-              <p className="text-[10px] text-white/20 mt-2">Deploy your first agent from the blueprint page</p>
+              <p className="text-[10px] text-white/20 mt-2">Deploy your first agent from your intelligence profile</p>
             )}
           </Link>
 
@@ -641,7 +579,6 @@ export default async function ClientProfilePage({ params }: { params: Promise<{ 
             <div className="text-xs text-white/30 tracking-widest uppercase mb-3">Quick Links</div>
             {[
               { href: `${prefix}/twin`, label: 'View AI Twin' },
-              { href: `${prefix}/essence-profile`, label: 'Blueprint Details' },
               { href: `${prefix}/vault`, label: 'Intelligence Vault' },
               { href: `${prefix}/zuri`, label: 'Ask Zuri' },
               { href: `${prefix}/settings`, label: 'Account Settings' },

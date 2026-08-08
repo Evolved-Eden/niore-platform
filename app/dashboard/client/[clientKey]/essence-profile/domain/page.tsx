@@ -45,7 +45,7 @@ function DomainAssessmentInner() {
         return
       }
       try {
-        const res = await fetch(`/api/blueprint/domain?domain=${encodeURIComponent(domain)}`)
+        const res = await fetch(`/api/essence-profile/domain?domain=${encodeURIComponent(domain)}`)
         const data = await res.json()
         if (res.status === 402) {
           setError({ message: data.message || 'This module has not been purchased yet.', purchaseUrl: data.purchase_url })
@@ -109,10 +109,10 @@ function DomainAssessmentInner() {
         <h1 className="text-lg font-semibold mb-2">{label || 'Domain Module'}</h1>
         <p className="text-sm text-white/50 mb-6">{error.message}</p>
         <Link
-          href={error.purchaseUrl || `${prefix}/essence-profile`}
+          href={error.purchaseUrl || `${prefix}/profile`}
           className="inline-block px-5 py-2 bg-[#C6A664] text-black text-xs font-bold rounded-sm hover:bg-white transition-all"
         >
-          Go to Blueprint
+          Go to Profile
         </Link>
       </div>
     )
@@ -147,8 +147,8 @@ function DomainAssessmentInner() {
 
   return (
     <div className="max-w-2xl mx-auto py-10 animate-fade-in">
-      <button onClick={() => router.push(`${prefix}/essence-profile`)} className="text-xs text-white/30 hover:text-white/60 mb-6">
-        ← Back to Blueprint
+      <button onClick={() => router.push(`${prefix}/profile`)} className="text-xs text-white/30 hover:text-white/60 mb-6">
+        ← Back to Profile
       </button>
       <h1 className="font-display text-xl font-bold mb-1">
         {label} <span className="text-[#C6A664]">Module</span>

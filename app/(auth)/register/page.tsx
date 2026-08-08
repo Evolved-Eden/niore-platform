@@ -190,7 +190,7 @@ function RegisterForm() {
               Evolve Your <span className="text-[#C6A664]">Intelligence</span>
             </h1>
             <p className="text-white/40 text-sm mt-1">
-              Create your account and begin your blueprint
+              Create your account and begin your intelligence
             </p>
           </div>
 

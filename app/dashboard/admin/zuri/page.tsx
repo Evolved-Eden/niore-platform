@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useSpecialties } from '@/lib/specialties';
 import { useSelfClientKey } from '@/lib/client-view';
 
-const ZURI_AGENT_ID = 'AGT-215';
+const ZURI_AGENT_ID = 'ZURI';
 
 export default function ZuriAdminPage() {
   const { prefix: clientPrefix } = useSelfClientKey();

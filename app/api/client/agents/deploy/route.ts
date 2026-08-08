@@ -49,70 +49,72 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // ── Fetch client's tier entitlements ──
-    const { data: clientRow } = await ctx.svc
-      .from('clients')
-      .select('plan_tier_key')
-      .eq('id', ctx.clientId)
-      .maybeSingle()
+    // ── Fetch client's tier entitlements (Admin bypasses all limits) ──
+    if (!ctx.isAdmin) {
+      const { data: clientRow } = await ctx.svc
+        .from('clients')
+        .select('plan_tier_key')
+        .eq('id', ctx.clientId)
+        .maybeSingle()
 
-    if (!clientRow?.plan_tier_key) {
-      return NextResponse.json(
-        { error: 'No active plan tier found. Upgrade to deploy agents.' },
-        { status: 403 }
-      )
-    }
+      if (!clientRow?.plan_tier_key) {
+        return NextResponse.json(
+          { error: 'No active plan tier found. Upgrade to deploy agents.' },
+          { status: 403 }
+        )
+      }
 
-    const { data: tierEnt, error: tierErr } = await ctx.svc
-      .from('tier_entitlements')
-      .select('max_agents, max_custom_agents, max_specialty_agents')
-      .eq('plan_key', clientRow.plan_tier_key)
-      .maybeSingle()
+      const { data: tierEnt, error: tierErr } = await ctx.svc
+        .from('tier_entitlements')
+        .select('max_agents, max_custom_agents, max_specialty_agents')
+        .eq('plan_key', clientRow.plan_tier_key)
+        .maybeSingle()
 
-    if (tierErr) throw tierErr
+      if (tierErr) throw tierErr
 
-    // Count current active deployments by type
-    const { data: currentAgents, error: countErr } = await ctx.svc
-      .from('client_deployed_agents')
-      .select('agent_id, role_type, specialty')
-      .eq('client_id', ctx.clientId)
-      .neq('status', 'undeployed')
+      // Count current active deployments by type
+      const { data: currentAgents, error: countErr } = await ctx.svc
+        .from('client_deployed_agents')
+        .select('agent_id, role_type, specialty')
+        .eq('client_id', ctx.clientId)
+        .neq('status', 'undeployed')
 
-    if (countErr) throw countErr
+      if (countErr) throw countErr
 
-    const currentTotal = currentAgents?.length ?? 0
-    const currentCustom = currentAgents?.filter(a => a.role_type === 'CUSTOM').length ?? 0
-    const currentSpecialty = currentAgents?.filter(a => a.role_type === 'VERTICAL' || a.role_type === 'SPECIALTY').length ?? 0
+      const currentTotal = currentAgents?.length ?? 0
+      const currentCustom = currentAgents?.filter(a => a.role_type === 'CUSTOM').length ?? 0
+      const currentSpecialty = currentAgents?.filter(a => a.role_type === 'VERTICAL' || a.role_type === 'SPECIALTY').length ?? 0
 
-    // Fetch the agent being deployed to determine its type
-    const { data: catalogAgent } = await ctx.svc
-      .from('agent_catalog')
-      .select('agent_type, role_type')
-      .eq('agent_id', agentId)
-      .maybeSingle()
+      // Fetch the agent being deployed to determine its type
+      const { data: catalogAgent } = await ctx.svc
+        .from('agent_catalog')
+        .select('agent_type, role_type')
+        .eq('agent_id', agentId)
+        .maybeSingle()
 
-    const deployingAgentRole = catalogAgent?.role_type || roleType || 'CORE'
-    const isCustom = deployingAgentRole === 'CUSTOM'
-    const isSpecialty = deployingAgentRole === 'VERTICAL' || deployingAgentRole === 'SPECIALTY'
+      const deployingAgentRole = catalogAgent?.role_type || roleType || 'CORE'
+      const isCustom = deployingAgentRole === 'CUSTOM'
+      const isSpecialty = deployingAgentRole === 'VERTICAL' || deployingAgentRole === 'SPECIALTY'
 
-    // Check limits
-    if (tierEnt?.max_agents !== null && tierEnt?.max_agents !== undefined && currentTotal >= tierEnt.max_agents) {
-      return NextResponse.json(
-        { error: `Agent limit reached (${tierEnt.max_agents}). Upgrade your plan to deploy more.` },
-        { status: 403 }
-      )
-    }
-    if (isCustom && tierEnt?.max_custom_agents !== null && tierEnt?.max_custom_agents !== undefined && currentCustom >= tierEnt.max_custom_agents) {
-      return NextResponse.json(
-        { error: `Custom agent limit reached (${tierEnt.max_custom_agents}).` },
-        { status: 403 }
-      )
-    }
-    if (isSpecialty && tierEnt?.max_specialty_agents !== null && tierEnt?.max_specialty_agents !== undefined && currentSpecialty >= tierEnt.max_specialty_agents) {
-      return NextResponse.json(
-        { error: `Specialty agent limit reached (${tierEnt.max_specialty_agents}).` },
-        { status: 403 }
-      )
+      // Check limits
+      if (tierEnt?.max_agents !== null && tierEnt?.max_agents !== undefined && currentTotal >= tierEnt.max_agents) {
+        return NextResponse.json(
+          { error: `Agent limit reached (${tierEnt.max_agents}). Upgrade your plan to deploy more.` },
+          { status: 403 }
+        )
+      }
+      if (isCustom && tierEnt?.max_custom_agents !== null && tierEnt?.max_custom_agents !== undefined && currentCustom >= tierEnt.max_custom_agents) {
+        return NextResponse.json(
+          { error: `Custom agent limit reached (${tierEnt.max_custom_agents}).` },
+          { status: 403 }
+        )
+      }
+      if (isSpecialty && tierEnt?.max_specialty_agents !== null && tierEnt?.max_specialty_agents !== undefined && currentSpecialty >= tierEnt.max_specialty_agents) {
+        return NextResponse.json(
+          { error: `Specialty agent limit reached (${tierEnt.max_specialty_agents}).` },
+          { status: 403 }
+        )
+      }
     }
 
     const id = crypto.randomUUID()

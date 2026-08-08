@@ -28,6 +28,7 @@ export interface ApiClientContext {
   viewerId: string | null
   /** RLS-bypassing client for the target's data (use for cross-client views) */
   svc: ReturnType<typeof createServiceClient>
+  isAdmin: boolean
 }
 
 async function getViewer() {
@@ -103,11 +104,14 @@ export async function resolveApiClient(
   const { access, viewerRole } = await computeAccess(viewerId, targetClientId)
   if (access === 'none') return null
 
+  const isAdmin = viewerRole === 'admin'
+
   return {
     clientId: targetClientId,
     access,
     viewerId,
     svc: createServiceClient(),
+    isAdmin,
   }
 }
 

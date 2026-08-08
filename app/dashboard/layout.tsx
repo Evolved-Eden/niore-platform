@@ -6,7 +6,7 @@ import type { UserRole } from '@/types'
 import { deriveRoleFromPlanTier } from '@/types'
 import { buildClientKey } from '@/lib/client-dashboard'
 
-import SidebarNav from './_components/SidebarNav'
+import SidebarWrapper from '@/components/SidebarWrapper'
 
 // This one layout renders every role's shell (client/admin/creator/personal/
 // affiliate/collective all share it -- there's no per-role nested layout).
@@ -244,55 +244,8 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const nav = keyedNav
 
   return (
-    <div className="flex min-h-screen bg-[#0A0A0B]">
-      {/* Sidebar */}
-      <aside className="w-56 flex-shrink-0 border-r border-white/[0.06] flex flex-col">
-        {/* Logo */}
-        <div className="px-6 py-5 border-b border-white/[0.06]">
-          <Link href="/">
-            <Image src="/logo.JPG" alt="Evolved Eden" width={100} height={24} className="object-contain" />
-          </Link>
-        </div>
-
-        {/* Role badge */}
-        <div className="px-6 py-4 border-b border-white/[0.06]">
-          <div className="text-[10px] tracking-[0.25em] uppercase mb-1" style={{ color }}>
-            {role}
-          </div>
-          <div className="text-sm text-white/60 truncate">{name}</div>
-        </div>
-
-        {/* Nav */}
-        <SidebarNav nav={nav} color={color} />
-
-        {/* Bottom */}
-        <div className="px-6 py-4 border-t border-white/[0.06]">
-          <form action="/api/auth/signout" method="post">
-            <button className="text-xs text-white/20 hover:text-white/50 transition-colors">
-              Sign out
-            </button>
-          </form>
-        </div>
-      </aside>
-
-      {/* Main */}
-      <div className="flex-1 flex flex-col min-w-0">
-        {/* Top bar */}
-        <header className="flex items-center justify-between px-8 py-4 border-b border-white/[0.06] flex-shrink-0">
-          <div className="text-xs text-white/20 tracking-widest uppercase">
-            <Image src="/logo.JPG" alt="" width={60} height={14} className="object-contain inline-block -mt-0.5 opacity-60" /> / <span style={{ color }}>{role}</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="w-1.5 h-1.5 rounded-full animate-pulse-slow" style={{ background: color }} />
-            <span className="text-xs text-white/30">RI Online</span>
-          </div>
-        </header>
-
-        {/* Page content */}
-        <main className="flex-1 overflow-auto p-8">
-          {children}
-        </main>
-      </div>
-    </div>
+    <SidebarWrapper nav={nav} color={color} role={role} name={name}>
+      {children}
+    </SidebarWrapper>
   )
 }

@@ -236,10 +236,10 @@ export default function PricingManager({ initialTiers, initialEntitlements }: { 
                   <div />
                 </Grid>
                 <div className="grid grid-cols-2 gap-4">
-                  {['legal', 'wealth', 'luxury_hospitality', 'creator_commerce'].map(addon => (
+                  {['legal', 'wealth', 'luxury_hospitality', 'creator_commerce', 'custom_branding', 'deploy_swarms', 'api_access', 'voice_synthesis'].map(addon => (
                     <label key={addon} className="flex items-center gap-2">
                       <input type="checkbox" name={`can_use_${addon}_addon`} defaultChecked={(editEnt as any)[`can_use_${addon}_addon`]} className="accent-[#C6A664]" />
-                      <span className="text-xs text-white/40">{addon.replace('_', ' ')}</span>
+                      <span className="text-xs text-white/40">{addon.replace(/_/g, ' ')}</span>
                     </label>
                   ))}
                 </div>

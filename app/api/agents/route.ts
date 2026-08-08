@@ -3,21 +3,22 @@ import { createClient } from '@/lib/supabase/server'
 
 export const dynamic = 'force-dynamic'
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
     const { supabaseAdmin } = await import('@/lib/supabase/admin')
 
-    // 1. Fetch catalog agents (available agent types from agents table)
-    const { data: catalog, error: catalogError } = await supabaseAdmin
-      .from('agent_catalog')
-      .select('*')
-      .eq('is_published', true)
-      .order('name', { ascending: true })
+    const url = new URL(request.url)
+    const filterAll = url.searchParams.get('filter') === 'all'
 
-    if (catalogError) throw catalogError
+    // If user is admin and explicitly wants all, or if we want admins to see everything
+    let isAdmin = false
+    if (user) {
+      const { data: uData } = await supabaseAdmin.from('users').select('role').eq('id', user.id).maybeSingle()
+      isAdmin = uData?.role === 'admin'
+    }
 
     // 2. Fetch user's deployed agents with custom names
     const { data: deployed } = await supabaseAdmin
@@ -27,10 +28,11 @@ export async function GET() {
       .neq('status', 'undeployed')
       .order('created_at', { ascending: false })
 
-    // Build a map of agent_id → custom deployed name
     const deployedMap = new Map<string, { id: string; agent_name: string; status: string; created_at: string }>()
+    const deployedIds = new Set<string>()
     if (deployed) {
       for (const d of deployed) {
+        deployedIds.add(d.agent_id)
         if (!deployedMap.has(d.agent_id)) {
           deployedMap.set(d.agent_id, {
             id: d.id,
@@ -42,17 +44,40 @@ export async function GET() {
       }
     }
 
-    // 3. Merge: catalog agents enriched with deployment info
-    //    Also include standalone deployed agents if not in catalog
+    // Core default agents that every user gets (Zuri + Front Desk)
+    const coreDefaultIds = ['ZURI', 'FRONT_DESK', 'zuri', 'front_desk']
+
+    // 1. Fetch catalog agents
+    let query = supabaseAdmin
+      .from('agent_catalog')
+      .select('*')
+      .eq('is_published', true)
+
+    if (!isAdmin && !filterAll) {
+      // Restrict to core default agents OR agents the user has deployed/purchased
+      const allowedIds = [...coreDefaultIds, ...Array.from(deployedIds)]
+      // query in list or fetch all and filter in memory if list is large
+    }
+
+    const { data: catalog, error: catalogError } = await query.order('name', { ascending: true })
+
+    if (catalogError) throw catalogError
+
     const merged = new Map<string, any>()
 
-    // Add catalog agents
     for (const a of catalog || []) {
+      const isCore = coreDefaultIds.includes(a.agent_id) || coreDefaultIds.includes(a.slug)
+      const isDeployed = deployedIds.has(a.agent_id)
+
+      if (!isAdmin && !filterAll && !isCore && !isDeployed) {
+        continue // Skip unowned agents
+      }
+
       const dep = deployedMap.get(a.agent_id)
       merged.set(a.agent_id, {
         id: a.id,
         agent_id: a.agent_id,
-        name: dep?.agent_name || a.name,            // custom name if deployed, else catalog name
+        name: dep?.agent_name || a.name,
         tagline: a.tagline || '',
         description: a.description || '',
         icon: a.icon || '',
@@ -62,11 +87,10 @@ export async function GET() {
         slug: a.slug || a.agent_id?.toLowerCase() || '',
         deployment_id: dep?.id || null,
         deployment_status: dep?.status || null,
-        origin: 'catalog',                           // from agent_catalog
+        origin: 'catalog',
       })
     }
 
-    // Add deployed agents not in catalog (standalone custom agents)
     for (const d of deployed || []) {
       if (!merged.has(d.agent_id)) {
         merged.set(d.agent_id, {
@@ -82,13 +106,12 @@ export async function GET() {
           slug: d.agent_id?.toLowerCase(),
           deployment_id: d.id,
           deployment_status: d.status,
-          origin: 'deployed',                        // custom deployed — no catalog entry
+          origin: 'deployed',
         })
       }
     }
 
     const agents = Array.from(merged.values())
-
     return NextResponse.json({ agents, count: agents.length })
   } catch (error) {
     console.error('Agent catalog fetch failed:', error)

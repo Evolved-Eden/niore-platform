@@ -594,9 +594,18 @@ export default function DefineIntelligenceFlow({ initialPath, member = false }: 
     return (
       <main className="min-h-screen bg-[#0A0A0B] text-white">
         <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 py-5 border-b border-white/5 bg-[#0A0A0B]/80 backdrop-blur-xl">
-          <Link href="/" className="font-display font-bold tracking-tight text-lg">
-            EVOLVED <span className="text-[#C6A664]">EDEN</span>
-          </Link>
+          <button
+            onClick={() => {
+              if (step === 'scope-intro') setStep('welcome')
+              else if (step === 'questions') { setStep('scope-intro'); setPath(null); }
+              else if (step === 'analysis') setStep('questions')
+              else if (step === 'builder') setStep('analysis')
+              else router.back()
+            }}
+            className="text-sm text-white/40 hover:text-white transition-colors flex items-center gap-2"
+          >
+            ← Back
+          </button>
           <div className="flex items-center gap-6 text-sm text-white/50">
             <Link href="/demo" className="hover:text-white transition-colors">Demo</Link>
             <Link href="/pricing" className="hover:text-white transition-colors">Pricing</Link>

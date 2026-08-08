@@ -83,43 +83,46 @@ const SERVICES = [
     eyebrow: 'Intake and scheduling',
     copy: 'Qualify leads, answer common questions, route requests, and hand off clean context to your team.',
     accent: 'border-[#5E8B84]/35 text-cyan',
+    href: '/intelligence-exchange?category=Sales',
   },
   {
     title: 'Business Twins',
     eyebrow: 'Operations memory',
     copy: 'Turn your services, policies, offers, and workflows into a deployable intelligence layer.',
     accent: 'border-[#C6A664]/35 text-acid',
+    href: '/intelligence-exchange?category=Operations',
   },
   {
     title: 'Creator Systems',
     eyebrow: 'Content and monetization',
     copy: 'Package expertise into assistants, campaigns, premium experiences, and affiliate-ready funnels.',
     accent: 'border-[#8B7AA8]/35 text-violet',
+    href: '/intelligence-exchange?category=Creation',
   },
 ]
 
 const ROLE_PATHS = [
   {
     role: 'Clients',
-    href: '/define-intelligence/client',
+    href: '/define-intelligence/client?member=1',
     metric: 'Intelligence -> Twin -> Deploy',
     copy: 'Build a practical AI operating system around the way your business already works.',
   },
   {
     role: 'Creators',
-    href: '/define-intelligence/creator',
+    href: '/define-intelligence/creator?member=1',
     metric: 'IP -> Product -> Revenue',
     copy: 'Turn your perspective, voice, and playbooks into an always-on intelligence product.',
   },
   {
     role: 'Personal',
-    href: '/define-intelligence/personal',
+    href: '/define-intelligence/personal?member=1',
     metric: 'Life -> Systems -> Growth',
     copy: 'Build a personal AI companion that learns your world, simplifies your day, and grows with you.',
   },
   {
     role: 'Affiliates',
-    href: '/define-intelligence/affiliate',
+    href: '/define-intelligence/affiliate?member=1',
     metric: 'Audience -> Match -> Commission',
     copy: 'Route the right people into the right systems with partner-ready tracking and offers.',
   },
@@ -208,14 +211,6 @@ export default async function DashboardHub({ searchParams }: { searchParams?: Pr
         </h1>
         <p className="text-white/30 text-sm">Your {role} intelligence command center</p>
       </div>
-
-      {/* ── Share & Earn ── */}
-      {myLink?.code && (
-        <CopyLink
-          value={affiliateLinkUrl(myLink.code)}
-          label="Share & Earn — Your Referral Link"
-        />
-      )}
 
       {/* ── System Status Bar ── */}
       <div className="flex flex-wrap gap-6 mb-4">
@@ -312,14 +307,29 @@ export default async function DashboardHub({ searchParams }: { searchParams?: Pr
         <p className="text-xs uppercase tracking-[0.3em] text-white/35 mb-3">Services</p>
         <div className="grid gap-4 md:grid-cols-3">
           {SERVICES.map((service) => (
-            <div key={service.title} className={`rounded-lg border bg-white/[0.025] p-6 ${service.accent}`}>
+            <Link
+              key={service.title}
+              href={service.href}
+              className={`group rounded-lg border bg-white/[0.025] p-6 ${service.accent} transition-colors hover:border-white/25`}
+            >
               <p className="text-xs uppercase tracking-[0.26em] text-white/35">{service.eyebrow}</p>
               <h3 className="mt-4 text-xl font-semibold text-white">{service.title}</h3>
               <p className="mt-4 text-sm leading-7 text-white/45">{service.copy}</p>
-            </div>
+              <span className="mt-4 inline-flex text-sm font-semibold text-white/60 transition-colors group-hover:text-white">
+                Browse marketplace →
+              </span>
+            </Link>
           ))}
         </div>
       </div>
+
+      {/* ── Share & Earn ── */}
+      {myLink?.code && (
+        <CopyLink
+          value={affiliateLinkUrl(myLink.code)}
+          label="Share & Earn — Your Referral Link"
+        />
+      )}
 
       {/* ── Role Paths ── */}
       <div>

@@ -1,8 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import Link from 'next/link'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase-client'
+
+const FALLBACK_CATEGORIES = ['Productivity', 'Sales', 'Creation', 'Data', 'Marketing', 'Operations']
 
 const FALLBACK_LISTINGS = [
   { id: '1', title: 'Scheduling Agent', category_name: 'Productivity', description: 'AI-powered calendar coordination — books, reschedules, and syncs across all platforms.', price_label: 'Free', author: 'Zuri Labs', downloads: 2400, tags: ['calendar', 'automation', 'sync'], featured: true },
@@ -25,9 +28,32 @@ const FALLBACK_TWINS = [
 type Tab = 'marketplace' | 'twins'
 
 export default function IntelligenceExchangePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#0A0A0B] flex items-center justify-center">
+        <div className="w-6 h-6 border-2 border-[#5E8B84] border-t-transparent rounded-full animate-spin" />
+      </div>
+    }>
+      <IntelligenceExchangeInner />
+    </Suspense>
+  )
+}
+
+function IntelligenceExchangeInner() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const categoryParam = searchParams.get('category')
+
   const [tab, setTab] = useState<Tab>('marketplace')
   const [listings, setListings] = useState(FALLBACK_LISTINGS)
   const [twins, setTwins] = useState(FALLBACK_TWINS)
+  const [activeCategory, setActiveCategory] = useState<string | null>(categoryParam)
+
+  // Sync category when the URL changes (e.g. back/forward, dashboard card links)
+  useEffect(() => {
+    setActiveCategory(categoryParam)
+    if (categoryParam) setTab('marketplace')
+  }, [categoryParam])
 
   useEffect(() => {
     const supabase = createClient()
@@ -60,6 +86,10 @@ export default function IntelligenceExchangePage() {
         }
       })
   }, [])
+
+  const filteredListings = activeCategory
+    ? listings.filter(l => l.category_name === activeCategory)
+    : listings
 
   return (
     <div className="min-h-screen bg-[#0A0A0B] text-white">
@@ -116,11 +146,38 @@ export default function IntelligenceExchangePage() {
         {/* Marketplace */}
         {tab === 'marketplace' && (
           <section className="px-6 py-12 max-w-6xl mx-auto">
+            {/* Category filter */}
+            <div className="flex flex-wrap items-center gap-2 mb-8">
+              {['All', ...FALLBACK_CATEGORIES].map(cat => {
+                const selected = activeCategory === null || activeCategory === '' ? cat === 'All' : activeCategory === cat
+                return (
+                  <button
+                    key={cat}
+                    onClick={() => {
+                      const next = cat === 'All' ? null : cat
+                      setActiveCategory(next)
+                      router.replace(next ? `/intelligence-exchange?category=${encodeURIComponent(next)}` : '/intelligence-exchange')
+                    }}
+                    className={`px-4 py-2 rounded-full border text-xs transition-all ${
+                      selected
+                        ? 'border-[#5E8B84] bg-[#5E8B84]/10 text-[#5E8B84]'
+                        : 'border-white/10 text-white/40 hover:border-white/25 hover:text-white/70'
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                )
+              })}
+            </div>
+
             <div className="flex items-center justify-between mb-8">
-              <p className="text-sm text-white/40">{listings.length} listings</p>
+              <p className="text-sm text-white/40">
+                {filteredListings.length} listing{filteredListings.length === 1 ? '' : 's'}
+                {activeCategory ? ` in ${activeCategory}` : ''}
+              </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {listings.map((item) => (
+              {filteredListings.map((item) => (
                 <div key={item.id} className="group rounded-lg border border-white/10 bg-white/[0.025] p-6 hover:border-white/20 hover:bg-white/[0.04] transition-all cursor-pointer">
                   <div className="flex items-start justify-between mb-3">
                     <div>

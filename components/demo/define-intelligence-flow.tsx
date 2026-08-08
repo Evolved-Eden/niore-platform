@@ -372,6 +372,21 @@ function getQuestionSet(path: PathType) {
   }
 }
 
+// Member mode: these are already-verified platform members, so we skip the
+// full intake (name/email/dob etc.) and only ask the handful of questions the
+// path analyzer actually scores on — 5 per path.
+const MEMBER_QUESTION_IDS: Record<string, string[]> = {
+  client: ['archetype', 'ai_involvement', 'most_true', 'hardest', 'biggest_win'],
+  creator: ['creator_stage', 'ai_help', 'most_true_creator', 'biggest_goal', 'hardest_creator'],
+  personal: ['personal_tech', 'personal_usage', 'personal_most_true', 'personal_goal', 'personal_area'],
+  affiliate: ['current_level', 'biggest_goal_aff', 'biggest_challenge', 'most_true_aff', 'ai_involvement_aff'],
+}
+
+function getMemberQuestions(path: PathType) {
+  const ids = new Set(MEMBER_QUESTION_IDS[path ?? 'client'] ?? [])
+  return getQuestionSet(path).filter(q => ids.has(q.id))
+}
+
 function getAnalyzer(path: PathType): (answers: Record<string, string>) => AnalysisResult {
   switch (path) {
     case 'client': return analyzeClient
@@ -470,9 +485,11 @@ const SCOPE_DATA = {
   },
 }
 
-export default function DefineIntelligenceFlow({ initialPath }: { initialPath?: PathType }) {
+export default function DefineIntelligenceFlow({ initialPath, member = false }: { initialPath?: PathType; member?: boolean }) {
   const router = useRouter()
-  const [step, setStep] = useState<Step>(initialPath ? 'scope-intro' : 'welcome')
+  // Member mode: skip welcome/scope/personal-info entirely — these users have
+  // already completed intake, so they land directly on the path questions.
+  const [step, setStep] = useState<Step>(initialPath ? (member ? 'questions' : 'scope-intro') : 'welcome')
   const [path, setPath] = useState<PathType>(initialPath || null)
   const [currentQuestion, setCurrentQuestion] = useState(0)
   const [answers, setAnswers] = useState<Record<string, string>>({})
@@ -482,7 +499,7 @@ export default function DefineIntelligenceFlow({ initialPath }: { initialPath?: 
   const [checkoutLoading, setCheckoutLoading] = useState(false)
   const [checkoutError, setCheckoutError] = useState('')
 
-  const questions = getQuestionSet(path)
+  const questions = member ? getMemberQuestions(path) : getQuestionSet(path)
   const totalQuestions = questions.length
   const progress = path && step === 'questions'
     ? Math.round(((currentQuestion) / totalQuestions) * 100)
@@ -727,6 +744,8 @@ export default function DefineIntelligenceFlow({ initialPath }: { initialPath?: 
             <div className="flex items-center justify-between mt-10">
               {hasPrev ? (
                 <button onClick={goBackQuestion} className="text-sm text-white/30 hover:text-white/60 transition-colors">← Previous</button>
+              ) : member ? (
+                <Link href="/dashboard" className="text-sm text-white/30 hover:text-white/60 transition-colors">← Back to Dashboard</Link>
               ) : (
                 <Link href="/define-intelligence" className="text-sm text-white/30 hover:text-white/60 transition-colors">← All Paths</Link>
               )}
@@ -818,6 +837,7 @@ export default function DefineIntelligenceFlow({ initialPath }: { initialPath?: 
       client: { A: 'client_founder', B: 'client_org' },
       creator: { A: 'creator_studio', B: 'creator_premium' },
       personal: { A: 'personal_plus', B: 'personal_premium' },
+      affiliate: { A: 'affiliate_annual', B: 'affiliate_plug' },
     }
     const planKey = planMapping[path]?.[analysis.recommendation] || 'client_founder'
     const baseKey = planKey.replace(/^(client|creator|personal)_/, '')
@@ -848,6 +868,37 @@ export default function DefineIntelligenceFlow({ initialPath }: { initialPath?: 
       })
       const addonIds = Array.from(selectedAddons)
       if (addonIds.length > 0) params.set('addons', addonIds.join(','))
+
+      // Member mode: the user is already signed in, so create the Stripe
+      // session immediately instead of routing through the register flow.
+      if (member) {
+        try {
+          const res = await fetch('/api/stripe/checkout-flow', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              tier: planKey,
+              path: path ?? 'client',
+              addons: addonIds.map(id => ({ id })),
+            }),
+          })
+          const d = await res.json()
+          if (d.url) {
+            window.location.href = d.url
+            return
+          }
+          if (d.requiresAuth) {
+            router.push(d.redirectUrl || '/login')
+            return
+          }
+          setCheckoutError(d.error || 'Checkout failed')
+        } catch {
+          setCheckoutError('Checkout failed. Please try again.')
+        }
+        setCheckoutLoading(false)
+        return
+      }
+
       router.push(`/register?${params.toString()}`)
     }
 

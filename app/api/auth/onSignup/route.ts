@@ -1,6 +1,7 @@
-import { createAdminClient } from '@/lib/supabase/server'
+import { createAdminClient, createServiceClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { provisionAccount } from '@/app/api/admin/provision/route'
+import { ensureAffiliateLink } from '@/lib/affiliate'
 
 export async function POST(req: NextRequest) {
   try {
@@ -77,6 +78,13 @@ client_type: safeRole === 'creator' ? 'creator' : safeRole === 'personal' ? 'per
         }).catch((err: unknown) => console.error('auto-provision error:', err))
       }
 
+      // Every user gets their own affiliate/referral link
+      ensureAffiliateLink({
+        userId: user_id,
+        name: name,
+        client: createServiceClient(),
+      }).catch((err: unknown) => console.error('affiliate link error (non-fatal):', err))
+
       return NextResponse.json({ ok: true, message: 'User already exists' })
     }
 
@@ -125,6 +133,13 @@ client_type: safeRole === 'creator' ? 'creator' : safeRole === 'personal' ? 'per
         role: safeRole,
       }).catch((err: unknown) => console.error('auto-provision error:', err))
     }
+
+    // Every user gets their own affiliate/referral link
+    ensureAffiliateLink({
+      userId: user_id,
+      name: name,
+      client: createServiceClient(),
+    }).catch((err: unknown) => console.error('affiliate link error (non-fatal):', err))
 
     return NextResponse.json({ ok: true })
   } catch (err) {

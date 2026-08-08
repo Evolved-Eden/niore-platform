@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'section and data are required' }, { status: 400 })
     }
 
-    const validSections = ['personal', 'role', 'results']
+    const validSections = ['personal', 'business', 'role', 'results']
     if (!validSections.includes(section)) {
       return NextResponse.json({ error: 'Invalid section' }, { status: 400 })
     }
@@ -68,8 +68,11 @@ export async function POST(req: NextRequest) {
     }
 
     if (section === 'personal') {
-      if (data.name) updates.full_name = data.name
+      if (data.firstName && data.lastName) updates.full_name = `${data.firstName} ${data.lastName}`
+      else if (data.name) updates.full_name = data.name
       if (data.email) updates.email = data.email
+      if (data.website) updates.website = data.website
+      if (data.businessName) updates.business_name = data.businessName
     }
 
     // Determine suggested path from role section

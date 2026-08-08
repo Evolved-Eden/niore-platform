@@ -2,7 +2,9 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import EssenceBoard from '@/components/EssenceBoard'
+import CopyLink from '@/components/CopyLink'
 import { deriveRoleFromPlanTier } from '@/types'
+import { ensureAffiliateLink, affiliateLinkUrl } from '@/lib/affiliate'
 
 const ROLE_COLOR: Record<string, string> = {
   admin: '#7A2E32',
@@ -170,6 +172,14 @@ export default async function DashboardHub({ searchParams }: { searchParams?: Pr
   const userRole = (identity?.role as string) ?? 'client'
   const name = identity?.full_name ?? user.email?.split('@')[0] ?? 'User'
 
+  // Every user has a personal referral link (auto-created at signup; this is
+  // a safety net for pre-existing users so the link is always available).
+  const myLink = await ensureAffiliateLink({
+    userId: user.id,
+    name: identity?.full_name ?? null,
+    client: supabase,
+  })
+
   // Admin always wins regardless of plan_tier_key (see app/dashboard/layout.tsx
   // for the full explanation -- same bug fixed there, admins with a purchased
   // plan were getting silently demoted to their plan's role).
@@ -198,6 +208,14 @@ export default async function DashboardHub({ searchParams }: { searchParams?: Pr
         </h1>
         <p className="text-white/30 text-sm">Your {role} intelligence command center</p>
       </div>
+
+      {/* ── Share & Earn ── */}
+      {myLink?.code && (
+        <CopyLink
+          value={affiliateLinkUrl(myLink.code)}
+          label="Share & Earn — Your Referral Link"
+        />
+      )}
 
       {/* ── System Status Bar ── */}
       <div className="flex flex-wrap gap-6 mb-4">

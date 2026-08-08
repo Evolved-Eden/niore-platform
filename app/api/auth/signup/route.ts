@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { createServerClient } from '@supabase/ssr'
 import { supabaseAdmin } from '@/lib/supabase/admin'
+import { ensureAffiliateLink } from '@/lib/affiliate'
 
 /**
  * POST /api/auth/signup
@@ -80,6 +81,19 @@ export async function POST(req: NextRequest) {
       }
     } catch (refErr) {
       console.error('Affiliate referral capture failed (non-fatal):', refErr)
+    }
+
+    // Every user gets their own affiliate/referral link (no approval needed).
+    // Fire-and-forget so a failure here never blocks sign-in.
+    try {
+      const newUserId = user.id || user
+      ensureAffiliateLink({
+        userId: newUserId,
+        name: user.email ? user.email.split('@')[0] : null,
+        client: supabaseAdmin,
+      }).catch(err => console.error('Affiliate link generation failed (non-fatal):', err))
+    } catch (affErr) {
+      console.error('Affiliate link generation failed (non-fatal):', affErr)
     }
 
     // Try to sign in immediately (in case auto-confirm is on)

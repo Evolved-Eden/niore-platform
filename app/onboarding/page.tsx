@@ -1,5 +1,5 @@
 'use client'
-import { Suspense, useEffect, useState } from 'react'
+import { Suspense, useEffect, useRef, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { loadStripe } from '@stripe/stripe-js'
@@ -14,7 +14,7 @@ import { toast } from 'sonner'
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
 
 // ── Types ─────────────────────────────────────────────────────
-type Step = 'payment' | 'zuri' | 'upload' | 'schedule' | 'done'
+type Step = 'payment' | 'zuri' | 'upload' | 'brand' | 'schedule' | 'done'
 
 interface SlotsByDate {
   [date: string]: string[]
@@ -319,6 +319,144 @@ function UploadStep({ onNext, userId }: { onNext: () => void; userId: string }) 
   )
 }
 
+// ── Brand Step ────────────────────────────────────────────────
+function BrandStep({ onNext, userId, onBrandData }: {
+  onNext: () => void
+  userId: string
+  onBrandData: (data: { logoPath: string | null; brandColors: Record<string, string>; tagline: string | null; description: string | null }) => void
+}) {
+  const supabase = createClient()
+  const [logoFile, setLogoFile] = useState<File | null>(null)
+  const [logoPath, setLogoPath] = useState('')
+  const [primaryColor, setPrimaryColor] = useState('#C6A664')
+  const [secondaryColor, setSecondaryColor] = useState('#0A0A0B')
+  const [accentColor, setAccentColor] = useState('#FFFFFF')
+  const [tagline, setTagline] = useState('')
+  const [description, setDescription] = useState('')
+  const [saving, setSaving] = useState(false)
+  const [uploading, setUploading] = useState(false)
+
+  async function handleLogoUpload(file: File) {
+    setUploading(true)
+    const ext = file.name.split('.').pop() || 'png'
+    const path = `branding/${userId}/logo_${Date.now()}.${ext}`
+    const { error } = await supabase.storage
+      .from('onboarding')
+      .upload(path, file)
+    if (!error) {
+      setLogoPath(path)
+      toast.success('Logo uploaded')
+    } else {
+      toast.error('Logo upload failed')
+      console.warn('Logo upload error:', error.message)
+    }
+    setUploading(false)
+  }
+
+  function handleContinue() {
+    setSaving(true)
+    onBrandData({
+      logoPath: logoPath || null,
+      brandColors: { primary: primaryColor, secondary: secondaryColor, accent: accentColor },
+      tagline: tagline || null,
+      description: description || null,
+    })
+    setSaving(false)
+    onNext()
+  }
+
+  return (
+    <div className="max-w-xl mx-auto">
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold mb-2">Brand & Company</h2>
+        <p className="text-white/40 text-sm">Share your brand identity so your intelligence reflects who you are. All optional.</p>
+      </div>
+
+      {/* Logo upload */}
+      <div className="mb-6">
+        <div className="text-xs text-white/30 tracking-widest uppercase mb-3">Logo</div>
+        <label className="block border-2 border-dashed border-white/10 rounded-sm p-6 text-center cursor-pointer hover:border-[#C6A664]/30 transition-colors">
+          <div className="text-white/20 text-sm mb-1">
+            {logoPath ? `Uploaded: ${logoPath.split('/').pop()}` : (uploading ? 'Uploading...' : 'Upload your logo (PNG, JPG, SVG)')}
+          </div>
+          <input
+            type="file"
+            className="hidden"
+            accept=".png,.jpg,.jpeg,.svg"
+            disabled={uploading}
+            onChange={e => {
+              const f = e.target.files?.[0]
+              if (f) handleLogoUpload(f)
+            }}
+          />
+        </label>
+      </div>
+
+      {/* Brand colors */}
+      <div className="mb-6">
+        <div className="text-xs text-white/30 tracking-widest uppercase mb-3">Brand Colors</div>
+        <div className="grid grid-cols-3 gap-4">
+          {[
+            { label: 'Primary', value: primaryColor, set: setPrimaryColor },
+            { label: 'Secondary', value: secondaryColor, set: setSecondaryColor },
+            { label: 'Accent', value: accentColor, set: setAccentColor },
+          ].map(c => (
+            <div key={c.label}>
+              <label className="block text-xs text-white/30 mb-1.5">{c.label}</label>
+              <input
+                type="color"
+                value={c.value}
+                onChange={e => c.set(e.target.value)}
+                className="w-full h-10 bg-white/[0.04] border border-white/10 rounded-sm cursor-pointer"
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Company info */}
+      <div className="space-y-4 mb-6">
+        <div>
+          <label className="block text-xs text-white/30 mb-1.5 tracking-wider uppercase">Tagline</label>
+          <input
+            type="text"
+            value={tagline}
+            onChange={e => setTagline(e.target.value)}
+            placeholder="A short tagline for your brand"
+            className="w-full bg-white/[0.04] border border-white/10 rounded-sm px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-[#C6A664]/40 transition-colors"
+          />
+        </div>
+        <div>
+          <label className="block text-xs text-white/30 mb-1.5 tracking-wider uppercase">Company Description</label>
+          <textarea
+            value={description}
+            onChange={e => setDescription(e.target.value)}
+            rows={3}
+            placeholder="A few sentences describing your company"
+            className="w-full bg-white/[0.04] border border-white/10 rounded-sm px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-[#C6A664]/40 transition-colors resize-none"
+          />
+        </div>
+      </div>
+
+      <div className="flex gap-3">
+        <button
+          onClick={onNext}
+          className="flex-1 py-3 border border-white/10 text-white/40 text-sm rounded-sm hover:text-white hover:border-white/20 transition-colors"
+        >
+          Skip for now
+        </button>
+        <button
+          onClick={handleContinue}
+          disabled={saving}
+          className="flex-1 py-3 bg-[#C6A664] text-black font-bold text-sm rounded-sm hover:bg-white transition-colors disabled:opacity-50"
+        >
+          {saving ? 'Saving...' : 'Continue →'}
+        </button>
+      </div>
+    </div>
+  )
+}
+
 // ── Schedule Step ─────────────────────────────────────────────
 function ScheduleStep({ onNext, userId, userName }: {
   onNext: () => void
@@ -499,6 +637,27 @@ function OnboardingContent() {
   const [user, setUser] = useState<{ id: string; email: string; name: string } | null>(null)
   const [tier, setTier] = useState<string>('')
   const [suite, setSuite] = useState<string>('')
+  const [brandData, setBrandData] = useState<{ logoPath: string | null; brandColors: Record<string, string>; tagline: string | null; description: string | null } | null>(null)
+  const completionFired = useRef(false)
+
+  // Fire the onboarding completion hook exactly once when the user reaches the
+  // done step — the "catch-all" that aligns org/client records and triggers
+  // downstream workflows even if payment/intake didn't connect them.
+  useEffect(() => {
+    if (step === 'done' && user && !completionFired.current) {
+      completionFired.current = true
+      fetch('/api/onboarding/complete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          logoPath: brandData?.logoPath ?? null,
+          brandColors: brandData?.brandColors ?? null,
+          tagline: brandData?.tagline ?? null,
+          description: brandData?.description ?? null,
+        }),
+      }).catch(e => console.warn('Onboarding complete hook failed:', e))
+    }
+  }, [step, user, brandData])
 
   useEffect(() => {
     let cancelled = false
@@ -571,6 +730,7 @@ function OnboardingContent() {
     { id: 'payment',  label: 'Payment'  },
     { id: 'zuri',     label: 'Meet Zuri' },
     { id: 'upload',   label: 'Upload'   },
+    { id: 'brand',    label: 'Brand'    },
     { id: 'schedule', label: 'Schedule' },
     { id: 'done',     label: 'Done'     },
   ]
@@ -671,7 +831,11 @@ function OnboardingContent() {
         )}
 
         {step === 'upload' && user && (
-          <UploadStep userId={user.id} onNext={() => setStep('schedule')} />
+          <UploadStep userId={user.id} onNext={() => setStep('brand')} />
+        )}
+
+        {step === 'brand' && user && (
+          <BrandStep userId={user.id} onBrandData={setBrandData} onNext={() => setStep('schedule')} />
         )}
 
         {step === 'schedule' && user && (

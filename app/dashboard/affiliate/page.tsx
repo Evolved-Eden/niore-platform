@@ -2,6 +2,8 @@ import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import EssenceBoard from '@/components/EssenceBoard'
 import UpgradePanel from '@/components/UpgradePanel'
+import CopyLink from '@/components/CopyLink'
+import { ensureAffiliateLink, affiliateLinkUrl } from '@/lib/affiliate'
 
 export default async function AffiliateDashboard() {
   const supabase = await createClient()
@@ -13,6 +15,14 @@ export default async function AffiliateDashboard() {
     .select('full_name, role')
     .eq('id', user.id)
     .single()
+
+  // Ensure the user has a referral link (auto-created on signup; this is a
+  // safety net for users who signed up before auto-generation shipped).
+  const myLink = await ensureAffiliateLink({
+    userId: user.id,
+    name: profile?.full_name ?? user.email?.split('@')[0] ?? null,
+    client: supabase,
+  })
 
   const { data: myLinks } = await supabase
     .from('affiliate_links')
@@ -49,6 +59,13 @@ export default async function AffiliateDashboard() {
         </h1>
         <p className="text-white/30 text-sm">Welcome back, {name}</p>
       </div>
+
+      {myLink?.code && (
+        <CopyLink
+          value={affiliateLinkUrl(myLink.code)}
+          label="Your Referral Link"
+        />
+      )}
 
       <div className="mb-8">
         <div className="text-xs text-[#C9974A] tracking-widest uppercase font-medium mb-3">

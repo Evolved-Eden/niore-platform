@@ -3,21 +3,49 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { getDefaultSpecialties } from '@/lib/specialties'
 import Link from 'next/link'
 
-type Step = 'welcome' | 'personal' | 'role' | 'results' | 'complete'
+type Step = 'welcome' | 'personal' | 'business' | 'role' | 'results' | 'complete'
 
 type IntakeData = {
-  name: string
+  // personal
+  firstName: string
+  lastName: string
+  name: string // kept as computed "first last" for downstream compat
   email: string
+  website: string
+  businessName: string
   dob: string
   birthTime: string
   birthLocation: string
   birthTimezone: string
+  // role
   sellTo: string
   roleType: string
   personalType: string
   offerType: string
+  // business step
+  businessStage: string
+  industries: string[]
+  salesStyle: string
+  automationLevel: string
+  growthSpeed: string
+  brandPersonality: string
+  brandDescription: string
+  audienceCurrentSize: string
+  audienceDesiredSize: string
+  teamCurrentSize: string
+  teamDesiredSize: string
+  revenueGoals: string
+  vision1Year: string
+  vision3Year: string
+  vision5Year: string
+  vision10Year: string
+  vision25Year: string
+  techComfort: string
+  purpose: string
+  mission: string
 }
 
 type EEProfile = {
@@ -107,8 +135,12 @@ export default function IntakePage() {
   }, [])
 
   const [data, setData] = useState<IntakeData>({
+    firstName: '',
+    lastName: '',
     name: '',
     email: '',
+    website: '',
+    businessName: '',
     dob: '',
     birthTime: '',
     birthLocation: '',
@@ -118,10 +150,42 @@ export default function IntakePage() {
     roleType: '',
     personalType: '',
     offerType: '',
+    businessStage: '',
+    industries: [],
+    salesStyle: '',
+    automationLevel: '',
+    growthSpeed: '',
+    brandPersonality: '',
+    brandDescription: '',
+    audienceCurrentSize: '',
+    audienceDesiredSize: '',
+    teamCurrentSize: '',
+    teamDesiredSize: '',
+    revenueGoals: '',
+    vision1Year: '',
+    vision3Year: '',
+    vision5Year: '',
+    vision10Year: '',
+    vision25Year: '',
+    techComfort: '',
+    purpose: '',
+    mission: '',
   })
+
+  // Derived full name (kept on `data.name` so downstream API calls are untouched)
+  const fullName = [data.firstName, data.lastName].filter(Boolean).join(' ').trim()
 
   function update(field: keyof IntakeData, value: string) {
     setData(prev => ({ ...prev, [field]: value }))
+  }
+
+  function toggleIndustry(key: string) {
+    setData(prev => ({
+      ...prev,
+      industries: prev.industries.includes(key)
+        ? prev.industries.filter(k => k !== key)
+        : [...prev.industries, key],
+    }))
   }
 
   // ── Save intake section to DB (if authenticated) ──
@@ -147,22 +211,57 @@ export default function IntakePage() {
     }
   }
 
-  // ── Move to role section with save ──
-  async function goToRole() {
+  // ── Move to business section with save ──
+  async function goToBusiness() {
     await saveSection('personal', {
-      name: data.name,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      name: fullName || data.name,
       email: data.email,
+      website: data.website,
+      businessName: data.businessName,
       dob: data.dob,
       birthTime: data.birthTime,
       birthLocation: data.birthLocation,
       birthTimezone: data.birthTimezone,
     })
+    setStep('business')
+  }
+
+  // ── Move to role section with save ──
+  async function goToRole() {
+    await saveSection('business', {
+      businessStage: data.businessStage,
+      industries: data.industries,
+      salesStyle: data.salesStyle,
+      automationLevel: data.automationLevel,
+      growthSpeed: data.growthSpeed,
+      brandPersonality: data.brandPersonality,
+      brandDescription: data.brandDescription,
+      audienceCurrentSize: data.audienceCurrentSize,
+      audienceDesiredSize: data.audienceDesiredSize,
+      teamCurrentSize: data.teamCurrentSize,
+      teamDesiredSize: data.teamDesiredSize,
+      revenueGoals: data.revenueGoals,
+      vision1Year: data.vision1Year,
+      vision3Year: data.vision3Year,
+      vision5Year: data.vision5Year,
+      vision10Year: data.vision10Year,
+      vision25Year: data.vision25Year,
+      techComfort: data.techComfort,
+      purpose: data.purpose,
+      mission: data.mission,
+    })
     setStep('role')
   }
 
   async function calculateProfile() {
-    if (!data.name || !data.dob) {
-      setError('Name and date of birth are required')
+    if (!fullName && !data.name) {
+      setError('First and last name are required')
+      return
+    }
+    if (!data.dob) {
+      setError('Date of birth is required')
       return
     }
     setLoading(true)
@@ -180,7 +279,10 @@ export default function IntakePage() {
       const res = await fetch('/api/intake/calculate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          ...data,
+          name: fullName || data.name,
+        }),
       })
       const result = await res.json()
       if (!res.ok || result.error) {
@@ -232,14 +334,15 @@ export default function IntakePage() {
       }
     }
 
-    const params = new URLSearchParams({ name: data.name, path, archetype: profile.archetype.primary, energy: profile.rhythm.energyType, mind: profile.essence.mindArchitecture })
+    const params = new URLSearchParams({ name: fullName || data.name, path, archetype: profile.archetype.primary, energy: profile.rhythm.energyType, mind: profile.essence.mindArchitecture })
     return { path: `/demo?${params.toString()}`, label: path }
   }
 
   const progress = step === 'welcome' ? 0
-    : step === 'personal' ? 25
-    : step === 'role' ? 50
-    : step === 'results' ? 75
+    : step === 'personal' ? 20
+    : step === 'business' ? 40
+    : step === 'role' ? 60
+    : step === 'results' ? 80
     : 100
 
   return (
@@ -309,24 +412,59 @@ export default function IntakePage() {
             </p>
 
             <div className="space-y-5">
-              <div>
-                <label className="block text-xs text-white/30 mb-1.5 tracking-wider uppercase">Full Name</label>
-                <input
-                  type="text"
-                  value={data.name}
-                  onChange={e => update('name', e.target.value)}
-                  placeholder="Your name"
-                  className="w-full bg-white/[0.04] border border-white/10 rounded-sm px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-[#C6A664]/40 transition-all"
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs text-white/30 mb-1.5 tracking-wider uppercase">First Name</label>
+                  <input
+                    type="text"
+                    value={data.firstName}
+                    onChange={e => update('firstName', e.target.value)}
+                    placeholder="Jane"
+                    className="w-full bg-white/[0.04] border border-white/10 rounded-sm px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-[#C6A664]/40 transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-white/30 mb-1.5 tracking-wider uppercase">Last Name</label>
+                  <input
+                    type="text"
+                    value={data.lastName}
+                    onChange={e => update('lastName', e.target.value)}
+                    placeholder="Doe"
+                    className="w-full bg-white/[0.04] border border-white/10 rounded-sm px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-[#C6A664]/40 transition-all"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs text-white/30 mb-1.5 tracking-wider uppercase">Email</label>
+                  <input
+                    type="email"
+                    value={data.email}
+                    onChange={e => update('email', e.target.value)}
+                    placeholder="you@example.com"
+                    className="w-full bg-white/[0.04] border border-white/10 rounded-sm px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-[#C6A664]/40 transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-white/30 mb-1.5 tracking-wider uppercase">Website</label>
+                  <input
+                    type="text"
+                    value={data.website}
+                    onChange={e => update('website', e.target.value)}
+                    placeholder="yourwebsite.com"
+                    className="w-full bg-white/[0.04] border border-white/10 rounded-sm px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-[#C6A664]/40 transition-all"
+                  />
+                </div>
               </div>
 
               <div>
-                <label className="block text-xs text-white/30 mb-1.5 tracking-wider uppercase">Email</label>
+                <label className="block text-xs text-white/30 mb-1.5 tracking-wider uppercase">Business Name</label>
                 <input
-                  type="email"
-                  value={data.email}
-                  onChange={e => update('email', e.target.value)}
-                  placeholder="you@example.com"
+                  type="text"
+                  value={data.businessName}
+                  onChange={e => update('businessName', e.target.value)}
+                  placeholder="Your business name (optional)"
                   className="w-full bg-white/[0.04] border border-white/10 rounded-sm px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-[#C6A664]/40 transition-all"
                 />
               </div>
@@ -386,9 +524,324 @@ export default function IntakePage() {
                   ← Back
                 </button>
                 <button
-                  onClick={goToRole}
-                  disabled={!data.name || !data.dob}
+                  onClick={goToBusiness}
+                  disabled={!data.firstName || !data.lastName || !data.dob}
                   className="px-6 py-3 bg-[#C6A664] text-black text-sm font-bold rounded-sm hover:bg-white transition-all disabled:opacity-40"
+                >
+                  Continue →
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── BUSINESS PROFILE ── */}
+        {step === 'business' && (
+          <div className="animate-fade-in">
+            <h2 className="font-display text-2xl font-bold mb-1">Your Business</h2>
+            <p className="text-white/40 text-sm mb-8">
+              Help us calibrate your ecosystem to your business. All fields are optional —
+              skip anything you prefer not to share.
+            </p>
+
+            <div className="space-y-8">
+              {/* Business stage */}
+              <div>
+                <label className="block text-sm text-white/70 mb-3">What stage is your business in?</label>
+                <div className="grid grid-cols-2 gap-3">
+                  {['Idea/Validating', 'Launching', 'Growing', 'Scaling', 'Established', 'Pivoting'].map(opt => (
+                    <button
+                      key={opt}
+                      onClick={() => update('businessStage', opt)}
+                      className={`p-4 rounded-sm border text-sm text-left transition-all ${
+                        data.businessStage === opt
+                          ? 'border-[#C6A664] bg-[#C6A664]/10 text-[#C6A664]'
+                          : 'border-white/10 bg-white/[0.03] text-white/60 hover:border-white/20 hover:bg-white/[0.06]'
+                      }`}
+                    >
+                      {opt}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Industries served */}
+              <div>
+                <label className="block text-sm text-white/70 mb-3">What industries do you serve? (select all that apply)</label>
+                <div className="flex flex-wrap gap-2">
+                  {getDefaultSpecialties().map(s => (
+                    <button
+                      key={s.key}
+                      onClick={() => toggleIndustry(s.key)}
+                      className={`px-4 py-2.5 rounded-sm border text-sm transition-all ${
+                        data.industries.includes(s.key)
+                          ? 'border-[#C6A664] bg-[#C6A664]/10 text-[#C6A664]'
+                          : 'border-white/10 bg-white/[0.03] text-white/60 hover:border-white/20 hover:bg-white/[0.06]'
+                      }`}
+                    >
+                      {s.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs text-white/30 mb-1.5 tracking-wider uppercase">Sales Style</label>
+                  <select
+                    value={data.salesStyle}
+                    onChange={e => update('salesStyle', e.target.value)}
+                    className="w-full bg-white/[0.04] border border-white/10 rounded-sm px-4 py-3 text-sm text-white focus:outline-none focus:border-[#C6A664]/40 transition-all"
+                  >
+                    <option value="" className="bg-[#1A1A1A]">Select...</option>
+                    <option value="Relationship/Consultative" className="bg-[#1A1A1A]">Relationship / Consultative</option>
+                    <option value="Direct/High-Pressure" className="bg-[#1A1A1A]">Direct / High-Pressure</option>
+                    <option value="Content/Marketing-Led" className="bg-[#1A1A1A]">Content / Marketing-Led</option>
+                    <option value="Partnership/Referral" className="bg-[#1A1A1A]">Partnership / Referral</option>
+                    <option value="Other" className="bg-[#1A1A1A]">Other</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs text-white/30 mb-1.5 tracking-wider uppercase">Automation Level Desired</label>
+                  <select
+                    value={data.automationLevel}
+                    onChange={e => update('automationLevel', e.target.value)}
+                    className="w-full bg-white/[0.04] border border-white/10 rounded-sm px-4 py-3 text-sm text-white focus:outline-none focus:border-[#C6A664]/40 transition-all"
+                  >
+                    <option value="" className="bg-[#1A1A1A]">Select...</option>
+                    <option value="Fully Manual" className="bg-[#1A1A1A]">Fully Manual</option>
+                    <option value="Some Tools" className="bg-[#1A1A1A]">Some Tools</option>
+                    <option value="Light Automation" className="bg-[#1A1A1A]">Light Automation</option>
+                    <option value="Heavy Automation" className="bg-[#1A1A1A]">Heavy Automation</option>
+                    <option value="Fully Autonomous" className="bg-[#1A1A1A]">Fully Autonomous</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs text-white/30 mb-1.5 tracking-wider uppercase">Growth Speed</label>
+                  <select
+                    value={data.growthSpeed}
+                    onChange={e => update('growthSpeed', e.target.value)}
+                    className="w-full bg-white/[0.04] border border-white/10 rounded-sm px-4 py-3 text-sm text-white focus:outline-none focus:border-[#C6A664]/40 transition-all"
+                  >
+                    <option value="" className="bg-[#1A1A1A]">Select...</option>
+                    <option value="Steady" className="bg-[#1A1A1A]">Steady</option>
+                    <option value="Moderate" className="bg-[#1A1A1A]">Moderate</option>
+                    <option value="Fast" className="bg-[#1A1A1A]">Fast</option>
+                    <option value="Aggressive/Exponential" className="bg-[#1A1A1A]">Aggressive / Exponential</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs text-white/30 mb-1.5 tracking-wider uppercase">Brand Personality</label>
+                  <select
+                    value={data.brandPersonality}
+                    onChange={e => update('brandPersonality', e.target.value)}
+                    className="w-full bg-white/[0.04] border border-white/10 rounded-sm px-4 py-3 text-sm text-white focus:outline-none focus:border-[#C6A664]/40 transition-all"
+                  >
+                    <option value="" className="bg-[#1A1A1A]">Select...</option>
+                    <option value="Luxurious/Premium" className="bg-[#1A1A1A]">Luxurious / Premium</option>
+                    <option value="Professional/Trustworthy" className="bg-[#1A1A1A]">Professional / Trustworthy</option>
+                    <option value="Playful/Creative" className="bg-[#1A1A1A]">Playful / Creative</option>
+                    <option value="Bold/Disruptive" className="bg-[#1A1A1A]">Bold / Disruptive</option>
+                    <option value="Calm/Wellness" className="bg-[#1A1A1A]">Calm / Wellness</option>
+                    <option value="Innovative/Tech-Forward" className="bg-[#1A1A1A]">Innovative / Tech-Forward</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs text-white/30 mb-1.5 tracking-wider uppercase">Describe Your Brand</label>
+                <textarea
+                  value={data.brandDescription}
+                  onChange={e => update('brandDescription', e.target.value)}
+                  rows={3}
+                  placeholder="A few sentences about what your brand stands for..."
+                  className="w-full bg-white/[0.04] border border-white/10 rounded-sm px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-[#C6A664]/40 transition-all resize-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs text-white/30 mb-1.5 tracking-wider uppercase">Audience — Current Size</label>
+                  <select
+                    value={data.audienceCurrentSize}
+                    onChange={e => update('audienceCurrentSize', e.target.value)}
+                    className="w-full bg-white/[0.04] border border-white/10 rounded-sm px-4 py-3 text-sm text-white focus:outline-none focus:border-[#C6A664]/40 transition-all"
+                  >
+                    <option value="" className="bg-[#1A1A1A]">Select...</option>
+                    <option value="<100" className="bg-[#1A1A1A]">&lt; 100</option>
+                    <option value="100–1K" className="bg-[#1A1A1A]">100 – 1K</option>
+                    <option value="1K–10K" className="bg-[#1A1A1A]">1K – 10K</option>
+                    <option value="10K–100K" className="bg-[#1A1A1A]">10K – 100K</option>
+                    <option value="100K+" className="bg-[#1A1A1A]">100K+</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs text-white/30 mb-1.5 tracking-wider uppercase">Audience — Desired Size</label>
+                  <select
+                    value={data.audienceDesiredSize}
+                    onChange={e => update('audienceDesiredSize', e.target.value)}
+                    className="w-full bg-white/[0.04] border border-white/10 rounded-sm px-4 py-3 text-sm text-white focus:outline-none focus:border-[#C6A664]/40 transition-all"
+                  >
+                    <option value="" className="bg-[#1A1A1A]">Select...</option>
+                    <option value="<100" className="bg-[#1A1A1A]">&lt; 100</option>
+                    <option value="100–1K" className="bg-[#1A1A1A]">100 – 1K</option>
+                    <option value="1K–10K" className="bg-[#1A1A1A]">1K – 10K</option>
+                    <option value="10K–100K" className="bg-[#1A1A1A]">10K – 100K</option>
+                    <option value="100K+" className="bg-[#1A1A1A]">100K+</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs text-white/30 mb-1.5 tracking-wider uppercase">Team — Current Size</label>
+                  <select
+                    value={data.teamCurrentSize}
+                    onChange={e => update('teamCurrentSize', e.target.value)}
+                    className="w-full bg-white/[0.04] border border-white/10 rounded-sm px-4 py-3 text-sm text-white focus:outline-none focus:border-[#C6A664]/40 transition-all"
+                  >
+                    <option value="" className="bg-[#1A1A1A]">Select...</option>
+                    <option value="Just Me (Solo)" className="bg-[#1A1A1A]">Just Me (Solo)</option>
+                    <option value="2–5" className="bg-[#1A1A1A]">2 – 5</option>
+                    <option value="6–20" className="bg-[#1A1A1A]">6 – 20</option>
+                    <option value="21–50" className="bg-[#1A1A1A]">21 – 50</option>
+                    <option value="50+" className="bg-[#1A1A1A]">50+</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs text-white/30 mb-1.5 tracking-wider uppercase">Team — Desired Size</label>
+                  <select
+                    value={data.teamDesiredSize}
+                    onChange={e => update('teamDesiredSize', e.target.value)}
+                    className="w-full bg-white/[0.04] border border-white/10 rounded-sm px-4 py-3 text-sm text-white focus:outline-none focus:border-[#C6A664]/40 transition-all"
+                  >
+                    <option value="" className="bg-[#1A1A1A]">Select...</option>
+                    <option value="Just Me (Solo)" className="bg-[#1A1A1A]">Just Me (Solo)</option>
+                    <option value="2–5" className="bg-[#1A1A1A]">2 – 5</option>
+                    <option value="6–20" className="bg-[#1A1A1A]">6 – 20</option>
+                    <option value="21–50" className="bg-[#1A1A1A]">21 – 50</option>
+                    <option value="50+" className="bg-[#1A1A1A]">50+</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs text-white/30 mb-1.5 tracking-wider uppercase">Revenue Goals</label>
+                  <select
+                    value={data.revenueGoals}
+                    onChange={e => update('revenueGoals', e.target.value)}
+                    className="w-full bg-white/[0.04] border border-white/10 rounded-sm px-4 py-3 text-sm text-white focus:outline-none focus:border-[#C6A664]/40 transition-all"
+                  >
+                    <option value="" className="bg-[#1A1A1A]">Select...</option>
+                    <option value="Pre-revenue" className="bg-[#1A1A1A]">Pre-revenue</option>
+                    <option value="<$10K/mo" className="bg-[#1A1A1A]">&lt; $10K / mo</option>
+                    <option value="$10K–$50K/mo" className="bg-[#1A1A1A]">$10K – $50K / mo</option>
+                    <option value="$50K–$200K/mo" className="bg-[#1A1A1A]">$50K – $200K / mo</option>
+                    <option value="$200K+/mo" className="bg-[#1A1A1A]">$200K+ / mo</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs text-white/30 mb-1.5 tracking-wider uppercase">Tech Comfort</label>
+                  <select
+                    value={data.techComfort}
+                    onChange={e => update('techComfort', e.target.value)}
+                    className="w-full bg-white/[0.04] border border-white/10 rounded-sm px-4 py-3 text-sm text-white focus:outline-none focus:border-[#C6A664]/40 transition-all"
+                  >
+                    <option value="" className="bg-[#1A1A1A]">Select...</option>
+                    <option value="Beginner" className="bg-[#1A1A1A]">Beginner</option>
+                    <option value="Comfortable" className="bg-[#1A1A1A]">Comfortable</option>
+                    <option value="Advanced" className="bg-[#1A1A1A]">Advanced</option>
+                    <option value="Expert/Developer" className="bg-[#1A1A1A]">Expert / Developer</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Long-term vision */}
+              <div className="glass rounded-sm p-5 border border-white/[0.06] space-y-4">
+                <div className="text-xs text-white/30 tracking-widest uppercase">Long-Term Vision</div>
+                {[
+                  { key: 'vision1Year', label: '1 Year' },
+                  { key: 'vision3Year', label: '3 Years' },
+                  { key: 'vision5Year', label: '5 Years' },
+                  { key: 'vision10Year', label: '10 Years' },
+                  { key: 'vision25Year', label: '25 Years' },
+                ].map(v => (
+                  <div key={v.key}>
+                    <label className="block text-xs text-white/30 mb-1.5 tracking-wider uppercase">{v.label}</label>
+                    <textarea
+                      value={(data as any)[v.key] as string}
+                      onChange={e => update(v.key as keyof IntakeData, e.target.value)}
+                      rows={2}
+                      placeholder={`Where is your business in ${v.label.toLowerCase()}?`}
+                      className="w-full bg-white/[0.04] border border-white/10 rounded-sm px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-[#C6A664]/40 transition-all resize-none"
+                    />
+                  </div>
+                ))}
+              </div>
+
+              <div>
+                <label className="block text-xs text-white/30 mb-1.5 tracking-wider uppercase">What offers do you create?</label>
+                <div className="grid grid-cols-2 gap-3">
+                  {[
+                    { value: 'services', label: 'Services / Consulting' },
+                    { value: 'products', label: 'Digital Products' },
+                    { value: 'content', label: 'Content / Media' },
+                    { value: 'courses', label: 'Courses / Education' },
+                    { value: 'subscriptions', label: 'Subscriptions / Memberships' },
+                    { value: 'multiple', label: 'Multiple offers' },
+                    { value: 'none', label: 'Nothing yet' },
+                  ].map(opt => (
+                    <button
+                      key={opt.value}
+                      onClick={() => update('offerType', opt.value)}
+                      className={`p-4 rounded-sm border text-sm text-left transition-all ${
+                        data.offerType === opt.value
+                          ? 'border-[#C6A664] bg-[#C6A664]/10 text-[#C6A664]'
+                          : 'border-white/10 bg-white/[0.03] text-white/60 hover:border-white/20 hover:bg-white/[0.06]'
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs text-white/30 mb-1.5 tracking-wider uppercase">Your Purpose</label>
+                <textarea
+                  value={data.purpose}
+                  onChange={e => update('purpose', e.target.value)}
+                  rows={2}
+                  placeholder="Why does your business exist?"
+                  className="w-full bg-white/[0.04] border border-white/10 rounded-sm px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-[#C6A664]/40 transition-all resize-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs text-white/30 mb-1.5 tracking-wider uppercase">Your Mission</label>
+                <textarea
+                  value={data.mission}
+                  onChange={e => update('mission', e.target.value)}
+                  rows={2}
+                  placeholder="What is your mission?"
+                  className="w-full bg-white/[0.04] border border-white/10 rounded-sm px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-[#C6A664]/40 transition-all resize-none"
+                />
+              </div>
+
+              <div className="flex items-center justify-between pt-4 border-t border-white/10">
+                <button
+                  onClick={() => setStep('personal')}
+                  className="text-sm text-white/30 hover:text-white/60 transition-colors"
+                >
+                  ← Back
+                </button>
+                <button
+                  onClick={goToRole}
+                  className="px-6 py-3 bg-[#C6A664] text-black text-sm font-bold rounded-sm hover:bg-white transition-all"
                 >
                   Continue →
                 </button>
@@ -456,34 +909,6 @@ export default function IntakePage() {
                 </div>
               </div>
 
-              {/* What do you sell */}
-              <div>
-                <label className="block text-sm text-white/70 mb-3">What type of offers do you create?</label>
-                <div className="grid grid-cols-2 gap-3">
-                  {[
-                    { value: 'services', label: 'Services / Consulting' },
-                    { value: 'products', label: 'Digital Products' },
-                    { value: 'content', label: 'Content / Media' },
-                    { value: 'courses', label: 'Courses / Education' },
-                    { value: 'subscriptions', label: 'Subscriptions / Memberships' },
-                    { value: 'multiple', label: 'Multiple offers' },
-                    { value: 'none', label: 'Nothing yet' },
-                  ].map(opt => (
-                    <button
-                      key={opt.value}
-                      onClick={() => update('offerType', opt.value)}
-                      className={`p-4 rounded-sm border text-sm text-left transition-all ${
-                        data.offerType === opt.value
-                          ? 'border-[#C6A664] bg-[#C6A664]/10 text-[#C6A664]'
-                          : 'border-white/10 bg-white/[0.03] text-white/60 hover:border-white/20 hover:bg-white/[0.06]'
-                      }`}
-                    >
-                      {opt.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
               {/* Affiliate interest */}
               <div>
                 <label className="block text-sm text-white/70 mb-3">Are you interested in earning commissions by referring others to the ecosystem?</label>
@@ -510,7 +935,7 @@ export default function IntakePage() {
 
               <div className="flex items-center justify-between pt-4 border-t border-white/10">
                 <button
-                  onClick={() => setStep('personal')}
+                  onClick={() => setStep('business')}
                   className="text-sm text-white/30 hover:text-white/60 transition-colors"
                 >
                   ← Back
@@ -539,10 +964,10 @@ export default function IntakePage() {
             <div className="text-center mb-8">
               <div className="w-16 h-16 rounded-full bg-[#C6A664]/10 border-2 border-[#C6A664]/30 flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl font-bold text-[#C6A664]">
-                  {data.name.charAt(0).toUpperCase()}
+                  {(fullName || data.name).charAt(0).toUpperCase()}
                 </span>
               </div>
-              <h1 className="font-display text-2xl font-bold mb-1">{data.name}</h1>
+              <h1 className="font-display text-2xl font-bold mb-1">{fullName || data.name}</h1>
               <p className="text-white/40 text-sm">{profile.rhythm.energyType} &bull; {profile.essence.mindArchitecture}</p>
             </div>
 

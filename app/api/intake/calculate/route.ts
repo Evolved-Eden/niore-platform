@@ -329,9 +329,11 @@ function synthesizeIntakeArchetype(
 
 export async function POST(req: NextRequest) {
   try {
-    const { name, email, dob, birthTime, birthLocation, birthTimezone, sellTo, roleType, offerType, personalType } = await req.json()
+    const { name, firstName, lastName, website, businessName, email, dob, birthTime, birthLocation, birthTimezone, sellTo, roleType, offerType, personalType } = await req.json()
 
-    if (!name || !dob) {
+    const fullName = [firstName, lastName].filter(Boolean).join(' ').trim() || name
+
+    if (!fullName || !dob) {
       return NextResponse.json({ error: 'Name and date of birth are required' }, { status: 400 })
     }
 
@@ -516,8 +518,12 @@ export async function POST(req: NextRequest) {
         sections: {
           ...((existingMeta.intake as any)?.sections || {}),
           personal: {
-            name: name || '',
+            name: fullName || name || '',
+            firstName: firstName || '',
+            lastName: lastName || '',
             email: email || '',
+            website: website || '',
+            businessName: businessName || '',
             dob: dob || '',
             birthTime: birthTime || '',
             birthLocation: birthLocation || '',
@@ -547,8 +553,10 @@ export async function POST(req: NextRequest) {
         .from('clients')
         .upsert({
           id: user.id,
-          full_name: name || existing?.full_name || user.email?.split('@')[0] || 'User',
+          full_name: fullName || existing?.full_name || user.email?.split('@')[0] || 'User',
           email: email || undefined,
+          ...(website ? { website } : {}),
+          ...(businessName ? { business_name: businessName } : {}),
           metadata: { ...existingMeta, intake },
           updated_at: new Date().toISOString(),
         } as any, { onConflict: 'id' })
@@ -588,7 +596,7 @@ export async function POST(req: NextRequest) {
       let multiLensResult: any = null
       try {
         const { calculateFullProfile } = await import('@/lib/profile')
-        const nameParts = (name || '').split(' ')
+        const nameParts = (fullName || name || '').split(' ')
         multiLensResult = await calculateFullProfile({
           firstName: nameParts[0] || '',
           middleName: nameParts.length > 2 ? nameParts.slice(1, -1).join(' ') : undefined,

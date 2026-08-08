@@ -51,7 +51,7 @@ const NAV_SECTION: Record<string, number> = {
   '── System ──': 4,
 }
 
-export default function SidebarNav({ nav, color }: { nav: NavItem[]; color: string }) {
+export default function SidebarNav({ nav, color, collapsed }: { nav: NavItem[]; color: string; collapsed?: boolean }) {
   const pathname = usePathname()
   const router = useRouter()
   const isFirstRender = useRef(true)

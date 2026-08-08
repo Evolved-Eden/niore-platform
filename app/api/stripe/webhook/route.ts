@@ -614,6 +614,11 @@ export async function POST(req: Request) {
     const org = await getOrCreateOrg(userId, userData?.full_name || email.split('@')[0], tier)
     if (org) {
       await upsertClientTwin(userId, org.id)
+      // Link client row to its org so purchase→client→org is traceable
+      await supabaseAdmin
+        .from("clients")
+        .update({ organization_id: org.id })
+        .eq("id", userId)
       await createZuriAgent(userId, org.id)
 
       // Core Essintelligence build: buying a membership tier means the

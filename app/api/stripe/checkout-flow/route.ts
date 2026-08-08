@@ -116,6 +116,7 @@ export async function POST(req: NextRequest) {
     // Build metadata for webhook
     const metadata: Record<string, string> = {}
     metadata.base_tier = allTiers[0] || ''
+    metadata.tier = allTiers[0] || ''
     if (allTiers.length > 1) metadata.additional_tiers = JSON.stringify(allTiers.slice(1))
     if (path) metadata.path = path
     if (user?.id) metadata.user_id = user.id

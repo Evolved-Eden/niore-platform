@@ -64,6 +64,8 @@ const NAV: Record<UserRole, { label: string; href: string }[]> = {
     { label: 'Essence Intel',  href: '/dashboard/admin/essence' },
     { label: 'My Twin',        href: '/dashboard/admin/twin' },
     { label: 'Chat / Prompt',  href: '/dashboard/chat' },
+    { label: 'Vault',          href: '/dashboard/client/vault' },
+    { label: 'Journal',        href: '/dashboard/client/journal' },
     { label: '── System ──',   href: '#' },
     { label: 'Users',          href: '/dashboard/admin/users' },
     { label: 'Clients',        href: '/dashboard/admin/clients' },
